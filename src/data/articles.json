@@ -1,0 +1,304 @@
+[
+  {
+    "id": "644791571443562439",
+    "title": "world-robot-senses-idw1664 視覚と嗅覚が1.5mmに合体！ハエの能力を持つ「極小センサー」がロボットの常識を変える",
+    "content": "<blockquote class=\"twitter-tweet\" data-align=\"center\"><p dir=\"ltr\" lang=\"en\">Court allows Louisiana law requiring Ten Commandments in schools to take effect <a href=\"https://t.co/pSyO6uV8em\">https://t.co/pSyO6uV8em</a> <a href=\"https://t.co/pSyO6uV8em\">https://t.co/pSyO6uV8em</a></p>— Reuters (@Reuters) <a href=\"https://twitter.com/Reuters/status/2025106982466625884?ref_src=twsrc%5Etfw\">February 21, 2026</a></blockquote> <script async=\"\" charset=\"utf-8\" src=\"https://platform.twitter.com/widgets.js\"></script>\n\n<div style=\"margin-bottom: 20px; text-align: center;\"><br /></div>SF映画のような話ですが、ハエの能力をコピーした極小センサーが誕生しました。わずか1.5ミリのチップに「パノラマの視界」と「危険な匂いをかぎ分ける鼻」の両方が詰め込まれています。この技術があれば、災害現場など人間が入れない場所で活動するロボットが、劇的に進化するかもしれません。<br /><br />🪰 1.5ミリの空間に「1000個の目」<br /><br />昆虫の「ショウジョウバエ」をヒントにした、画期的なセンサーが発表されました。Nature Communicationsに掲載された論文によると、研究チームは1.5ミリメートル四方という米粒よりも小さなスペースに、なんと1,027個もの微小なレンズを並べることに成功しました。 <br /><br />このセンサーは「bio-CE」と名付けられています。最大の特徴は、私たち人間のような「単眼」ではなく、昆虫のような「複眼」構造を採用していることです。これにより、視点を動かさなくても180度という広範囲（パノラマ視野）を瞬時に見渡せます。 <br /><br />この微細な構造を作るために使われたのが、「フェムト秒レーザー」を用いた3D加工技術です。極めて短いパルスのレーザーで材料を精密に成形することで、光学部品の劇的な小型化と高密度化を実現しました。 <br /><br /><span style=\"font-size: 1.2em;\"><strong>👃 「見る」と「嗅ぐ」を同時にこなす設計</strong></span><br /><img src=\"https://img.24watchin.com/fly-inspired-micro-sensor-robot-vision-smell.webp\" style=\"height: auto; max-width: 100%; text-align: center;\" /><br />このデバイスがすごいのは、ただ目が見えるだけではありません。視覚と一緒に「人工的な嗅覚」も統合されているのです。 <br /><br />研究チームはインクジェット印刷技術を用い、特定の化学物質に反応するセンサーを組み込みました。これは、有害ガスなどを検知すると色が変化する仕組みです。つまり、ロボットはこのセンサー1つで、障害物を見て避けながら、同時にガス漏れなどの異常も「視覚情報として」察知できるようになります。 <br /><br />機能を1つに集約した最大の理由は、ドローンやマイクロロボットを極限まで軽くするためです。 <br /><br />別々の装置を積むと重くなってしまいますが、視覚と化学検知の装置を一体化すれば、重量を大幅に削減できます。狭い場所を飛ぶドローンにとって、この軽さは大きな武器になります。 <br /><br /><span style=\"font-size: 1.2em;\"><strong>🚧 過酷な環境でこそ真価を発揮</strong></span><br /><br />さらに、このセンサーにはユニークな工夫が施されています。レンズとレンズの間に、「setae（セタ）」と呼ばれる微小な人工の「毛」が生やされているのです。 <br /><br />この毛の役割は、湿気や汚れからレンズを守ることにあります。<br /><br />災害現場や倒壊した建物の内部は、湿気が多かったり粉塵が舞っていたりと過酷な環境です。レンズの曇りや汚れは致命的ですが、この毛がガード役となることで、厳しい環境でも性能を維持できると期待されています。 <br /><br />小型ロボットを用いた実証実験では、障害物を避けたり、移動する物体を認識したりすることに成功しました。<br /><br />もちろん課題もあります。現時点では撮影できる画像の解像度がまだ低く、化学センサーの反応速度にも改善の余地があります。また、曲面レンズ特有の画像のゆがみを直すための計算処理も必要です。<br /><br />それでも、これらの課題をクリアできれば、将来的には生存者の捜索や化学物質の漏出検知など、危険な場所での過酷任務をロボットが安全に担ってくれるようになるでしょう。<br /><br />※この記事は、関連報道に基づき作成しています。<br /><br />【参考URL】https://www.nature.com/articles/s41467-026-68940-0<br />【参考URL】https://advanced.onlinelibrary.wiley.com/doi/10.1002/advs.202204072<br />【参考URL】https://www.mlit.go.jp/en/koku/uas.html<br />【参考URL】https://www.nist.gov/el/intelligent-systems-division-73500/standard-test-methods-response-robots<br />",
+    "published": "2026-02-21T15:50:00+09:00",
+    "url": "http://www.24watchin.com/2026/02/world-robot-senses-idw1664-15mm.html",
+    "labels": [
+      "センサー",
+      "ブレークスルー",
+      "ロボット技術",
+      "国際",
+      "人工知能"
+    ]
+  },
+  {
+    "id": "4212586262463479333",
+    "title": "静岡・長泉町の強盗傷害事件、「指示役」とみられる21歳の男を逮捕",
+    "content": "<div style=\"text-align:center; margin-bottom:20px;\"><img src=\"https://img.24watchin.com/IDD147_shizuoka_robbery_arrest_21yo.jpg_記事全体.webp\" style=\"max-width:100%; height:auto;\"></div><span style=\"font-size: 1.2em;\"><strong>📌 3つのポイント</strong></span><br><br>・👮 逮捕：7人目の逮捕者は「指示役」とみられる21歳の男。<br>・📱 手口：秘匿アプリで「現金がある」と伝え、犯行を指示した疑い。<br>・🏚️ 事件：高齢夫婦を縛り、1000万円を奪った凶悪な手口。<br><br>昨年12月、静岡県長泉町で高齢の夫婦が襲われ、現金約1000万円が奪われた事件で、警察は新たに「指示役」とみられる男を逮捕しました。この事件での逮捕者はこれで7人目となり、組織的なグループによる犯行の全容が少しずつ明らかになってきました。<br><br><span style=\"font-size: 1.2em;\"><strong>👮 7人目の逮捕者は「指示役」か</strong></span><br><br>警察は2月12日、強盗傷害と住居侵入の疑いで、神奈川県小田原市に住む自称フリーター、岩崎孝太容疑者（21）を逮捕しました。<br>岩崎容疑者は、すでに逮捕されている実行役や運転手役ら6人と共謀し、事件に関わった疑いが持たれています。警察は、岩崎容疑者が現場には行かず、他のメンバーに犯行を命じる「指示役」だったとみて調べています。なお、警察は捜査に支障があるとして、岩崎容疑者が容疑を認めているかどうかを明らかにしていません。<br><br><span style=\"font-size: 1.2em;\"><strong>📱 アプリで「現金」のありか指示</strong></span><br><br>警察の調べによると、岩崎容疑者は現場の会社兼住宅に多額の現金があることを事前に知っていたとみられます。<br>犯行にあたっては、追跡されにくい「秘匿性の高い通信アプリ」を使用。実行役たちに対し、具体的な指示を出していた可能性が高いことがわかっています。現代の犯罪によく見られる、匿名性の高いツールを悪用した手口がここでも確認されました。<br><br><span style=\"font-size: 1.2em;\"><strong>🏚️ 恐怖の夜、奪われた1000万円</strong></span><br><br>事件が起きたのは2025年12月22日の深夜でした。長泉町の会社兼住宅に数人の男たちが押し入り、住人の高齢夫婦の手や口を粘着テープでふさいで拘束。夫にけがを負わせたうえ、現金およそ1000万円を奪って逃走しました。<br>これまでに現場の指示役、実行役、運転手役、メンバーを集めるリクルーター役などが次々と逮捕されており、同日には運転手役とみられる男の身柄が検察庁へ送られています。警察はグループの実態解明を急いでいます。<br><br>※この記事は、関連報道に基づき作成しています。<br><br>【参考URL】https://newsdig.tbs.co.jp/articles/-/2462611?display=1<br>【参考URL】https://www.fnn.jp/articles/-/1000505<br>",
+    "published": "2026-02-18T04:33:00+09:00",
+    "url": "http://www.24watchin.com/2026/02/soc-robbery-idd147.html",
+    "labels": [
+      "凶悪犯罪",
+      "強盗傷害事件",
+      "指示役逮捕",
+      "社会",
+      "長泉町",
+      "秘匿アプリ"
+    ]
+  },
+  {
+    "id": "3011860511032681014",
+    "title": "世田谷の保育施設うつぶせ寝事故、元園長と息子に有罪判決",
+    "content": "<div style=\"text-align:center; margin-bottom:20px;\"><img src=\"https://img.24watchin.com/IDD217_setagaya_nursery_suffocation_guilty_verdict_記事全体.webp\" style=\"max-width:100%; height:auto;\"></div><span style=\"font-size: 1.2em;\"><strong>📌 3つのポイント</strong></span><br><br>・⚖️ 判決：元園長と息子に「執行猶予付き」の有罪判決が言い渡された。<br>・⚠️ 原因：生後4か月の赤ちゃんをうつぶせ寝させ、注意を怠ったことが原因。<br>・📝 指摘：息子には知的障害があり、元園長の管理不足も重いと判断された。<br><br>東京・世田谷区の認可外保育施設で2023年、生後4か月の男の子が亡くなった事故の裁判で、東京地裁は2月12日、元園長とその息子に対し、執行猶予のついた有罪判決を言い渡しました。裁判所は、赤ちゃんを預かる責任の重さを厳しく指摘しています。<br><br><span style=\"font-size: 1.2em;\"><strong>⚖️ 執行猶予付きの有罪判決</strong></span><br><br>亡くなったのは、当時生後4か月の真渚己（まさき）ちゃんです。2023年12月、世田谷区の認可外保育施設「託児ルームバンビーノ」（現在は閉鎖）で、うつぶせの状態で寝かされ、呼吸ができなくなり亡くなりました。<br>この事故で、業務上過失致死の罪に問われていた元園長の野崎悦生被告（60）と、スタッフだった息子の舜介被告（25）に対し、東京地裁は有罪判決を言い渡しました。<br>野崎被告には「禁錮1年6か月・執行猶予3年」、息子の舜介被告には「禁錮10か月・執行猶予3年」という内容でした。つまり、刑務所に入る刑が言い渡されましたが、3年間真面目に過ごせば、その刑は行われないことになります。<br><br><span style=\"font-size: 1.2em;\"><strong>⚠️ 「命を預かる意識が乏しい」と厳しい指摘</strong></span><br><br>判決では、2人の責任について詳しく触れられました。<br>まず、実際に保育をしていた息子の舜介被告については、「初歩的な注意を怠ったミスは大きい」とされました。しかし一方で、彼には知的障害があり、当時は経験の浅いアルバイトと2人きりで9人もの乳幼児を見なければならない状況でした。裁判所は、こうした厳しい環境を作ったのは父親である野崎被告だとして、息子を「強くは責められない」と判断しました。<br>一方、元園長の野崎被告に対しては厳しい言葉が並びました。真渚己ちゃんの母親から「うつぶせ寝をさせないで」と強く頼まれていたにもかかわらず、スタッフへの指導をしていませんでした。裁判所は「乳幼児の命を預かっているという意識が乏しい」と指摘しました。<br><br><span style=\"font-size: 1.2em;\"><strong>🗣️ 「罪をどう償うか考えて」</strong></span><br><br>判決の最後、今井理裁判長は2人に対し、「今後は遺族の気持ちを心にとめて、社会でどうやって罪を償うか考えてください」と語りかけました。<br>この言葉に対し、2人は小さな声で「はい」と答え、裁判は終了しました。<br><br>※この記事は、埼玉新聞および関連報道に基づき作成しています。<br><br>【参考URL】https://www.saitama-np.co.jp/articles/181489<br>【参考URL】https://news.tv-asahi.co.jp/news_society/articles/000485042.html<br>【参考URL】https://www.nippon.com/ja/news/kd1394491686075794282/<br>",
+    "published": "2026-02-13T20:24:00+09:00",
+    "url": "http://www.24watchin.com/2026/02/soc-setagaya-idd217.html",
+    "labels": [
+      "うつぶせ寝",
+      "過失致死",
+      "事故",
+      "社会",
+      "世田谷",
+      "乳幼児",
+      "保育施設",
+      "有罪判決"
+    ]
+  },
+  {
+    "id": "1497880111271619230",
+    "title": "まさか骨折から25日で！？平野歩夢、痛みに耐えて決勝へ！伝説の続きが凄すぎる",
+    "content": "<div><img src=\"https://img.24watchin.com/IDD50_ayumu_hirano_comeback_snowboard_final.jpg_%E8%A8%98%E4%BA%8B%E5%85%A8%E4%BD%93.webp\" style=\"height: auto; max-width: 100%; text-align: center;\" /></div><div style=\"margin-bottom: 20px; text-align: center;\"></div>ミラノ・コルティナ冬季五輪、スノーボード男子ハーフパイプ。<br />前回の北京五輪金メダリスト・平野歩夢選手が、全治には程遠い「骨折からわずか25日」という体でスタートラインに立ち、見事に決勝への切符をつかみ取りました。<br /><br /><span style=\"font-size: 1.2em;\"><strong>🚑 まさかの大ケガ、車いすからの復活</strong></span><br /><br />時計の針を少し戻しましょう。予選のわずか25日前、1月17日のワールドカップ決勝での出来事でした。平野選手は激しく転倒し、顔面を強打しただけでなく、腸骨（腰のあたりの骨）など2カ所を骨折するという大ケガを負ってしまいました。<br />直後は松葉づえや車いすでの生活を余儀なくされるほどの状態。五輪連覇どころか、出場さえ絶望的と思われました。しかし、彼は諦めませんでした。<br /><br /><span style=\"font-size: 1.2em;\"><strong>🏂 痛みに耐えて空を舞う</strong></span><div><span style=\"font-size: 19.2px;\"><b><br /></b></span><div>そして迎えた2月11日、リビーニョ・スノーパーク。<br />直前の練習でも転倒し、腰を押さえる痛々しい姿がありましたが、本番では王者の意地を見せつけます。<br />1回目から大技「フロントサイドダブルコーク1440」を決め、2回目には得点を85.50点まで伸ばしました。<br />「ケガ明けで痛みもある」「練習でやりきれない部分がある」と本人が語る通り、万全には程遠い状態です。それでも予選を7位で通過し、上位12人による決勝へ駒を進めたのです。<br /><br /><span style=\"font-size: 1.2em;\"><strong>🤝 レジェンドとの絆、そして決勝へ</strong></span><br /><br />競技後には、感動的なシーンもありました。引き揚げる平野選手に声をかけたのは、五輪を3度制したショーン・ホワイト氏（39）。かつてのライバルであり、スノーボード界のレジェンドと言葉を交わす姿は、見ているファンの胸を熱くさせました。<br />決勝は中1日を空けて、13日（日本時間14日未明）に行われます。<br />「調子も上げきれない」と不安を口にしながらも、4大会連続出場の経験と技術で奇跡を起こそうとしている平野選手。傷だらけの王者が挑む「伝説の続き」から目が離せません。<br /><br />※この記事は、Olympics.comおよび関連報道に基づき作成しています。<br /><br />【参考URL】https://www.olympics.com/en/milano-cortina-2026/results/sbd/je/m/hp----------------/qual/--------/result<br />【参考URL】https://www.olympics.com/en/milano-cortina-2026/results/sbd/je/m/hp----------------/fnl-/--------/result<br />【参考URL】https://www.olympics.com/en/milano-cortina-2026/news/snowboard-milano-cortina-2026-hirano-ayumu<br />【参考URL】https://milanocortina2026.coni.it/en/schedule/venues/impianto/73%3ALivigno_Snow_Park.html<br /></div></div>",
+    "published": "2026-02-13T20:23:01+09:00",
+    "url": "http://www.24watchin.com/2026/02/sports-hirano-idd50.html",
+    "labels": [
+      "スノーボード",
+      "スポーツ",
+      "ハーフパイプ",
+      "怪我",
+      "骨折",
+      "冬季五輪",
+      "平野歩夢"
+    ]
+  },
+  {
+    "id": "8868124785051350077",
+    "title": "常陽銀のクレカ審査担当行員、自身のキャッシング枠を無審査で増額させ２３００万円出金…懲戒解雇",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/a/AVvXsEgA5a5B1XOTByqrIUm2bu29faQjn5fVg-77U6wG8sSCXsouzcDQFv3ShzRnkaAu8Msj6KTq2ycO2eELLmXNSUYf4LeQUVSuLbFoOiXAWxVVtgMOoj2Ha1ft7dSvvjc2HDz5khUGIOAlzPQdtNoPZ7q6kZiGbwyZjirZB8G2p1Ud6UP1shHirS653vDmzC3t\" style=\"margin-left: 1em; margin-right: 1em;\"><img data-original-height=\"512\" data-original-width=\"717\" height=\"458\" src=\"https://blogger.googleusercontent.com/img/a/AVvXsEgA5a5B1XOTByqrIUm2bu29faQjn5fVg-77U6wG8sSCXsouzcDQFv3ShzRnkaAu8Msj6KTq2ycO2eELLmXNSUYf4LeQUVSuLbFoOiXAWxVVtgMOoj2Ha1ft7dSvvjc2HDz5khUGIOAlzPQdtNoPZ7q6kZiGbwyZjirZB8G2p1Ud6UP1shHirS653vDmzC3t=w640-h458\" width=\"640\" /></a></div>&nbsp;<br /><p></p><p><span>常陽銀行（本店・水戸市）は２４日、クレジットカードの審査・管理を担当していた６０歳代の男性行員が、自分名義の同行クレジットカードでキャッシング枠を無審査で増額させ、現金計２３５１万円を引き出したとして、懲戒解雇したと発表した。処分は２２日付。男性は全額弁済したが、同行は茨城県警に被害届を出す方針という。</span></p><p><span><br /></span></p><p><span>　発表によると、男性は営業企画部に所属していた。２０１６年から２４年まで、自分名義のカードのキャッシング枠について、規定の審査を行わずに計１５５０万円分を拡大。この期間中、たびたびＡＴＭで現金を引き出し、一部の返済を行いながら、不正な引き出しを続けていた。</span></p><p><span><br /></span></p><p><span>　カード更新時に異常な利用記録が判明し、行内調査で今年９月下旬に不正が発覚した。</span></p>",
+    "published": "2026-01-03T10:24:00+09:00",
+    "url": "http://www.24watchin.com/2026/01/business-001.html",
+    "labels": [
+      "Business"
+    ]
+  },
+  {
+    "id": "1332516536096739028",
+    "title": " 「バイオ薬」後続品の使用促進　高額先行品は負担増も―厚労省検討",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjUPoV5aLZ6DLoQgeKLdbJZqauksMinMy64jIxFWDh7qbOGrr2gz4AjHR1sp632bostxXsBiLt7hqOv-nbKIvbXKsMY09gJJL-QqN0yOTPTS-ffG5ymlkzklHuQgMVVnM3ywbRj3NK9N2cDKeMQ7YJkwCgVtleGsHfrHQxd5x7YYetufK7QyQYIuPvuLtjz/s674/%E3%80%8C%E3%83%90%E3%82%A4%E3%82%AA%E8%96%AC%E3%80%8D%E5%BE%8C%E7%B6%9A%E5%93%81%E3%81%AE%E4%BD%BF%E7%94%A8%E4%BF%83%E9%80%B2%E3%80%80%E9%AB%98%E9%A1%8D%E5%85%88%E8%A1%8C%E5%93%81%E3%81%AF%E8%B2%A0%E6%8B%85%E5%A2%97%E3%82%82%E2%80%95%E5%8E%9A%E5%8A%B4%E7%9C%81%E6%A4%9C%E8%A8%8E.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"436\" data-original-width=\"674\" height=\"414\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjUPoV5aLZ6DLoQgeKLdbJZqauksMinMy64jIxFWDh7qbOGrr2gz4AjHR1sp632bostxXsBiLt7hqOv-nbKIvbXKsMY09gJJL-QqN0yOTPTS-ffG5ymlkzklHuQgMVVnM3ywbRj3NK9N2cDKeMQ7YJkwCgVtleGsHfrHQxd5x7YYetufK7QyQYIuPvuLtjz/w640-h414/%E3%80%8C%E3%83%90%E3%82%A4%E3%82%AA%E8%96%AC%E3%80%8D%E5%BE%8C%E7%B6%9A%E5%93%81%E3%81%AE%E4%BD%BF%E7%94%A8%E4%BF%83%E9%80%B2%E3%80%80%E9%AB%98%E9%A1%8D%E5%85%88%E8%A1%8C%E5%93%81%E3%81%AF%E8%B2%A0%E6%8B%85%E5%A2%97%E3%82%82%E2%80%95%E5%8E%9A%E5%8A%B4%E7%9C%81%E6%A4%9C%E8%A8%8E.png\" width=\"640\" /></a></div><br /><b>&nbsp;「バイオ薬」後続品の使用促進　高額先行品は負担増も―厚労省検討</b><p></p><p>厚生労働省は、生物由来で非常に高額な「バイオ医薬品」について、先行品と比べて安価な後続品の使用促進策の検討に乗り出した。品質や有効性が同じでも、先行品を選ぶ患者の窓口負担額を増やす案や、後続品を処方した医療機関の診療報酬を手厚くする案などを議論。医療費の抑制に向け、２０２６年度中の導入を目指す。</p><p>　後続品の薬価は先行品より３割ほど低いが、使用率（金額ベース）は２４年度で３３．７％にとどまる。後続品への切り替えによる同年度の医療費削減効果額は１１０３億円で、厚労省はさらに伸ばせるとみている。</p><p>　現在、保険適用されている後続品は入院患者向けが多いが、外来患者向けにも糖尿病の自己注射薬「インスリンリスプロＢＳ」などがある。後発医薬品（ジェネリック）がある先発医薬品については昨年１０月から患者の負担額を引き上げており、厚労省はバイオ薬の先行品でも同様の仕組みを設けられないか検討する。</p><p>　高額な医療費の患者負担を抑える「高額療養費制度」が適用されると、先行品と後続品のどちらを使っても負担額が変わらないため、医療機関側を含め後続品を積極的に選ばないケースがある。</p><p>　そこで医療機関が受け取る診療報酬について、患者に後続品を処方した場合は増やし、先行品は減らす案も浮上。現行でも、入院患者に一定量以上の後続品を使う医療機関の報酬を加算する仕組みがある。社会保障審議会（厚労相の諮問機関）の部会などで議論し、年末までに結論を得たい考えだ。</p>",
+    "published": "2025-10-27T00:00:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_90.html",
+    "labels": [
+      "Science"
+    ]
+  },
+  {
+    "id": "3187589446095123265",
+    "title": " ソフトバンク雪辱、１勝１敗　１０得点で阪神に大勝―プロ野球日本シリーズ第２戦",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjK81upBlUZazEldxXHD8hya2j4pXNDyieH79IPwp9x1GHNvI9HfTqYCQ6XnpHsXLJjjAA4bZWMJ0OFdraOBLj8XsvgKrERqXM0igecgZXKTLe1K93swmO_PwcpSZM6So7HQ7Uc2NyvkaczR2OI3Y5yRWAzYpNY-9ZaM2BqIhiS0BDYNxjGUhTIJfB_QrE/s674/%E3%82%BD%E3%83%95%E3%83%88%E3%83%90%E3%83%B3%E3%82%AF%E9%9B%AA%E8%BE%B1%E3%80%81%EF%BC%91%E5%8B%9D%EF%BC%91%E6%95%97%E3%80%80%EF%BC%91%EF%BC%90%E5%BE%97%E7%82%B9%E3%81%A7%E9%98%AA%E7%A5%9E%E3%81%AB%E5%A4%A7%E5%8B%9D%E2%80%95%E3%83%97%E3%83%AD%E9%87%8E%E7%90%83%E6%97%A5%E6%9C%AC%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA%E7%AC%AC%EF%BC%92%E6%88%A6.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"512\" data-original-width=\"674\" height=\"486\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjK81upBlUZazEldxXHD8hya2j4pXNDyieH79IPwp9x1GHNvI9HfTqYCQ6XnpHsXLJjjAA4bZWMJ0OFdraOBLj8XsvgKrERqXM0igecgZXKTLe1K93swmO_PwcpSZM6So7HQ7Uc2NyvkaczR2OI3Y5yRWAzYpNY-9ZaM2BqIhiS0BDYNxjGUhTIJfB_QrE/w640-h486/%E3%82%BD%E3%83%95%E3%83%88%E3%83%90%E3%83%B3%E3%82%AF%E9%9B%AA%E8%BE%B1%E3%80%81%EF%BC%91%E5%8B%9D%EF%BC%91%E6%95%97%E3%80%80%EF%BC%91%EF%BC%90%E5%BE%97%E7%82%B9%E3%81%A7%E9%98%AA%E7%A5%9E%E3%81%AB%E5%A4%A7%E5%8B%9D%E2%80%95%E3%83%97%E3%83%AD%E9%87%8E%E7%90%83%E6%97%A5%E6%9C%AC%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA%E7%AC%AC%EF%BC%92%E6%88%A6.png\" width=\"640\" /></a></div><br /><b>&nbsp;ソフトバンク雪辱、１勝１敗　１０得点で阪神に大勝―プロ野球日本シリーズ第２戦</b><p></p><p>プロ野球の日本シリーズ（７試合制）は２６日、みずほペイペイドーム福岡で第２戦が行われ、パ・リーグ連覇のソフトバンクがセ・リーグ王者の阪神に１０―１で大勝し、対戦成績を１勝１敗とした。</p><p>　ソフトバンクは１点を追う一回、栗原の適時打、山川の２点二塁打で３点を奪って逆転。二回も山川が３ランを放つなど６点を加え、序盤で大勢を決めた。阪神の先発デュプランティエは二回途中で降板。救援陣も打たれた。</p><p>　第３戦は移動日を挟み、２８日に甲子園球場で行われる。</p>",
+    "published": "2025-10-26T23:59:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_33.html",
+    "labels": [
+      "Trend"
+    ]
+  },
+  {
+    "id": "7216556230314438819",
+    "title": " 九電川内原発、使用済み燃料の乾式貯蔵施設建設へ　29年度運用開始",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1taAJJoCmkvgbW3nbF2EverpTR4uGHiReZb2CawcdfHJSMQm3DFgnEidHVxBU7UhHU_DCBPHKnePPx1_b45MPKAQ0Y9e0keiJ47jzxX4azHxEUXRO4tIe7hryMmccY6CYr_0LGnVObOY3NAiEKxOReF4YNgHOyZ4HXkr0Juy33B_0YGaBftvN2ZEWHsnb/s653/%E4%B9%9D%E9%9B%BB%E5%B7%9D%E5%86%85%E5%8E%9F%E7%99%BA%E3%80%81%E4%BD%BF%E7%94%A8%E6%B8%88%E3%81%BF%E7%87%83%E6%96%99%E3%81%AE%E4%B9%BE%E5%BC%8F%E8%B2%AF%E8%94%B5%E6%96%BD%E8%A8%AD%E5%BB%BA%E8%A8%AD%E3%81%B8%E3%80%8029%E5%B9%B4%E5%BA%A6%E9%81%8B%E7%94%A8%E9%96%8B%E5%A7%8B.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"387\" data-original-width=\"653\" height=\"380\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1taAJJoCmkvgbW3nbF2EverpTR4uGHiReZb2CawcdfHJSMQm3DFgnEidHVxBU7UhHU_DCBPHKnePPx1_b45MPKAQ0Y9e0keiJ47jzxX4azHxEUXRO4tIe7hryMmccY6CYr_0LGnVObOY3NAiEKxOReF4YNgHOyZ4HXkr0Juy33B_0YGaBftvN2ZEWHsnb/w640-h380/%E4%B9%9D%E9%9B%BB%E5%B7%9D%E5%86%85%E5%8E%9F%E7%99%BA%E3%80%81%E4%BD%BF%E7%94%A8%E6%B8%88%E3%81%BF%E7%87%83%E6%96%99%E3%81%AE%E4%B9%BE%E5%BC%8F%E8%B2%AF%E8%94%B5%E6%96%BD%E8%A8%AD%E5%BB%BA%E8%A8%AD%E3%81%B8%E3%80%8029%E5%B9%B4%E5%BA%A6%E9%81%8B%E7%94%A8%E9%96%8B%E5%A7%8B.png\" width=\"640\" /></a></div><br /><b>&nbsp;九電川内原発、使用済み燃料の乾式貯蔵施設建設へ　29年度運用開始</b><p></p><p>九州電力は24日、川内原発（鹿児島県薩摩川内市）の敷地内に、使用済み核燃料を一時保管する「乾式貯蔵施設」を建てると発表した。2027年度に着工、29年度をめどに運用開始をめざす。九電では玄海原発（佐賀県玄海町）に続く2カ所目になる。</p><p>　同日、原子力規制委員会に設置許可を申請。鹿児島県と薩摩川内市にも安全協定に基づき、事前協議書を出した。</p><p>　貯蔵容量は使用済み核燃料560体分。事業費は約350億円を見込む。</p><p>　乾式貯蔵施設は、燃料プールで冷却後の使用済み核燃料を「キャスク」と呼ばれる金属製の容器に収納し、循環する空気で冷やして保管する。</p>",
+    "published": "2025-10-26T23:58:03+09:00",
+    "url": "http://www.24watchin.com/2025/10/29.html",
+    "labels": [
+      "Science"
+    ]
+  },
+  {
+    "id": "3772578820074008429",
+    "title": " 米空母打撃群を南米沖に派遣　トランプ政権、ベネズエラへの圧力強化",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDtwH4QHLe8Yxc-gw6I9gxuewynGC3GFB9ngSJo6z8tGdNnJYg6xlV7h7y_hAc2n_hsWVCddL3WXxqXRcm2_39BY5blvFZHnRnW-05jmjlTH6oMug7T3r-8a6rODFYygO6xY1kJVhl0sEN5iBE7QT2pqky0Mjwv2s7sG9EeP3nLQ76o3jjH0nnQk0YtD-q/s654/%E7%B1%B3%E7%A9%BA%E6%AF%8D%E6%89%93%E6%92%83%E7%BE%A4%E3%82%92%E5%8D%97%E7%B1%B3%E6%B2%96%E3%81%AB%E6%B4%BE%E9%81%A3%E3%80%80%E3%83%88%E3%83%A9%E3%83%B3%E3%83%97%E6%94%BF%E6%A8%A9%E3%80%81%E3%83%99%E3%83%8D%E3%82%BA%E3%82%A8%E3%83%A9%E3%81%B8%E3%81%AE%E5%9C%A7%E5%8A%9B%E5%BC%B7%E5%8C%96.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"430\" data-original-width=\"654\" height=\"420\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDtwH4QHLe8Yxc-gw6I9gxuewynGC3GFB9ngSJo6z8tGdNnJYg6xlV7h7y_hAc2n_hsWVCddL3WXxqXRcm2_39BY5blvFZHnRnW-05jmjlTH6oMug7T3r-8a6rODFYygO6xY1kJVhl0sEN5iBE7QT2pqky0Mjwv2s7sG9EeP3nLQ76o3jjH0nnQk0YtD-q/w640-h420/%E7%B1%B3%E7%A9%BA%E6%AF%8D%E6%89%93%E6%92%83%E7%BE%A4%E3%82%92%E5%8D%97%E7%B1%B3%E6%B2%96%E3%81%AB%E6%B4%BE%E9%81%A3%E3%80%80%E3%83%88%E3%83%A9%E3%83%B3%E3%83%97%E6%94%BF%E6%A8%A9%E3%80%81%E3%83%99%E3%83%8D%E3%82%BA%E3%82%A8%E3%83%A9%E3%81%B8%E3%81%AE%E5%9C%A7%E5%8A%9B%E5%BC%B7%E5%8C%96.png\" width=\"640\" /></a></div><br /><b>&nbsp;米空母打撃群を南米沖に派遣　トランプ政権、ベネズエラへの圧力強化</b><p></p><p>米国防総省は24日、米原子力空母ジェラルド・R・フォードを中核とする空母打撃群を南米沖に派遣すると発表した。トランプ政権は「麻薬対策」を掲げてカリブ海などで船舶を爆撃してきたが、沖合への空母の派遣は、ベネズエラへの軍事的な圧力を劇的に高める動きだ。</p><p>　パーネル報道官は声明で「国境を越える犯罪組織を解体するようにとの大統領の命令」に従い、中南米を管轄する米南方軍の担当地域に空母打撃群を移動させると発表。「米国本土の安全・繁栄や、西半球における米国の安全保障を脅かす不法な集団を発見し、監視し、中断させる能力を高める」と述べた。</p>",
+    "published": "2025-10-26T23:58:03+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_34.html",
+    "labels": [
+      "World"
+    ]
+  },
+  {
+    "id": "2701307263974515320",
+    "title": " 富士山の初冠雪、猛暑の今年はいつ？山頂の気温は低下、気象台が注視",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgm9Zyg-OBsRgIBpzUe63E9S2FIIymFCCn_RwH-_A9JNqRUVnRHq-ZDz6cKsn48iwB6riSnMygpNe5J_yaxnDgvfZC5hi4LzC0mCi9qIMiXiDF9aGYpZ-_hWqK3-dplFxWYVBfiSTDMK3B0oQeIeoY8O0nkF14pTx-mSwVzLOeIrXCYnIwEITiQ-0wRTPU_/s633/%E5%AF%8C%E5%A3%AB%E5%B1%B1%E3%81%AE%E5%88%9D%E5%86%A0%E9%9B%AA%E3%80%81%E7%8C%9B%E6%9A%91%E3%81%AE%E4%BB%8A%E5%B9%B4%E3%81%AF%E3%81%84%E3%81%A4%EF%BC%9F%E5%B1%B1%E9%A0%82%E3%81%AE%E6%B0%97%E6%B8%A9%E3%81%AF%E4%BD%8E%E4%B8%8B%E3%80%81%E6%B0%97%E8%B1%A1%E5%8F%B0%E3%81%8C%E6%B3%A8%E8%A6%96.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"434\" data-original-width=\"633\" height=\"438\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgm9Zyg-OBsRgIBpzUe63E9S2FIIymFCCn_RwH-_A9JNqRUVnRHq-ZDz6cKsn48iwB6riSnMygpNe5J_yaxnDgvfZC5hi4LzC0mCi9qIMiXiDF9aGYpZ-_hWqK3-dplFxWYVBfiSTDMK3B0oQeIeoY8O0nkF14pTx-mSwVzLOeIrXCYnIwEITiQ-0wRTPU_/w640-h438/%E5%AF%8C%E5%A3%AB%E5%B1%B1%E3%81%AE%E5%88%9D%E5%86%A0%E9%9B%AA%E3%80%81%E7%8C%9B%E6%9A%91%E3%81%AE%E4%BB%8A%E5%B9%B4%E3%81%AF%E3%81%84%E3%81%A4%EF%BC%9F%E5%B1%B1%E9%A0%82%E3%81%AE%E6%B0%97%E6%B8%A9%E3%81%AF%E4%BD%8E%E4%B8%8B%E3%80%81%E6%B0%97%E8%B1%A1%E5%8F%B0%E3%81%8C%E6%B3%A8%E8%A6%96.png\" width=\"640\" /></a></div><br /><b>&nbsp;富士山の初冠雪、猛暑の今年はいつ？山頂の気温は低下、気象台が注視</b><p></p><p>富士山の「初冠雪」シーズンが今年も訪れた。10月2日が平年日とされる「秋の便り」だ。今夏は異例の暑さだったが、富士山頂の気温は例年通り9月中旬には最低気温が零下になった。甲府地方気象台の職員が初冠雪を注視する日々が続いている。</p><p>　全国的に暑かった今夏だが、甲府でも8月2日に観測史上9位となる39.6度を記録。最高気温35度以上の猛暑日は昨年より15日多い59日、30度以上の真夏日は昨年とほぼ同水準の94日だった。</p><p>　富士山頂も例年より暑かったようだ。気象庁のデータによると、山頂付近の7月の平均気温は、平年値より2.2度高い7.5度、8月は0.7度高い7.1度だった。</p>",
+    "published": "2025-10-26T23:57:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_37.html",
+    "labels": [
+      "Life"
+    ]
+  },
+  {
+    "id": "9162318150988208152",
+    "title": " 万博リング「全残し」、吉村知事「現実問題難しい」 年内にも解体へ",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8lglAWPEACTyBa8ylD36-oGBGwoaldEVf4zAON-0a_aKQzsyuDcvYoSVcfhHMVNjQqHXra6ikXRYFxN0hWxqvywzGqfy3iXUgLvdCxAIgI7zqw_KRPo2uy_h30ghvWHdVOcN2GB78cUnE5HxDM3k9783dulFCDSZ4GHiDqtxvehYomv7a06EFnALpTLvQ/s632/%E4%B8%87%E5%8D%9A%E3%83%AA%E3%83%B3%E3%82%B0%E3%80%8C%E5%85%A8%E6%AE%8B%E3%81%97%E3%80%8D%E3%80%81%E5%90%89%E6%9D%91%E7%9F%A5%E4%BA%8B%E3%80%8C%E7%8F%BE%E5%AE%9F%E5%95%8F%E9%A1%8C%E9%9B%A3%E3%81%97%E3%81%84%E3%80%8D%20%E5%B9%B4%E5%86%85%E3%81%AB%E3%82%82%E8%A7%A3%E4%BD%93%E3%81%B8.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"472\" data-original-width=\"632\" height=\"478\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8lglAWPEACTyBa8ylD36-oGBGwoaldEVf4zAON-0a_aKQzsyuDcvYoSVcfhHMVNjQqHXra6ikXRYFxN0hWxqvywzGqfy3iXUgLvdCxAIgI7zqw_KRPo2uy_h30ghvWHdVOcN2GB78cUnE5HxDM3k9783dulFCDSZ4GHiDqtxvehYomv7a06EFnALpTLvQ/w640-h478/%E4%B8%87%E5%8D%9A%E3%83%AA%E3%83%B3%E3%82%B0%E3%80%8C%E5%85%A8%E6%AE%8B%E3%81%97%E3%80%8D%E3%80%81%E5%90%89%E6%9D%91%E7%9F%A5%E4%BA%8B%E3%80%8C%E7%8F%BE%E5%AE%9F%E5%95%8F%E9%A1%8C%E9%9B%A3%E3%81%97%E3%81%84%E3%80%8D%20%E5%B9%B4%E5%86%85%E3%81%AB%E3%82%82%E8%A7%A3%E4%BD%93%E3%81%B8.png\" width=\"640\" /></a></div><br /><b>&nbsp;万博リング「全残し」、吉村知事「現実問題難しい」 年内にも解体へ</b><p></p><p>大阪・関西万博の閉幕から27日で2週間。シンボルの大屋根リングは、一部を人が上れる形で残す方針だが、残りの部分については年内にも解体が始まる見込みだ。ただ、来場者らの高い評価もあって、関西の学術界などからはより幅広く保存するべきだとの声も相次ぐ。リングを含む万博のレガシーのあり方は今後、国でも検討される。</p><p>　10月下旬、大阪市の人工島・夢洲（ゆめしま）。会期中は大勢の来場者でにぎわった万博会場は、撤去作業などを行う作業員が行き交う程度で人影は少ない。リングは今も原形をとどめているものの、リング上への立ち入りは禁止されていた。</p>",
+    "published": "2025-10-26T23:56:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_60.html",
+    "labels": [
+      "Trend"
+    ]
+  },
+  {
+    "id": "4954944714793291355",
+    "title": " H3ロケット「最強型」打ち上げ成功　競争激しい世界市場にどう挑む",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEikvUfbnhsCuiRbKKT4h9viDsr-uXIIK6EOdBv7NGkB3m7GvGVoprNrnMW9-gLVJET2g-3y48kPs0-JJrfkBXqB58xIB7AVhvG5er3tlxjHDyqFZQO2unMohjby20ss01jhnOsBTrd9qyqwY8y32HfhGw97NmI9ZKWDLSkKP1-jdGwd3SRvAsbPntHWtO4w/s657/H3%E3%83%AD%E3%82%B1%E3%83%83%E3%83%88%E3%80%8C%E6%9C%80%E5%BC%B7%E5%9E%8B%E3%80%8D%E6%89%93%E3%81%A1%E4%B8%8A%E3%81%92%E6%88%90%E5%8A%9F%E3%80%80%E7%AB%B6%E4%BA%89%E6%BF%80%E3%81%97%E3%81%84%E4%B8%96%E7%95%8C%E5%B8%82%E5%A0%B4%E3%81%AB%E3%81%A9%E3%81%86%E6%8C%91%E3%82%80.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"437\" data-original-width=\"657\" height=\"426\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEikvUfbnhsCuiRbKKT4h9viDsr-uXIIK6EOdBv7NGkB3m7GvGVoprNrnMW9-gLVJET2g-3y48kPs0-JJrfkBXqB58xIB7AVhvG5er3tlxjHDyqFZQO2unMohjby20ss01jhnOsBTrd9qyqwY8y32HfhGw97NmI9ZKWDLSkKP1-jdGwd3SRvAsbPntHWtO4w/w640-h426/H3%E3%83%AD%E3%82%B1%E3%83%83%E3%83%88%E3%80%8C%E6%9C%80%E5%BC%B7%E5%9E%8B%E3%80%8D%E6%89%93%E3%81%A1%E4%B8%8A%E3%81%92%E6%88%90%E5%8A%9F%E3%80%80%E7%AB%B6%E4%BA%89%E6%BF%80%E3%81%97%E3%81%84%E4%B8%96%E7%95%8C%E5%B8%82%E5%A0%B4%E3%81%AB%E3%81%A9%E3%81%86%E6%8C%91%E3%82%80.png\" width=\"640\" /></a></div><br /><b>&nbsp;H3ロケット「最強型」打ち上げ成功　競争激しい世界市場にどう挑む</b><p></p><p>日本の基幹ロケット「H3」7号機が鹿児島県の種子島宇宙センターから打ち上げられた。H3は、拡大する商業打ち上げ市場を見据え、低コスト化や運用面の改善を図り、次世代の主力ロケットとして重責を担う。日本はこのロケットで世界市場にどう挑もうとしているのか。</p><p>H3ロケット7号機打ち上げ成功　補給船HTV-Xを予定軌道に投入</p><p>　H3は、これまで日本の打ち上げを支えてきた「H2A」ロケットの後継機だ。H2Aは最後の打ち上げとなった今年6月の50号機まで、日本の宇宙開発を20年以上支えてきた。このバトンを受け継ぐH3の開発に、宇宙航空研究開発機構（JAXA）と三菱重工業が2014年から取り組んできた。23年の初号機打ち上げは失敗したものの、それ以降は成功を重ね、信頼性を着実に上げている。</p>",
+    "published": "2025-10-26T23:55:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/h3.html",
+    "labels": [
+      "Science"
+    ]
+  },
+  {
+    "id": "6075528940734485515",
+    "title": " 手作りＢＥＮＴＯは日本の文化",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhS8IFNrSnuG3mjhzIMapdgt1Ym4DDf5E2b-fmZR09GqHDnFtYD3Hf58e-XuvrVj7aTr984WKNj0fvrsEhWxmmUf5unz3qnYOiH7nVXw7eIKus0lvJuX3XNCgFkNIfzwgb0wTUa2iw0QxvLy7Afw-iro7RykvmGw2cs1imC76f0Xnos-shyvVudMYMXrWfY/s718/%E6%89%8B%E4%BD%9C%E3%82%8A%EF%BC%A2%EF%BC%A5%EF%BC%AE%EF%BC%B4%EF%BC%AF%E3%81%AF%E6%97%A5%E6%9C%AC%E3%81%AE%E6%96%87%E5%8C%96.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"498\" data-original-width=\"718\" height=\"444\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhS8IFNrSnuG3mjhzIMapdgt1Ym4DDf5E2b-fmZR09GqHDnFtYD3Hf58e-XuvrVj7aTr984WKNj0fvrsEhWxmmUf5unz3qnYOiH7nVXw7eIKus0lvJuX3XNCgFkNIfzwgb0wTUa2iw0QxvLy7Afw-iro7RykvmGw2cs1imC76f0Xnos-shyvVudMYMXrWfY/w640-h444/%E6%89%8B%E4%BD%9C%E3%82%8A%EF%BC%A2%EF%BC%A5%EF%BC%AE%EF%BC%B4%EF%BC%AF%E3%81%AF%E6%97%A5%E6%9C%AC%E3%81%AE%E6%96%87%E5%8C%96.png\" width=\"640\" /></a></div><br /><b>&nbsp;手作りＢＥＮＴＯは日本の文化</b><p></p><p>行楽に手作り弁当を持参するのは、日本の伝統でもある。１９１８年（大正７年）４月１６日朝刊４面に〈花見ずの記〉と題した記事がある。花見の名所、東京の上野公園を訪ねて、花見ではなく花見をする人々を観察したルポだ。当時の人々の服装などがうかがえて面白い。ここに、花見の弁当の記述もある。今で言う子連れのママ友らしき集団は〈 海苔巻のりまき とおさつの蒸かしたの〉を食べ、若い女性グループは〈竹の皮の 包つつみ と大きな 煎餅せんべい 袋〉、小さな子供２人を連れた父親は〈子供達の 為た めには 茹ゆ で卵と 餡あん パン、自分の為めにはビールを一本〉。質素ではあるが、今でも見られそうな取り合わせである。</p>",
+    "published": "2025-10-26T23:54:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_73.html",
+    "labels": [
+      "Life"
+    ]
+  },
+  {
+    "id": "7393315255877879984",
+    "title": " あんかけ揚げそば",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7nX1Pm65XPD7FHhPXPZUtWP9p_ROGne8I6gQfm6srDaBDmSxH0L-0M6w8VyDGHq5MrtqCOhRl0zl6MqhNV8JRQQEzAyGTVOq2wjX45yk1uLRdjGJXoV5RUSQlI-3xPpLlm-xDFqReGBFQzW2I9dEtPJaQPH4IEOIUdzpE0OS10nuG8oEBMxFQS6JfK59w/s715/%E3%81%82%E3%82%93%E3%81%8B%E3%81%91%E6%8F%9A%E3%81%92%E3%81%9D%E3%81%B0.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"470\" data-original-width=\"715\" height=\"420\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7nX1Pm65XPD7FHhPXPZUtWP9p_ROGne8I6gQfm6srDaBDmSxH0L-0M6w8VyDGHq5MrtqCOhRl0zl6MqhNV8JRQQEzAyGTVOq2wjX45yk1uLRdjGJXoV5RUSQlI-3xPpLlm-xDFqReGBFQzW2I9dEtPJaQPH4IEOIUdzpE0OS10nuG8oEBMxFQS6JfK59w/w640-h420/%E3%81%82%E3%82%93%E3%81%8B%E3%81%91%E6%8F%9A%E3%81%92%E3%81%9D%E3%81%B0.png\" width=\"640\" /></a></div><br /><b>&nbsp;あんかけ揚げそば</b><p></p><p>＜和風あんかけ　体ポカポカ＞</p><p>　京都ノートルダム女子大名誉教授・鳥居本幸代さんに季節の精進料理や京都の暮らしなどを教えてもらう第４水曜日の「京の精進ごよみ」。今回は、お寺と縁深いそば料理を紹介する。（山本美菜子）</p><p>◇</p><p>　日本人の食生活におなじみの麺類ですが、中でもそばは修行中の僧侶から参詣者のおなかまでを満たしてきました。善光寺そばや永平寺そばとして知られるように、寺院の門前にはそば屋が並び、天台宗の総本山・比叡山延暦寺の門前町である大津市坂本にもそうした光景が残ります。法要などでも精進料理のお膳で、汁物として出されることもあります。</p><p>　密教では、米や麦など五つの穀物を食べない「五穀断ち」という修行があります。そばは五穀に含まれないため、修行僧の大切な栄養源となってきました。用いられるのは小麦などを混ぜない十割そばで、「寺方そば」と呼ばれます。</p><p>　諸説ありますが、簡単にそばの来歴をご紹介しましょう。</p><p>　現在食べられているそばは、江戸初期に登場した「そばきり」です。そば自体は奈良時代以前に伝来しましたが、長らくそばの実のおかゆや、そば粉を餅状に練った「そばがき」として食されてきました。古くから麺類として親しまれてきたうどんやそうめんとは異なり、そばが麺状となったのは江戸初期なのです。生育が早く、どんな土地でも栽培しやすいそばは、寒冷地の開拓が進んだ江戸時代に重宝され、生産量も増えました。</p><p>　さて、関東はそば、関西はうどんを好むとされますね。京都人もうどん派が多く、かくいう私もうどん派。かけそばやざるそばは、ちょっと物足りなく感じます。</p><p>　今回ご紹介する「あんかけ揚げそば」は、そんな物足りなさを逆転させるような、ひと味違ったそばをお寺で楽しんでもらいたいという思いから作りました。</p><p>　お寺で出すと、そばを揚げるという意外性が受け、ショウガの風味が利いたあんも好評でした。あんは、中華風も試しましたが、やはり少し甘辛い味付けの和風あんの方が合いました。ニンジンや絹さやで彩りを添え、ショウガで味をぐっと引き締めます。そばは半玉ずつラップに包んで丸く成形し、網じゃくしに入れたまま揚げると上手にできるでしょう。</p><p>　冬場の冷え込みもあって、京都人は体の温まるあんかけを好みます。豆腐やうどんなど、あんをかけるメニューは多いです。少しずつ冬の足音が聞こえてくるこれからの季節、皆さんも自由に楽しんでみてくださいね。</p>",
+    "published": "2025-10-26T23:53:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_80.html",
+    "labels": [
+      "Trend"
+    ]
+  },
+  {
+    "id": "8143239667131337007",
+    "title": " 福岡市「アイランドシティ」まちびらき２０年、２６日に記念式典…事業は最終的に１５２億円黒字見込み",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVlzX0QU5MQ1kviVxV2lABSD2mbKTcg-kPHhZAhyphenhyphenGoiHG078TlYPczB5ukrQxyq7ps6kFzzOvR0HAcGC_rqmfqQDoGuv99PGxuToGgL-g7ipZAcbfasyeYF01icAaHcyXCECs4haRMKSFpHG5atxII6fKLqT9aU755bcSsbLnnUBXoqqcqHVJCG-8sxfOX/s719/%E7%A6%8F%E5%B2%A1%E5%B8%82%E3%80%8C%E3%82%A2%E3%82%A4%E3%83%A9%E3%83%B3%E3%83%89%E3%82%B7%E3%83%86%E3%82%A3%E3%80%8D%E3%81%BE%E3%81%A1%E3%81%B3%E3%82%89%E3%81%8D%EF%BC%92%EF%BC%90%E5%B9%B4%E3%80%81%EF%BC%92%EF%BC%96%E6%97%A5%E3%81%AB%E8%A8%98%E5%BF%B5%E5%BC%8F%E5%85%B8%E2%80%A6%E4%BA%8B%E6%A5%AD%E3%81%AF%E6%9C%80%E7%B5%82%E7%9A%84%E3%81%AB%EF%BC%91%EF%BC%95%EF%BC%92%E5%84%84%E5%86%86%E9%BB%92%E5%AD%97%E8%A6%8B%E8%BE%BC%E3%81%BF.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"516\" data-original-width=\"719\" height=\"460\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiVlzX0QU5MQ1kviVxV2lABSD2mbKTcg-kPHhZAhyphenhyphenGoiHG078TlYPczB5ukrQxyq7ps6kFzzOvR0HAcGC_rqmfqQDoGuv99PGxuToGgL-g7ipZAcbfasyeYF01icAaHcyXCECs4haRMKSFpHG5atxII6fKLqT9aU755bcSsbLnnUBXoqqcqHVJCG-8sxfOX/w640-h460/%E7%A6%8F%E5%B2%A1%E5%B8%82%E3%80%8C%E3%82%A2%E3%82%A4%E3%83%A9%E3%83%B3%E3%83%89%E3%82%B7%E3%83%86%E3%82%A3%E3%80%8D%E3%81%BE%E3%81%A1%E3%81%B3%E3%82%89%E3%81%8D%EF%BC%92%EF%BC%90%E5%B9%B4%E3%80%81%EF%BC%92%EF%BC%96%E6%97%A5%E3%81%AB%E8%A8%98%E5%BF%B5%E5%BC%8F%E5%85%B8%E2%80%A6%E4%BA%8B%E6%A5%AD%E3%81%AF%E6%9C%80%E7%B5%82%E7%9A%84%E3%81%AB%EF%BC%91%EF%BC%95%EF%BC%92%E5%84%84%E5%86%86%E9%BB%92%E5%AD%97%E8%A6%8B%E8%BE%BC%E3%81%BF.png\" width=\"640\" /></a></div><br /><b>&nbsp;福岡市「アイランドシティ」まちびらき２０年、２６日に記念式典…事業は最終的に１５２億円黒字見込み</b><p></p><p>福岡市東区の人工島「アイランドシティ」が今秋、まちびらきから２０年を迎え、２６日に記念式典が開かれる。子育て世帯の増加で人口は１万６０００人を超え、進出事業所は約３１０か所に上る街に成長した。</p><p>　博多湾の工事で出た土砂を使い、東区沖の約４００ヘクタールを埋め立てる市の事業として、１９９４年に着工した。東側は住宅などの「まちづくりエリア」、西側は企業や港湾施設などの「みなとづくりエリア」とし、総事業費は約３９４０億円。２００５年９月、住宅ゾーン「 照葉てりは のまち」がまちびらきした。</p><p>　当初は住宅の分譲や企業誘致が進まなかったが、０７年に小学校が開校。１４年には市立こども病院も開院して路線バスが増え、子育て世代の人気が高まった。２２年に全ての分譲地の売却先が決まり、市によると、事業は最終的に約１５２億円の黒字となる見込みだ。</p><p>　タワーマンションが立ち並び、人口は当初の４６倍の１万６１３９人（８月末現在）に増えた。</p><p>　長年、事業に携わった光山裕朗副市長は「当初は開発が中止されてもおかしくない状況だった。街の成長は本当に感慨深い」と語った。照葉校区自治協議会の東川勝巳会長（５８）は「県外や海外からの移住もあり、様々な人々が暮らすにぎやかな街になった」と話している。</p>",
+    "published": "2025-10-26T23:52:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_54.html",
+    "labels": [
+      "Business"
+    ]
+  },
+  {
+    "id": "5585523619460558076",
+    "title": " 国宝「早来迎」をスクリーンに映し雅楽を演奏…九州国立博物館「法然と極楽浄土」に優美な調べ",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiH9NdjozOu35K7bkghnNnLnREaKx-LQbCkIM6B1xvcog2NMoOFmPH0DclqyBOwDk3E091zwbxlSxFCda-ZrUi3M8GiMZDtEUxkAIUWJLNSfO4bUtHWOnqwZLk8szSMesCBbGl-dyYFINQHz5E-KOe5IEEJ3RhVkM7sw6OPZkRE7JCvkiSaTfu4MfgFaNLx/s718/%E5%9B%BD%E5%AE%9D%E3%80%8C%E6%97%A9%E6%9D%A5%E8%BF%8E%E3%80%8D%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AB%E6%98%A0%E3%81%97%E9%9B%85%E6%A5%BD%E3%82%92%E6%BC%94%E5%A5%8F%E2%80%A6%E4%B9%9D%E5%B7%9E%E5%9B%BD%E7%AB%8B%E5%8D%9A%E7%89%A9%E9%A4%A8%E3%80%8C%E6%B3%95%E7%84%B6%E3%81%A8%E6%A5%B5%E6%A5%BD%E6%B5%84%E5%9C%9F%E3%80%8D%E3%81%AB%E5%84%AA%E7%BE%8E%E3%81%AA%E8%AA%BF%E3%81%B9.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"464\" data-original-width=\"718\" height=\"414\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiH9NdjozOu35K7bkghnNnLnREaKx-LQbCkIM6B1xvcog2NMoOFmPH0DclqyBOwDk3E091zwbxlSxFCda-ZrUi3M8GiMZDtEUxkAIUWJLNSfO4bUtHWOnqwZLk8szSMesCBbGl-dyYFINQHz5E-KOe5IEEJ3RhVkM7sw6OPZkRE7JCvkiSaTfu4MfgFaNLx/w640-h414/%E5%9B%BD%E5%AE%9D%E3%80%8C%E6%97%A9%E6%9D%A5%E8%BF%8E%E3%80%8D%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AB%E6%98%A0%E3%81%97%E9%9B%85%E6%A5%BD%E3%82%92%E6%BC%94%E5%A5%8F%E2%80%A6%E4%B9%9D%E5%B7%9E%E5%9B%BD%E7%AB%8B%E5%8D%9A%E7%89%A9%E9%A4%A8%E3%80%8C%E6%B3%95%E7%84%B6%E3%81%A8%E6%A5%B5%E6%A5%BD%E6%B5%84%E5%9C%9F%E3%80%8D%E3%81%AB%E5%84%AA%E7%BE%8E%E3%81%AA%E8%AA%BF%E3%81%B9.png\" width=\"640\" /></a></div><br /><b>&nbsp;国宝「早来迎」をスクリーンに映し雅楽を演奏…九州国立博物館「法然と極楽浄土」に優美な調べ</b><p></p><p>九州国立博物館（福岡県太宰府市）で開催中の特別展「法然と極楽浄土」（読売新聞社など主催）の関連イベントとして、雅楽グループ「浄土宗福岡雅楽会 鎮西楽所ちんぜいがくそ 」の演奏会が２５日、同館で開かれた。</p><p>　鎮西楽所は１９８９年、浄土宗の僧侶らが結成。現在は福岡市中央区の正光寺を拠点に、県内外の約３０人が稽古に励んでいる。</p><p>　演奏会では、特別展の前期（１１月３日まで）で展示している京都・知恩院の国宝「 阿弥陀二十五菩薩来迎図あみだにじゅうごぼさつらいごうず （ 早来迎はやらいごう ）」が映し出されたスクリーンを背景に、「 海青楽かいせいらく 」や「 越殿楽えてんらく 」などを披露。来迎図に描かれた太鼓や琵琶などの調べで、その世界観を表現した。面を着けた僧侶の舞楽もあり、エントランスの立ち見客も含め約４３０人が鑑賞した。</p><p>　同市西区の会社員（５８）は「優美な調べで素晴らしかった」と話した。</p><p>　特別展は１１月３０日まで。一部、展示替えを行い、同５日から後期が始まる。</p>",
+    "published": "2025-10-26T23:51:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_1.html",
+    "labels": [
+      "Life"
+    ]
+  },
+  {
+    "id": "5045256443841347493",
+    "title": " ルーブル美術館強盗で男２人逮捕　宝飾品８点奪った疑い―仏",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhKBfRAdbcidL_5nMHOlCvDXZT2HEllbSPTCAQJ_8rcDK9mZ8aXKcpOgdcZBaL_9XQyLlO7hetwqYaHW9ViD-_WopI7bKo9qfA0ZNFkx1eQuiI0GAGf0ZLJKeQzqsRKqsgws3-7tIwmeYScrMuFNaaZ1o-S3CuWrvgO6zgsrbImEQYU7LFZRvvdagrF34m9/s671/%E3%83%AB%E3%83%BC%E3%83%96%E3%83%AB%E7%BE%8E%E8%A1%93%E9%A4%A8%E5%BC%B7%E7%9B%97%E3%81%A7%E7%94%B7%EF%BC%92%E4%BA%BA%E9%80%AE%E6%8D%95%E3%80%80%E5%AE%9D%E9%A3%BE%E5%93%81%EF%BC%98%E7%82%B9%E5%A5%AA%E3%81%A3%E3%81%9F%E7%96%91%E3%81%84%E2%80%95%E4%BB%8F.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"450\" data-original-width=\"671\" height=\"430\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhKBfRAdbcidL_5nMHOlCvDXZT2HEllbSPTCAQJ_8rcDK9mZ8aXKcpOgdcZBaL_9XQyLlO7hetwqYaHW9ViD-_WopI7bKo9qfA0ZNFkx1eQuiI0GAGf0ZLJKeQzqsRKqsgws3-7tIwmeYScrMuFNaaZ1o-S3CuWrvgO6zgsrbImEQYU7LFZRvvdagrF34m9/w640-h430/%E3%83%AB%E3%83%BC%E3%83%96%E3%83%AB%E7%BE%8E%E8%A1%93%E9%A4%A8%E5%BC%B7%E7%9B%97%E3%81%A7%E7%94%B7%EF%BC%92%E4%BA%BA%E9%80%AE%E6%8D%95%E3%80%80%E5%AE%9D%E9%A3%BE%E5%93%81%EF%BC%98%E7%82%B9%E5%A5%AA%E3%81%A3%E3%81%9F%E7%96%91%E3%81%84%E2%80%95%E4%BB%8F.png\" width=\"640\" /></a></div><br /><b>&nbsp;ルーブル美術館強盗で男２人逮捕　宝飾品８点奪った疑い―仏</b><p></p><p>フランス・パリの観光名所ルーブル美術館で起きた強盗事件で、捜査当局は２５日、組織的窃盗の疑いで男２人を逮捕した。４人組の強盗団のうちの２人とみられ、共犯や背後関係について追及する。仏メディアが２６日報じた。</p><p>パリジャン紙（電子版）によると、２人はパリ郊外出身。３０歳前後で、窃盗のプロとして知られていた。当局は、１人が北アフリカ・アルジェリアへの逃亡を計画しているとの情報をつかみ、パリ郊外のシャルル・ドゴール空港で逮捕。もう１人も近辺で拘束した。２人が盗んだ宝飾品を所持していたかは不明。ＡＦＰ通信は「まだ見つかっていない」と伝えた。</p><p>　強盗団は１９日、美術館２階の窓ガラスを割って侵入。電動工具で展示ケースを破壊し宝飾品８点を奪うと、バイクで逃げた。被害額は推計８８００万ユーロ（約１５６億円）。当局が遺留品や監視カメラ映像を基に犯人の特定を進めていた。</p>",
+    "published": "2025-10-26T23:50:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_26.html",
+    "labels": [
+      "World"
+    ]
+  },
+  {
+    "id": "2627375083364120049",
+    "title": " 仏ルーブル窃盗で2人拘束　1人はアルジェリア出国寸前",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhya0bbMc0Fcy-VyDCI1oyI6HcP7gmPOKbuWlacAmpeK6FpKp7K_OfJMpqrvcGITjwvxM5gxgBn8luMPdoRndDUeeuBc2gw_83ekxXW63UTtmMLIDRXYgTZFDc0mLGjLoWpkwWCvsDIx_pMj2b3YlzQBMi6xaTjrB6ky7gqf3MxZ4od9qoikh6m8POJbyQL/s695/%E4%BB%8F%E3%83%AB%E3%83%BC%E3%83%96%E3%83%AB%E7%AA%83%E7%9B%97%E3%81%A72%E4%BA%BA%E6%8B%98%E6%9D%9F%E3%80%801%E4%BA%BA%E3%81%AF%E3%82%A2%E3%83%AB%E3%82%B8%E3%82%A7%E3%83%AA%E3%82%A2%E5%87%BA%E5%9B%BD%E5%AF%B8%E5%89%8D.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"460\" data-original-width=\"695\" height=\"424\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhya0bbMc0Fcy-VyDCI1oyI6HcP7gmPOKbuWlacAmpeK6FpKp7K_OfJMpqrvcGITjwvxM5gxgBn8luMPdoRndDUeeuBc2gw_83ekxXW63UTtmMLIDRXYgTZFDc0mLGjLoWpkwWCvsDIx_pMj2b3YlzQBMi6xaTjrB6ky7gqf3MxZ4od9qoikh6m8POJbyQL/w640-h424/%E4%BB%8F%E3%83%AB%E3%83%BC%E3%83%96%E3%83%AB%E7%AA%83%E7%9B%97%E3%81%A72%E4%BA%BA%E6%8B%98%E6%9D%9F%E3%80%801%E4%BA%BA%E3%81%AF%E3%82%A2%E3%83%AB%E3%82%B8%E3%82%A7%E3%83%AA%E3%82%A2%E5%87%BA%E5%9B%BD%E5%AF%B8%E5%89%8D.png\" width=\"640\" /></a></div><br /><b>&nbsp;仏ルーブル窃盗で2人拘束　1人はアルジェリア出国寸前</b><br /><p></p><p>パリのルーブル美術館から被害総額8800万ユーロ（約156億円）相当の歴史的な宝飾品が盗まれた事件で、フランスメディアは26日、情報筋などの話として、容疑者の男2人が25日夜に組織的窃盗などの疑いで拘束されたと伝えた。うち1人はパリ近郊のシャルル・ドゴール空港で、アルジェリア行きの便に搭乗しようとしていたという。</p><p>　26日で事件から1週間。捜査当局は100人態勢で4人組の容疑者の行方を追っていた。パリ検察は26日、複数の人物を25日夜に拘束し、うち男1人が空港から出国しようとしていたことを認めたが、これ以上の情報開示は捜査に悪影響を及ぼすとして詳細を明らかにしなかった。</p><p>　ヌニェス内相はX（旧ツイッター）で「信頼していた捜査員らを祝福する」と述べ、今後の捜査の行方に期待を示した。</p><p>　19日、開館後の午前9時半ごろ、覆面姿の犯人らが、高所作業用のリフトを使って2階のバルコニーから窓を割って侵入。2千個近くのダイヤモンドをあしらったナポレオン3世妃のティアラなど8点を奪った。</p>",
+    "published": "2025-10-26T23:49:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/21.html",
+    "labels": [
+      "World"
+    ]
+  },
+  {
+    "id": "4773599949821238062",
+    "title": " 無人タクシー、米中で急速に普及　「安くて安全」も残る課題【地球コラム】",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiFdKQUofxmecx5bP3z9WdDrK_9yQHg1oY0eipvdG7s6r1VqL-yf8k4etT7Qn_k1rMaf5Z3sD3Gpf8bXysj0eJvKjwAthPQ-yDdEFuETTSQ_1-4vdme2U6FtKvC0U7biJe5uNXz6GH8cyVlK6kK-71FiuSl_av9DXc93OWdARQ-cMxXcWpV3N01_Y4dIZA/s678/%E7%84%A1%E4%BA%BA%E3%82%BF%E3%82%AF%E3%82%B7%E3%83%BC%E3%80%81%E7%B1%B3%E4%B8%AD%E3%81%A7%E6%80%A5%E9%80%9F%E3%81%AB%E6%99%AE%E5%8F%8A%E3%80%80%E3%80%8C%E5%AE%89%E3%81%8F%E3%81%A6%E5%AE%89%E5%85%A8%E3%80%8D%E3%82%82%E6%AE%8B%E3%82%8B%E8%AA%B2%E9%A1%8C%E3%80%90%E5%9C%B0%E7%90%83%E3%82%B3%E3%83%A9%E3%83%A0%E3%80%91.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"433\" data-original-width=\"678\" height=\"408\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiFdKQUofxmecx5bP3z9WdDrK_9yQHg1oY0eipvdG7s6r1VqL-yf8k4etT7Qn_k1rMaf5Z3sD3Gpf8bXysj0eJvKjwAthPQ-yDdEFuETTSQ_1-4vdme2U6FtKvC0U7biJe5uNXz6GH8cyVlK6kK-71FiuSl_av9DXc93OWdARQ-cMxXcWpV3N01_Y4dIZA/w640-h408/%E7%84%A1%E4%BA%BA%E3%82%BF%E3%82%AF%E3%82%B7%E3%83%BC%E3%80%81%E7%B1%B3%E4%B8%AD%E3%81%A7%E6%80%A5%E9%80%9F%E3%81%AB%E6%99%AE%E5%8F%8A%E3%80%80%E3%80%8C%E5%AE%89%E3%81%8F%E3%81%A6%E5%AE%89%E5%85%A8%E3%80%8D%E3%82%82%E6%AE%8B%E3%82%8B%E8%AA%B2%E9%A1%8C%E3%80%90%E5%9C%B0%E7%90%83%E3%82%B3%E3%83%A9%E3%83%A0%E3%80%91.png\" width=\"640\" /></a></div><br />&nbsp;<b>無人タクシー、米中で急速に普及　「安くて安全」も残る課題【地球コラム】</b><p></p><p>　アメリカと中国で無人タクシーの実用化が進んでいる。運行地域は限定されているものの、運転者のいない完全自動運転が可能な「レベル４」の技術が用いられている。日本で「レベル４」の営業運転は２０２３年以降、松山市を走る路線バスや福井県永平寺の電動カートで実施されているが、タクシーは一部地域で実証の初期段階にある状態だ。大きく先行する米中両国での利用状況や安全性、課題をリポートする。（時事通信社ニューヨーク総局　武司智美、中国総局　榊原俊介）</p><p>【「譲り合い」も再現】</p><p>　無人タクシーは、カメラやセンサーが周囲の状況を把握し、人工知能（ＡＩ）が自動で操縦する。記者は２０２４年１０月、スマートフォンのアプリを使い、米カリフォルニア州サンフランシスコ中心部の広場に米グーグル系ウェイモのタクシーを呼んだ。５分ほどでイギリスの高級車、ジャガーの電気自動車（ＥＶ）が到着。アプリでドアを開錠して乗り込み、車内モニターの「出発」をタップすると、無人の運転席で勝手にハンドルが回って走り始めた。</p><p>　中華街や急坂などの観光名所を通る約９キロのルートを約４０分かけて走行した。信号や道路標識、法定速度を守り、交差点では歩行者を優先した。狭い道では対向車のスペースを空けて待機したり、前方の車がＵターンする際に脇によけたりするなど「譲り合い」の姿勢も見せ、人間らしい運転を再現していた。</p><p>料金は約３５ドル（約５０００円）だった。米メディアの調査によると、ウェイモは従来の配車サービスより平均して３割あまり料金が高い。ただ、いずれも価格が需要に応じて大きく変動するため、必ずしもウェイモの方が高くなるとは限らない。</p><p>【「客が奪われた」】</p><p>　加えて、米国では配車サービスのウーバーやタクシーを利用した場合、１５～２０％程度のチップを支払うのがマナーとされるが、無人のウェイモでは不要だ。試しにウーバーで、ウェイモに乗車したのと同じ平日午後の時間帯に同様のルートを検索すると、料金は約４３ドルだった。この時点でウェイモより高く、仮に１５％のチップを上乗せすれば５０ドル程度となる。</p><p>　サンフランシスコでウーバーの運転手をしている男性は「ウェイモのせいで最近客が減った気がする」と焦った様子だ。米調査会社イピットデータによると、サンフランシスコの配車サービスでウーバーのシェアは、ウェイモが参入した２３年８月時点では６６％だったが、２４年１１月には５５％へ減少。一方、ウェイモはこの１年３カ月間に０％から２２％へ伸ばしていた。</p><p>　ウェイモはサンフランシスコ一帯で約３００台を展開している。無人タクシーに関する情報を発信している地元ユーチューバーのケビン・チェンさん（２９）は「利用者は新しい物好きが多い」と指摘しつつ、「既に通勤など日常の足として使われている」とも語った。</p><p>【１～２分に１台の頻度】</p><p>　中国では、政府が走行規制の緩和で普及を後押しする中、各地で無人タクシーの商業化が始まっている。⾸都北京や広東省広州では複数の事業者が参入し、サービスを競っている。</p><p>　インターネット検索大手の百度（バイドゥ）は２２年、中国で初めて完全無人タクシーの商用化に踏み切った。中国メディアによると、湖北省武漢では投入台数を段階的に増やしており、２５年中に１５００台まで拡大する方針。２４年の利用者数は前年比で２桁増えたもようだ。</p><p>　記者は２４年１１月、武漢の中心街近くから数キロ離れたショッピングモールまでの移動に百度の無人タクシーを利用した。前に割り込んできた車両をよけるため急減速することはあったものの、総じて滑らかな走りだった。２年前に乗ったときと比べ、「違和感」を感じる頻度は大幅に減り、乗り心地は相当改善していると感じた。</p><p>　到着したモールの近くでは、１～２分に１台の頻度で利用者を見掛けた。２０代の女性は「ここでは日常の風景だ」と話す。乗降場所が限られている上、制限速度を厳守するため通常のタクシーより時間がかかることが多いが、運賃はタクシーよりも４割ほど安いため「週に３回は乗る」という。</p>",
+    "published": "2025-10-24T19:13:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_28.html",
+    "labels": [
+      "Business"
+    ]
+  },
+  {
+    "id": "6333376780641205111",
+    "title": " 縫いぐるみのペングリップ　キングジム",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjVoI4NKH1eFo47H_4nA-pp4BRC25G6U8BKTraoyVBlQsokpGEM5KEeXXnuWiwjjMTRtJA7mndTG5qxx4RKvlNnsZFcIaWZYRdQcP56LU4WKN0fYUpKTJsJiyzaX1ULj3pz7GtDvviqvBsP9M4tA4wR4kq0X7NnSapbNTKFFGcPZs0rM2lcwMCImJzk-qI/s447/%E7%B8%AB%E3%81%84%E3%81%90%E3%82%8B%E3%81%BF%E3%81%AE%E3%83%9A%E3%83%B3%E3%82%B0%E3%83%AA%E3%83%83%E3%83%97%E3%80%80%E3%82%AD%E3%83%B3%E3%82%B0%E3%82%B8%E3%83%A0.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"297\" data-original-width=\"447\" height=\"426\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjVoI4NKH1eFo47H_4nA-pp4BRC25G6U8BKTraoyVBlQsokpGEM5KEeXXnuWiwjjMTRtJA7mndTG5qxx4RKvlNnsZFcIaWZYRdQcP56LU4WKN0fYUpKTJsJiyzaX1ULj3pz7GtDvviqvBsP9M4tA4wR4kq0X7NnSapbNTKFFGcPZs0rM2lcwMCImJzk-qI/w640-h426/%E7%B8%AB%E3%81%84%E3%81%90%E3%82%8B%E3%81%BF%E3%81%AE%E3%83%9A%E3%83%B3%E3%82%B0%E3%83%AA%E3%83%83%E3%83%97%E3%80%80%E3%82%AD%E3%83%B3%E3%82%B0%E3%82%B8%E3%83%A0.png\" width=\"640\" /></a></div><br /><b>&nbsp;縫いぐるみのペングリップ　キングジム</b><p></p><p>キングジムは、縫いぐるみポーチの「ポーズー」シリーズより、大学生との産学連携で開発した動物形ペングリップ「『ポーズー』ペングリップ」を発売。縫いぐるみ素材のグリップを取り付けることで手汗をかいても滑りにくく、ペンだこを防げる。適度な太さとなり、長時間筆記しても疲れにくいという。装着したままペン先の出し入れ操作が可能。スナネコ、キリンなど全５種で、価格は１９８０円。</p>",
+    "published": "2025-10-24T19:11:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_47.html",
+    "labels": [
+      "Trend"
+    ]
+  },
+  {
+    "id": "7821154956018478644",
+    "title": "米中首脳会談、韓国で３０日に　高市首相とは２８日―トランプ氏、２期目初のアジア歴訪へ",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiSgNDlk5SMh51hbC-pvTMewWIVuyIpI5ZjVsbx7j9naN_cZt45wlV3PrKZNLfCewxGo9l_nuz4nI9mYKOGPhPW05yc-sSUVBKuGHUKomkaVNIkjPs_n-vuFAEFIE2kI-K0u_oia-Rml_T01CcaXaFfAfReVatvoRTs-aA8bw81je7sr2ISMjV0TnTbHsU/s676/%E7%B1%B3%E4%B8%AD%E9%A6%96%E8%84%B3%E4%BC%9A%E8%AB%87%E3%80%81%E9%9F%93%E5%9B%BD%E3%81%A7%EF%BC%93%EF%BC%90%E6%97%A5%E3%81%AB%E3%80%80%E9%AB%98%E5%B8%82%E9%A6%96%E7%9B%B8%E3%81%A8%E3%81%AF%EF%BC%92%EF%BC%98%E6%97%A5%E2%80%95%E3%83%88%E3%83%A9%E3%83%B3%E3%83%97%E6%B0%8F%E3%80%81%EF%BC%92%E6%9C%9F%E7%9B%AE%E5%88%9D%E3%81%AE%E3%82%A2%E3%82%B8%E3%82%A2%E6%AD%B4%E8%A8%AA%E3%81%B8.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"432\" data-original-width=\"676\" height=\"431\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiSgNDlk5SMh51hbC-pvTMewWIVuyIpI5ZjVsbx7j9naN_cZt45wlV3PrKZNLfCewxGo9l_nuz4nI9mYKOGPhPW05yc-sSUVBKuGHUKomkaVNIkjPs_n-vuFAEFIE2kI-K0u_oia-Rml_T01CcaXaFfAfReVatvoRTs-aA8bw81je7sr2ISMjV0TnTbHsU/w675-h431/%E7%B1%B3%E4%B8%AD%E9%A6%96%E8%84%B3%E4%BC%9A%E8%AB%87%E3%80%81%E9%9F%93%E5%9B%BD%E3%81%A7%EF%BC%93%EF%BC%90%E6%97%A5%E3%81%AB%E3%80%80%E9%AB%98%E5%B8%82%E9%A6%96%E7%9B%B8%E3%81%A8%E3%81%AF%EF%BC%92%EF%BC%98%E6%97%A5%E2%80%95%E3%83%88%E3%83%A9%E3%83%B3%E3%83%97%E6%B0%8F%E3%80%81%EF%BC%92%E6%9C%9F%E7%9B%AE%E5%88%9D%E3%81%AE%E3%82%A2%E3%82%B8%E3%82%A2%E6%AD%B4%E8%A8%AA%E3%81%B8.png\" width=\"675\" /></a></div><br /><b>&nbsp;米中首脳会談、韓国で３０日に　高市首相とは２８日―トランプ氏、２期目初のアジア歴訪へ</b><p></p><p>【ワシントン、北京時事】レビット米大統領報道官は２３日に記者会見し、トランプ米大統領が２４～３０日の日程でマレーシアと日本、韓国を歴訪すると発表した。中国の習近平国家主席と３０日に韓国で会談。これに先立ち、２８日には日本で高市早苗首相との初会談に臨む。</p><p>　第２次政権発足後、トランプ氏のアジア歴訪は初めて。貿易や台湾、南シナ海問題で米中対立が続き、米国の高関税政策に各国が対応を迫られる中、トランプ政権のアジア地域への関与姿勢が焦点となる。</p><p>　トランプ氏は現地時間２６日午前（日本時間同）にマレーシア入りしてアンワル首相と会談し、東南アジア諸国連合（ＡＳＥＡＮ）関連首脳会議に出席。２７日午前に日本に向けて出発する。</p><p>　高市氏とは２８日午前に会談を行い、日米同盟強化などを巡り議論し、首脳間の関係構築を図る。日米関税合意の署名式も開かれる見通し。２９日午前に韓国へ移り、李在明大統領と会い、アジア太平洋経済協力会議（ＡＰＥＣ）首脳会議の関連行事に参加する。</p><p>　習氏とは、２期目では初の対面会談を３０日午前に行う。米国の対中関税のほか、中国が強めるレアアース（希土類）輸出規制や台湾周辺での威圧的行動などについて協議するとみられる。トランプ氏と習氏の直接会談は、大阪での２０カ国・地域首脳会議（Ｇ２０サミット）に合わせて行った２０１９年以来。</p>",
+    "published": "2025-10-24T19:10:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_6.html",
+    "labels": [
+      "World"
+    ]
+  },
+  {
+    "id": "5867351949395393882",
+    "title": "政府、「国家情報局」創設を検討　インテリジェンス強化へ首相指示",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgLR5Yy-lUpuqPwNFLR_mEP3HV1eHTfcFzSKXXtlCCfeT91q-5YYhDMbuQUvcQOFdGgITr2pbHmN5Et8JlaBqRb4iiWIK_1C110GmP-6Qp2s1zlRKFTjG4KjnKQmRXxhq8pvWBJX-5entgfYY2FSwf2jhyp4dola8bbRZeiNnAN8XeTNyw1SDRNnigeyE4/s677/%E6%94%BF%E5%BA%9C%E3%80%81%E3%80%8C%E5%9B%BD%E5%AE%B6%E6%83%85%E5%A0%B1%E5%B1%80%E3%80%8D%E5%89%B5%E8%A8%AD%E3%82%92%E6%A4%9C%E8%A8%8E%E3%80%80%E3%82%A4%E3%83%B3%E3%83%86%E3%83%AA%E3%82%B8%E3%82%A7%E3%83%B3%E3%82%B9%E5%BC%B7%E5%8C%96%E3%81%B8%E9%A6%96%E7%9B%B8%E6%8C%87%E7%A4%BA.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"425\" data-original-width=\"677\" height=\"436\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgLR5Yy-lUpuqPwNFLR_mEP3HV1eHTfcFzSKXXtlCCfeT91q-5YYhDMbuQUvcQOFdGgITr2pbHmN5Et8JlaBqRb4iiWIK_1C110GmP-6Qp2s1zlRKFTjG4KjnKQmRXxhq8pvWBJX-5entgfYY2FSwf2jhyp4dola8bbRZeiNnAN8XeTNyw1SDRNnigeyE4/w694-h436/%E6%94%BF%E5%BA%9C%E3%80%81%E3%80%8C%E5%9B%BD%E5%AE%B6%E6%83%85%E5%A0%B1%E5%B1%80%E3%80%8D%E5%89%B5%E8%A8%AD%E3%82%92%E6%A4%9C%E8%A8%8E%E3%80%80%E3%82%A4%E3%83%B3%E3%83%86%E3%83%AA%E3%82%B8%E3%82%A7%E3%83%B3%E3%82%B9%E5%BC%B7%E5%8C%96%E3%81%B8%E9%A6%96%E7%9B%B8%E6%8C%87%E7%A4%BA.png\" width=\"694\" /></a></div><br /><b>&nbsp;政府、「国家情報局」創設を検討　インテリジェンス強化へ首相指示</b><p></p><p>政府は、インテリジェンス（情報活動）体制の強化のため、各省庁の関係機関を統括する「国家情報局」を創設する方向で検討に入った。木原稔官房長官が２４日の記者会見で、高市早苗首相から「インテリジェンス司令塔機能の強化」を図るよう指示を受けたと明らかにした。</p><p>木原氏は「戦後最も厳しく複雑な安全保障環境において、国益を守り、国民の安全を確保するためには、インテリジェンスに関する国家機能の強化が急務だ」と指摘。組織の在り方や権限などについて「与党と連携して早急に論点を整理し、検討を進めたい」と強調した。</p><p>政府は内閣情報調査室（内調）を格上げする形での創設を想定。トップの国家情報局長は、外交・安保政策の司令塔を担う国家安全保障局長と同格とする方向だ。</p><p>政府の情報機関は内調のほか、公安調査庁、警察庁警備局、外務省国際情報統括官組織、防衛省情報本部などがある。国家情報局は、課題とされてきた情報の集約や分析を一元的に担うとみられる。</p>",
+    "published": "2025-10-24T19:09:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_66.html",
+    "labels": [
+      "Business"
+    ]
+  },
+  {
+    "id": "6977444186652683863",
+    "title": "佐々木、ソフトバンクが交渉権　立石は３球団競合で阪神―プロ野球ドラフト",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjh8yWbfCmwdUmkDmyL5bylEB7rRaDFvWF-WpoxALVj_xYkXI8ZaGpOiyEcwZq5LOwHLqxA7VAIQOdF7C5hMnI6obyEKeItJDDxrJbOvCvEW6ajyk2YcD72shrrKDCcoHjBVaB5S5NRJe4wzQEeTRVM94h9idZyNHsGsK2rIjBqlYTHLhyVEtq9FSQaF0E/s675/%E4%BD%90%E3%80%85%E6%9C%A8%E3%80%81%E3%82%BD%E3%83%95%E3%83%88%E3%83%90%E3%83%B3%E3%82%AF%E3%81%8C%E4%BA%A4%E6%B8%89%E6%A8%A9%E3%80%80%E7%AB%8B%E7%9F%B3%E3%81%AF%EF%BC%93%E7%90%83%E5%9B%A3%E7%AB%B6%E5%90%88%E3%81%A7%E9%98%AA%E7%A5%9E%E2%80%95%E3%83%97%E3%83%AD%E9%87%8E%E7%90%83%E3%83%89%E3%83%A9%E3%83%95%E3%83%88.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"455\" data-original-width=\"675\" height=\"438\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjh8yWbfCmwdUmkDmyL5bylEB7rRaDFvWF-WpoxALVj_xYkXI8ZaGpOiyEcwZq5LOwHLqxA7VAIQOdF7C5hMnI6obyEKeItJDDxrJbOvCvEW6ajyk2YcD72shrrKDCcoHjBVaB5S5NRJe4wzQEeTRVM94h9idZyNHsGsK2rIjBqlYTHLhyVEtq9FSQaF0E/w650-h438/%E4%BD%90%E3%80%85%E6%9C%A8%E3%80%81%E3%82%BD%E3%83%95%E3%83%88%E3%83%90%E3%83%B3%E3%82%AF%E3%81%8C%E4%BA%A4%E6%B8%89%E6%A8%A9%E3%80%80%E7%AB%8B%E7%9F%B3%E3%81%AF%EF%BC%93%E7%90%83%E5%9B%A3%E7%AB%B6%E5%90%88%E3%81%A7%E9%98%AA%E7%A5%9E%E2%80%95%E3%83%97%E3%83%AD%E9%87%8E%E7%90%83%E3%83%89%E3%83%A9%E3%83%95%E3%83%88.png\" width=\"650\" /></a></div><br />&nbsp;<b>佐々木、ソフトバンクが交渉権　立石は３球団競合で阪神―プロ野球ドラフト</b><p></p><p>プロ野球のドラフト（新人選択）会議が２３日、東京都内のホテルで行われ、米スタンフォード大の佐々木麟太郎内野手はソフトバンクとＤｅＮＡの２球団が競合し、ソフトバンクが交渉権を獲得した。</p><p>　立石正広内野手（創価大）は阪神、広島、日本ハムが１位で重複し、阪神が当たりくじを引いた。２球団が入札した石垣元気投手（群馬・健大高崎高）はロッテが交渉権を得た。</p><p>　巨人は竹丸和幸投手（鷺宮製作所）、中日は中西聖輝投手（青学大）、ヤクルトは松下歩叶内野手（法大）、西武は小島大河捕手（明大）、楽天は藤原聡大投手（花園大）をそれぞれ単独指名。抽選で外れたＤｅＮＡは小田康一郎内野手（青学大）、オリックスは藤川敦也投手（宮崎・延岡学園高）を１位指名した。</p><p>　広島と日本ハムは２度目の入札でも競合し、広島が平川蓮外野手（仙台大）の交渉権を獲得。抽選で外れた日本ハムは大川慈英投手（明大）を指名した。</p><p>　支配下選手の指名は計７３人で、大学生が４０人と大半を占めた。</p>",
+    "published": "2025-10-24T19:07:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_50.html",
+    "labels": [
+      "Trend"
+    ]
+  },
+  {
+    "id": "4204112720731473351",
+    "title": "英才教育の象徴、ピアノを手放す中間層【洞察☆中国】",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjMFtCBSy7kM8iVbuSdrpEwoCp4uofFdiTQIEpbmIR0kEZpMFfVMjgMon9We4FjsyhyphenhyphenfhzzVCmwRjYK33_RhMSzWbhvojHUrPbwbSuWfe__xOuUxbcfmfqkGL1qHbOIF1U1Xfo_gz2af-zskrO6_WMqBON_S_-P798ztOyFuGOxBoAuUNlvaL6kdC44c8Q/s677/%E8%8B%B1%E6%89%8D%E6%95%99%E8%82%B2%E3%81%AE%E8%B1%A1%E5%BE%B4%E3%80%81%E3%83%94%E3%82%A2%E3%83%8E%E3%82%92%E6%89%8B%E6%94%BE%E3%81%99%E4%B8%AD%E9%96%93%E5%B1%A4%E3%80%90%E6%B4%9E%E5%AF%9F%E2%98%86%E4%B8%AD%E5%9B%BD%E3%80%91.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"433\" data-original-width=\"677\" height=\"391\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjMFtCBSy7kM8iVbuSdrpEwoCp4uofFdiTQIEpbmIR0kEZpMFfVMjgMon9We4FjsyhyphenhyphenfhzzVCmwRjYK33_RhMSzWbhvojHUrPbwbSuWfe__xOuUxbcfmfqkGL1qHbOIF1U1Xfo_gz2af-zskrO6_WMqBON_S_-P798ztOyFuGOxBoAuUNlvaL6kdC44c8Q/w611-h391/%E8%8B%B1%E6%89%8D%E6%95%99%E8%82%B2%E3%81%AE%E8%B1%A1%E5%BE%B4%E3%80%81%E3%83%94%E3%82%A2%E3%83%8E%E3%82%92%E6%89%8B%E6%94%BE%E3%81%99%E4%B8%AD%E9%96%93%E5%B1%A4%E3%80%90%E6%B4%9E%E5%AF%9F%E2%98%86%E4%B8%AD%E5%9B%BD%E3%80%91.png\" width=\"611\" /></a></div><div class=\"separator\" style=\"clear: both; text-align: center;\"><br /></div><b>&nbsp;英才教育の象徴、ピアノを手放す中間層【洞察☆中国】</b><div><br /></div><div>中間層世帯の定義は国や地域によって異なるが、収入、資産、教育水準など複数の指標が含まれる。中国の中央銀行など金融機関による大まかな基準では、一般的には世帯の年間収入５０万元（１０００万円）以上、金融資産１５０万元（約３０００万円）以上となっている。</div><div><br /></div><div>　中国国家統計局と中国社会科学院が共同で出したリポートによると、２０２４年には中間層の数が３３２０万世帯あり、全世帯数の８．９％を占める。最近、この一握りの中間層について、何かと話題になることが多い。</div><p></p>",
+    "published": "2025-10-24T19:06:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_27.html",
+    "labels": [
+      "Business"
+    ]
+  },
+  {
+    "id": "7446438618108011778",
+    "title": "マツコ・デラックス「もうカニを食べたいのよ！」　足が遠のいていた北海道への移住を希望？",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgA5P1EeHH85DjIi67YQqjQeE6hRK89Mq0ZkWpIzN3Pbj6rpdSsHsc7i7RwMfEjUJNMUtC6MWUtBgp3R_fhjoJrt-kyTmlZIdDCaLrSArfz4bh-U_COkut7khYEMBd5-6u8a-setYNi7Rrr9cF0AO0FfGQ3PfwOalpD84XCEhstaeBazsx9QX2uxJWjjVs/s676/%E3%83%9E%E3%83%84%E3%82%B3%E3%83%BB%E3%83%87%E3%83%A9%E3%83%83%E3%82%AF%E3%82%B9%E3%80%8C%E3%82%82%E3%81%86%E3%82%AB%E3%83%8B%E3%82%92%E9%A3%9F%E3%81%B9%E3%81%9F%E3%81%84%E3%81%AE%E3%82%88%EF%BC%81%E3%80%8D%E3%80%80%E8%B6%B3%E3%81%8C%E9%81%A0%E3%81%AE%E3%81%84%E3%81%A6%E3%81%84%E3%81%9F%E5%8C%97%E6%B5%B7%E9%81%93%E3%81%B8%E3%81%AE%E7%A7%BB%E4%BD%8F%E3%82%92%E5%B8%8C%E6%9C%9B%EF%BC%9F.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"496\" data-original-width=\"676\" height=\"432\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgA5P1EeHH85DjIi67YQqjQeE6hRK89Mq0ZkWpIzN3Pbj6rpdSsHsc7i7RwMfEjUJNMUtC6MWUtBgp3R_fhjoJrt-kyTmlZIdDCaLrSArfz4bh-U_COkut7khYEMBd5-6u8a-setYNi7Rrr9cF0AO0FfGQ3PfwOalpD84XCEhstaeBazsx9QX2uxJWjjVs/w589-h432/%E3%83%9E%E3%83%84%E3%82%B3%E3%83%BB%E3%83%87%E3%83%A9%E3%83%83%E3%82%AF%E3%82%B9%E3%80%8C%E3%82%82%E3%81%86%E3%82%AB%E3%83%8B%E3%82%92%E9%A3%9F%E3%81%B9%E3%81%9F%E3%81%84%E3%81%AE%E3%82%88%EF%BC%81%E3%80%8D%E3%80%80%E8%B6%B3%E3%81%8C%E9%81%A0%E3%81%AE%E3%81%84%E3%81%A6%E3%81%84%E3%81%9F%E5%8C%97%E6%B5%B7%E9%81%93%E3%81%B8%E3%81%AE%E7%A7%BB%E4%BD%8F%E3%82%92%E5%B8%8C%E6%9C%9B%EF%BC%9F.png\" width=\"589\" /></a></div><br /><b>&nbsp;マツコ・デラックス「もうカニを食べたいのよ！」　足が遠のいていた北海道への移住を希望？</b><p></p><p>タレントのマツコ・デラックスが２２日、東京都内で開催された「令和７年度北海道米」の新米発表会に出席した。</p><p>　北海道米のＣＭイメージキャラクターを務めているマツコはこの日、「ゆめぴりか」「ななつぼし」など４種の新米を試食。「今、お米はおいしくて当たり前みたいになっているけど、農家の皆さんがものすごく計算をして、育て方をいろいろ調整して、ようやく、そのおいしさになっているんですよ」と感謝を込め、「もっと（消費者の）皆さんに知っていただきたいわね」とも話した。</p><p>　試食中、「５０歳を超えて、さすがに食が細くなってきた」とマツコ。「一日に食べるご飯の量」を尋ねられると、「調子が良ければ３杯。さすがに、どんぶりはやめました。でも、普通の茶わんよりは大きいですよ」などと応じた。</p><p>　マツコは以前、「年に２回ペースで北海道に行っていた時代があって、１０何年続いた」そうだが、「大好きなカニを一日に３～４杯ずつぐらい食べていたら当たりまして。それから甲殻類を食べられなくなってしまった…。残念なのよ」。その後、北海道からは足が遠のいていたという。</p><p><br /></p><p><br /></p><p>　それでも、この日は「住んじゃおうかな」と言い、「カニを食べられなくなってから、悲しいのよ。もう食べたいのよ！　もし私が北海道に移住したと聞いたときは、好きな物を食べて死のうというぐらいの覚悟で行ったと思ってください」などと言って会場の笑いを誘った。</p>",
+    "published": "2025-10-24T19:04:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_69.html",
+    "labels": [
+      "Trend"
+    ]
+  },
+  {
+    "id": "1910031464378196715",
+    "title": "ついに復帰、投手・大谷翔平　前例なき二刀流復活劇の舞台裏",
+    "content": "<p></p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh19twpltKhTFoQnV6FnlaOCeAPCGUK1JNq4VAHEL_QSWn4Vrz46H_UILbszQ6YBqdDMWX97bH03jVCIRZGF_7xV1kglTu9soi4Is1Hif5efahxt7Ldqqcojm6Zj6NDJtTs0OaheCEIXa8s61CkNYrnXZYivODonYLIRc13k2BJMkVuunYWdDhF1r4JK_M/s677/%E3%81%A4%E3%81%84%E3%81%AB%E5%BE%A9%E5%B8%B0%E3%80%81%E6%8A%95%E6%89%8B%E3%83%BB%E5%A4%A7%E8%B0%B7%E7%BF%94%E5%B9%B3%E3%80%80%E5%89%8D%E4%BE%8B%E3%81%AA%E3%81%8D%E4%BA%8C%E5%88%80%E6%B5%81%E5%BE%A9%E6%B4%BB%E5%8A%87%E3%81%AE%E8%88%9E%E5%8F%B0%E8%A3%8F.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"468\" data-original-width=\"677\" height=\"377\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh19twpltKhTFoQnV6FnlaOCeAPCGUK1JNq4VAHEL_QSWn4Vrz46H_UILbszQ6YBqdDMWX97bH03jVCIRZGF_7xV1kglTu9soi4Is1Hif5efahxt7Ldqqcojm6Zj6NDJtTs0OaheCEIXa8s61CkNYrnXZYivODonYLIRc13k2BJMkVuunYWdDhF1r4JK_M/w546-h377/%E3%81%A4%E3%81%84%E3%81%AB%E5%BE%A9%E5%B8%B0%E3%80%81%E6%8A%95%E6%89%8B%E3%83%BB%E5%A4%A7%E8%B0%B7%E7%BF%94%E5%B9%B3%E3%80%80%E5%89%8D%E4%BE%8B%E3%81%AA%E3%81%8D%E4%BA%8C%E5%88%80%E6%B5%81%E5%BE%A9%E6%B4%BB%E5%8A%87%E3%81%AE%E8%88%9E%E5%8F%B0%E8%A3%8F.png\" width=\"546\" /></a></div><p></p><p><b>ついに復帰、投手・大谷翔平　前例なき二刀流復活劇の舞台裏</b></p><p>　２０２５年、大谷翔平が再びメジャーリーグのマウンドに立った。手術から約２年、打者として球界最高クラスの成績を維持しながらの異例の投手復帰は、全米の注目を集めた。なぜ大谷はこれほど早く戻る決断を下したのか。打撃の勢いはそのままに、４度目のＭＶＰに向けた戦いが本格的に始まる。ロサンゼルスの地方紙でスポーツライターを務めた経験もある日本人ジャーナリストが、現地の視点からその舞台裏に迫る。（志村朋哉　在米ジャーナリスト）</p><p>【以前と変わらぬ球威、球質】</p><p>　現地時間６月１６日、ロサンゼルス・ドジャースのユニホームを身にまとった大谷が、ついにマウンドに戻ってきた。２度目となる右肘手術を経て、再び「二刀流」としての第一歩を踏み出す日。球団が先発登板を発表すると、ＳＮＳのタイムラインは一斉に沸いた。ＭＬＢ公式はこの試合を無料配信し、球界の“顔”の投手復帰を全世界へ届けた。</p><p>&nbsp;</p>",
+    "published": "2025-10-24T19:03:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_71.html",
+    "labels": [
+      "Trend"
+    ]
+  },
+  {
+    "id": "4056674800339247273",
+    "title": "コメ価格、５週ぶり上昇　４２５１円、銘柄米は最高値―農水省",
+    "content": "<p>&nbsp;</p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgx7WYOFeMAhXsS8Ws7CRN9bhS2I_glCY2x-hvQg3Fm2AbMIKacE8eTIdzSIbfmkGD27TNv-UXAnc3qMYw7JMLrTsOKWy9-pASReumGhNiBEJSAxzoVJLemmgTHOTPxkQj7TE26R2gntDPJcUyHDpU3avTixa6cLl8c9bDR81OYzHkHRDLfoWW59H0iGYE/s677/%E3%82%B3%E3%83%A1%E4%BE%A1%E6%A0%BC%E3%80%81%EF%BC%95%E9%80%B1%E3%81%B6%E3%82%8A%E4%B8%8A%E6%98%87%E3%80%80%EF%BC%94%EF%BC%92%EF%BC%95%EF%BC%91%E5%86%86%E3%80%81%E9%8A%98%E6%9F%84%E7%B1%B3%E3%81%AF%E6%9C%80%E9%AB%98%E5%80%A4%E2%80%95%E8%BE%B2%E6%B0%B4%E7%9C%81.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"432\" data-original-width=\"677\" height=\"337\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgx7WYOFeMAhXsS8Ws7CRN9bhS2I_glCY2x-hvQg3Fm2AbMIKacE8eTIdzSIbfmkGD27TNv-UXAnc3qMYw7JMLrTsOKWy9-pASReumGhNiBEJSAxzoVJLemmgTHOTPxkQj7TE26R2gntDPJcUyHDpU3avTixa6cLl8c9bDR81OYzHkHRDLfoWW59H0iGYE/w529-h337/%E3%82%B3%E3%83%A1%E4%BE%A1%E6%A0%BC%E3%80%81%EF%BC%95%E9%80%B1%E3%81%B6%E3%82%8A%E4%B8%8A%E6%98%87%E3%80%80%EF%BC%94%EF%BC%92%EF%BC%95%EF%BC%91%E5%86%86%E3%80%81%E9%8A%98%E6%9F%84%E7%B1%B3%E3%81%AF%E6%9C%80%E9%AB%98%E5%80%A4%E2%80%95%E8%BE%B2%E6%B0%B4%E7%9C%81.png\" width=\"529\" /></a></div><br /><p></p><p><b>コメ価格、５週ぶり上昇　４２５１円、銘柄米は最高値―農水省</b></p><p>農林水産省は２４日、全国のスーパー約１０００店舗で１３～１９日に販売されたコメ５キロ当たりの平均価格が前週より１０９円高い４２５１円だったと発表した。５週ぶりに上昇に転じ、４０００円台の高値水準は７週連続となった。</p><p>このうち新米を含む銘柄米は６１円高の４５０１円と７週連続で値上がりし、種類別の集計を始めた２月以降で過去最高を更新した。これまでの最高値は５月１２～１８日の４４６９円だった。農協が農家に前払いする概算金が、前年比で大幅に上昇していることなどが影響しているとみられる。</p>",
+    "published": "2025-10-24T19:02:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post_24.html",
+    "labels": [
+      "Life"
+    ]
+  },
+  {
+    "id": "2809793086280406934",
+    "title": "ＢＭＷ×トヨタ、提携のシナジーは　　普及へいよいよ本腰　水素燃料電池車",
+    "content": "<p>&nbsp;</p><div class=\"separator\" style=\"clear: both; text-align: center;\"><a href=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgPJjXOU331tOmwJf8k03h1Zqc6L8edup82gljN8HMBv_9tHeHkIHlW3O0i1apiMTq0VdYNKVxwDkFmelnlKWzqoODRoHsc0InSmRdISboPsJM9Fhr-KwdmGo0_fnqrMSiAal3xCICXkE5cfai_4GPXP6vhz1NlI9jEma8rt1kRvUkEWiTMTTyRnw-31nE/s680/%EF%BC%A2%EF%BC%AD%EF%BC%B7%C3%97%E3%83%88%E3%83%A8%E3%82%BF%E3%80%81%E6%8F%90%E6%90%BA%E3%81%AE%E3%82%B7%E3%83%8A%E3%82%B8%E3%83%BC%E3%81%AF%E3%80%80%E3%80%80%E6%99%AE%E5%8F%8A%E3%81%B8%E3%81%84%E3%82%88%E3%81%84%E3%82%88%E6%9C%AC%E8%85%B0%E3%80%80%E6%B0%B4%E7%B4%A0%E7%87%83%E6%96%99%E9%9B%BB%E6%B1%A0%E8%BB%8A.png\" imageanchor=\"1\" style=\"margin-left: 1em; margin-right: 1em;\"><img border=\"0\" data-original-height=\"383\" data-original-width=\"680\" height=\"320\" src=\"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgPJjXOU331tOmwJf8k03h1Zqc6L8edup82gljN8HMBv_9tHeHkIHlW3O0i1apiMTq0VdYNKVxwDkFmelnlKWzqoODRoHsc0InSmRdISboPsJM9Fhr-KwdmGo0_fnqrMSiAal3xCICXkE5cfai_4GPXP6vhz1NlI9jEma8rt1kRvUkEWiTMTTyRnw-31nE/w569-h320/%EF%BC%A2%EF%BC%AD%EF%BC%B7%C3%97%E3%83%88%E3%83%A8%E3%82%BF%E3%80%81%E6%8F%90%E6%90%BA%E3%81%AE%E3%82%B7%E3%83%8A%E3%82%B8%E3%83%BC%E3%81%AF%E3%80%80%E3%80%80%E6%99%AE%E5%8F%8A%E3%81%B8%E3%81%84%E3%82%88%E3%81%84%E3%82%88%E6%9C%AC%E8%85%B0%E3%80%80%E6%B0%B4%E7%B4%A0%E7%87%83%E6%96%99%E9%9B%BB%E6%B1%A0%E8%BB%8A.png\" width=\"569\" /></a></div><br /><p></p><p><b>ＢＭＷ×トヨタ、提携のシナジーは　　普及へいよいよ本腰　水素燃料電池車</b></p><p>水素を燃料に使い、走行中に水しか排出しないため「究極のエコカー」と言われる燃料電池自動車（ＦＣＥＶ）。その本格的な普及は到来するのだろうか。ＦＣＥＶ分野で提携するドイツのＢＭＷとトヨタ自動車の開発責任者によるトークセッションが東京都内で開かれ、新技術や今後のビジョンが語られた。東京では新たなプロジェクトが始動。ＢＭＷもいよいよ２０２８年に初の量産車を発売する計画だ。（時事通信解説委員　宮坂一平）</p><p>【東京都、水素タクシー６００台導入へ】</p><p>　トークセッションは、東京都が９月３日に水素活用を加速させる官民連携プロジェクト「ＴＯＫＹＯ　Ｈ２」のスタートとＦＣＥＶタクシーの大量導入構想を発表してから１カ月後のタイミングで開催。会場は、港区の麻布台ヒルズにあるＢＭＷのブランドストアに設定された。</p><p>登壇したのは、今年４月から日本（愛知県）に拠点を移し、ＢＭＷの燃料電池技術分野の責任者を務めるペーター・レナート氏と、ＦＣＥＶもラインアップするトヨタ新型クラウンのチーフエンジニア清水竜太郎氏。</p>",
+    "published": "2025-10-24T19:00:00+09:00",
+    "url": "http://www.24watchin.com/2025/10/blog-post.html",
+    "labels": [
+      "Tech"
+    ]
+  }
+]

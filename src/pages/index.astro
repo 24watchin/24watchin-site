@@ -1,0 +1,44 @@
+---
+// ここでBloggerから抜き出したデータを読み込みます
+import articles from '../data/articles.json';
+const siteTitle = "24Watchin - 全世界の最新ニュース";
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>{siteTitle}</title>
+		<style>
+			body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
+			header { background: #1e3a8a; color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+			.card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+			.card a { text-decoration: none; color: #1e3a8a; font-weight: bold; font-size: 1.2rem; }
+			.date { font-size: 0.8rem; color: #666; margin-top: 5px; }
+			.label { background: #e5e7eb; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>{siteTitle}</h1>
+			<p>AIが届ける、世界と日本の今</p>
+		</header>
+
+		<main>
+			{articles.map((article) => (
+				<div class="card">
+					{article.labels.map((label) => (
+						<span class="label">{label}</span>
+					))}
+					<br />
+					<a href={`/news/${article.id}`}>{article.title}</a>
+					<div class="date">{new Date(article.published).toLocaleDateString('ja-JP')} 配信</div>
+				</div>
+			))}
+		</main>
+
+		<footer style="text-align:center; margin-top:40px; color:#888;">
+			&copy; 2026 W-Studio Global Media Enterprises
+		</footer>
+	</body>
+</html>

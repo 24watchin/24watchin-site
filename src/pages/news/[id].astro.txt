@@ -1,0 +1,48 @@
+---
+// すべての記事データを読み込みます
+import articles from '../../data/articles.json';
+
+// 全記事分のページを自動で作るための設定です
+export async function getStaticPaths() {
+  return articles.map((article) => ({
+    params: { id: article.id },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>{article.title} - 24Watchin</title>
+		<style>
+			body { font-family: sans-serif; line-height: 1.8; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #fff; }
+			.back-link { display: inline-block; margin-bottom: 20px; color: #1e3a8a; text-decoration: none; font-weight: bold; }
+			h1 { font-size: 1.8rem; color: #111; line-height: 1.4; margin-bottom: 10px; }
+			.date { color: #666; font-size: 0.9rem; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+			.content { font-size: 1.1rem; }
+			/* Bloggerから来た画像などのスタイルを整えます */
+			.content img { max-width: 100%; height: auto; display: block; margin: 20px auto; border-radius: 8px; }
+			.content blockquote { border-left: 4px solid #1e3a8a; padding-left: 15px; color: #555; font-style: italic; margin: 20px 0; }
+		</style>
+	</head>
+	<body>
+		<a href="/" class="back-link">← ニュース一覧に戻る</a>
+		
+		<main>
+			<article>
+				<h1>{article.title}</h1>
+				<div class="date">{new Date(article.published).toLocaleString('ja-JP')} 公開</div>
+				
+				<div class="content" set:html={article.content} />
+			</article>
+		</main>
+
+		<footer style="text-align:center; margin-top:60px; padding-top:20px; border-top:1px solid #eee; color:#888;">
+			&copy; 2026 W-Studio Global Media Enterprises
+		</footer>
+	</body>
+</html>
