@@ -5,6 +5,7 @@ import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
 import RegionNewsBlock from '../components/RegionNewsBlock.astro';
+import Sidebar from '../components/Sidebar.astro'; // ←ここを追加しました！
 
 // Bloggerから記事を取得
 const API_KEY = import.meta.env.API_KEY;
@@ -26,7 +27,6 @@ const northAmericaData = [
   { cityName: "デトロイト", posts: allPosts.slice(6, 9) },
   { cityName: "ニューヨーク", posts: allPosts.slice(9, 12) }
 ];
-
 // 3. ヨーロッパブロック用のデータ（例として別の場所から取得）
 const europeData = [
   { cityName: "ロンドン", posts: allPosts.slice(12, 15) },
@@ -58,6 +58,11 @@ const europeData = [
 
   <GoogleAdBanner position="下部" />
 
+  {/* ↓ここを追加しました！右側のサイドバーエリアです */}
+  <div slot="sidebar">
+    <Sidebar />
+  </div>
+
   <div slot="bottom-wide">
     <RegionNewsBlock 
       title="北米" 
@@ -68,8 +73,7 @@ const europeData = [
       title="ヨーロッパ" 
       cityData={europeData} 
     />
-
-    </div>
+  </div>
 </Layout>
 
 <style>
