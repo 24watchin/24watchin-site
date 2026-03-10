@@ -1,0 +1,168 @@
+---
+// Bloggerから「最新記事」を最大10件取得します（今回はこれを仮のランキングデータとします）
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = import.meta.env.BLOG_ID;
+const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+const response = await fetch(url).catch(() => null);
+const data = response ? await response.json() : { items: [] };
+const fetchedPosts = data.items || [];
+
+// 常に1位〜10位まで表示するため、足りない分は「空のデータ」で埋める準備をします
+const rankingList = [];
+for (let i = 0; i < 10; i++) {
+  if (fetchedPosts[i]) {
+    // 記事がある場合はその記事のデータを使う
+    rankingList.push(fetchedPosts[i]);
+  } else {
+    // 記事がない場合は空のデータ（ダミー）を入れる
+    rankingList.push({ title: "（記事準備中）", url: "#", dummy: true });
+  }
+}
+---
+
+<div class="ranking-container">
+  {/* タイトル部分 */}
+  <div class="ranking-header">
+    <h2><span class="ranking-label">RANKING</span> アクセスランキング</h2>
+  </div>
+
+  {/* タブの見た目部分（今回はデザインのみ） */}
+  <div class="tabs">
+    <div class="tab active">最新</div>
+    <div class="tab">24時間</div>
+    <div class="tab">週間</div>
+  </div>
+
+  {/* ランキングのリスト部分 */}
+  <ul class="ranking-list">
+    {rankingList.map((post, index) => (
+      <li class="ranking-item">
+        {/* 順位の数字 */}
+        <div class="rank-number">{index + 1}</div>
+        
+        {/* 記事のタイトル */}
+        <div class="post-info">
+          <a href={post.url} class="post-title">{post.title}</a>
+        </div>
+        
+        {/* サムネイル画像（今回はすべて仮の画像スペースを表示します） */}
+        <div class="post-thumbnail">
+          <img src="https://placehold.co/80x60?text=No+Image" alt="サムネイル" />
+        </div>
+      </li>
+    ))}
+  </ul>
+  
+  {/* フッター部分 */}
+  <div class="ranking-footer">
+    <a href="#">ランキング一覧へ ＞</a>
+  </div>
+</div>
+
+<style>
+  /* 全体の枠組み */
+  .ranking-container {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 15px;
+    font-family: sans-serif;
+  }
+
+  /* タイトルのデザイン */
+  .ranking-header h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ranking-label {
+    font-size: 10px;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    padding: 2px 0;
+  }
+
+  /* タブのデザイン */
+  .tabs {
+    display: flex;
+    margin-bottom: 15px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 0;
+    font-size: 14px;
+    background-color: #eee;
+    color: #333;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  .tab.active {
+    background-color: #333;
+    color: #fff;
+    font-weight: bold;
+    border-color: #333;
+  }
+
+  /* リスト全体の設定 */
+  .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* リスト1行ごとの設定 */
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed #ccc;
+    gap: 10px;
+  }
+  .ranking-item:last-child {
+    border-bottom: none;
+  }
+
+  /* 順位の数字のデザイン */
+  .rank-number {
+    font-size: 24px;
+    font-weight: bold;
+    font-style: italic;
+    width: 30px;
+    text-align: center;
+  }
+
+  /* 記事タイトルの設定 */
+  .post-info {
+    flex: 1;
+  }
+  .post-title {
+    font-size: 13px;
+    color: #000;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* 2行で末尾を「...」にする設定 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 画像の設定 */
+  .post-thumbnail img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+  }
+
+  /* 一覧へボタンの設定 */
+  .ranking-footer {
+    text-align: right;
+    margin-top: 15px;
+    font-size: 12px;
+  }
+  .ranking-footer a {
+    color: #666;
+    text-decoration: none;
+  }
+</style>
