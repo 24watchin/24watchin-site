@@ -1,106 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-// Bloggerから記事を取得するための設定
-const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
-const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}`;
-
-const response = await fetch(url);
-const data = await response.json();
-const posts = data.items || [];
-
-// ★ここが新しく追加した「写真を見つけ出す魔法」です
-const getImageUrl = (content) => {
-  // 記事の文章の中から、最初の画像のURLを探し出します
-  const match = content.match(/<img[^>]+src="([^">]+)"/);
-  // 画像があればその写真を、なければグレーの代わりの画像を出します
-  return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
-};
+// 作成した2つの部品を読み込みます
+import MainNewsLayout from '../components/MainNewsLayout.astro';
+import TrendScroll from '../components/TrendScroll.astro';
 ---
 
 <Layout title="TOP">
-  <section class="hero-section">
-    {posts.length > 0 && (
-      <div class="hero-grid">
-        <a href={`/news/${posts[0].id}/`} class="main-featured">
-          <img src={getImageUrl(posts[0].content)} alt={posts[0].title} class="cover-image" />
-          <div class="featured-content">
-            <span class="category-tag">Breaking News</span>
-            <h2>{posts[0].title}</h2>
-          </div>
-        </a>
-        
-        <div class="sub-featured-list">
-          {posts.slice(1, 4).map((post) => (
-            <a href={`/news/${post.id}/`} class="sub-featured-item">
-              <span class="category-tag small">Region</span>
-              <h3>{post.title}</h3>
-            </a>
-          ))}
-        </div>
-      </div>
-    )}
-  </section>
+  <MainNewsLayout />
 
-  <div class="ad-banner-middle">
-    広告スペース
+  <div slot="bottom-wide">
+    <TrendScroll />
   </div>
-
-  <div class="category-sections">
-    <div class="section-header">
-      <h2>最新ニュース</h2>
-      <a href="#" class="view-all">一覧へ →</a>
-    </div>
-    
-    <div class="news-grid">
-      {posts.map((post) => (
-        <article class="news-card">
-          <a href={`/news/${post.id}/`}>
-            <div class="card-image">
-              <img src={getImageUrl(post.content)} alt={post.title} class="cover-image" />
-            </div>
-            <div class="card-body">
-              <span class="card-date">{new Date(post.published).toLocaleDateString('ja-JP')}</span>
-              <h3>{post.title}</h3>
-            </div>
-          </a>
-        </article>
-      ))}
-    </div>
-  </div>
-
-  <style>
-    /* トップページ専用のデザイン */
-    .hero-section { margin-bottom: 30px; }
-    .hero-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
-    @media (max-width: 768px) { .hero-grid { grid-template-columns: 1fr; } }
-
-    .main-featured { display: block; position: relative; background: #000; aspect-ratio: 16/9; text-decoration: none; color: #fff; overflow: hidden; border-radius: 4px; }
-    
-    /* ★どんな大きさの写真でも、枠にピッタリ綺麗に収めるための魔法です */
-    .cover-image { width: 100%; height: 100%; object-fit: cover; display: block; }
-    
-    .featured-content { position: absolute; bottom: 0; left: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); width: 100%; box-sizing: border-box; }
-    .category-tag { background: #1e3a8a; color: #fff; padding: 4px 8px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
-    .main-featured h2 { font-size: 24px; margin: 5px 0 0; }
-
-    .sub-featured-list { display: flex; flex-direction: column; gap: 10px; }
-    .sub-featured-item { display: block; padding-bottom: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #333; }
-    .sub-featured-item h3 { font-size: 15px; margin: 5px 0; }
-    
-    .ad-banner-middle { background: #eee; height: 120px; display: flex; align-items: center; justify-content: center; color: #999; margin: 30px 0; border: 1px solid #ddd; }
-
-    .section-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e3a8a; margin-bottom: 20px; }
-    .section-header h2 { font-size: 20px; margin: 0; padding-bottom: 5px; color: #1e3a8a; }
-    .view-all { font-size: 12px; text-decoration: none; color: #888; }
-
-    .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    .news-card { background: #fff; border: 1px solid #eee; border-radius: 4px; overflow: hidden; }
-    .news-card a { text-decoration: none; color: #333; }
-    .card-image { height: 180px; background: #f0f0f0; overflow: hidden; }
-    .card-body { padding: 15px; }
-    .card-date { font-size: 11px; color: #999; }
-    .card-body h3 { font-size: 16px; margin: 5px 0 0; line-height: 1.4; }
-  </style>
 </Layout>
