@@ -1,0 +1,29 @@
+---
+// 場所の名前を受け取れるようにします（プログラミングで「引数」と呼びます）
+const { position = "上部" } = Astro.props;
+---
+
+<div class="ad-banner-main">
+  広告スペース（{position}）
+</div>
+
+<style>
+  .ad-banner-main {
+    background-color: #bbb;
+    height: 180px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    border-radius: 4px;
+    border: 2px dashed #888; /* 枠線を点線にして「ここが広告枠」と分かりやすくしました */
+  }
+
+  @media (max-width: 768px) {
+    .ad-banner-main { height: 120px; font-size: 18px; }
+  }
+</style>
