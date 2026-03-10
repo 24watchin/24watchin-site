@@ -1,0 +1,18 @@
+---
+// ここはSidebar.astroの裏側の設定を書く場所です。
+// 後でここに「アクセスランキング」などの部品を読み込みます。
+---
+
+<aside class="sidebar-wrapper">
+  {/* とりあえず、箱がちゃんと置けたか確認するための仮の文字です */}
+  <p>ここにサイドバーの部品が入ります</p>
+</aside>
+
+<style>
+  /* サイドバー全体の簡単なデザイン設定です */
+  .sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* 部品と部品の間に20px（ピクセル）の隙間を空けます */
+  }
+</style>
