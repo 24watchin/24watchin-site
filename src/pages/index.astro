@@ -1,12 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
-// 作成した2つの部品を読み込みます
 import MainNewsLayout from '../components/MainNewsLayout.astro';
 import TrendScroll from '../components/TrendScroll.astro';
 ---
 
 <Layout title="TOP">
-  <MainNewsLayout />
+  <div slot="top-full">
+    <MainNewsLayout />
+  </div>
+
+  <div style="display:none;"></div>
 
   <div slot="bottom-wide">
     <TrendScroll />
