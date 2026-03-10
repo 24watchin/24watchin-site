@@ -1,81 +1,90 @@
 ---
-// SEOとスマホ表示を追求した「記事リスト」の部品です
+// テスト用：全体で11記事目から「もっと見る」が出る設定です
 const { posts, getImageUrl } = Astro.props;
 ---
 
-<section class="more-news-section">
-  <div class="more-news-list">
-    {posts.map((post) => (
-      <article class="list-item">
+<div class="news-list-container">
+  <div class="more-news-list" id="news-list">
+    {posts.map((post, index) => (
+      <article class={`list-item ${index >= 5 ? 'is-hidden' : ''}`}>
         <a href={`/news/${post.id}/`} class="item-link">
           <div class="image-wrapper">
-            {/* object-fit: coverで、どんな形の写真も綺麗に枠に収めます */}
             <img 
               src={getImageUrl(post.content)} 
-              alt={`${post.title}のアイキャッチ画像`} 
+              alt={post.title} 
               class="list-image"
               loading="lazy" 
             />
           </div>
           <div class="list-content">
             <h4 class="list-title">{post.title}</h4>
-            <div class="meta-info">
-              <time datetime={post.published} class="date">
-                {new Date(post.published).toLocaleDateString('ja-JP')}
-              </time>
-            </div>
+            <time datetime={post.published} class="date">
+              {new Date(post.published).toLocaleDateString('ja-JP')}
+            </time>
           </div>
         </a>
       </article>
     ))}
   </div>
-</section>
+
+  {/* リストに6記事目（全体で11記事目）があればボタンを出します */}
+  {posts.length > 5 && (
+    <div class="button-container">
+      <button id="load-more-btn" class="load-more-button">
+        もっと見る
+      </button>
+    </div>
+  )}
+</div>
+
+<script>
+  const btn = document.getElementById('load-more-btn');
+  // 隠れている記事をすべて取得します
+  const listItems = Array.from(document.querySelectorAll('.list-item.is-hidden'));
+  let currentVisible = 0;
+  const increment = 5; // ボタンを押すごとに5件ずつ出す設定
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      for (let i = 0; i < increment; i++) {
+        const item = listItems[currentVisible + i];
+        if (item) {
+          item.classList.remove('is-hidden');
+        } else {
+          btn.style.display = 'none';
+          break;
+        }
+      }
+      currentVisible += increment;
+    });
+  }
+</script>
 
 <style>
-  /* 記事リスト全体の余白 */
-  .more-news-section { margin-top: 2rem; }
   .more-news-list { display: flex; flex-direction: column; gap: 1.5rem; }
+  .list-item.is-hidden { display: none; }
+  .item-link { display: flex; gap: 1.2rem; text-decoration: none; color: #333; }
+  .image-wrapper { width: 140px; height: 90px; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+  .list-image { width: 100%; height: 100%; object-fit: cover; }
+  .list-title { font-size: 1.1rem; margin: 0 0 0.5rem 0; line-height: 1.4; font-weight: bold; }
+  .date { font-size: 0.85rem; color: #888; }
 
-  /* リンク全体を囲う箱の設定 */
-  .item-link {
-    display: flex;
-    gap: 1.2rem;
-    text-decoration: none;
-    color: #333;
-    transition: opacity 0.2s;
+  .button-container { text-align: center; margin-top: 3rem; }
+  .load-more-button {
+    background: #fff;
+    border: 2px solid #1e3a8a;
+    color: #1e3a8a;
+    padding: 12px 40px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
   }
-  .item-link:hover { opacity: 0.7; }
+  .load-more-button:hover { background: #1e3a8a; color: #fff; }
 
-  /* 写真の枠：SEOを意識して固定比率にしています */
-  .image-wrapper {
-    width: 160px; /* PCでは少し大きめに */
-    height: 100px;
-    background: #f0f0f0;
-    border-radius: 6px;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-  .list-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* 記事タイトルのデザイン：読みやすさを追求 */
-  .list-title {
-    font-size: 1.1rem;
-    margin: 0 0 0.5rem 0;
-    line-height: 1.5;
-    font-weight: 600;
-  }
-  .date { font-size: 0.85rem; color: #666; }
-
-  /* 【スマホ対策】画面が小さい時はレイアウトを変える */
   @media (max-width: 600px) {
-    .image-wrapper {
-      width: 120px; /* スマホでは写真を少し小さく */
-      height: 80px;
-    }
-    .list-title { font-size: 1rem; }
+    .image-wrapper { width: 100px; height: 70px; }
+    .list-title { font-size: 0.95rem; }
   }
 </style>
