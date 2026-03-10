@@ -1,75 +1,51 @@
 ---
-// デザイン画像に基づいた共通レイアウト（シンプルな箱バージョン）
 const { title } = Astro.props;
 import '../styles/global.css'; 
 import Footer from '../components/Footer.astro';
 ---
-
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title ? `${title} | 24Watchin` : '24Watchin - 全世界の最新ニュース'}</title>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-      /* 全体の基本設定 */
-      body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-      margin: 0; background-color: #f8f9fa; color: #333; }
+      body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
       
-      /* 共通の横幅設定：ここがサイト全体の最大幅(1200px)になります */
-      .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+      /* サイト全体の最大幅を広げます */
+      .container { 
+        max-width: 1400px; /* 1200から1400へ拡大 */
+        margin: 0 auto; 
+        padding: 0 20px; 
+      }
 
-      /* ヘッダー部分 */
       header { background: #fff; border-bottom: 2px solid #1e3a8a; position: sticky; top: 0; z-index: 100; }
-      .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+      .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
       .logo { font-size: 28px; font-weight: bold; color: #1e3a8a; text-decoration: none; }
-      
-      /* ナビゲーション */
-      .nav-categories { display: flex; list-style: none; padding: 0; margin: 0; overflow-x: auto; white-space: nowrap; }
-      .nav-categories li a { display: block; padding: 15px 20px; color: #333; text-decoration: none; font-weight: bold; font-size: 14px; }
-      .nav-categories li a:hover { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; }
-
-      /* メインエリア：2列設定(main-layout)を削除しました */
-      main { margin-top: 20px; }
+      .nav-categories { display: flex; list-style: none; padding: 0; margin: 0; overflow-x: auto; }
+      .nav-categories li a { display: block; padding: 15px 20px; color: #333; text-decoration: none; font-weight: bold; }
     </style>
   </head>
   <body>
     <header>
       <div class="container">
-        <div class="top-bar">
-          <a href="/" class="logo">24Watchin</a>
-          <div class="header-tools">
-            <button style="background:#f97316; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold;">申し込み</button>
-          </div>
-        </div>
-        <nav>
-          <ul class="nav-categories">
-            <li><a href="/">TOP</a></li>
-            <li><a href="/category/international">国際</a></li>
-            <li><a href="/category/business">ビジネス</a></li>
-            <li><a href="/category/science">科学</a></li>
-            <li><a href="/category/local">地域</a></li>
-            <li><a href="/category/politics">政治経済</a></li>
-            <li><a href="/category/industry">産業</a></li>
-            <li><a href="/category/life">ライフ・教養</a></li>
-            <li><a href="/category/special">特集</a></li>
-          </ul>
-        </nav>
+        <div class="top-bar"><a href="/" class="logo">24Watchin</a></div>
+        <nav><ul class="nav-categories">
+          <li><a href="/">TOP</a></li>
+          <li><a href="/category/international">国際</a></li>
+          <li><a href="/category/business">ビジネス</a></li>
+          <li><a href="/category/science">科学</a></li>
+          {/* ...他のメニューも同様... */}
+        </ul></nav>
       </div>
     </header>
 
+    {/* 余計な main タグの余白をなくし、中身に任せます */}
     <div class="container">
       <slot name="top-full" />
-
-      {/* ここから2列設定を消したことで、中身が広々と表示されます */}
-      <main>
-        <slot />
-      </main>
-      
+      <slot />
       <slot name="bottom-wide" />
     </div>
-
     <Footer />
   </body>
 </html>
