@@ -1,7 +1,20 @@
 ---
-// ここでBloggerから抜き出したデータを読み込みます
-import articles from '../data/articles.json';
 const siteTitle = "24Watchin - 全世界の最新ニュース";
+
+// Cloudflareの金庫から、住所と合言葉を取り出します
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = import.meta.env.BLOG_ID;
+
+// Google（Blogger）に最新記事をお願いするための専用URLを作ります
+const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}`;
+
+// Googleにお願いをして、最新の記事リストをもらってきます
+const response = await fetch(url);
+const data = await response.json();
+
+// もらってきたデータの中から「記事のまとまり（items）」だけを抜き出します
+// まだ記事がない場合は、エラーにならないように空っぽのリストにしておきます
+const articles = data.items || [];
 ---
 
 <html lang="ja">
@@ -27,7 +40,8 @@ const siteTitle = "24Watchin - 全世界の最新ニュース";
 		<main>
 			{articles.map((article) => (
 				<div class="card">
-					{article.labels.map((label) => (
+					{/* ラベル（タグ）が設定されている場合だけ表示します */}
+					{article.labels && article.labels.map((label) => (
 						<span class="label">{label}</span>
 					))}
 					<br />
