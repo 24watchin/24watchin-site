@@ -3,6 +3,24 @@ import Layout from '../layouts/Layout.astro';
 import MainNewsLayout from '../components/MainNewsLayout.astro';
 import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
+import CategoryNews from '../components/CategoryNews.astro'; // 追加
+
+// Bloggerから記事を取得
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = import.meta.env.BLOG_ID;
+const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+const response = await fetch(url).catch(() => null);
+const data = response ? await response.json() : { items: [] };
+const allPosts = data.items || [];
+
+// ジャンル分けのシミュレーション（本来はラベルで分けますが、一旦記事を分割して表示します）
+const medical = allPosts.slice(0, 2);
+const education = allPosts.slice(2, 4);
+const culture = allPosts.slice(4, 6);
+const life = allPosts.slice(6, 8);
+const society = allPosts.slice(8, 10);
+const economy = allPosts.slice(10, 12);
+// ...同様に10個分
 ---
 
 <Layout title="TOP">
@@ -13,9 +31,33 @@ import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 
   <GoogleAdBanner position="上部" />
 
-  <div class="main-news-list">
-    </div>
+  <div class="genre-grid">
+    <CategoryNews title="医療・健康" posts={medical} />
+    <CategoryNews title="教育" posts={education} />
+    <CategoryNews title="文化" posts={culture} />
+    <CategoryNews title="くらし" posts={life} />
+    <CategoryNews title="社会" posts={society} />
+    <CategoryNews title="経済" posts={economy} />
+    <CategoryNews title="テクノロジー" posts={allPosts.slice(12, 14)} />
+    <CategoryNews title="スポーツ" posts={allPosts.slice(14, 16)} />
+    <CategoryNews title="エンタメ" posts={allPosts.slice(16, 18)} />
+    <CategoryNews title="国際" posts={allPosts.slice(18, 20)} />
+  </div>
 
   <GoogleAdBanner position="下部" />
-
 </Layout>
+
+<style>
+  .genre-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2列に並べる魔法 */
+    gap: 30px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .genre-grid {
+      grid-template-columns: 1fr; /* スマホでは1列にする */
+    }
+  }
+</style>
