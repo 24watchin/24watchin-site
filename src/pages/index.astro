@@ -1,58 +1,96 @@
 ---
-const siteTitle = "24Watchin - 全世界の最新ニュース";
+// 新しいLayout（土台）を読み込みます
+import Layout from '../layouts/Layout.astro';
 
-// Cloudflareの金庫から、住所と合言葉を取り出します
+// Bloggerから記事を取得するための設定（以前と同じです）
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
-
-// Google（Blogger）に最新記事をお願いするための専用URLを作ります
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}`;
 
-// Googleにお願いをして、最新の記事リストをもらってきます
 const response = await fetch(url);
 const data = await response.json();
-
-// もらってきたデータの中から「記事のまとまり（items）」だけを抜き出します
-// まだ記事がない場合は、エラーにならないように空っぽのリストにしておきます
-const articles = data.items || [];
+const posts = data.items || [];
 ---
 
-<html lang="ja">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<title>{siteTitle}</title>
-		<style>
-			body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
-			header { background: #1e3a8a; color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
-			.card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-			.card a { text-decoration: none; color: #1e3a8a; font-weight: bold; font-size: 1.2rem; }
-			.date { font-size: 0.8rem; color: #666; margin-top: 5px; }
-			.label { background: #e5e7eb; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
-		</style>
-	</head>
-	<body>
-		<header>
-			<h1>{siteTitle}</h1>
-			<p>AIが届ける、世界と日本の今</p>
-		</header>
+<Layout title="TOP">
+  <section class="hero-section">
+    {posts.length > 0 && (
+      <div class="hero-grid">
+        {/* 一番新しい記事を大きく表示 */}
+        <a href={`/news/${posts[0].id}/`} class="main-featured">
+          <div class="image-placeholder">No Image</div>
+          <div class="featured-content">
+            <span class="category-tag">Breaking News</span>
+            <h2>{posts[0].title}</h2>
+          </div>
+        </a>
+        
+        {/* 2番目以降の記事を横に並べるリスト */}
+        <div class="sub-featured-list">
+          {posts.slice(1, 4).map((post) => (
+            <a href={`/news/${post.id}/`} class="sub-featured-item">
+              <span class="category-tag small">Region</span>
+              <h3>{post.title}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </section>
 
-		<main>
-			{articles.map((article) => (
-				<div class="card">
-					{/* ラベル（タグ）が設定されている場合だけ表示します */}
-					{article.labels && article.labels.map((label) => (
-						<span class="label">{label}</span>
-					))}
-					<br />
-					<a href={`/news/${article.id}`}>{article.title}</a>
-					<div class="date">{new Date(article.published).toLocaleDateString('ja-JP')} 配信</div>
-				</div>
-			))}
-		</main>
+  <div class="ad-banner-middle">
+    広告スペース
+  </div>
 
-		<footer style="text-align:center; margin-top:40px; color:#888;">
-			&copy; 2026 W-Studio Global Media Enterprises
-		</footer>
-	</body>
-</html>
+  <div class="category-sections">
+    <div class="section-header">
+      <h2>最新ニュース</h2>
+      <a href="#" class="view-all">一覧へ →</a>
+    </div>
+    
+    <div class="news-grid">
+      {posts.map((post) => (
+        <article class="news-card">
+          <a href={`/news/${post.id}/`}>
+            <div class="card-image">No Image</div>
+            <div class="card-body">
+              <span class="card-date">{new Date(post.published).toLocaleDateString('ja-JP')}</span>
+              <h3>{post.title}</h3>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+
+  <style>
+    /* トップページ専用のデザイン */
+    .hero-section { margin-bottom: 30px; }
+    .hero-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .hero-grid { grid-template-columns: 1fr; } }
+
+    .main-featured { display: block; position: relative; background: #000; aspect-ratio: 16/9; text-decoration: none; color: #fff; overflow: hidden; border-radius: 4px; }
+    .image-placeholder { width: 100%; height: 100%; background: #ddd; display: flex; align-items: center; justify-content: center; color: #888; }
+    .featured-content { position: absolute; bottom: 0; left: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); width: 100%; }
+    .category-tag { background: #1e3a8a; color: #fff; padding: 4px 8px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+    .main-featured h2 { font-size: 24px; margin: 5px 0 0; }
+
+    .sub-featured-list { display: flex; flex-direction: column; gap: 10px; }
+    .sub-featured-item { display: block; padding-bottom: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #333; }
+    .sub-featured-item h3 { font-size: 15px; margin: 5px 0; }
+    
+    .ad-banner-middle { background: #eee; height: 120px; display: flex; align-items: center; justify-content: center; color: #999; margin: 30px 0; border: 1px solid #ddd; }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e3a8a; margin-bottom: 20px; }
+    .section-header h2 { font-size: 20px; margin: 0; padding-bottom: 5px; color: #1e3a8a; }
+    .view-all { font-size: 12px; text-decoration: none; color: #888; }
+
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .news-card { background: #fff; border: 1px solid #eee; border-radius: 4px; overflow: hidden; }
+    .news-card a { text-decoration: none; color: #333; }
+    .card-image { height: 180px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #ccc; }
+    .card-body { padding: 15px; }
+    .card-date { font-size: 11px; color: #999; }
+    .card-body h3 { font-size: 16px; margin: 5px 0 0; line-height: 1.4; }
+  </style>
+</Layout>
