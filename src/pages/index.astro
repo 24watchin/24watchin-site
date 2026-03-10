@@ -5,7 +5,6 @@ import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
 import RegionNewsBlock from '../components/RegionNewsBlock.astro';
-import Sidebar from '../components/Sidebar.astro';
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
@@ -18,36 +17,27 @@ const filterByLabel = (labelName, count = 2) => {
   return allPosts.filter(post => post.labels && post.labels.includes(labelName)).slice(0, count);
 };
 ---
-
 <Layout title="TOP">
   <div slot="top-full">
     <MainNewsLayout />
     <TrendScroll />
   </div>
 
-  {/* ここでメインとサイドバーを2列に並べます。これで押しつぶされません */}
-  <div class="top-main-columns">
-    <div class="main-news-area">
-      <GoogleAdBanner position="上部" />
-      <div class="category-grid">
-        <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
-        <CategoryNews title="教育" posts={filterByLabel("教育")} />
-        <CategoryNews title="文化" posts={filterByLabel("文化")} />
-        <CategoryNews title="くらし" posts={filterByLabel("くらし")} />
-        <CategoryNews title="社会" posts={filterByLabel("社会")} />
-        <CategoryNews title="経済" posts={filterByLabel("経済")} />
-        <CategoryNews title="テクノロジー" posts={filterByLabel("テクノロジー")} />
-        <CategoryNews title="スポーツ" posts={filterByLabel("スポーツ")} />
-        <CategoryNews title="エンタメ" posts={filterByLabel("エンタメ")} />
-        <CategoryNews title="国際" posts={filterByLabel("国際")} />
-      </div>
-      <GoogleAdBanner position="下部" />
-    </div>
-
-    <aside class="sidebar-area">
-      <Sidebar />
-    </aside>
+  {/* Layout側で2列にしてくれるので、ここでは純粋に記事だけを並べます */}
+  <GoogleAdBanner position="上部" />
+  <div class="genre-grid">
+    <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
+    <CategoryNews title="教育" posts={filterByLabel("教育")} />
+    <CategoryNews title="文化" posts={filterByLabel("文化")} />
+    <CategoryNews title="くらし" posts={filterByLabel("くらし")} />
+    <CategoryNews title="社会" posts={filterByLabel("社会")} />
+    <CategoryNews title="経済" posts={filterByLabel("経済")} />
+    <CategoryNews title="テクノロジー" posts={filterByLabel("テクノロジー")} />
+    <CategoryNews title="スポーツ" posts={filterByLabel("スポーツ")} />
+    <CategoryNews title="エンタメ" posts={filterByLabel("エンタメ")} />
+    <CategoryNews title="国際" posts={filterByLabel("国際")} />
   </div>
+  <GoogleAdBanner position="下部" />
 
   <div slot="bottom-wide">
     <RegionNewsBlock title="北米" cityData={[]} />
@@ -56,18 +46,6 @@ const filterByLabel = (labelName, count = 2) => {
 </Layout>
 
 <style>
-  /* 1200pxの中で「メイン」と「サイドバー(300px)」を横に並べる魔法 */
-  .top-main-columns {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 40px;
-  }
-  .category-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  @media (max-width: 950px) {
-    .top-main-columns, .category-grid { grid-template-columns: 1fr; }
-  }
+  .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
 </style>
