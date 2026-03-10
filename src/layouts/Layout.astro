@@ -2,6 +2,7 @@
 // デザイン画像に基づいた共通レイアウト
 const { title } = Astro.props;
 import '../styles/global.css'; 
+import Footer from '../components/Footer.astro'; // ←新しいフッターを読み込むための1行を追加しました
 ---
 
 <!DOCTYPE html>
@@ -46,6 +47,7 @@ import '../styles/global.css';
             <button style="background:#f97316; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold;">申し込み</button>
           </div>
         </div>
+    
         <nav>
           <ul class="nav-categories">
             <li><a href="/">TOP</a></li>
@@ -90,10 +92,7 @@ import '../styles/global.css';
       </div>
     </div>
 
-    <footer>
-      <div class="container">
-        <div class="copyright">&copy; 2026 24Watchin.</div>
-      </div>
-    </footer>
+    {/* 元々あった古いフッターを消して、新しいフッター部品に置き換えました */}
+    <Footer />
   </body>
 </html>
