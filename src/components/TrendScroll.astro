@@ -12,28 +12,125 @@ const getImageUrl = (content) => {
   return match ? match[1] : 'https://placehold.co/300x200/eeeeee/999999?text=Trend';
 };
 ---
-<div class="trend-section">
+
+<section class="bing-trend-section">
   <div class="trend-header">
     <h3>Bing のトレンド</h3>
     <p>今日のトレンドを発見</p>
   </div>
-  <div class="trend-scroll-container">
-    {posts.map((post) => (
-      <a href={`/news/${post.id}/`} class="trend-item">
-        <div class="trend-img-wrapper"><img src={getImageUrl(post.content)} /></div>
-        <h4>{post.title}</h4>
-      </a>
-    ))}
+
+  <div class="trend-scroll-outer">
+    <div class="trend-scroll-container">
+      {posts.map((post) => (
+        <a href={`/news/${post.id}/`} class="trend-item">
+          <div class="trend-img-wrapper">
+            <img src={getImageUrl(post.content)} alt={post.title} />
+          </div>
+          <h4 class="trend-title">{post.title}</h4>
+        </a>
+      ))}
+    </div>
+    <div class="scroll-arrow-next">
+      <i class="fas fa-chevron-right"></i>
+    </div>
   </div>
-</div>
+</section>
 
 <style>
-  .trend-section { margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; width: 100%; }
-  .trend-header h3 { font-size: 20px; margin: 0; }
-  .trend-header p { font-size: 14px; color: #666; margin: 5px 0 20px; }
-  .trend-scroll-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
-  .trend-item { min-width: 180px; text-decoration: none; color: #333; flex-shrink: 0; }
-  .trend-img-wrapper { height: 110px; border-radius: 8px; overflow: hidden; margin-bottom: 10px; background: #eee; }
-  .trend-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-  .trend-item h4 { font-size: 13px; margin: 0; line-height: 1.4; }
+  .bing-trend-section {
+    padding: 30px 0;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+    background: #fff; /* 背景を白にして清潔感を */
+  }
+
+  .trend-header h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    color: #111;
+  }
+
+  .trend-header p {
+    font-size: 13px;
+    color: #666;
+    margin: 4px 0 20px;
+  }
+
+  .trend-scroll-outer {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .trend-scroll-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+    /* スクロールバーを非表示にする（モダンなブラウザ用） */
+    scrollbar-width: none; 
+  }
+
+  .trend-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari用 */
+  }
+
+  .trend-item {
+    min-width: 140px;
+    max-width: 140px;
+    text-decoration: none;
+    color: #333;
+    flex-shrink: 0;
+  }
+
+  .trend-img-wrapper {
+    width: 100%;
+    height: 90px;
+    border-radius: 12px; /* 画像のような丸みのある角 */
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: #f0f0f0;
+  }
+
+  .trend-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .trend-item:hover img {
+    transform: scale(1.05); /* 少しズームする演出 */
+  }
+
+  .trend-title {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin: 0;
+    text-align: left;
+    /* 2行以上は「...」で省略する設定 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .scroll-arrow-next {
+    position: absolute;
+    right: -10px;
+    background: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    z-index: 5;
+    color: #666;
+  }
 </style>
