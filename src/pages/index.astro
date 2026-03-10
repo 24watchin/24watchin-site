@@ -5,7 +5,7 @@ import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
 import RegionNewsBlock from '../components/RegionNewsBlock.astro';
-import Sidebar from '../components/Sidebar.astro';
+import Sidebar from '../components/Sidebar.astro'; // サイドバー部品を読み込む
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
@@ -17,18 +17,6 @@ const allPosts = data.items || [];
 const filterByLabel = (labelName, count = 2) => {
   return allPosts.filter(post => post.labels && post.labels.includes(labelName)).slice(0, count);
 };
-
-const northAmericaData = [
-  { cityName: "シカゴ", posts: allPosts.slice(0, 3) },
-  { cityName: "アトランタ", posts: allPosts.slice(3, 6) },
-  { cityName: "デトロイト", posts: allPosts.slice(6, 9) },
-  { cityName: "ニューヨーク", posts: allPosts.slice(9, 12) }
-];
-const europeData = [
-  { cityName: "ロンドン", posts: allPosts.slice(12, 15) },
-  { cityName: "パリ", posts: allPosts.slice(15, 18) },
-  { cityName: "ベルリン", posts: allPosts.slice(18, 21) }
-];
 ---
 
 <Layout title="TOP">
@@ -37,9 +25,9 @@ const europeData = [
     <TrendScroll />
   </div>
 
-  {/* トレンドバーより下を、記事エリアとサイドバーに分けます */}
-  <div class="top-page-layout">
-    <div class="main-content">
+  {/* ここで初めて「記事」と「サイドバー部品」を横に並べる指示を出します */}
+  <div class="top-main-grid">
+    <div class="content-side">
       <GoogleAdBanner position="上部" />
       <div class="genre-grid">
         <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
@@ -56,34 +44,30 @@ const europeData = [
       <GoogleAdBanner position="下部" />
     </div>
 
-    <aside class="sidebar-content">
-      <Sidebar />
+    <aside class="sidebar-side">
+      <Sidebar /> {/* ここでサイドバー部品を表示 */}
     </aside>
   </div>
 
   <div slot="bottom-wide">
-    <RegionNewsBlock title="北米" cityData={northAmericaData} />
-    <RegionNewsBlock title="ヨーロッパ" cityData={europeData} />
+    <RegionNewsBlock title="北米" cityData={[]} />
+    <RegionNewsBlock title="ヨーロッパ" cityData={[]} />
   </div>
 </Layout>
 
 <style>
-  /* ここでトップページの2列レイアウトを定義 */
-  .top-page-layout {
+  /* 1200px の中を「記事エリア」と「300pxのサイドバー」に分けます */
+  .top-main-grid {
     display: grid;
-    grid-template-columns: 1fr 300px; /* メインとサイドバー(300px) */
+    grid-template-columns: 1fr 300px;
     gap: 40px;
-    margin-top: 20px;
   }
-
   .genre-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: 20px;
   }
-
   @media (max-width: 900px) {
-    .top-page-layout { grid-template-columns: 1fr; }
-    .genre-grid { grid-template-columns: 1fr; }
+    .top-main-grid, .genre-grid { grid-template-columns: 1fr; }
   }
 </style>
