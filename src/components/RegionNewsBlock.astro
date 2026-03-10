@@ -1,92 +1,101 @@
 ---
-// 地域名（title）と記事データ（posts）を受け取ります
-const { title, posts = [] } = Astro.props;
+// 画像デザインに基づいた地域別ブロック
+// title: セクション名 (北米, ヨーロッパ等)
+// mainItem: 左側の大きな記事 (countryName プロパティを持つ)
+// subItems: 右側の小さな記事4つの配列
+const { title, mainItem, subItems = [] } = Astro.props;
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
-  return match ? match[1] : 'https://placehold.co/150x100/eeeeee/999999?text=No+Image';
+  return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=Image';
+};
+
+const getSnippet = (content) => {
+  if (!content) return "";
+  return content.replace(/<[^>]*>/g, '').substring(0, 80) + '...';
 };
 ---
 
-<section class="region-block">
-  <div class="region-header">
-    <div class="region-label">{title}</div>
-    <div class="region-line"></div>
-    <a href="#" class="more-link">もっと見る <i class="fas fa-chevron-right"></i></a>
+<section class="region-genre-block">
+  <div class="section-title-wrapper">
+    <h2 class="section-title">{title}</h2>
   </div>
-
-  <div class="region-grid">
-    {posts.map((post) => (
-      <a href={`/news/${post.id}/`} class="region-item">
-        <div class="region-img">
-          <img src={getImageUrl(post.content)} alt={post.title} />
+  
+  <div class="genre-content-grid">
+    <div class="genre-main-item">
+      <a href={`/news/${mainItem.id}/`}>
+        <div class="image-wrapper">
+          <img src={getImageUrl(mainItem.content)} alt={mainItem.title} />
+          <span class="country-tag-overlay">{mainItem.countryName}</span>
         </div>
-        <div class="region-info">
-          <h4>{post.title}</h4>
-          <div class="region-meta">
-            <span class="time"><i class="far fa-clock"></i> {new Date(post.published).toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})}</span>
-            <span class="badge-new">NEW</span>
-            <span class="tag">{title.split('（')[0]}</span>
+        <div class="text-wrapper">
+          <h3>{mainItem.title}</h3>
+          <p class="snippet">{getSnippet(mainItem.content)}</p>
+          <div class="meta">
+            <span class="date">{new Date(mainItem.published).toLocaleDateString('ja-JP')}</span>
+            <span class="category-tag">#{title}</span>
           </div>
         </div>
       </a>
-    ))}
+    </div>
+    
+    <div class="genre-sub-items">
+      {subItems.map((item) => (
+        <article class="sub-item">
+          <a href={`/news/${item.id}/`}>
+            <div class="thumbnail">
+              <img src={getImageUrl(item.content)} alt={item.title} />
+            </div>
+            <div class="info">
+              <h4>{item.title}</h4>
+              <div class="meta">
+                <span class="date">{new Date(item.published).toLocaleDateString('ja-JP')}</span>
+                <span class="category-tag">#ニュース</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
-  .region-block { margin-bottom: 50px; width: 100%; }
-
-  /* ヘッダーデザイン（赤いラベルとライン） */
-  .region-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    position: relative;
-  }
-  .region-label {
-    background: #e11d48; /* 鮮やかな赤 */
-    color: #fff;
-    padding: 6px 15px;
-    font-weight: bold;
-    font-size: 16px;
-    z-index: 2;
-  }
-  .region-line {
-    flex-grow: 1;
-    height: 2px;
-    background: #e11d48;
-    margin-left: -5px; /* ラベルと少し重ねる */
-  }
-  .more-link {
-    font-size: 13px;
-    color: #e11d48;
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 15px;
-    white-space: nowrap;
-  }
-
-  /* 3列グリッドのレイアウト */
-  .region-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3列に分ける魔法 */
-    gap: 30px 20px;
-  }
-
-  .region-item { display: flex; gap: 15px; text-decoration: none; color: #333; }
-  .region-img { width: 110px; height: 75px; flex-shrink: 0; border-radius: 8px; overflow: hidden; }
-  .region-img img { width: 100%; height: 100%; object-fit: cover; }
+  .region-genre-block { margin-top: 50px; margin-bottom: 50px; width: 100%; }
   
-  .region-info h4 { font-size: 14px; margin: 0 0 8px; line-height: 1.4; font-weight: bold; color: #111; }
-  .region-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
-  .badge-new { background: #e11d48; color: #fff; padding: 0 4px; border-radius: 2px; font-weight: bold; }
+  /* 赤いタイトルのデザイン */
+  .section-title-wrapper { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+  .section-title { color: #e11d48; font-size: 24px; font-weight: bold; margin: 0; }
+  
+  .genre-content-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; }
+  
+  /* 左側の大きな記事 */
+  .genre-main-item a { text-decoration: none; color: #333; }
+  .image-wrapper { position: relative; aspect-ratio: 16 / 9; border-radius: 4px; overflow: hidden; margin-bottom: 15px; }
+  .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+  
+  /* 画像の上の赤ラベル（アメリカ（シカゴ）等） */
+  .country-tag-overlay { position: absolute; top: 10px; left: 10px; background: #e11d48; color: #fff; padding: 4px 10px; font-weight: bold; font-size: 13px; z-index: 2; border-radius: 2px; }
+  
+  .genre-main-item h3 { font-size: 22px; line-height: 1.3; margin: 0 0 10px; font-weight: bold; }
+  .snippet { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 10px; }
+  
+  /* 右側の小さな記事（縦2列×横2行） */
+  .genre-sub-items { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-content: start; }
+  .sub-item a { text-decoration: none; color: #333; display: flex; flex-direction: column; gap: 10px; }
+  .thumbnail { width: 100%; aspect-ratio: 16 / 10; border-radius: 4px; overflow: hidden; }
+  .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+  .sub-item h4 { font-size: 14px; margin: 0; line-height: 1.4; font-weight: bold; }
 
-  /* スマホ・タブレット対応 */
-  @media (max-width: 1024px) {
-    .region-grid { grid-template-columns: repeat(2, 1fr); } /* タブレットは2列 */
+  .meta { display: flex; gap: 15px; font-size: 11px; color: #999; }
+  .category-tag { color: #f97316; font-weight: bold; }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 900px) {
+    .genre-content-grid { grid-template-columns: 1fr; }
+    .genre-sub-items { grid-template-columns: 1fr 1fr; }
   }
-  @media (max-width: 640px) {
-    .region-grid { grid-template-columns: 1fr; } /* スマホは1列 */
+  @media (max-width: 600px) {
+    .genre-sub-items { grid-template-columns: 1fr; }
   }
 </style>
