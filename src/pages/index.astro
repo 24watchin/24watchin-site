@@ -5,9 +5,8 @@ import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
 import RegionNewsBlock from '../components/RegionNewsBlock.astro';
-import Sidebar from '../components/Sidebar.astro'; // ←ここを追加しました！
+import Sidebar from '../components/Sidebar.astro';
 
-// Bloggerから記事を取得
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
@@ -15,19 +14,16 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// 1. ジャンル別ニュース（ラベルで自動仕分け）
 const filterByLabel = (labelName, count = 2) => {
   return allPosts.filter(post => post.labels && post.labels.includes(labelName)).slice(0, count);
 };
 
-// 2. 北米ブロック用のデータ（都市ごとに3記事ずつ）
 const northAmericaData = [
   { cityName: "シカゴ", posts: allPosts.slice(0, 3) },
   { cityName: "アトランタ", posts: allPosts.slice(3, 6) },
   { cityName: "デトロイト", posts: allPosts.slice(6, 9) },
   { cityName: "ニューヨーク", posts: allPosts.slice(9, 12) }
 ];
-// 3. ヨーロッパブロック用のデータ（例として別の場所から取得）
 const europeData = [
   { cityName: "ロンドン", posts: allPosts.slice(12, 15) },
   { cityName: "パリ", posts: allPosts.slice(15, 18) },
@@ -41,54 +37,53 @@ const europeData = [
     <TrendScroll />
   </div>
 
-  <GoogleAdBanner position="上部" />
+  {/* トレンドバーより下を、記事エリアとサイドバーに分けます */}
+  <div class="top-page-layout">
+    <div class="main-content">
+      <GoogleAdBanner position="上部" />
+      <div class="genre-grid">
+        <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
+        <CategoryNews title="教育" posts={filterByLabel("教育")} />
+        <CategoryNews title="文化" posts={filterByLabel("文化")} />
+        <CategoryNews title="くらし" posts={filterByLabel("くらし")} />
+        <CategoryNews title="社会" posts={filterByLabel("社会")} />
+        <CategoryNews title="経済" posts={filterByLabel("経済")} />
+        <CategoryNews title="テクノロジー" posts={filterByLabel("テクノロジー")} />
+        <CategoryNews title="スポーツ" posts={filterByLabel("スポーツ")} />
+        <CategoryNews title="エンタメ" posts={filterByLabel("エンタメ")} />
+        <CategoryNews title="国際" posts={filterByLabel("国際")} />
+      </div>
+      <GoogleAdBanner position="下部" />
+    </div>
 
-  <div class="genre-grid">
-    <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
-    <CategoryNews title="教育" posts={filterByLabel("教育")} />
-    <CategoryNews title="文化" posts={filterByLabel("文化")} />
-    <CategoryNews title="くらし" posts={filterByLabel("くらし")} />
-    <CategoryNews title="社会" posts={filterByLabel("社会")} />
-    <CategoryNews title="経済" posts={filterByLabel("経済")} />
-    <CategoryNews title="テクノロジー" posts={filterByLabel("テクノロジー")} />
-    <CategoryNews title="スポーツ" posts={filterByLabel("スポーツ")} />
-    <CategoryNews title="エンタメ" posts={filterByLabel("エンタメ")} />
-    <CategoryNews title="国際" posts={filterByLabel("国際")} />
-  </div>
-
-  <GoogleAdBanner position="下部" />
-
-  {/* ↓ここを追加しました！右側のサイドバーエリアです */}
-  <div slot="sidebar">
-    <Sidebar />
+    <aside class="sidebar-content">
+      <Sidebar />
+    </aside>
   </div>
 
   <div slot="bottom-wide">
-    <RegionNewsBlock 
-      title="北米" 
-      cityData={northAmericaData} 
-    />
-    
-    <RegionNewsBlock 
-      title="ヨーロッパ" 
-      cityData={europeData} 
-    />
+    <RegionNewsBlock title="北米" cityData={northAmericaData} />
+    <RegionNewsBlock title="ヨーロッパ" cityData={europeData} />
   </div>
 </Layout>
 
 <style>
-  /* ジャンルブロックを2列にする設定 */
+  /* ここでトップページの2列レイアウトを定義 */
+  .top-page-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px; /* メインとサイドバー(300px) */
+    gap: 40px;
+    margin-top: 20px;
+  }
+
   .genre-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
-    margin-bottom: 20px;
   }
 
-  /* スマホでは1列にする */
-  @media (max-width: 768px) {
-    .genre-grid {
-      grid-template-columns: 1fr;
-    }
+  @media (max-width: 900px) {
+    .top-page-layout { grid-template-columns: 1fr; }
+    .genre-grid { grid-template-columns: 1fr; }
   }
 </style>
