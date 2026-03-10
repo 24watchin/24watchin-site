@@ -5,7 +5,7 @@ import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
 import RegionNewsBlock from '../components/RegionNewsBlock.astro';
-import Sidebar from '../components/Sidebar.astro'; // サイドバー部品を読み込む
+import Sidebar from '../components/Sidebar.astro';
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
@@ -25,11 +25,11 @@ const filterByLabel = (labelName, count = 2) => {
     <TrendScroll />
   </div>
 
-  {/* ここで初めて「記事」と「サイドバー部品」を横に並べる指示を出します */}
-  <div class="top-main-grid">
-    <div class="content-side">
+  {/* ここでメインとサイドバーを2列に並べます。これで押しつぶされません */}
+  <div class="top-main-columns">
+    <div class="main-news-area">
       <GoogleAdBanner position="上部" />
-      <div class="genre-grid">
+      <div class="category-grid">
         <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
         <CategoryNews title="教育" posts={filterByLabel("教育")} />
         <CategoryNews title="文化" posts={filterByLabel("文化")} />
@@ -44,8 +44,8 @@ const filterByLabel = (labelName, count = 2) => {
       <GoogleAdBanner position="下部" />
     </div>
 
-    <aside class="sidebar-side">
-      <Sidebar /> {/* ここでサイドバー部品を表示 */}
+    <aside class="sidebar-area">
+      <Sidebar />
     </aside>
   </div>
 
@@ -56,18 +56,18 @@ const filterByLabel = (labelName, count = 2) => {
 </Layout>
 
 <style>
-  /* 1200px の中を「記事エリア」と「300pxのサイドバー」に分けます */
-  .top-main-grid {
+  /* 1200pxの中で「メイン」と「サイドバー(300px)」を横に並べる魔法 */
+  .top-main-columns {
     display: grid;
     grid-template-columns: 1fr 300px;
     gap: 40px;
   }
-  .genre-grid {
+  .category-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
   }
-  @media (max-width: 900px) {
-    .top-main-grid, .genre-grid { grid-template-columns: 1fr; }
+  @media (max-width: 950px) {
+    .top-main-columns, .category-grid { grid-template-columns: 1fr; }
   }
 </style>
