@@ -2,18 +2,20 @@
 import Layout from '../layouts/Layout.astro';
 import MainNewsLayout from '../components/MainNewsLayout.astro';
 import TrendScroll from '../components/TrendScroll.astro';
+import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 ---
 
 <Layout title="TOP">
   <div slot="top-full">
     <MainNewsLayout />
-    
     <TrendScroll />
   </div>
 
-  <div class="lower-content">
-    <p style="color: #999; font-size: 14px; padding: 40px 0; text-align: center; border: 1px dashed #eee;">
-      ここから下に、ジャンル別のニュースや最新記事一覧を追加していく予定です。
-    </p>
-  </div>
+  <GoogleAdBanner position="上部" />
+
+  <div class="main-news-list">
+    </div>
+
+  <GoogleAdBanner position="下部" />
+
 </Layout>
