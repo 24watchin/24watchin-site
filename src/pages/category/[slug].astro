@@ -4,12 +4,39 @@ import CategoryHero from '../../components/CategoryHero.astro';
 import NewsList from '../../components/NewsList.astro';
 import CategorySidebar from '../../components/CategorySidebar.astro';
 
-// (省略：getStaticPaths などのスクリプト部分はそのまま)
+export async function getStaticPaths() {
+  const categories = [
+    { slug: 'international', name: '国際' },
+    { slug: 'business', name: 'ビジネス' },
+    { slug: 'science', name: '科学' },
+    { slug: 'local', name: '地域' },
+    { slug: 'politics', name: '政治経済' },
+    { slug: 'industry', name: '産業' },
+    { slug: 'life', name: 'ライフ・教養' },
+    { slug: 'special', name: '特集' },
+  ];
+  const API_KEY = import.meta.env.API_KEY;
+  const BLOG_ID = import.meta.env.BLOG_ID;
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+  const response = await fetch(url);
+  const data = await response.json();
+  const allPosts = data.items || [];
+  return categories.map((category) => {
+    const filteredPosts = allPosts.filter((post) => post.labels && post.labels.includes(category.name));
+    return { params: { slug: category.slug }, props: { categoryName: category.name, posts: filteredPosts } };
+  });
+}
+
+const { categoryName, posts } = Astro.props;
+const getImageUrl = (content) => {
+  const match = content.match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
+};
 ---
 
-<Layout title={`${categoryName}`}>
-  <div class="genre-container">
-    <div class="main-column">
+<Layout title={categoryName}>
+  <div class="category-page-layout">
+    <div class="main-content">
       {posts.length > 0 ? (
         <>
           <CategoryHero posts={posts} categoryName={categoryName} getImageUrl={getImageUrl} />
@@ -18,28 +45,27 @@ import CategorySidebar from '../../components/CategorySidebar.astro';
           <NewsList posts={posts.slice(5)} getImageUrl={getImageUrl} />
         </>
       ) : (
-        <p>準備中です</p>
+        <p>現在、この記事は準備中です。</p>
       )}
     </div>
 
-    <aside class="sidebar-column">
+    <aside class="sidebar-content">
       <CategorySidebar />
     </aside>
   </div>
 </Layout>
 
 <style>
-  /* ここで「広々とした2列」を定義します */
-  .genre-container {
+  /* ここでジャンルページの2列レイアウトを定義 */
+  .category-page-layout {
     display: grid;
-    grid-template-columns: 1fr 320px; /* サイドバーを少し広めの320pxに */
-    gap: 50px; /* 記事とサイドバーの間隔をゆったりあける */
-    margin-top: 30px;
+    grid-template-columns: 1fr 300px;
+    gap: 50px;
   }
-  .divider { border: 0; border-top: 1px solid #eee; margin: 40px 0; }
-  .section-title { font-size: 1.5rem; border-left: 5px solid #1e3a8a; padding-left: 15px; margin-bottom: 30px; }
+  .divider { border: 0; border-top: 1px solid #eee; margin: 3rem 0; }
+  .section-title { font-size: 1.5rem; border-left: 5px solid #1e3a8a; padding-left: 1rem; font-weight: bold; margin-bottom: 2rem; }
 
-  @media (max-width: 1000px) {
-    .genre-container { grid-template-columns: 1fr; }
+  @media (max-width: 900px) {
+    .category-page-layout { grid-template-columns: 1fr; }
   }
 </style>
