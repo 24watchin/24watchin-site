@@ -1,48 +1,61 @@
 ---
-// すべての記事データを読み込みます
-import articles from '../../data/articles.json';
-
-// 全記事分のページを自動で作るための設定です
+// サイトを作る準備段階で、Bloggerからすべての記事をもらってきて、
+// 「この記事のURLはこれ！中身はこれ！」とあらかじめ割り振るための特別な指示です
 export async function getStaticPaths() {
-  return articles.map((article) => ({
-    params: { id: article.id },
-    props: { article },
-  }));
+  // Cloudflareの金庫から合言葉を取り出します
+  const API_KEY = import.meta.env.API_KEY;
+  const BLOG_ID = import.meta.env.BLOG_ID;
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+  const articles = data.items || [];
+
+  // 記事1つ1つに対して、専用のID（URL）と、記事の中身（データ）をセットにします
+  return articles.map((article) => {
+    return {
+      params: { id: article.id }, // URLの末尾になる数字
+      props: { article: article }, // 画面に表示する本文などのデータ
+    };
+  });
 }
 
+// 上の準備で割り振られた「記事の中身」を受け取ります
 const { article } = Astro.props;
 ---
 
 <html lang="ja">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<title>{article.title} - 24Watchin</title>
-		<style>
-			body { font-family: sans-serif; line-height: 1.8; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #fff; }
-			.back-link { display: inline-block; margin-bottom: 20px; color: #1e3a8a; text-decoration: none; font-weight: bold; }
-			h1 { font-size: 1.8rem; color: #111; line-height: 1.4; margin-bottom: 10px; }
-			.date { color: #666; font-size: 0.9rem; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-			.content { font-size: 1.1rem; }
-			/* Bloggerから来た画像などのスタイルを整えます */
-			.content img { max-width: 100%; height: auto; display: block; margin: 20px auto; border-radius: 8px; }
-			.content blockquote { border-left: 4px solid #1e3a8a; padding-left: 15px; color: #555; font-style: italic; margin: 20px 0; }
-		</style>
-	</head>
-	<body>
-		<a href="/" class="back-link">← ニュース一覧に戻る</a>
-		
-		<main>
-			<article>
-				<h1>{article.title}</h1>
-				<div class="date">{new Date(article.published).toLocaleString('ja-JP')} 公開</div>
-				
-				<div class="content" set:html={article.content} />
-			</article>
-		</main>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    {/* ブラウザのタブに「記事のタイトル - 24Watchin」と表示させます */}
+    <title>{article.title} - 24Watchin</title>
+    <style>
+      body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
+      header { background: #1e3a8a; color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+      header a { color: white; text-decoration: none; font-weight: bold; }
+      .article-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+      .date { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+      .content { margin-top: 20px; }
+      /* Bloggerの画像が、スマホなどでも画面からはみ出さないようにする設定です */
+      .content img { max-width: 100%; height: auto; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/">← 24Watchin トップページに戻る</a>
+    </header>
 
-		<footer style="text-align:center; margin-top:60px; padding-top:20px; border-top:1px solid #eee; color:#888;">
-			&copy; 2026 W-Studio Global Media Enterprises
-		</footer>
-	</body>
+    <main class="article-container">
+      <h1>{article.title}</h1>
+      <div class="date">{new Date(article.published).toLocaleDateString('ja-JP')} 公開</div>
+
+      {/* Bloggerで書いた本文を、そのまま画面に表示するための特別な書き方（set:html）です */}
+      <div class="content" set:html={article.content} />
+    </main>
+
+    <footer style="text-align:center; margin-top:40px; color:#888;">
+      &copy; 2026 W-Studio Global Media Enterprises
+    </footer>
+  </body>
 </html>
