@@ -1,10 +1,9 @@
 ---
-// デザイン画像に基づいた共通レイアウト（Pattern A：シンプルな箱）
+// Pattern A: 外枠は「2列」のことは考えず、ただの1200pxの箱にします
 const { title } = Astro.props;
 import '../styles/global.css'; 
 import Footer from '../components/Footer.astro';
 ---
-
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -15,8 +14,12 @@ import Footer from '../components/Footer.astro';
     <style>
       body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
       
-      /* サイト全体の最大幅を1200pxに固定します */
-      .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+      /* サイト全体の最大幅を1200pxに設定。ここが全ての土台です */
+      .container { 
+        max-width: 1200px; 
+        margin: 0 auto; 
+        padding: 0 15px; 
+      }
 
       header { background: #fff; border-bottom: 2px solid #1e3a8a; position: sticky; top: 0; z-index: 100; }
       .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -49,7 +52,7 @@ import Footer from '../components/Footer.astro';
     </header>
 
     <div class="container">
-      {/* 1カラムのシンプルな構造。各ページの中身がここに入ります */}
+      {/* ここには何の「列」の制限もありません。中身が自由に動けます */}
       <slot name="top-full" />
       <main style="margin-top: 20px;">
         <slot />
