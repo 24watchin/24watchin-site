@@ -34,11 +34,6 @@ import '../styles/global.css';
 
       /* フッター */
       footer { background: #1a1a1a; color: #fff; padding: 40px 0; margin-top: 60px; }
-      .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
-      .footer-section h3 { font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
-      .footer-section ul { list-style: none; padding: 0; }
-      .footer-section ul li { margin-bottom: 8px; }
-      .footer-section ul li a { color: #ccc; text-decoration: none; font-size: 14px; }
       .copyright { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #333; color: #888; font-size: 12px; }
     </style>
   </head>
@@ -48,7 +43,7 @@ import '../styles/global.css';
         <div class="top-bar">
           <a href="/" class="logo">24Watchin</a>
           <div class="header-tools">
-            <button style="background:#f97316; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">申し込み</button>
+            <button style="background:#f97316; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold;">申し込み</button>
           </div>
         </div>
         <nav>
@@ -68,64 +63,36 @@ import '../styles/global.css';
     </header>
 
     <div class="container">
+      <div style="margin-top: 20px;">
+        <slot name="top-full" />
+      </div>
+
       <div class="main-layout">
         <main>
           <slot />
         </main>
 
         <aside>
-          <div class="sidebar-box">
-            <div class="sidebar-title">アクセスランキング</div>
-            <p style="font-size:12px; color:#888;">（ここにランキングが表示されます）</p>
-          </div>
-          <div class="sidebar-box" style="background:#f4f4f4; height:250px; display:flex; align-items:center; justify-content:center; color:#999;">
-            広告スペース
-          </div>
-          <div class="sidebar-box">
-            <div class="sidebar-title">カテゴリー</div>
-            <ul style="list-style:none; padding:0; font-size:14px;">
-              <li style="padding:5px 0; border-bottom:1px solid #eee;">テクノロジー</li>
-              <li style="padding:5px 0; border-bottom:1px solid #eee;">ビジネス</li>
-              <li style="padding:5px 0; border-bottom:1px solid #eee;">スポーツ</li>
-            </ul>
-          </div>
+          <slot name="sidebar">
+            <div class="sidebar-box">
+              <div class="sidebar-title">アクセスランキング</div>
+              <p style="font-size:12px; color:#888;">（準備中）</p>
+            </div>
+            <div class="sidebar-box" style="background:#f4f4f4; height:250px; display:flex; align-items:center; justify-content:center; color:#999;">
+              広告スペース
+            </div>
+          </slot>
         </aside>
       </div>
       
       <div style="margin-top: 40px;">
         <slot name="bottom-wide" />
       </div>
-
     </div>
 
     <footer>
       <div class="container">
-        <div class="footer-grid">
-          <div class="footer-section">
-            <h3>NEWS</h3>
-            <p style="font-size:13px; color:#ccc;">最新のニュースと情報をお届けする総合ニュースサイトです。</p>
-          </div>
-          <div class="footer-section">
-            <h3>カテゴリー</h3>
-            <ul>
-              <li><a href="/">トップ</a></li>
-              <li><a href="#">テクノロジー</a></li>
-              <li><a href="#">ビジネス</a></li>
-            </ul>
-          </div>
-          <div class="footer-section">
-            <h3>情報</h3>
-            <ul>
-              <li><a href="/about">会社概要</a></li>
-              <li><a href="#">利用規約</a></li>
-              <li><a href="#">プライバシーポリシー</a></li>
-              <li><a href="#">お問い合わせ</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="copyright">
-          &copy; 2026 W-Studio Global Media Enterprises. All rights reserved.
-        </div>
+        <div class="copyright">&copy; 2026 24Watchin.</div>
       </div>
     </footer>
   </body>
