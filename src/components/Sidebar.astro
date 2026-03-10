@@ -1,11 +1,11 @@
 ---
-// ここはSidebar.astroの裏側の設定を書く場所です。
-// 後でここに「アクセスランキング」などの部品を読み込みます。
+// ここで、さきほど作ったランキング部品を読み込みます
+import AccessRanking from './AccessRanking.astro';
 ---
 
 <aside class="sidebar-wrapper">
-  {/* とりあえず、箱がちゃんと置けたか確認するための仮の文字です */}
-  <p>ここにサイドバーの部品が入ります</p>
+  {/* 読み込んだランキング部品をここに配置します */}
+  <AccessRanking />
 </aside>
 
 <style>
@@ -13,6 +13,6 @@
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* 部品と部品の間に20px（ピクセル）の隙間を空けます */
+    gap: 20px; /* 今後、広告などを追加した時のために隙間を空けておきます */
   }
 </style>
