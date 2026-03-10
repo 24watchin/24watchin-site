@@ -1,0 +1,92 @@
+---
+// 地域名（title）と記事データ（posts）を受け取ります
+const { title, posts = [] } = Astro.props;
+
+const getImageUrl = (content) => {
+  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/150x100/eeeeee/999999?text=No+Image';
+};
+---
+
+<section class="region-block">
+  <div class="region-header">
+    <div class="region-label">{title}</div>
+    <div class="region-line"></div>
+    <a href="#" class="more-link">もっと見る <i class="fas fa-chevron-right"></i></a>
+  </div>
+
+  <div class="region-grid">
+    {posts.map((post) => (
+      <a href={`/news/${post.id}/`} class="region-item">
+        <div class="region-img">
+          <img src={getImageUrl(post.content)} alt={post.title} />
+        </div>
+        <div class="region-info">
+          <h4>{post.title}</h4>
+          <div class="region-meta">
+            <span class="time"><i class="far fa-clock"></i> {new Date(post.published).toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})}</span>
+            <span class="badge-new">NEW</span>
+            <span class="tag">{title.split('（')[0]}</span>
+          </div>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>
+
+<style>
+  .region-block { margin-bottom: 50px; width: 100%; }
+
+  /* ヘッダーデザイン（赤いラベルとライン） */
+  .region-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .region-label {
+    background: #e11d48; /* 鮮やかな赤 */
+    color: #fff;
+    padding: 6px 15px;
+    font-weight: bold;
+    font-size: 16px;
+    z-index: 2;
+  }
+  .region-line {
+    flex-grow: 1;
+    height: 2px;
+    background: #e11d48;
+    margin-left: -5px; /* ラベルと少し重ねる */
+  }
+  .more-link {
+    font-size: 13px;
+    color: #e11d48;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 15px;
+    white-space: nowrap;
+  }
+
+  /* 3列グリッドのレイアウト */
+  .region-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3列に分ける魔法 */
+    gap: 30px 20px;
+  }
+
+  .region-item { display: flex; gap: 15px; text-decoration: none; color: #333; }
+  .region-img { width: 110px; height: 75px; flex-shrink: 0; border-radius: 8px; overflow: hidden; }
+  .region-img img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .region-info h4 { font-size: 14px; margin: 0 0 8px; line-height: 1.4; font-weight: bold; color: #111; }
+  .region-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+  .badge-new { background: #e11d48; color: #fff; padding: 0 4px; border-radius: 2px; font-weight: bold; }
+
+  /* スマホ・タブレット対応 */
+  @media (max-width: 1024px) {
+    .region-grid { grid-template-columns: repeat(2, 1fr); } /* タブレットは2列 */
+  }
+  @media (max-width: 640px) {
+    .region-grid { grid-template-columns: 1fr; } /* スマホは1列 */
+  }
+</style>
