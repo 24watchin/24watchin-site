@@ -1,11 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import MainNewsLayout from '../components/MainNewsLayout.astro';
-import TrendScroll from '../components/TrendScroll.astro';
-import GoogleAdBanner from '../components/GoogleAdBanner.astro';
-import CategoryNews from '../components/CategoryNews.astro';
-// 先ほど修正した部品を読み込みます
 import RegionNewsBlock from '../components/RegionNewsBlock.astro';
+// (他のimportは省略)
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
@@ -14,40 +10,20 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// データの仕分け（シミュレーション）
-// 北米用：メイン1件 + サブ4件
-const mainNA = { ...allPosts[10], countryName: "アメリカ（シカゴ）" };
-const subNA = allPosts.slice(11, 15);
-
-// ヨーロッパ用：メイン1件 + サブ4件
-const mainEU = { ...allPosts[15], countryName: "英国（ロンドン）" };
-const subEU = allPosts.slice(16, 20);
+// 都市ごとにデータをまとめる（例：記事を順番に3つずつ割り当て）
+const northAmericaData = [
+  { cityName: "シカゴ", posts: allPosts.slice(0, 3) },
+  { cityName: "アトランタ", posts: allPosts.slice(3, 6) },
+  { cityName: "デトロイト", posts: allPosts.slice(6, 9) },
+  { cityName: "ニューヨーク", posts: allPosts.slice(9, 12) }
+];
 ---
 
 <Layout title="TOP">
-  <div slot="top-full">
-    <MainNewsLayout />
-    <TrendScroll />
-  </div>
-
-  <GoogleAdBanner position="上部" />
-
-  <div class="genre-grid">
-     </div>
-
-  <GoogleAdBanner position="下部" />
-
   <div slot="bottom-wide">
     <RegionNewsBlock 
       title="北米" 
-      mainItem={mainNA} 
-      subItems={subNA} 
-    />
-    
-    <RegionNewsBlock 
-      title="ヨーロッパ" 
-      mainItem={mainEU} 
-      subItems={subEU} 
+      cityData={northAmericaData} 
     />
   </div>
 </Layout>
