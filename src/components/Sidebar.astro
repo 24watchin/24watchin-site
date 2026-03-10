@@ -1,11 +1,22 @@
 ---
-// ここで、さきほど作ったランキング部品を読み込みます
+// さきほど作ったランキング部品を読み込みます
 import AccessRanking from './AccessRanking.astro';
+// 新しく作ったサイドバー用の広告部品を読み込みます
+import SidebarAd from './SidebarAd.astro';
 ---
 
 <aside class="sidebar-wrapper">
-  {/* 読み込んだランキング部品をここに配置します */}
+  {/* 上部の広告（ここは画面に表示させます） */}
+  <SidebarAd />
+
+  {/* ランキング部品 */}
   <AccessRanking />
+
+  {/* 中部の広告（今はコードを隠して非表示にしています） */}
+  {/* <SidebarAd /> */}
+
+  {/* 下部の広告（今はコードを隠して非表示にしています） */}
+  {/* <SidebarAd /> */}
 </aside>
 
 <style>
@@ -13,6 +24,6 @@ import AccessRanking from './AccessRanking.astro';
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* 今後、広告などを追加した時のために隙間を空けておきます */
+    gap: 20px; /* 部品と部品の間に20pxの隙間を空けます */
   }
 </style>
