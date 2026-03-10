@@ -3,19 +3,24 @@
 import AccessRanking from './AccessRanking.astro';
 // サイドバー用の広告部品を読み込みます
 import SidebarAd from './SidebarAd.astro';
+// ★新しく作った「編集部のおすすめ」部品を読み込みます
+import EditorsPick from './EditorsPick.astro';
 ---
 
 <aside class="sidebar-wrapper">
-  {/* ランキング部品を一番上に配置します */}
+  {/* 1. 一番上にランキング部品を配置します */}
   <AccessRanking />
 
-  {/* 1つ目の広告（上部広告）をランキングの下に配置します */}
+  {/* 2. ランキングの下に上部広告を配置します */}
   <SidebarAd />
 
-  {/* 2つ目の広告（中部の広告予定・今は隠しています） */}
+  {/* 3. ★上部広告の下に「編集部のおすすめ」を配置します */}
+  <EditorsPick />
+
+  {/* 中部の広告（今は隠しています） */}
   {/* <SidebarAd /> */}
 
-  {/* 3つ目の広告（下部の広告予定・今は隠しています） */}
+  {/* 下部の広告（今は隠しています） */}
   {/* <SidebarAd /> */}
 </aside>
 
