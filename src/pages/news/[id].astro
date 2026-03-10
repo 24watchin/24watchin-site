@@ -1,61 +1,169 @@
 ---
-// サイトを作る準備段階で、Bloggerからすべての記事をもらってきて、
-// 「この記事のURLはこれ！中身はこれ！」とあらかじめ割り振るための特別な指示です
+import Layout from '../../layouts/Layout.astro';
+
 export async function getStaticPaths() {
-  // Cloudflareの金庫から合言葉を取り出します
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}`;
-
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
   const response = await fetch(url);
   const data = await response.json();
-  const articles = data.items || [];
+  const posts = data.items || [];
 
-  // 記事1つ1つに対して、専用のID（URL）と、記事の中身（データ）をセットにします
-  return articles.map((article) => {
-    return {
-      params: { id: article.id }, // URLの末尾になる数字
-      props: { article: article }, // 画面に表示する本文などのデータ
-    };
-  });
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { 
+      post,
+      // 記事の下に表示するために、最新の記事をいくつか一緒に渡します
+      recentPosts: posts.slice(0, 6)
+    },
+  }));
 }
 
-// 上の準備で割り振られた「記事の中身」を受け取ります
-const { article } = Astro.props;
+const { post, recentPosts } = Astro.props;
+
+// 写真を見つけ出す魔法（下部の関連記事などで使います）
+const getImageUrl = (content) => {
+  const match = content.match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
+};
 ---
 
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    {/* ブラウザのタブに「記事のタイトル - 24Watchin」と表示させます */}
-    <title>{article.title} - 24Watchin</title>
-    <style>
-      body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
-      header { background: #1e3a8a; color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
-      header a { color: white; text-decoration: none; font-weight: bold; }
-      .article-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-      .date { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
-      .content { margin-top: 20px; }
-      /* Bloggerの画像が、スマホなどでも画面からはみ出さないようにする設定です */
-      .content img { max-width: 100%; height: auto; }
-    </style>
-  </head>
-  <body>
-    <header>
-      <a href="/">← 24Watchin トップページに戻る</a>
+<Layout title={post.title}>
+  <article class="post-container">
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="category-tag">ニュース</span>
+        <time class="post-date">{new Date(post.published).toLocaleDateString('ja-JP')}</time>
+      </div>
+      <h1 class="post-title">{post.title}</h1>
+      
+      <div class="share-buttons">
+        <span class="share-icon" style="background:#000;">X</span>
+        <span class="share-icon" style="background:#1877f2;">F</span>
+        <span class="share-icon" style="background:#00c300;">L</span>
+      </div>
     </header>
 
-    <main class="article-container">
-      <h1>{article.title}</h1>
-      <div class="date">{new Date(article.published).toLocaleDateString('ja-JP')} 公開</div>
+    <div class="post-content" set:html={post.content} />
 
-      {/* Bloggerで書いた本文を、そのまま画面に表示するための特別な書き方（set:html）です */}
-      <div class="content" set:html={article.content} />
-    </main>
+    <div class="bottom-section">
+      <h3 class="section-title">関連記事</h3>
+      <div class="related-grid">
+        {recentPosts.map((rp) => (
+          <a href={`/news/${rp.id}/`} class="related-card">
+            <div class="related-img-wrapper">
+              <img src={getImageUrl(rp.content)} alt={rp.title} />
+            </div>
+            <div class="related-text">
+              <h4>{rp.title}</h4>
+              <span class="tag-link"># 関連ニュース</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
 
-    <footer style="text-align:center; margin-top:40px; color:#888;">
-      &copy; 2026 W-Studio Global Media Enterprises
-    </footer>
-  </body>
-</html>
+  </article>
+
+  <div class="editor-picks-section">
+    <h3 class="section-title">編集部のおすすめ</h3>
+    <div class="scroll-wrapper">
+      <div class="scroll-container">
+        {recentPosts.map((rp) => (
+          <a href={`/news/${rp.id}/`} class="scroll-item">
+            <div class="scroll-img-wrapper">
+              <img src={getImageUrl(rp.content)} alt={rp.title} />
+            </div>
+            <div class="scroll-text">
+              <h4>{rp.title}</h4>
+              <span class="tag-link"># おすすめ</span>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="scroll-arrow"><i class="fas fa-chevron-right"></i></div>
+    </div>
+  </div>
+
+  <div class="bottom-section sponsored-section">
+    <div class="sponsored-header">
+      <h3 class="section-title">あわせて読みたい</h3>
+      <span class="sponsor-credit">by Taboola <i class="fas fa-caret-right"></i></span>
+    </div>
+    <div class="sponsored-grid">
+      {[1, 2, 3, 4, 5, 6].map((item) => (
+        <a href="#" class="sponsored-card">
+          <div class="sponsored-img-wrapper">広告画像が入ります</div>
+          <div class="sponsored-text">
+            <h4>「歯を失った人は必ずやって」後悔する前に！インプラントという選択肢。</h4>
+            <div class="sponsored-bottom">
+              <span class="sponsor-name">あんしんインプラント</span>
+              <span class="sponsor-btn">こちらをクリック</span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <style>
+    /* 記事上部のデザイン */
+    .post-container { background: #fff; padding: 30px; border-radius: 4px; border: 1px solid #eee; margin-bottom: 40px; }
+    .post-header { border-bottom: 2px solid #f4f4f4; padding-bottom: 20px; margin-bottom: 20px; }
+    .post-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+    .category-tag { color: #1e3a8a; font-weight: bold; font-size: 14px; border: 1px solid #1e3a8a; padding: 2px 8px; }
+    .post-date { color: #666; font-size: 14px; }
+    .post-title { font-size: 28px; line-height: 1.4; margin: 0 0 15px; color: #111; }
+    .share-buttons { display: flex; gap: 10px; }
+    .share-icon { width: 30px; height: 30px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; cursor: pointer; }
+
+    /* 記事本文のデザイン */
+    .post-content { font-size: 16px; line-height: 1.8; color: #333; margin-bottom: 50px; }
+    .post-content img { max-width: 100%; height: auto; display: block; margin: 20px 0; }
+
+    /* 共通の見出しデザイン */
+    .section-title { font-size: 22px; color: #333; margin-bottom: 20px; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; display: inline-block; }
+    .tag-link { font-size: 12px; color: #d97706; font-weight: bold; margin-top: 10px; display: block; }
+
+    /* 1. 関連記事のデザイン */
+    .bottom-section { margin-bottom: 50px; }
+    .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .related-card { text-decoration: none; color: #333; display: block; }
+    .related-img-wrapper { height: 160px; overflow: hidden; background: #eee; margin-bottom: 10px; }
+    .related-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+    .related-text h4 { font-size: 15px; margin: 0; line-height: 1.4; }
+
+    /* 2. 編集部のおすすめ（横スクロール）のデザイン */
+    .editor-picks-section { background: #f4f4f4; padding: 30px; margin: 0 -15px 50px; border-radius: 4px; }
+    .scroll-wrapper { position: relative; }
+    .scroll-container { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 15px; scroll-snap-type: x mandatory; }
+    /* スクロールバーを隠す魔法 */
+    .scroll-container::-webkit-scrollbar { display: none; } 
+    .scroll-item { min-width: 280px; flex-shrink: 0; background: #fff; scroll-snap-align: start; text-decoration: none; color: #333; display: flex; flex-direction: column; }
+    .scroll-img-wrapper { height: 180px; overflow: hidden; background: #ddd; }
+    .scroll-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+    .scroll-text { padding: 15px; }
+    .scroll-text h4 { font-size: 16px; margin: 0; line-height: 1.4; }
+    .scroll-arrow { position: absolute; right: 0; top: 40%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+    /* 3. あわせて読みたい（広告）のデザイン */
+    .sponsored-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+    .sponsored-header .section-title { border-bottom: none; margin-bottom: 5px; padding-bottom: 0; }
+    .sponsor-credit { font-size: 12px; color: #007bff; font-weight: bold; margin-bottom: 5px; }
+    .sponsored-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .sponsored-card { background: #fff; border: 1px solid #eee; text-decoration: none; color: #333; display: flex; flex-direction: column; }
+    .sponsored-img-wrapper { height: 150px; background: #ddd; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; }
+    .sponsored-text { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .sponsored-text h4 { font-size: 14px; margin: 0 0 15px; line-height: 1.5; font-weight: bold; }
+    .sponsored-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .sponsor-name { font-size: 11px; color: #888; }
+    .sponsor-btn { font-size: 11px; border: 1px solid #333; padding: 2px 8px; border-radius: 2px; }
+
+    /* スマホ画面の調整 */
+    @media (max-width: 768px) {
+      .post-container { padding: 15px; }
+      .related-grid, .sponsored-grid { grid-template-columns: 1fr; }
+      .editor-picks-section { padding: 20px 15px; margin: 0 0 40px; }
+    }
+  </style>
+</Layout>
