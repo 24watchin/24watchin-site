@@ -4,7 +4,8 @@ import MainNewsLayout from '../components/MainNewsLayout.astro';
 import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
-import RegionNewsBlock from '../components/RegionNewsBlock.astro'; // 追加
+// 先ほど修正した部品を読み込みます
+import RegionNewsBlock from '../components/RegionNewsBlock.astro';
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
@@ -13,14 +14,14 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ラベルによる仕分け（例として新しいラベルを追加）
-const filterByLabel = (labelName, count = 2) => {
-  return allPosts.filter(post => post.labels && post.labels.includes(labelName)).slice(0, count);
-};
+// データの仕分け（シミュレーション）
+// 北米用：メイン1件 + サブ4件
+const mainNA = { ...allPosts[10], countryName: "アメリカ（シカゴ）" };
+const subNA = allPosts.slice(11, 15);
 
-// 地域別のデータ取得（3列にするため、多めに9記事ずつ取得する例）
-const usPosts = filterByLabel("アメリカ", 9);
-const euPosts = filterByLabel("ヨーロッパ", 9);
+// ヨーロッパ用：メイン1件 + サブ4件
+const mainEU = { ...allPosts[15], countryName: "英国（ロンドン）" };
+const subEU = allPosts.slice(16, 20);
 ---
 
 <Layout title="TOP">
@@ -30,17 +31,23 @@ const euPosts = filterByLabel("ヨーロッパ", 9);
   </div>
 
   <GoogleAdBanner position="上部" />
-  
+
   <div class="genre-grid">
-    <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
-    <CategoryNews title="教育" posts={filterByLabel("教育")} />
-    </div>
+     </div>
 
   <GoogleAdBanner position="下部" />
 
   <div slot="bottom-wide">
-    <RegionNewsBlock title="アメリカ（シカゴ）" posts={usPosts} />
-    <RegionNewsBlock title="ヨーロッパ（ロンドン）" posts={euPosts} />
+    <RegionNewsBlock 
+      title="北米" 
+      mainItem={mainNA} 
+      subItems={subNA} 
+    />
     
-    </div>
+    <RegionNewsBlock 
+      title="ヨーロッパ" 
+      mainItem={mainEU} 
+      subItems={subEU} 
+    />
+  </div>
 </Layout>
