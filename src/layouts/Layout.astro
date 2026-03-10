@@ -1,5 +1,5 @@
 ---
-// デザイン画像に基づいた共通レイアウト（Pattern A：シンプルな箱バージョン）
+// デザイン画像に基づいた共通レイアウト（シンプルな箱バージョン）
 const { title } = Astro.props;
 import '../styles/global.css'; 
 import Footer from '../components/Footer.astro';
@@ -17,7 +17,7 @@ import Footer from '../components/Footer.astro';
       body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
       margin: 0; background-color: #f8f9fa; color: #333; }
       
-      /* 共通の横幅設定：ここがサイト全体の最大幅になります */
+      /* 共通の横幅設定：ここがサイト全体の最大幅(1200px)になります */
       .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
 
       /* ヘッダー部分 */
@@ -30,7 +30,7 @@ import Footer from '../components/Footer.astro';
       .nav-categories li a { display: block; padding: 15px 20px; color: #333; text-decoration: none; font-weight: bold; font-size: 14px; }
       .nav-categories li a:hover { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; }
 
-      /* メインエリア：強制的な2列設定を削除しました */
+      /* メインエリア：2列設定(main-layout)を削除しました */
       main { margin-top: 20px; }
     </style>
   </head>
@@ -43,7 +43,6 @@ import Footer from '../components/Footer.astro';
             <button style="background:#f97316; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold;">申し込み</button>
           </div>
         </div>
-    
         <nav>
           <ul class="nav-categories">
             <li><a href="/">TOP</a></li>
@@ -63,9 +62,7 @@ import Footer from '../components/Footer.astro';
     <div class="container">
       <slot name="top-full" />
 
-      {/* ここをシンプルにしたことで、ジャンルページ側の「2列」が
-          1200px の幅をフルに使って綺麗に並ぶようになります 
-      */}
+      {/* ここから2列設定を消したことで、中身が広々と表示されます */}
       <main>
         <slot />
       </main>
