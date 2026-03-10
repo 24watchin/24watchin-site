@@ -4,6 +4,7 @@ import MainNewsLayout from '../components/MainNewsLayout.astro';
 import TrendScroll from '../components/TrendScroll.astro';
 import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
+import RegionNewsBlock from '../components/RegionNewsBlock.astro'; // 追加
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
@@ -12,24 +13,14 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ★ 記事をラベル（タグ）で自動仕分けする魔法の関数
-const filterByLabel = (labelName) => {
-  return allPosts.filter(post => 
-    post.labels && post.labels.includes(labelName)
-  ).slice(0, 2); // 1ジャンルにつき最新2件だけ取得
+// ラベルによる仕分け（例として新しいラベルを追加）
+const filterByLabel = (labelName, count = 2) => {
+  return allPosts.filter(post => post.labels && post.labels.includes(labelName)).slice(0, count);
 };
 
-// 【重要】ここのカッコ内の文字を、Bloggerで使っている実際のラベル名に書き換えてください！
-const medicalPosts = filterByLabel("医療"); 
-const educationPosts = filterByLabel("教育");
-const culturePosts = filterByLabel("文化");
-const lifePosts = filterByLabel("くらし");
-const societyPosts = filterByLabel("社会");
-const economyPosts = filterByLabel("経済");
-const techPosts = filterByLabel("テクノロジー");
-const sportsPosts = filterByLabel("スポーツ");
-const entPosts = filterByLabel("エンタメ");
-const intPosts = filterByLabel("国際");
+// 地域別のデータ取得（3列にするため、多めに9記事ずつ取得する例）
+const usPosts = filterByLabel("アメリカ", 9);
+const euPosts = filterByLabel("ヨーロッパ", 9);
 ---
 
 <Layout title="TOP">
@@ -39,31 +30,17 @@ const intPosts = filterByLabel("国際");
   </div>
 
   <GoogleAdBanner position="上部" />
-
+  
   <div class="genre-grid">
-    <CategoryNews title="医療・健康" posts={medicalPosts} />
-    <CategoryNews title="教育" posts={educationPosts} />
-    <CategoryNews title="文化" posts={culturePosts} />
-    <CategoryNews title="くらし" posts={lifePosts} />
-    <CategoryNews title="社会" posts={societyPosts} />
-    <CategoryNews title="経済" posts={economyPosts} />
-    <CategoryNews title="テクノロジー" posts={techPosts} />
-    <CategoryNews title="スポーツ" posts={sportsPosts} />
-    <CategoryNews title="エンタメ" posts={entPosts} />
-    <CategoryNews title="国際" posts={intPosts} />
-  </div>
+    <CategoryNews title="医療・健康" posts={filterByLabel("医療")} />
+    <CategoryNews title="教育" posts={filterByLabel("教育")} />
+    </div>
 
   <GoogleAdBanner position="下部" />
-</Layout>
 
-<style>
-  .genre-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 20px;
-  }
-  @media (max-width: 768px) {
-    .genre-grid { grid-template-columns: 1fr; }
-  }
-</style>
+  <div slot="bottom-wide">
+    <RegionNewsBlock title="アメリカ（シカゴ）" posts={usPosts} />
+    <RegionNewsBlock title="ヨーロッパ（ロンドン）" posts={euPosts} />
+    
+    </div>
+</Layout>
