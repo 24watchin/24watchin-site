@@ -65,33 +65,37 @@ const getImageUrl = (content) => {
   .hero-text { display: flex; align-items: center; } 
   .hero-text h2 { font-size: 24px; margin: 0; line-height: 1.4; } 
   
-  .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+  /* 線の色を#cccに変更 */
+  .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #ccc; padding-top: 15px; }
   .grid-item a { display: flex; gap: 15px; text-decoration: none; color: #333; }
   .grid-image { width: 120px; height: 80px; flex-shrink: 0; overflow: hidden; border-radius: 4px; }
   .grid-image img { width: 100%; height: 100%; object-fit: cover; }
-  .grid-text h3 { font-size: 14px; margin: 0; line-height: 1.4; }
+  /* 文字サイズを16pxに変更 */
+  .grid-text h3 { font-size: 16px; margin: 0; line-height: 1.4; }
   
-  .side-list-column { border-left: 1px solid #eee; padding-left: 20px; }
-  .list-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+  /* 線の色を#cccに変更 */
+  .side-list-column { border-left: 1px solid #ccc; padding-left: 20px; }
+  /* 線の色を#cccに変更 */
+  .list-item { border-bottom: 1px solid #ccc; padding: 10px 0; }
   .list-item:first-child { padding-top: 0; }
   .list-item a { text-decoration: none; color: #333; }
   
-  /* ▼ ① 右側のタイトルを太字（bold）に変更しました ▼ */
-  .list-item h4 { display: inline; font-size: 14px; line-height: 1.25; font-weight: bold; margin: 0; display: block; }
+  /* 文字サイズを16pxに変更 */
+  .list-item h4 { display: inline; font-size: 16px; line-height: 1.25; font-weight: bold; margin: 0; display: block; }
   
-  /* ▼ ② マウスを乗せた時に、タイトルの下に細い黒線を出す設定です ▼ */
   .hero-post a:hover h2,
   .grid-item a:hover h3,
   .list-item a:hover h4 {
     text-decoration: underline;
-    text-decoration-thickness: 1px; /* 細い線 */
-    text-decoration-color: #333; /* 黒色 */
-    text-underline-offset: 3px; /* 文字から少しだけ線を離して読みやすくします */
+    text-decoration-thickness: 1px;
+    text-decoration-color: #333;
+    text-underline-offset: 3px;
   }
   
   @media (max-width: 600px) { 
     .hero-post a { grid-template-columns: 1fr; } 
     .sub-grid { grid-template-columns: 1fr; } 
-    .side-list-column { border-left: none; padding-left: 0; border-top: 1px solid #eee; margin-top: 20px; } 
+    /* 線の色を#cccに変更 */
+    .side-list-column { border-left: none; padding-left: 0; border-top: 1px solid #ccc; margin-top: 20px; } 
   }
 </style>
