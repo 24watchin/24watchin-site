@@ -1,43 +1,41 @@
 ---
-// 画像デザインに基づいた「地域別・都市別」ブロック
-// title: 地域名 (北米 など)
-// cityData: [{ cityName: "シカゴ", posts: [...] }, { cityName: "アトランタ", posts: [...] }] のようなデータ
-const { title, cityData = [] } = Astro.props;
-
-const getImageUrl = (content) => {
-  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
-  return match ? match[1] : 'https://placehold.co/120x80/eeeeee/999999?text=No+Image';
-};
+// index.astro から送られてくるデータ（地域名と都市ごとの記事）を受け取ります
+const { title, cityData } = Astro.props;
 ---
 
-<section class="region-section">
-  <div class="region-main-header">
-    <div class="region-badge">{title}</div>
-    <div class="region-line"></div>
-  </div>
+<section class="region-block">
+  <h2 class="region-title">{title}</h2>
 
-  <div class="city-groups">
+  <div class="cities-container">
     {cityData.map((city) => (
-      <div class="city-block">
+      <div class="city-section">
         <h3 class="city-name">{city.cityName}</h3>
         
-        <div class="article-3-grid">
-          {city.posts.slice(0, 3).map((post) => (
-            <a href={`/news/${post.id}/`} class="news-item">
-              <div class="thumbnail">
-                <img src={getImageUrl(post.content)} alt={post.title} />
-              </div>
-              <div class="info">
-                <h4>{post.title}</h4>
-                <p class="summary">{post.title.substring(0, 30)}...</p>
-                <div class="meta">
-                  <span class="time"><i class="far fa-clock"></i> 15:00</span>
-                  <span class="badge-new">NEW</span>
-                  <span class="tag">国際</span>
-                </div>
-              </div>
-            </a>
-          ))}
+        <div class="posts-grid">
+          {city.posts.map((post) => {
+            // 記事の中から最初の画像を探します
+            const imgMatch = (post.content || '').match(/<img[^>]+src="([^">]+)"/);
+            const imgSrc = imgMatch ? imgMatch[1] : 'https://placehold.co/300x200/eeeeee/999999?text=No+Image';
+            const date = new Date(post.published).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+
+            return (
+              <article class="post-card">
+                <a href={`/news/${post.id}/`} class="post-link">
+                  <div class="img-wrapper">
+                    <img src={imgSrc} alt="" loading="lazy" />
+                  </div>
+                  <div class="post-info">
+                    <h4 class="post-title">{post.title}</h4>
+                    <div class="post-meta">
+                      <span class="time"><i class="far fa-clock"></i> {date}</span>
+                      <span class="badge-new">NEW</span>
+                      <span class="category">国際</span>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
         </div>
       </div>
     ))}
@@ -45,39 +43,109 @@ const getImageUrl = (content) => {
 </section>
 
 <style>
-  .region-section { margin-bottom: 60px; width: 100%; }
+  .region-block {
+    margin-bottom: 40px;
+  }
 
-  /* 赤い大見出しのデザイン */
-  .region-main-header { display: flex; align-items: center; margin-bottom: 30px; }
-  .region-badge { background: #e11d48; color: #fff; padding: 6px 20px; font-weight: bold; font-size: 18px; border-radius: 2px; }
-  .region-line { flex-grow: 1; height: 2px; background: #e11d48; margin-left: -2px; }
+  /* ① 地域タイトルの赤線デザイン */
+  .region-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    /* 指定された赤色（#b11d2c）で下線を引きます */
+    border-bottom: 4px solid #b11d2c;
+  }
 
-  /* 都市名 */
-  .city-name { font-size: 20px; font-weight: bold; margin: 0 0 15px 10px; color: #111; }
-  .city-block { margin-bottom: 40px; }
+  /* ④ 行間の調整：都市ごとのセクションの隙間を狭くします */
+  .city-section {
+    margin-bottom: 25px;
+  }
 
-  /* 3枚横並びのグリッド */
-  .article-3-grid {
+  .city-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #333;
+  }
+
+  .posts-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
 
-  /* 個別の記事パーツ（横型） */
-  .news-item { display: flex; gap: 12px; text-decoration: none; color: #333; }
-  .thumbnail { width: 120px; height: 80px; flex-shrink: 0; border-radius: 4px; overflow: hidden; background: #eee; }
-  .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-  
-  .info h4 { font-size: 14px; margin: 0 0 4px; line-height: 1.4; font-weight: bold; }
-  .summary { font-size: 12px; color: #666; margin: 0 0 8px; line-height: 1.4; }
-  .meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
-  .badge-new { background: #e11d48; color: #fff; padding: 0 4px; border-radius: 2px; font-weight: bold; }
-
-  /* レスポンシブ：画面が狭くなったら1列にする */
-  @media (max-width: 1024px) {
-    .article-3-grid { grid-template-columns: 1fr 1fr; }
+  .post-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    gap: 12px;
   }
-  @media (max-width: 700px) {
-    .article-3-grid { grid-template-columns: 1fr; }
+
+  .img-wrapper {
+    flex-shrink: 0;
+    width: 100px;
+    height: 65px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #eee;
+  }
+
+  .img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post-info {
+    flex-grow: 1;
+  }
+
+  .post-title {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.4;
+    margin: 0 0 6px 0;
+    color: #333;
+    /* ③ リンクの黒い細線：通常時は透明、ホバー時に表示 */
+    border-bottom: 1px solid transparent;
+  }
+
+  /* ③ ホバー時に黒い細線を出す設定 */
+  .post-link:hover .post-title {
+    border-bottom: 1px solid #333;
+  }
+
+  .post-meta {
+    font-size: 11px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .badge-new {
+    background: #e11d48;
+    color: white;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: 10px;
+  }
+
+  .category {
+    color: #888;
+  }
+
+  /* スマホ対応：1列にする */
+  @media (max-width: 768px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    .region-title {
+      font-size: 20px;
+    }
   }
 </style>
