@@ -1,5 +1,5 @@
 ---
-// ページによってサイドバーを切り替える機能 ＋ SEO強化版
+// ページによってサイドバーを切り替える機能 ＋ SEO強化 ＋ 全ページ共通のヘッダー下余白設定
 const { title, description = '24Watchinは、世界中の最新ニュースを日本語でお届けするグローバルメディアです。', sidebarType = 'top' } = Astro.props;
 import '../styles/global.css'; 
 import Footer from '../components/Footer.astro';
@@ -57,25 +57,24 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       </div>
     </header>
 
-    <div class="container">
+    {/* ▼▼▼ ここが今回の修正ポイントです！ ▼▼▼ */}
+    {/* コンテンツ全体を包む箱に、直接「上に30pxの隙間を作りなさい」という指示を出しました */}
+    <div class="container" style="margin-top: 30px;">
+      
       <slot name="top-full" />
       
       <div class="main-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 40px; margin-top: 20px; align-items: flex-start;">
         
-        {/* ▼▼▼ ここが今回の修正ポイントです！ ▼▼▼ */}
-        {/* marginやpaddingを0にし、強制的に幅を100%（830px）に広げる魔法をかけました */}
         <main style="margin: 0; padding: 0; width: 100%; max-width: none;">
           <slot />
         </main>
         
-        {/* 右サイドバー側にも、念のため同じ魔法をかけておきます */}
         <aside style="margin: 0; padding: 0; width: 100%; max-width: none;">
           {sidebarType === 'category' ? <CategorySidebar /> : 
            sidebarType === 'article' ? <ArticleSidebar /> : 
            <Sidebar />}
         </aside>
-        {/* ▲▲▲ ここまで ▲▲▲ */}
-
+        
       </div>
       
       <slot name="bottom-wide" />
