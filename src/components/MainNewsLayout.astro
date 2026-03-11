@@ -11,11 +11,7 @@ const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
-
-const getExcerpt = (content) => {
-  if (!content) return "";
-  return content.replace(/<[^>]*>/g, '').substring(0, 100) + '...';
-};
+// ※文章を切り取るプログラム（getExcerpt）はもう使わないので削除しました！
 ---
 
 <div class="top-news-container">
@@ -27,9 +23,8 @@ const getExcerpt = (content) => {
             <img src={getImageUrl(posts[0].content)} alt={posts[0].title} />
           </div>
           <div class="hero-text">
-            <span class="category-red">Region</span>
+            {/* ▼ Regionと文章を消し、タイトルだけにしました ▼ */}
             <h2>{posts[0].title}</h2>
-            <p>{getExcerpt(posts[0].content)}</p>
           </div>
         </a>
       </article>
@@ -43,7 +38,7 @@ const getExcerpt = (content) => {
               <img src={getImageUrl(post.content)} alt={post.title} />
             </div>
             <div class="grid-text">
-              <span class="category-red small">Region</span>
+              {/* ▼ ここに残っていたRegionも消しました ▼ */}
               <h3>{post.title}</h3>
             </div>
           </a>
@@ -53,7 +48,6 @@ const getExcerpt = (content) => {
   </div>
 
   <div class="side-list-column">
-    {/* ▼ 記事を8件（5番目〜13番目）に増やしました ▼ */}
     {posts.slice(5, 13).map((post) => (
       <article class="list-item">
         <a href={`/news/${post.id}/`}>
@@ -65,18 +59,18 @@ const getExcerpt = (content) => {
 </div>
 
 <style>
-  /* ▼ 右側の幅を400px（左右で約半分ずつ）に広げました ▼ */
   .top-news-container { display: grid; grid-template-columns: 1fr 400px; gap: 30px; margin-bottom: 40px; }
   @media (max-width: 900px) { .top-news-container { grid-template-columns: 1fr; } }
-  .category-red { color: #b91c1c; font-weight: bold; font-size: 14px; margin-bottom: 5px; display: block; }
-  .category-red.small { font-size: 12px; }
-  .category-red.mini { font-size: 11px; display: inline; margin-right: 5px; }
+  
+  /* Region用のデザイン設定も不要になったので削除しました */
   
   .hero-post a { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; text-decoration: none; color: #333; margin-bottom: 15px; }
   .hero-image { aspect-ratio: 16/10; overflow: hidden; border-radius: 4px; }
   .hero-image img { width: 100%; height: 100%; object-fit: cover; }
-  .hero-text h2 { font-size: 22px; margin: 5px 0 10px; line-height: 1.3; }
-  .hero-text p { font-size: 14px; color: #666; line-height: 1.6; }
+  
+  /* ▼ 文章がなくなった分、タイトルの位置を少し調整しました ▼ */
+  .hero-text { display: flex; align-items: center; } 
+  .hero-text h2 { font-size: 24px; margin: 0; line-height: 1.4; } 
   
   .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #eee; padding-top: 15px; }
   .grid-item a { display: flex; gap: 15px; text-decoration: none; color: #333; }
@@ -88,7 +82,6 @@ const getExcerpt = (content) => {
   .list-item { border-bottom: 1px solid #eee; padding: 10px 0; }
   .list-item:first-child { padding-top: 0; }
   .list-item a { text-decoration: none; color: #333; }
-  
   .list-item h4 { display: inline; font-size: 14px; line-height: 1.25; font-weight: normal; margin: 0; display: block; }
   
   @media (max-width: 600px) { 
