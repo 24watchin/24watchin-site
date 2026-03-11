@@ -1,0 +1,59 @@
+---
+// 「あわせて読みたい（PR・広告風）」を表示する専用の部品です
+const { recentPosts } = Astro.props; // 記事データを受け取ります
+
+const getImageUrl = (content) => {
+  const match = content.match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
+};
+---
+
+<div class="bottom-section">
+  <div class="sponsored-header">
+    <h3 class="section-title">あわせて読みたい</h3>
+    <span class="sponsor-credit">PR</span>
+  </div>
+  
+  <div class="sponsored-grid">
+    {recentPosts.map((rp) => (
+      <a href={`/news/${rp.id}/`} class="sponsored-card">
+        <div class="sponsored-img-wrapper">
+          <img src={getImageUrl(rp.content)} alt={rp.title} />
+        </div>
+        <div class="sponsored-text">
+          <h4>{rp.title}</h4>
+          <div class="sponsored-bottom">
+            <span>詳細を見る <i class="fas fa-chevron-right"></i></span>
+          </div>
+        </div>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* 全体の余白 */
+  .bottom-section { margin-bottom: 50px; }
+  
+  /* 見出しと「PR」文字の横並び設定 */
+  .sponsored-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+  .section-title { font-size: 22px; color: #333; margin-bottom: 5px; padding-bottom: 0; display: inline-block; border-bottom: none; }
+  .sponsor-credit { font-size: 12px; color: #007bff; font-weight: bold; margin-bottom: 5px; }
+  
+  /* カードを並べる設定 */
+  .sponsored-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .sponsored-card { background: #fff; border: 1px solid #eee; text-decoration: none; color: #333; display: flex; flex-direction: column; overflow: hidden; border-radius: 4px; transition: transform 0.2s; }
+  .sponsored-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  
+  /* 画像とテキストの設定 */
+  .sponsored-img-wrapper { height: 160px; background: #ddd; overflow: hidden; }
+  .sponsored-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+  .sponsored-text { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .sponsored-text h4 { font-size: 14px; margin: 0 0 15px; line-height: 1.5; font-weight: bold; }
+  .sponsored-bottom { display: flex; justify-content: flex-end; font-size: 12px; color: #007bff; font-weight: bold; }
+  
+  /* スマホ画面の調整 */
+  @media (max-width: 768px) {
+    .sponsored-grid { grid-template-columns: 1fr; }
+  }
+</style>
