@@ -1,0 +1,56 @@
+---
+// 記事ページ専用のサイドバー部品です
+---
+<div class="article-sidebar">
+  {/* サイドバー用の広告スペース */}
+  <div class="ad-space">
+    <p style="text-align:center; color:#999; font-size:12px; margin:0 0 5px 0;">広告</p>
+    <div style="background:#ddd; height:250px; display:flex; align-items:center; justify-content:center; color:#666;">
+      記事用 300x250 バナー
+    </div>
+  </div>
+
+  {/* おすすめ記事などの仮のリストです */}
+  <div class="recommend-box">
+    <h3 class="side-title">この記事を読んだ人におすすめ</h3>
+    <ul class="side-list">
+      <li><a href="#">おすすめ記事のタイトルがここに入ります...</a></li>
+      <li><a href="#">おすすめ記事のタイトルがここに入ります...</a></li>
+      <li><a href="#">おすすめ記事のタイトルがここに入ります...</a></li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  .article-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  .side-title {
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+  }
+  .side-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .side-list li {
+    border-bottom: 1px dashed #ccc;
+  }
+  .side-list li a {
+    display: block;
+    padding: 10px 0;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .side-list li a:hover {
+    color: #1e3a8a;
+  }
+</style>
