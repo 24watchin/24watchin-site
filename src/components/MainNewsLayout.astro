@@ -56,7 +56,8 @@ const getImageUrl = (content) => {
 </div>
 
 <style>
-  .top-news-container { display: grid; grid-template-columns: 1fr 400px; gap: 30px; margin-bottom: 40px; }
+  /* 右幅を420pxに広げました */
+  .top-news-container { display: grid; grid-template-columns: 1fr 420px; gap: 30px; margin-bottom: 40px; }
   @media (max-width: 900px) { .top-news-container { grid-template-columns: 1fr; } }
   
   .hero-post a { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; text-decoration: none; color: #333; margin-bottom: 15px; }
@@ -65,22 +66,17 @@ const getImageUrl = (content) => {
   .hero-text { display: flex; align-items: center; } 
   .hero-text h2 { font-size: 24px; margin: 0; line-height: 1.4; } 
   
-  /* 線の色を#cccに変更 */
   .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #ccc; padding-top: 15px; }
   .grid-item a { display: flex; gap: 15px; text-decoration: none; color: #333; }
   .grid-image { width: 120px; height: 80px; flex-shrink: 0; overflow: hidden; border-radius: 4px; }
   .grid-image img { width: 100%; height: 100%; object-fit: cover; }
-  /* 文字サイズを16pxに変更 */
   .grid-text h3 { font-size: 16px; margin: 0; line-height: 1.4; }
   
-  /* 線の色を#cccに変更 */
   .side-list-column { border-left: 1px solid #ccc; padding-left: 20px; }
-  /* 線の色を#cccに変更 */
   .list-item { border-bottom: 1px solid #ccc; padding: 10px 0; }
   .list-item:first-child { padding-top: 0; }
   .list-item a { text-decoration: none; color: #333; }
   
-  /* 文字サイズを16pxに変更 */
   .list-item h4 { display: inline; font-size: 16px; line-height: 1.25; font-weight: bold; margin: 0; display: block; }
   
   .hero-post a:hover h2,
@@ -95,7 +91,6 @@ const getImageUrl = (content) => {
   @media (max-width: 600px) { 
     .hero-post a { grid-template-columns: 1fr; } 
     .sub-grid { grid-template-columns: 1fr; } 
-    /* 線の色を#cccに変更 */
     .side-list-column { border-left: none; padding-left: 0; border-top: 1px solid #ccc; margin-top: 20px; } 
   }
 </style>
