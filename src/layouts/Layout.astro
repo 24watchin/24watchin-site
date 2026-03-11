@@ -1,6 +1,5 @@
 ---
 // ページによってサイドバーを切り替える機能 ＋ SEO強化版
-// 新しく「description（説明文）」を受け取れるようにしました
 const { title, description = '24Watchinは、世界中の最新ニュースを日本語でお届けするグローバルメディアです。', sidebarType = 'top' } = Astro.props;
 import '../styles/global.css'; 
 import Footer from '../components/Footer.astro';
@@ -14,16 +13,12 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
-    
-    {/* ▼▼▼ ここが追加したSEO・SNS対策の魔法です ▼▼▼ */}
     <meta name="description" content={description} />
     <meta property="og:title" content={title ? `${title} | 24Watchin` : '24Watchin'} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="24Watchin" />
     <meta name="twitter:card" content="summary_large_image" />
-    {/* ▲▲▲ ここまで ▲▲▲ */}
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
       body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
@@ -66,14 +61,21 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       <slot name="top-full" />
       
       <div class="main-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 40px; margin-top: 20px; align-items: flex-start;">
-        <main style="margin-top: 0; padding-top: 0;">
+        
+        {/* ▼▼▼ ここが今回の修正ポイントです！ ▼▼▼ */}
+        {/* marginやpaddingを0にし、強制的に幅を100%（830px）に広げる魔法をかけました */}
+        <main style="margin: 0; padding: 0; width: 100%; max-width: none;">
           <slot />
         </main>
-        <aside style="margin-top: 0; padding-top: 0;">
+        
+        {/* 右サイドバー側にも、念のため同じ魔法をかけておきます */}
+        <aside style="margin: 0; padding: 0; width: 100%; max-width: none;">
           {sidebarType === 'category' ? <CategorySidebar /> : 
            sidebarType === 'article' ? <ArticleSidebar /> : 
            <Sidebar />}
         </aside>
+        {/* ▲▲▲ ここまで ▲▲▲ */}
+
       </div>
       
       <slot name="bottom-wide" />
