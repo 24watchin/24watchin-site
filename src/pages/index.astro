@@ -6,7 +6,6 @@ import GoogleAdBanner from '../components/GoogleAdBanner.astro';
 import CategoryNews from '../components/CategoryNews.astro';
 import RegionNewsBlock from '../components/RegionNewsBlock.astro';
 
-// Bloggerから記事のデータを取得する準備です
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
@@ -14,12 +13,10 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// 記事に付いている「ラベル（ジャンル）」を見て、自動で振り分けるための仕組みです
 const filterByLabel = (labelName, count = 2) => {
   return allPosts.filter(post => post.labels && post.labels.includes(labelName)).slice(0, count);
 };
 
-// 【復活】北米ブロックに表示する「都市と記事」のデータです
 const northAmericaData = [
   { cityName: "シカゴ", posts: allPosts.slice(0, 3) },
   { cityName: "アトランタ", posts: allPosts.slice(3, 6) },
@@ -27,21 +24,31 @@ const northAmericaData = [
   { cityName: "ニューヨーク", posts: allPosts.slice(9, 12) }
 ];
 
-// 【復活】ヨーロッパブロックに表示する「都市と記事」のデータです
 const europeData = [
   { cityName: "ロンドン", posts: allPosts.slice(12, 15) },
   { cityName: "パリ", posts: allPosts.slice(15, 18) },
   { cityName: "ベルリン", posts: allPosts.slice(18, 21) }
 ];
+
+// ▼ SEO用：トップページ専用の説明文です ▼
+const pageDescription = "24Watchinのトップページです。国際、ビジネス、科学、地域ニュースなど、世界中の最新動向を日本語で24時間お届けするグローバルメディアサイトです。";
 ---
 
-<Layout title="TOP">
+<Layout title="TOP" description={pageDescription}>
+  
+  {/* ▼ SEO対策：Googleに「ここはWebサイトの顔ですよ」と伝えるデータです ▼ */}
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "24Watchin",
+    "url": "https://your-domain.com/"
+  })} />
+
   <div slot="top-full">
     <MainNewsLayout />
     <TrendScroll />
   </div>
 
-  {/* 左側のメインエリアの一番上に表示する広告です */}
   <GoogleAdBanner position="上部" />
 
   <div class="genre-grid">
@@ -57,31 +64,20 @@ const europeData = [
     <CategoryNews title="国際" posts={filterByLabel("国際")} />
   </div>
 
-  {/* ジャンル記事の下に表示する広告です */}
   <GoogleAdBanner position="下部" />
 
-  {/* 【復活】ページの下の方に、国別の記事ブロックを表示します */}
   <div slot="bottom-wide">
     <RegionNewsBlock title="北米" cityData={northAmericaData} />
     <RegionNewsBlock title="ヨーロッパ" cityData={europeData} />
   </div>
 </Layout>
 
-{/* ↓ ここが今回のポイントです！ 
-  「is:global」という特別な言葉をつけることで、Astroの見えない壁をすり抜け、
-  強制的に「一番上のパーツの隙間をなくして！」という指示を届けます。
-*/}
 <style is:global>
-  main > :first-child {
-    margin-top: 0 !important;
-  }
-  aside > :first-child {
-    margin-top: 0 !important;
-  }
+  main > :first-child { margin-top: 0 !important; }
+  aside > :first-child { margin-top: 0 !important; }
 </style>
 
 <style>
-  /* ジャンルごとの記事を、綺麗に2列に並べるための設定です */
   .genre-grid { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 
@@ -89,8 +85,12 @@ const europeData = [
     margin-top: 20px; 
     margin-bottom: 30px;
   }
-  /* スマホの画面など、狭い時は1列（縦並び）に変えます */
+  
+  /* ▼ スマホ対策：画面が狭い時の余白を最適化して誤タップを防ぎます ▼ */
   @media (max-width: 900px) { 
-    .genre-grid { grid-template-columns: 1fr; } 
+    .genre-grid { 
+      grid-template-columns: 1fr; 
+      gap: 35px; /* スマホではジャンル同士の隙間を広くして、指で押しやすくします */
+    } 
   }
 </style>
