@@ -1,10 +1,11 @@
 ---
-// ページによってサイドバーを切り替える機能（直接上揃えにする完全版）
+// ページによってサイドバーを切り替える機能（記事専用サイドバー追加版）
 const { title, sidebarType = 'top' } = Astro.props;
 import '../styles/global.css'; 
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 import CategorySidebar from '../components/CategorySidebar.astro';
+import ArticleSidebar from '../components/ArticleSidebar.astro'; // ←新しいサイドバーを読み込みます
 ---
 <!DOCTYPE html>
 <html lang="ja">
@@ -22,7 +23,6 @@ import CategorySidebar from '../components/CategorySidebar.astro';
       .nav-categories { display: flex; list-style: none; padding: 0; margin: 0; overflow-x: auto; white-space: nowrap; }
       .nav-categories li a { display: block; padding: 15px 20px; color: #333; text-decoration: none; font-weight: bold; font-size: 14px; }
       
-      /* スマホ画面など、狭い時に1列にする設定だけ残します */
       @media (max-width: 900px) { 
         .main-layout { grid-template-columns: 1fr !important; } 
       }
@@ -54,17 +54,17 @@ import CategorySidebar from '../components/CategorySidebar.astro';
     <div class="container">
       <slot name="top-full" />
       
-      {/* ↓ ここが一番重要な修正です！直接「上揃え（flex-start）」を書き込みました */}
       <div class="main-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 40px; margin-top: 20px; align-items: flex-start;">
         
-        {/* 左側の記事・広告エリア（上の見えない隙間を強制的にゼロにします） */}
         <main style="margin-top: 0; padding-top: 0;">
           <slot />
         </main>
         
-        {/* 右側のサイドバーエリア（上の見えない隙間を強制的にゼロにします） */}
         <aside style="margin-top: 0; padding-top: 0;">
-          {sidebarType === 'category' ? <CategorySidebar /> : <Sidebar />}
+          {/* ↓ ここが修正ポイントです！指示に合わせて3種類のサイドバーを切り替えます */}
+          {sidebarType === 'category' ? <CategorySidebar /> : 
+           sidebarType === 'article' ? <ArticleSidebar /> : 
+           <Sidebar />}
         </aside>
         
       </div>
