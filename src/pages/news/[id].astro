@@ -1,6 +1,5 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-// 先ほど作った3つの部品（ブロック）をここで読み込みます！
 import RelatedNews from '../../components/RelatedNews.astro';
 import EditorPicks from '../../components/EditorPicks.astro';
 import RecommendedLinks from '../../components/RecommendedLinks.astro';
@@ -25,10 +24,8 @@ export async function getStaticPaths() {
 const { post, recentPosts } = Astro.props;
 ---
 
-{/* sidebarType="article" で、専用の右サイドバーを呼び出します */}
 <Layout title={post.title} sidebarType="article">
   
-  {/* ここが純粋な「記事」のメインエリアです */}
   <article class="post-container">
     <header class="post-header">
       <div class="post-meta">
@@ -38,27 +35,25 @@ const { post, recentPosts } = Astro.props;
       <h1 class="post-title">{post.title}</h1>
     </header>
 
-    {/* Bloggerから取得した記事の本文がここに入ります */}
     <div class="post-content" set:html={post.content} />
   </article>
 
-  {/* 記事の下に、先ほど作った3つのブロックを並べます */}
-  <div class="article-footer-blocks">
+  {/* ↓ここが修正ポイントです！ slot="bottom-wide" を付けることで、1カラムの全幅エリアに移動します */}
+  <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews recentPosts={recentPosts} />
     <EditorPicks recentPosts={recentPosts} />
-    <RecommendedLinks recentPosts={recentPosts} />
+    {/* あわせて読みたいブロックには、もう記事データを渡さないようにしました */}
+    <RecommendedLinks />
   </div>
 
 </Layout>
 
 <style>
-  /* 記事のメインエリア専用のシンプルなデザイン（スマホ対応済み）です */
   .post-container {
     background: #fff;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin-bottom: 40px;
   }
   .post-header {
     margin-bottom: 30px;
@@ -94,16 +89,16 @@ const { post, recentPosts } = Astro.props;
     line-height: 1.8;
     color: #444;
   }
-  
-  /* 記事内の画像がはみ出さないようにするスマホ対策の魔法です */
   .post-content :global(img) {
     max-width: 100% !important;
     height: auto !important;
     border-radius: 4px;
     margin: 20px 0;
   }
+  .article-footer-blocks {
+    margin-top: 50px;
+  }
 
-  /* スマホ画面の時の調整です */
   @media (max-width: 768px) {
     .post-container { padding: 15px; }
     .post-title { font-size: 22px; }
