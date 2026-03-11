@@ -1,6 +1,7 @@
 ---
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
+// 10件の記事を取得します
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
 
 const response = await fetch(url).catch(() => null);
@@ -15,12 +16,17 @@ const getImageUrl = (content) => {
 
 <section class="bing-trend-section">
   <div class="trend-header">
-    <h3>Bing のトレンド</h3>
-    <p>今日のトレンドを発見</p>
+    {/* ▼ タイトルを変更し、サブタイトルは消してスッキリさせました ▼ */}
+    <h3>トレンドWatchin！</h3>
   </div>
 
   <div class="trend-scroll-outer">
-    <div class="trend-scroll-container">
+    {/* ▼ 左に動かすボタンを追加しました ▼ */}
+    <div class="scroll-arrow prev-arrow" id="btn-prev">
+      <i class="fas fa-chevron-left"></i>
+    </div>
+
+    <div class="trend-scroll-container" id="trend-scroll">
       {posts.map((post) => (
         <a href={`/news/${post.id}/`} class="trend-item">
           <div class="trend-img-wrapper">
@@ -30,31 +36,34 @@ const getImageUrl = (content) => {
         </a>
       ))}
     </div>
-    <div class="scroll-arrow-next">
+
+    {/* ▼ 右に動かすボタンを追加しました ▼ */}
+    <div class="scroll-arrow next-arrow" id="btn-next">
       <i class="fas fa-chevron-right"></i>
     </div>
   </div>
 </section>
 
 <style>
+  /* ▼ 6. 上の無駄なスペースを削り、キュッと詰めました ▼ */
   .bing-trend-section {
-    padding: 30px 0;
-    border-top: 1px solid #eee;
-    margin-top: 20px;
-    background: #fff; /* 背景を白にして清潔感を */
+    padding: 10px 0 20px 0; 
+    margin-top: 0; 
+    background: #fff;
   }
 
+  /* ▼ 3 & 4. 赤い下線（#8b0000）を引いたかっこいいタイトル設定 ▼ */
+  .trend-header {
+    margin-bottom: 20px;
+  }
   .trend-header h3 {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     margin: 0;
     color: #111;
-  }
-
-  .trend-header p {
-    font-size: 13px;
-    color: #666;
-    margin: 4px 0 20px;
+    display: inline-block;
+    border-bottom: 4px solid #8b0000;
+    padding-bottom: 5px;
   }
 
   .trend-scroll-outer {
@@ -65,21 +74,21 @@ const getImageUrl = (content) => {
 
   .trend-scroll-container {
     display: flex;
-    gap: 12px;
+    gap: 20px; 
     overflow-x: auto;
-    padding-bottom: 10px;
-    scroll-behavior: smooth;
-    /* スクロールバーを非表示にする（モダンなブラウザ用） */
-    scrollbar-width: none; 
+    padding: 10px 0; 
+    scroll-behavior: smooth; /* スルスルと滑らかに動く魔法 */
+    scrollbar-width: none;
+    width: 100%;
   }
-
   .trend-scroll-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari用 */
+    display: none;
   }
 
+  /* ▼ 1. 画像のサイズを大きくし、画面に約6枚並ぶように計算しました ▼ */
   .trend-item {
-    min-width: 140px;
-    max-width: 140px;
+    min-width: 180px; 
+    max-width: 180px;
     text-decoration: none;
     color: #333;
     flex-shrink: 0;
@@ -87,8 +96,8 @@ const getImageUrl = (content) => {
 
   .trend-img-wrapper {
     width: 100%;
-    height: 90px;
-    border-radius: 12px; /* 画像のような丸みのある角 */
+    height: 120px; /* 高さを90pxから120pxにアップ */
+    border-radius: 8px;
     overflow: hidden;
     margin-bottom: 10px;
     background: #f0f0f0;
@@ -102,35 +111,80 @@ const getImageUrl = (content) => {
   }
 
   .trend-item:hover img {
-    transform: scale(1.05); /* 少しズームする演出 */
+    transform: scale(1.05); /* マウスオンで写真が少しズームします */
   }
 
   .trend-title {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 14px; /* 読みやすく少し大きくしました */
+    font-weight: bold; /* 太字にしました */
     line-height: 1.4;
     margin: 0;
     text-align: left;
-    /* 2行以上は「...」で省略する設定 */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  .scroll-arrow-next {
+  /* ▼ 5. マウスオンで黒い細線を出す魔法です ▼ */
+  .trend-item:hover .trend-title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: #333;
+    text-underline-offset: 3px;
+  }
+
+  /* ▼ 2. 左右の「＜ ＞」ボタンのデザイン設定 ▼ */
+  .scroll-arrow {
     position: absolute;
-    right: -10px;
     background: #fff;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     cursor: pointer;
     z-index: 5;
-    color: #666;
+    color: #333;
+    font-size: 18px;
+    transition: background 0.2s;
+  }
+  .scroll-arrow:hover {
+    background: #f0f0f0;
+  }
+  /* ボタンが画像に少し被るように配置します */
+  .prev-arrow { left: -15px; } 
+  .next-arrow { right: -15px; } 
+
+  @media (max-width: 768px) {
+    .trend-item { min-width: 140px; max-width: 140px; }
+    .trend-img-wrapper { height: 90px; }
+    .prev-arrow { left: -5px; }
+    .next-arrow { right: -5px; }
   }
 </style>
+
+{/* ▼▼▼ ここからが、ボタンを動かすための新しいプログラムです ▼▼▼ */}
+<script>
+  // 画面が表示されたら、このプログラムのスイッチを入れます
+  document.addEventListener('DOMContentLoaded', () => {
+    // スクロールする箱と、左右のボタンを探し出します
+    const scrollContainer = document.getElementById('trend-scroll');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+
+    if (scrollContainer && btnPrev && btnNext) {
+      // 右ボタン（＞）を押したとき：横に400px進む
+      btnNext.addEventListener('click', () => {
+        scrollContainer.scrollBy({ left: 400, behavior: 'smooth' });
+      });
+
+      // 左ボタン（＜）を押したとき：横に400px戻る
+      btnPrev.addEventListener('click', () => {
+        scrollContainer.scrollBy({ left: -400, behavior: 'smooth' });
+      });
+    }
+  });
+</script>
