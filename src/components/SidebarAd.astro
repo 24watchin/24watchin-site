@@ -1,49 +1,31 @@
 ---
-// サイドバー用の300x250広告部品です。
-// 現在はダミー表示になっています。
+// サイドバーに表示する広告（300x250サイズ）の部品です
 ---
-
-<div class="sidebar-ad-wrapper">
-  {/* 上部の「広告スペース」という文字です */}
-  <div class="ad-label">広告スペース</div>
-  
-  {/* 白い四角い枠（300x250）の部分です */}
-  <div class="ad-box">
-    <span class="ad-size">300 x 250</span>
-  </div>
+<div class="sidebar-ad">
+  {/* ここに将来、Googleアドセンスなどの広告コードが入ります */}
+  {/* 今は分かりやすい300x250のダミー画像を表示します */}
+  <img 
+    src="https://placehold.co/300x250/dddddd/999999?text=広告スペース+(300x250)" 
+    alt="広告ダミー画像"
+    class="ad-image"
+  />
 </div>
 
 <style>
-  /* 外側の薄いグレーの枠の設定です */
-  .sidebar-ad-wrapper {
-    background-color: #f1f3f6; /* 薄いグレーの背景 */
-    padding: 15px; /* 内側に少し余白をとります */
-    border-radius: 5px; /* 角を少しだけ丸くします */
-    text-align: center; /* 文字を真ん中に寄せます */
-    font-family: sans-serif;
+  /* 広告エリアの枠の設定 */
+  .sidebar-ad {
+    width: 100%;
+    /* 念のため、最大幅を300pxに制限して、絶対にはみ出さないようにします */
+    max-width: 300px;
+    margin: 0 auto; /* 中央揃え */
+    border: 1px solid #eee; /* 薄い枠線をつけて分かりやすくします */
+    background: #f9f9f9; /* 背景色 */
   }
-  
-  /* 「広告スペース」という文字の設定です */
-  .ad-label {
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 10px; /* 下に少し隙間を空けます */
-  }
-  
-  /* 白い広告枠本体の設定です */
-  .ad-box {
-    background-color: #ffffff;
-    width: 300px;
-    height: 250px;
-    margin: 0 auto; /* 真ん中に配置します */
-    display: flex;
-    justify-content: center; /* 中の文字を左右の真ん中にします */
-    align-items: center; /* 中の文字を上下の真ん中にします */
-  }
-  
-  /* 「300 x 250」という文字の設定です */
-  .ad-size {
-    font-size: 18px;
-    color: #99aab5;
+
+  /* ダミー画像の設定 */
+  .ad-image {
+    width: 100%; /* 親の枠（300px）に合わせて横幅いっぱいに広げます */
+    height: auto; /* 高さは自動で調整して比率を保ちます */
+    display: block; /* 画像の下に変な隙間ができるのを防ぎます */
   }
 </style>
