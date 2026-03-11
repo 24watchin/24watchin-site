@@ -1,7 +1,6 @@
 ---
-// ページによってサイドバーを切り替える機能 ＋ SEO強化 ＋ 全ページ共通のヘッダー下余白設定
 const { title, description = '24Watchinは、世界中の最新ニュースを日本語でお届けするグローバルメディアです。', sidebarType = 'top' } = Astro.props;
-import '../styles/global.css'; 
+import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 import CategorySidebar from '../components/CategorySidebar.astro';
@@ -26,6 +25,34 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       header { background: #fff; border-bottom: 2px solid #1e3a8a; position: sticky; top: 0; z-index: 100; }
       .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
       .logo { font-size: 28px; font-weight: bold; color: #1e3a8a; text-decoration: none; }
+      
+      /* 検索窓の設定 */
+      .search-form {
+        display: flex;
+        align-items: center;
+        background: #f0f0f0;
+        border-radius: 4px;
+        padding: 4px 10px;
+        width: 180px;
+      }
+      .search-form input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        width: 100%;
+        color: #333;
+      }
+      .search-form button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0 4px;
+        color: #666;
+        display: flex;
+        align-items: center;
+      }
+
       .nav-categories { display: flex; list-style: none; padding: 0; margin: 0; overflow-x: auto; white-space: nowrap; }
       .nav-categories li a { display: block; padding: 15px 20px; color: #333; text-decoration: none; font-weight: bold; font-size: 14px; }
       
@@ -39,7 +66,14 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       <div class="container">
         <div class="top-bar">
           <a href="/" class="logo">24Watchin</a>
-          <button style="background:#f97316; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold;">申し込み</button>
+          
+          {/* 検索窓の設置 */}
+          <form action="/search" method="get" class="search-form">
+            <input type="text" name="q" placeholder="検索..." required />
+            <button type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </form>
         </div>
         <nav>
           <ul class="nav-categories">
@@ -57,14 +91,10 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       </div>
     </header>
 
-    {/* ▼▼▼ ここが今回の修正ポイントです！ ▼▼▼ */}
-    {/* コンテンツ全体を包む箱に、直接「上に30pxの隙間を作りなさい」という指示を出しました */}
     <div class="container" style="margin-top: 30px;">
-      
       <slot name="top-full" />
       
       <div class="main-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 40px; margin-top: 20px; align-items: flex-start;">
-        
         <main style="margin: 0; padding: 0; width: 100%; max-width: none;">
           <slot />
         </main>
@@ -74,7 +104,6 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
            sidebarType === 'article' ? <ArticleSidebar /> : 
            <Sidebar />}
         </aside>
-        
       </div>
       
       <slot name="bottom-wide" />
