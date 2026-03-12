@@ -7,7 +7,8 @@ const { posts, getImageUrl } = Astro.props;
   <div class="more-news-list" id="news-list">
     {posts.map((post, index) => (
       <article class={`list-item ${index >= 5 ? 'is-hidden' : ''}`}>
-        <a href={`/news/${post.id}/`} class="item-link">
+        {/* ★ ここを日本版の住所（/jp/jp/）に修正しました！ */}
+        <a href={`/jp/jp/news/${post.id}/`} class="item-link">
           <div class="image-wrapper">
             <img 
               src={getImageUrl(post.content)} 
@@ -42,7 +43,8 @@ const { posts, getImageUrl } = Astro.props;
   // 隠れている記事をすべて取得します
   const listItems = Array.from(document.querySelectorAll('.list-item.is-hidden'));
   let currentVisible = 0;
-  const increment = 5; // ボタンを押すごとに5件ずつ出す設定
+  const increment = 5;
+  // ボタンを押すごとに5件ずつ出す設定
 
   if (btn) {
     btn.addEventListener('click', () => {
