@@ -22,35 +22,11 @@
 </div>
 
 <style>
-  .article-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-  }
-  .side-title {
-    font-size: 16px;
-    font-weight: bold;
-    border-bottom: 2px solid #1e3a8a;
-    padding-bottom: 8px;
-    margin-bottom: 15px;
-  }
-  .side-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .side-list li {
-    border-bottom: 1px dashed #ccc;
-  }
-  .side-list li a {
-    display: block;
-    padding: 10px 0;
-    color: #333;
-    text-decoration: none;
-    font-size: 14px;
-    line-height: 1.4;
-  }
-  .side-list li a:hover {
-    color: #1e3a8a;
-  }
+  .article-sidebar { display: flex; flex-direction: column; gap: 30px; }
+  .side-title { font-size: 16px; font-weight: bold; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 15px; }
+  .side-list { list-style: none; padding: 0; margin: 0; }
+  .side-list li { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
+  .side-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .side-list a { color: #333; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+  .side-list a:hover { color: #1e3a8a; }
 </style>
