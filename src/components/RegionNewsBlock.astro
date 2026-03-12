@@ -20,7 +20,8 @@ const { title, cityData } = Astro.props;
 
             return (
               <article class="post-card">
-                <a href={`/news/${post.id}/`} class="post-link">
+                {/* ★ ここを日本版の住所（/jp/jp/）に修正しました！ */}
+                <a href={`/jp/jp/news/${post.id}/`} class="post-link">
                   <div class="img-wrapper">
                     <img src={imgSrc} alt="" loading="lazy" />
                   </div>
@@ -43,109 +44,22 @@ const { title, cityData } = Astro.props;
 </section>
 
 <style>
-  .region-block {
-    margin-bottom: 40px;
-  }
-
-  /* ① 地域タイトルの赤線デザイン */
-  .region-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
-    padding-bottom: 8px;
-    /* 指定された赤色（#b11d2c）で下線を引きます */
-    border-bottom: 4px solid #b11d2c;
-  }
-
-  /* ④ 行間の調整：都市ごとのセクションの隙間を狭くします */
-  .city-section {
-    margin-bottom: 25px;
-  }
-
-  .city-name {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 12px;
-    color: #333;
-  }
-
-  .posts-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-
-  .post-link {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    gap: 12px;
-  }
-
-  .img-wrapper {
-    flex-shrink: 0;
-    width: 100px;
-    height: 65px;
-    overflow: hidden;
-    border-radius: 4px;
-    background: #eee;
-  }
-
-  .img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .post-info {
-    flex-grow: 1;
-  }
-
-  .post-title {
-    font-size: 14px;
-    font-weight: bold;
-    line-height: 1.4;
-    margin: 0 0 6px 0;
-    color: #333;
-    /* ③ リンクの黒い細線：通常時は透明、ホバー時に表示 */
-    border-bottom: 1px solid transparent;
-  }
-
-  /* ③ ホバー時に黒い細線を出す設定 */
-  .post-link:hover .post-title {
-    border-bottom: 1px solid #333;
-  }
-
-  .post-meta {
-    font-size: 11px;
-    color: #888;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .badge-new {
-    background: #e11d48;
-    color: white;
-    padding: 1px 4px;
-    border-radius: 2px;
-    font-weight: bold;
-    font-size: 10px;
-  }
-
-  .category {
-    color: #888;
-  }
-
-  /* スマホ対応：1列にする */
+  .region-block { margin-bottom: 40px; }
+  .region-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 4px solid #b11d2c; }
+  .city-section { margin-bottom: 25px; }
+  .city-name { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #333; }
+  .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .post-link { text-decoration: none; color: inherit; display: flex; gap: 12px; }
+  .img-wrapper { flex-shrink: 0; width: 100px; height: 65px; overflow: hidden; border-radius: 4px; background: #eee; }
+  .img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+  .post-info { flex-grow: 1; }
+  .post-title { font-size: 14px; font-weight: bold; line-height: 1.4; margin: 0 0 6px 0; color: #333; border-bottom: 1px solid transparent; }
+  .post-link:hover .post-title { border-bottom: 1px solid #333; }
+  .post-meta { font-size: 11px; color: #888; display: flex; align-items: center; gap: 8px; }
+  .badge-new { background: #e11d48; color: white; padding: 1px 4px; border-radius: 2px; font-weight: bold; font-size: 10px; }
+  .category { color: #888; }
   @media (max-width: 768px) {
-    .posts-grid {
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-    .region-title {
-      font-size: 20px;
-    }
+    .posts-grid { grid-template-columns: 1fr; gap: 15px; }
+    .region-title { font-size: 20px; }
   }
 </style>
