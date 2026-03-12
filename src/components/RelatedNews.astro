@@ -13,7 +13,8 @@ const getImageUrl = (content) => {
   <h3 class="section-title">関連記事</h3>
   <div class="related-grid">
     {recentPosts.map((rp) => (
-      <a href={`/news/${rp.id}/`} class="related-card">
+      {/* ★ ここを日本版の住所（/jp/jp/）に修正しました！ */}
+      <a href={`/jp/jp/news/${rp.id}/`} class="related-card">
         <div class="related-img-wrapper">
           <img src={getImageUrl(rp.content)} alt={rp.title} />
         </div>
