@@ -40,9 +40,9 @@ for (let i = 0; i < 10; i++) {
         {/* 順位の数字 */}
         <div class="rank-number">{index + 1}</div>
         
-        {/* 記事のタイトル */}
+        {/* 記事のタイトル（★ここを日本版の住所に修正しました！） */}
         <div class="post-info">
-          <a href={post.url} class="post-title">{post.title}</a>
+          <a href={post.dummy ? "#" : `/jp/jp/news/${post.id}/`} class="post-title">{post.title}</a>
         </div>
         
         {/* サムネイル画像（今回はすべて仮の画像スペースを表示します） */}
@@ -143,7 +143,8 @@ for (let i = 0; i < 10; i++) {
     color: #000;
     text-decoration: none;
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* 2行で末尾を「...」にする設定 */
+    -webkit-line-clamp: 2;
+    /* 2行で末尾を「...」にする設定 */
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
