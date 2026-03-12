@@ -17,7 +17,8 @@ const getImageUrl = (content) => {
   <div class="main-column">
     {posts.length > 0 && (
       <article class="hero-post">
-        <a href={`/news/${posts[0].id}/`}>
+        {/* ★ 1箇所目：一番大きなメイン記事のリンクを修正 */}
+        <a href={`/jp/jp/news/${posts[0].id}/`}>
           <div class="hero-image">
             <img src={getImageUrl(posts[0].content)} alt={posts[0].title} />
           </div>
@@ -31,7 +32,8 @@ const getImageUrl = (content) => {
     <div class="sub-grid">
       {posts.slice(1, 5).map((post) => (
         <article class="grid-item">
-          <a href={`/news/${post.id}/`}>
+          {/* ★ 2箇所目：メイン記事の下に並ぶ4つの記事のリンクを修正 */}
+          <a href={`/jp/jp/news/${post.id}/`}>
             <div class="grid-image">
               <img src={getImageUrl(post.content)} alt={post.title} />
             </div>
@@ -47,7 +49,8 @@ const getImageUrl = (content) => {
   <div class="side-list-column">
     {posts.slice(5, 13).map((post) => (
       <article class="list-item">
-        <a href={`/news/${post.id}/`}>
+        {/* ★ 3箇所目：右側に縦に並ぶ記事リストのリンクを修正 */}
+        <a href={`/jp/jp/news/${post.id}/`}>
           <h4>{post.title}</h4>
         </a>
       </article>
