@@ -17,7 +17,8 @@ const subPosts = posts.slice(1, 5);
 <div class="hero-grid">
   {mainPost && (
     <article class="main-featured">
-      <a href={`/news/${mainPost.id}/`} class="hero-link">
+      {/* ★ 1箇所目：メイン記事のリンクを日本版（/jp/jp/）に修正しました！ */}
+      <a href={`/jp/jp/news/${mainPost.id}/`} class="hero-link">
         <div class="main-image-wrapper">
           <img 
             src={getImageUrl(mainPost.content)} 
@@ -38,7 +39,8 @@ const subPosts = posts.slice(1, 5);
   <div class="sub-featured-list">
     {subPosts.map((post) => (
       <article class="sub-item">
-        <a href={`/news/${post.id}/`} class="hero-link sub-link">
+        {/* ★ 2箇所目：横に並ぶサブ記事リストのリンクを日本版（/jp/jp/）に修正しました！ */}
+        <a href={`/jp/jp/news/${post.id}/`} class="hero-link sub-link">
           <div class="sub-image-wrapper">
             <img src={getImageUrl(post.content)} alt={post.title} class="hero-image" />
           </div>
