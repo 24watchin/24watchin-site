@@ -1,25 +1,20 @@
 ---
-// 道案内を「4つ戻る」にし、BKから3つのブロックを復元しました
 import Layout from '../../../../layouts/Layout.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
-import EditorPicks from '../../../../components/EditorPicks.astro'; // BKにあった名称
+import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
-
   const response = await fetch(url);
   const data = await response.json();
   const posts = data.items || [];
 
   return posts.map((post) => ({
     params: { id: post.id },
-    props: { 
-      post,
-      recentPosts: posts.slice(0, 6)
-    },
+    props: { post, recentPosts: posts.slice(0, 6) },
   }));
 }
 
@@ -28,6 +23,11 @@ const { post, recentPosts } = Astro.props;
 
 <Layout title={post.title} sidebarType="article">
   
+  {/* ★ サイドバー側に「編集部のおすすめ」を配置 */}
+  <div slot="sidebar-top">
+    <EditorPicks recentPosts={recentPosts} />
+  </div>
+
   <article class="post-container">
     <header class="post-header">
       <div class="post-meta">
@@ -39,7 +39,7 @@ const { post, recentPosts } = Astro.props;
     <div class="post-content" set:html={post.content} />
   </article>
 
-  {/* 記事下のエリア：以前の通り「3つのブロック」を並べます */}
+  {/* ★ 記事下（底部）にも「関連記事」「編集部のおすすめ」「あわせて読みたい」の3つを配置 */}
   <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews recentPosts={recentPosts} />
     <EditorPicks recentPosts={recentPosts} />
