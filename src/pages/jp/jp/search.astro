@@ -10,21 +10,19 @@ const response = await fetch(url);
 const data = await response.json();
 const allPosts = data.items || [];
 
-// 2. 検索条件の取得
+// 2. 検索ワードの取得
 const { searchParams } = Astro.url;
 const q = searchParams.get('q') || '';
 const searchWord = q.toLowerCase();
-const includeTags = searchParams.get('includeTags') === 'true';
 
-// 3. 検索フィルタリング
+// 3. 検索フィルタリング（タイトルと本文のみを対象にします）
 const filteredPosts = allPosts.filter((post) => {
   if (!searchWord) return false;
   const title = post.title.toLowerCase();
   const content = post.content.toLowerCase();
-  const labels = post.labels ? post.labels.join(' ').toLowerCase() : '';
-  const matchText = title.includes(searchWord) || content.includes(searchWord);
-  const matchTags = labels.includes(searchWord);
-  return includeTags ? (matchText || matchTags) : matchText;
+  
+  // タグ（labels）は含まず、タイトルか本文にワードが含まれているかだけをチェック
+  return title.includes(searchWord) || content.includes(searchWord);
 });
 
 // 画像取得の関数
@@ -38,21 +36,10 @@ const getImageUrl = (content) => {
   <div class="search-container">
     <div class="search-header-area">
       <h1>「{q}」の検索結果：{filteredPosts.length}件</h1>
-      
-      <form method="get" action="/jp/jp/search" class="search-radio-options">
-        <input type="hidden" name="q" value={q} />
-        <label>
-          <input type="radio" name="includeTags" value="false" checked={!includeTags} onchange="this.form.submit()" />
-          タイトル・本文のみ
-        </label>
-        <label>
-          <input type="radio" name="includeTags" value="true" checked={includeTags} onchange="this.form.submit()" />
-          タグも含めて検索
-        </label>
-      </form>
+      {/* ラジオボタンを削除し、ヘッダーをスッキリさせました */}
     </div>
 
-    {/* グリッドレイアウト */}
+    {/* 4列グリッドレイアウト */}
     <div class="results-grid" id="resultsGrid">
       {filteredPosts.map((post, index) => (
         <a href={`/jp/jp/news/${post.id}`} class="grid-item" style={index >= 20 ? "display: none;" : ""}>
@@ -82,7 +69,6 @@ const getImageUrl = (content) => {
 </Layout>
 
 <script is:inline>
-  // エラーを防ぐため、標準的なJavaScriptの書き方に変更しました
   const btn = document.getElementById('loadMoreBtn');
   const grid = document.getElementById('resultsGrid');
   let currentVisible = 20;
@@ -112,9 +98,7 @@ const getImageUrl = (content) => {
     border-bottom: 2px solid #872732; 
     padding-bottom: 20px; 
   }
-  .search-header-area h1 { font-size: 20px; margin-bottom: 15px; }
-  .search-radio-options { display: flex; gap: 20px; font-size: 14px; }
-  .search-radio-options label { cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .search-header-area h1 { font-size: 20px; margin: 0; }
 
   .results-grid {
     display: grid;
@@ -145,7 +129,9 @@ const getImageUrl = (content) => {
     font-weight: bold;
     cursor: pointer;
     border-radius: 4px;
+    transition: 0.2s;
   }
+  .load-more-btn:hover { background: #f4f4f4; border-color: #bbb; }
 
   @media (max-width: 1000px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
