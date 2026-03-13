@@ -1,26 +1,33 @@
 ---
-// 記事ページ専用のサイドバー
-// アクセスランキングを一番下に移動しました
-import AccessRanking from './AccessRanking.astro'; // ファイル名が違う場合は調整してください
-import EditorPicksSidebar from './EditorPicks.astro'; // サイドバー用の「おすすめ」
+// ここで呼び出すファイル名は、実際のファイル名と完全に一致させる必要があります
+import EditorPicks from './EditorPicks.astro';
+import AccessRanking from './AccessRanking.astro';
 ---
 
 <div class="article-sidebar">
-  {/* 1. 編集部のおすすめ（サイドバー用）を上に配置 */}
   <section class="sidebar-block">
-    <EditorPicksSidebar />
+    <EditorPicks />
   </section>
 
-  {/* 2. その他の広告やバナーなど（あればここに） */}
-
-  {/* 3. アクセスランキングを最後に配置 */}
   <section class="sidebar-block ranking-bottom">
     <AccessRanking />
   </section>
 </div>
 
 <style>
-  .article-sidebar { display: flex; flex-direction: column; gap: 20px; }
-  .sidebar-block { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .ranking-bottom { margin-top: 10px; }
+  .article-sidebar { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+  }
+  .sidebar-block { 
+    background: #fff; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    display: block;
+  }
+  .ranking-bottom { 
+    margin-top: 10px; 
+  }
 </style>
