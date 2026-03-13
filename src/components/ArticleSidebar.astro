@@ -1,20 +1,20 @@
 ---
-// サイドバー用の広告部品を読み込みます
+// 1. 広告部品を読み込みます
 import SidebarAd from './SidebarAd.astro';
-// ★新しく作った「編集部のおすすめ」部品を読み込みます
+// 2. 「編集部のおすすめ」部品を読み込みます（ファイル名を修正しました）
 import EditorsPick from './EditorsPick.astro';
 ---
 
 <div class="sidebar-wrapper">
-  {/* 1. 上部に広告を配置します（ランキングを削除しました） */}
+  {/* 1. 広告を上に配置します */}
   <SidebarAd />
 
-  {/* 2. 広告の下に「編集部のおすすめ」を配置します */}
+  {/* 2. 「編集部のおすすめ」を配置します（アクセスランキングは完全に削除しました） */}
   <EditorsPick />
 </div>
 
 <style>
-  /* サイドバー全体をピシッと整列させるための設定です */
+  /* サイドバー全体の見た目を整える設定です */
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
@@ -24,12 +24,10 @@ import EditorsPick from './EditorsPick.astro';
     padding: 0;
   }
 
-  /* 中に入るパーツを枠いっぱいに揃える設定 */
+  /* 中に入るパーツの横幅を100%に揃える設定 */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
     box-sizing: border-box !important;
   }
 </style>
