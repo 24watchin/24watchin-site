@@ -1,4 +1,5 @@
 ---
+// 部品を呼び出すための道案内を「さらに2つ戻る（../../../../）」に変更しました
 import Layout from '../../../../layouts/Layout.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
@@ -8,6 +9,7 @@ export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+
   const response = await fetch(url);
   const data = await response.json();
   const posts = data.items || [];
