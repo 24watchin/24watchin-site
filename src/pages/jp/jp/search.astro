@@ -1,7 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 
-// 1. 記事データをあらかじめ取得しておきます
+// 1. 記事データを取得（サーバー側）
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
@@ -12,57 +12,48 @@ const allPosts = data.items || [];
 ---
 
 <Layout title="検索結果">
-  <div class="search-container">
+  <div class="search-main-wrapper">
     <div class="search-header-area">
-      {/* ブラウザ側で文字を入れ込むための「空欄」を用意します */}
-      <h1>「<span id="displayWord"></span>」の検索結果：<span id="resultCount">0</span>件</h1>
+      <h1 class="search-title">「<span id="displayWord"></span>」の検索結果：<span id="resultCount">0</span>件</h1>
     </div>
 
-    {/* スクリーンショット通りの4列グリッド：最初は空にしておきます */}
+    {/* 4列のグリッド。サイドバーを突き破らないよう、container-typeを設定します */}
     <div class="results-grid" id="resultsGrid"></div>
 
-    {/* 0件だった場合のメッセージ */}
     <div id="noResults" class="no-results" style="display: none;">
       「<span id="displayWordNo"></span>」に一致する記事は見つかりませんでした。
     </div>
 
-    {/* もっと見るボタン */}
     <div id="loadMoreArea" class="load-more-area" style="display: none;">
-      <button id="loadMoreBtn" class="load-more-btn">さらに検索結果を表示</button>
+      <button id="loadMoreBtn" class="load-more-btn">さらに表示</button>
     </div>
   </div>
 </Layout>
 
-{/* ブラウザで検索を実行するプログラム */}
 <script is:inline define:vars={{ allPosts }}>
-  // 1. URLから検索ワード（q）を取得します
   const params = new URLSearchParams(window.location.search);
   const q = params.get('q') || '';
   const searchWord = q.toLowerCase();
 
-  // 表示用の文字をセットします
   document.getElementById('displayWord').textContent = q;
   document.getElementById('displayWordNo').textContent = q;
 
-  // 2. 検索を実行（指示通り、タグは含めずタイトルと本文のみ）
+  // タグは含めず、タイトルと本文のみで絞り込み
   const filtered = allPosts.filter(post => {
     if (!searchWord) return false;
-    const title = post.title.toLowerCase();
-    const content = post.content.toLowerCase();
+    const title = (post.title || '').toLowerCase();
+    const content = (post.content || '').toLowerCase();
     return title.includes(searchWord) || content.includes(searchWord);
   });
 
-  // 件数を表示
   document.getElementById('resultCount').textContent = filtered.length;
 
-  // 3. 画面に表示する（4列グリッドの作成）
   const grid = document.getElementById('resultsGrid');
   let currentCount = 0;
 
   function displayItems(limit) {
     const nextItems = filtered.slice(currentCount, currentCount + limit);
     nextItems.forEach(post => {
-      // 画像を取り出す
       const match = post.content.match(/<img[^>]+src="([^">]+)"/);
       const imgUrl = match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
       
@@ -70,24 +61,17 @@ const allPosts = data.items || [];
       card.href = `/jp/jp/news/${post.id}`;
       card.className = 'grid-item';
       card.innerHTML = `
-        <div class="post-image"><img src="${imgUrl}" alt=""></div>
-        <div class="post-meta">
+        <div class="post-image-box"><img src="${imgUrl}" alt=""></div>
+        <div class="post-meta-line">
           <time>${new Date(post.published).toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})}</time>
-          <span class="source-tag">24Watchin</span>
+          <span class="site-name">24Watchin</span>
         </div>
-        <h2 class="post-title">${post.title}</h2>
+        <h2 class="post-title-text">${post.title}</h2>
       `;
       grid.appendChild(card);
     });
     currentCount += nextItems.length;
-    
-    // もっと見るボタンの表示制御
-    const btnArea = document.getElementById('loadMoreArea');
-    if (currentCount < filtered.length) {
-      btnArea.style.display = 'block';
-    } else {
-      btnArea.style.display = 'none';
-    }
+    document.getElementById('loadMoreArea').style.display = currentCount < filtered.length ? 'block' : 'none';
   }
 
   if (filtered.length > 0) {
@@ -96,40 +80,97 @@ const allPosts = data.items || [];
     document.getElementById('noResults').style.display = 'block';
   }
 
-  // ボタンクリック時の動作
   document.getElementById('loadMoreBtn')?.addEventListener('click', () => displayItems(20));
 </script>
 
 <style>
-  .search-container { width: 100%; }
-  .search-header-area { margin-bottom: 30px; border-bottom: 2px solid #872732; padding-bottom: 20px; }
-  .search-header-area h1 { font-size: 20px; color: #333; }
+  /* メインの幅をサイドバーがある前提の100%に固定します */
+  .search-main-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
 
-  /* スクリーンショット通りの4列グリッド */
-  .results-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .grid-item { text-decoration: none; color: inherit; display: block; }
-  .post-image img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; background: #f0f0f0; }
+  .search-header-area {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+  }
+
+  .search-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+  }
+
+  /* 4列グリッド：1つが大きくなりすぎないよう1fr（均等）で固定 */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    width: 100%;
+  }
+
+  .grid-item {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* 画像の大きさを16:9で強制的に揃えます */
+  .post-image-box {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #f0f0f0;
+    border-radius: 4px;
+  }
+
+  .post-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   /* 薄いグレーの時刻表示 */
-  .post-meta { margin: 10px 0 5px 0; font-size: 13px; color: #999; display: flex; gap: 10px; }
+  .post-meta-line {
+    margin: 8px 0 4px 0;
+    font-size: 12px;
+    color: #999;
+    display: flex;
+    gap: 8px;
+  }
 
-  /* 16px / 3行制限のタイトル */
-  .post-title {
-    font-size: 16px; 
+  /* タイトル：16px / 3行制限 */
+  .post-title-text {
+    font-size: 16px !important;
+    line-height: 1.4;
     font-weight: bold;
-    line-height: 1.5;
     color: #333;
+    margin: 0;
+    /* 3行以上は省略 */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-all;
   }
 
-  .load-more-area { text-align: center; margin-top: 50px; padding-bottom: 50px; }
-  .load-more-btn { background: #fff; border: 1px solid #ccc; padding: 12px 35px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-  .no-results { padding: 80px 0; text-align: center; color: #888; }
+  .load-more-area { text-align: center; margin-top: 40px; }
+  .load-more-btn {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px 30px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
 
-  @media (max-width: 1000px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
+  /* 画面幅が狭い場合のレスポンシブ対応 */
+  @media (max-width: 1024px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 480px) { .results-grid { grid-template-columns: 1fr; } }
 </style>
