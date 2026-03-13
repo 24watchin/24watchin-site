@@ -3,6 +3,7 @@ import Layout from '../../../../layouts/Layout.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
+// もし「編集部のお知らせ」という部品(例: EditorNotice.astro)があれば、ここでimportしてください
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
@@ -23,9 +24,15 @@ const { post, recentPosts } = Astro.props;
 
 <Layout title={post.title} sidebarType="article">
   
-  {/* ★ サイドバー側に「編集部のおすすめ」を配置 */}
+  {/* ★ サイドバーに「編集部のお知らせ」を設置 */}
   <div slot="sidebar-top">
-    <EditorPicks recentPosts={recentPosts} />
+    <div class="editor-notice">
+      <h3 style="font-size: 16px; border-bottom: 2px solid #872732; padding-bottom: 5px; margin-bottom: 10px;">編集部からのお知らせ</h3>
+      <p style="font-size: 13px; color: #555; line-height: 1.6;">
+        ここに大切なお知らせや、読者へのメッセージを表示できます。<br>
+        （部品化されている場合は、ここにそのコンポーネントを入れます）
+      </p>
+    </div>
   </div>
 
   <article class="post-container">
@@ -39,7 +46,7 @@ const { post, recentPosts } = Astro.props;
     <div class="post-content" set:html={post.content} />
   </article>
 
-  {/* ★ 記事下（底部）にも「関連記事」「編集部のおすすめ」「あわせて読みたい」の3つを配置 */}
+  {/* 記事下の3つのブロックは維持 */}
   <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews recentPosts={recentPosts} />
     <EditorPicks recentPosts={recentPosts} />
