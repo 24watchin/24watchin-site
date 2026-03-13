@@ -1,21 +1,15 @@
 ---
-// ランキング部品を読み込みます
-import AccessRanking from './AccessRanking.astro';
 // サイドバー用の広告部品を読み込みます
 import SidebarAd from './SidebarAd.astro';
 // ★新しく作った「編集部のおすすめ」部品を読み込みます
 import EditorsPick from './EditorsPick.astro';
 ---
 
-{/* Layoutの外枠（aside）の中にさらに入る箱なので、divに変更してタグをスッキリさせました */}
 <div class="sidebar-wrapper">
-  {/* 1. 一番上にランキング部品を配置します */}
-  <AccessRanking />
-
-  {/* 2. ランキングの下に上部広告を配置します */}
+  {/* 1. 上部に広告を配置します（ランキングを削除しました） */}
   <SidebarAd />
 
-  {/* 3. ★上部広告の下に「編集部のおすすめ」を配置します */}
+  {/* 2. 広告の下に「編集部のおすすめ」を配置します */}
   <EditorsPick />
 </div>
 
@@ -24,14 +18,13 @@ import EditorsPick from './EditorsPick.astro';
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 40px; /* パーツとパーツの間の隙間を均等に「40px」空けて、窮屈さをなくしました */
-    width: 100%; /* サイドバーの枠（300px）いっぱいに広げます */
+    gap: 40px; /* パーツの間の隙間を40pxに設定 */
+    width: 100%;
     margin: 0;
     padding: 0;
   }
 
-  /* ▼▼▼ ここが今回の魔法です ▼▼▼ */
-  /* 中に入る3つのパーツに対して、「自分勝手な幅やズレをなくして、強制的に100%に揃えなさい」と指示します */
+  /* 中に入るパーツを枠いっぱいに揃える設定 */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
@@ -39,5 +32,4 @@ import EditorsPick from './EditorsPick.astro';
     margin-right: 0 !important;
     box-sizing: border-box !important;
   }
-  /* ▲▲▲ ここまで ▲▲▲ */
 </style>
