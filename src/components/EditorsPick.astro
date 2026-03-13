@@ -1,12 +1,12 @@
 ---
 // 編集部のおすすめ用のダミーデータ（仮のデータ）を準備します。
-// 今回は5個の記事があるように見せかけます。
+// 今回は5個の記事があるように見せかけます（将来本物のデータと入れ替えます）。
 const dummyPosts = [
-  { title: "前三原市長・天満祥典氏の公選法違反 竹原市長「公民権停止知らな…", time: "19時18分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" },
-  { title: "【事件】浜田の農道で橋の名板12枚盗まれる", time: "19時15分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" },
-  { title: "県民会館大ホールの空調が復旧、2月28日から通常利用を再開 防…", time: "19時10分", source: "新潟日報", img: "https://placehold.co/80x60?text=No+Image" },
-  { title: "茨城県内中学校で卒業式 潮来・牛堀中 最後の35人、学びやに別れ", time: "19時06分", source: "茨城新聞", img: "https://placehold.co/80x60?text=No+Image" },
-  { title: "3月10日の市長往来（広島県東部）", time: "19時05分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" }
+  { id: "dummy1", title: "前三原市長・天満祥典氏の公選法違反 竹原市長「公民権停止知らな…", time: "19時18分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" },
+  { id: "dummy2", title: "【事件】浜田の農道で橋の名板12枚盗まれる", time: "19時15分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" },
+  { id: "dummy3", title: "県民会館大ホールの空調が復旧、2月28日から通常利用を再開 防…", time: "19時10分", source: "新潟日報", img: "https://placehold.co/80x60?text=No+Image" },
+  { id: "dummy4", title: "茨城県内中学校で卒業式 潮来・牛堀中 最後の35人、学びやに別れ", time: "19時06分", source: "茨城新聞", img: "https://placehold.co/80x60?text=No+Image" },
+  { id: "dummy5", title: "3月10日の市長往来（広島県東部）", time: "19時05分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" }
 ];
 ---
 
@@ -23,7 +23,8 @@ const dummyPosts = [
       <li class="ep-item">
         {/* 左側の文字エリア */}
         <div class="ep-text-area">
-          <a href="#" class="ep-title">{post.title}</a>
+          {/* ★ ここを日本版の住所（/jp/jp/）に修正し、将来本物のデータが入った時用に備えました！ */}
+          <a href={`/jp/jp/news/${post.id}/`} class="ep-title">{post.title}</a>
           <div class="ep-meta">
             <span class="ep-time">{post.time}</span>
             {/* アイコンはひとまず雪の結晶の絵文字で代用しています */}
@@ -42,83 +43,23 @@ const dummyPosts = [
 
 <style>
   /* 全体の枠組みの設定です */
-  .editors-pick-container {
-    background-color: #fff;
-    font-family: sans-serif;
-  }
-
+  .editors-pick-container { background-color: #fff; font-family: sans-serif; }
+  
   /* 赤いタイトルのデザインです */
-  .ep-header {
-    background-color: #ef3332; /* 画像に近い赤色にしています */
-    color: #fff;
-    padding: 10px 15px;
-    border-radius: 8px 8px 0 0; /* 上の角だけ少し丸くして優しい印象にします */
-    border-bottom: 2px solid #ff9999; /* タイトル下にあるオレンジっぽい線を再現しています */
-  }
-  .ep-header h2 {
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0;
-  }
-
-  /* リスト全体の設定です */
-  .ep-list {
-    list-style: none; /* 初期設定の黒い「・」を消します */
-    padding: 0;
-    margin: 0;
-    border: 1px solid #ccc; /* リスト全体を囲む枠線です */
-    border-top: none; /* 上の線はタイトルと被るので消しています */
-  }
-
-  /* リスト1行ごとの設定です */
-  .ep-item {
-    display: flex; /* 左に文字、右に画像を横並びにするための設定です */
-    justify-content: space-between; /* 文字と画像を左右の端に振り分けます */
-    padding: 12px 10px;
-    border-bottom: 1px dotted #ccc; /* 記事と記事の間の点線です */
-    gap: 10px; /* 文字と画像の間に少し隙間を空けます */
-  }
-  .ep-item:last-child {
-    border-bottom: none; /* 一番下の記事の下には点線を引かないようにします */
-  }
-
+  .ep-header { background-color: #ef3332; color: #fff; padding: 10px 15px; border-radius: 8px 8px 0 0; border-bottom: 2px solid #ff9999; }
+  .ep-header h2 { font-size: 16px; font-weight: bold; margin: 0; }
+  
+  /* リスト全体と1行ごとの設定です */
+  .ep-list { list-style: none; padding: 0; margin: 0; border: 1px solid #ccc; border-top: none; }
+  .ep-item { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px dotted #ccc; gap: 10px; }
+  .ep-item:last-child { border-bottom: none; }
+  
   /* 左側の文字エリアの設定です */
-  .ep-text-area {
-    flex: 1; /* 余ったスペースを全部文字エリアとして使います */
-    display: flex;
-    flex-direction: column; /* タイトルと時間を縦並びにします */
-    justify-content: space-between; /* タイトルを上、時間を下に振り分けます */
-  }
-
-  /* 記事のタイトルの設定です */
-  .ep-title {
-    font-size: 14px;
-    color: #333;
-    text-decoration: none;
-    font-weight: bold;
-    line-height: 1.4;
-    /* 2行目まで表示し、入りきらない場合は末尾を「...」にする設定です */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* 時間と新聞社名のエリアの設定です */
-  .ep-meta {
-    font-size: 11px;
-    color: #666;
-    margin-top: 5px;
-  }
-  .ep-time {
-    margin-right: 8px; /* 時間と新聞社名の間に隙間を空けます */
-  }
-
-  /* 右側の画像の設定です */
-  .ep-thumbnail img {
-    width: 80px;
-    height: 60px;
-    object-fit: cover; /* 画像が歪まないように、指定したサイズに合わせて切り取ります */
-    border: 1px solid #eee;
-  }
+  .ep-text-area { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .ep-title { font-size: 14px; color: #333; text-decoration: none; font-weight: bold; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  
+  /* 時間と新聞社名、画像の設定です */
+  .ep-meta { font-size: 11px; color: #666; margin-top: 5px; }
+  .ep-time { margin-right: 8px; }
+  .ep-thumbnail img { width: 80px; height: 60px; object-fit: cover; border: 1px solid #eee; }
 </style>
