@@ -1,32 +1,33 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 
-// 1. ニュースを取得する設定
+// 1. データの取得設定 [cite: 8]
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
-
-// 最大100件まで取得するように増やしました
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
-const response = await fetch(url);
-const data = await response.json();
-const allPosts = data.items || [];
+const response = await fetch(url); [cite: 8]
+const data = await response.json(); [cite: 9]
+const allPosts = data.items || []; [cite: 9]
 
-// 2. 検索のロジック（URLの後ろについている言葉を読み取ります）
+// 2. 検索とラジオボタンの状態取得
 const { searchParams } = Astro.url;
-const q = searchParams.get('q')?.toLowerCase() || '';
+const q = searchParams.get('q') || '';
+const searchWord = q.toLowerCase();
+const includeTags = searchParams.get('includeTags') === 'true';
 
-// 検索ワードが含まれているかチェック（タイトル、本文、ラベルのすべてを探します）
+// 3. 検索フィルタリング [cite: 10]
 const filteredPosts = allPosts.filter((post) => {
+  if (!searchWord) return false;
   const title = post.title.toLowerCase();
   const content = post.content.toLowerCase();
-  // ラベル（カテゴリ名）の中も探すように追加しました
   const labels = post.labels ? post.labels.join(' ').toLowerCase() : '';
-  
-  return title.includes(q) || content.includes(q) || labels.includes(q);
+  const matchText = title.includes(searchWord) || content.includes(searchWord);
+  const matchTags = labels.includes(searchWord);
+  return includeTags ? (matchText || matchTags) : matchText;
 });
 
-// 画像を取り出す道具
+// 画像取得の道具 [cite: 11]
 const getImageUrl = (content) => {
   const match = content.match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
@@ -34,111 +35,133 @@ const getImageUrl = (content) => {
 ---
 
 <Layout title={`「${q}」の検索結果`}>
-  <div class="search-page-container">
-    <h1 class="search-title">「{q}」の検索結果：{filteredPosts.length}件</h1>
+  <div class="search-container">
+    <div class="search-header-area">
+      <h1>「{q}」の検索結果：{filteredPosts.length}件</h1>
+      
+      <form method="get" action="/jp/jp/search" class="search-radio-options">
+        <input type="hidden" name="q" value={q} />
+        <label>
+          <input type="radio" name="includeTags" value="false" checked={!includeTags} onchange="this.form.submit()" />
+          タイトル・本文のみ
+        </label>
+        <label>
+          <input type="radio" name="includeTags" value="true" checked={includeTags} onchange="this.form.submit()" />
+          タグも含めて検索
+        </label>
+      </form>
+    </div>
 
-    {filteredPosts.length > 0 ? (
-      <div class="results-grid">
-        {filteredPosts.map((post) => (
-          <a href={`/jp/jp/news/${post.id}`} class="result-card">
-            <div class="result-image">
-              <img src={getImageUrl(post.content)} alt={post.title} loading="lazy" />
-            </div>
-            <div class="result-info">
-              <time>{new Date(post.published).toLocaleDateString('ja-JP')}</time>
-              <h3>{post.title}</h3>
-              <p>{post.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</p>
-            </div>
-          </a>
-        ))}
+    {/* スクリーンショット通りのグリッドレイアウト */}
+    <div class="results-grid" id="resultsGrid">
+      {filteredPosts.map((post, index) => (
+        <a href={`/jp/jp/news/${post.id}`} class="grid-item" style={index >= 20 ? "display: none;" : ""}>
+          <div class="post-image">
+            <img src={getImageUrl(post.content)} alt={post.title} />
+          </div>
+          <div class="post-meta">
+            <time>{new Date(post.published).toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})}</time>
+            <span class="source-tag">24Watchin</span>
+          </div>
+          <h2 class="post-title">{post.title}</h2>
+        </a>
+      ))}
+    </div>
+
+    {/* もっと見るボタン（20件以上ある場合のみ表示） */}
+    {filteredPosts.length > 20 && (
+      <div class="load-more-area">
+        <button id="loadMoreBtn" class="load-more-btn">さらに検索結果を表示</button>
       </div>
-    ) : (
-      <div class="no-results">
-        <p>「{q}」に一致する記事は見つかりませんでした。</p>
-        <a href="/jp/jp/" class="back-link">トップページへ戻る</a>
-      </div>
+    )}
+
+    {filteredPosts.length === 0 && (
+      <div class="no-results">「{q}」に一致する記事は見つかりませんでした。</div>
     )}
   </div>
 </Layout>
 
+<script>
+  // 「もっと見る」の動作
+  const btn = document.getElementById('loadMoreBtn');
+  const grid = document.getElementById('resultsGrid');
+  let currentVisible = 20;
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const items = grid.querySelectorAll('.grid-item');
+      let count = 0;
+      for (let i = currentVisible; i < items.length && count < 20; i++) {
+        (items[i] as HTMLElement).style.display = 'block';
+        count++;
+      }
+      currentVisible += count;
+      if (currentVisible >= items.length) btn.style.display = 'none';
+    });
+  }
+</script>
+
 <style>
-  /* 中央に寄りすぎないよう、他のページと横幅を合わせます */
-  .search-page-container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 20px 0;
+  .search-container { width: 100%; }
+  .search-header-area { 
+    margin-bottom: 30px; 
+    border-bottom: 2px solid #872732; 
+    padding-bottom: 20px; 
   }
+  .search-header-area h1 { font-size: 20px; margin-bottom: 15px; }
+  .search-radio-options { display: flex; gap: 20px; font-size: 14px; }
+  .search-radio-options label { cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-  .search-title {
-    font-size: 24px;
-    margin-bottom: 30px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #872732;
-    color: #333;
-  }
-
+  /* スクリーンショットを再現したグリッド */
   .results-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .result-card {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: repeat(4, 1fr); /* 4列表示 */
     gap: 20px;
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
   }
 
-  .result-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  .grid-item { text-decoration: none; color: inherit; display: block; }
+  .post-image img { 
+    width: 100%; 
+    aspect-ratio: 16 / 9; 
+    object-fit: cover; 
+    background: #eee; 
   }
 
-  .result-image img {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 4px;
+  /* メタ情報（薄いグレーの文字） */
+  .post-meta { 
+    margin: 8px 0; 
+    font-size: 13px; 
+    color: #888; /* 薄いグレー */
+    display: flex;
+    gap: 10px;
   }
 
-  .result-info time {
-    font-size: 13px;
-    color: #666;
-  }
-
-  .result-info h3 {
-    margin: 10px 0;
-    font-size: 18px;
+  /* タイトル設定（16px、3行まで） */
+  .post-title {
+    font-size: 16px; 
+    font-weight: bold;
     line-height: 1.4;
-    color: #872732;
+    color: #333;
+    /* 3行以上は「...」にする魔法 */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .result-info p {
-    font-size: 14px;
-    color: #555;
-    line-height: 1.6;
-  }
-
-  .no-results {
-    text-align: center;
-    padding: 100px 0;
+  /* もっと見るボタン */
+  .load-more-area { text-align: center; margin-top: 50px; }
+  .load-more-btn {
     background: #fff;
-    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 12px 40px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.2s;
   }
+  .load-more-btn:hover { background: #f4f4f4; border-color: #bbb; }
 
-  @media (max-width: 600px) {
-    .result-card {
-      grid-template-columns: 1fr;
-    }
-    .result-image img {
-      height: 200px;
-    }
-  }
+  @media (max-width: 1000px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
