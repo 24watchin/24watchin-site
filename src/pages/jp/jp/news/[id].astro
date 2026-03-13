@@ -21,13 +21,9 @@ export async function getStaticPaths() {
 const { post, recentPosts } = Astro.props;
 ---
 
-<Layout title={post.title} sidebarType="article">
+{/* ★ sidebarType を "top" にすることで、トップページと同じサイドバーを呼び出します */}
+<Layout title={post.title} sidebarType="top">
   
-  {/* ★ サイドバーの最上部に、サイドバー用の「編集部のおすすめ」を配置 */}
-  <div slot="sidebar-top">
-    <EditorPicks recentPosts={recentPosts} />
-  </div>
-
   <article class="post-container">
     <header class="post-header">
       <div class="post-meta">
@@ -39,7 +35,7 @@ const { post, recentPosts } = Astro.props;
     <div class="post-content" set:html={post.content} />
   </article>
 
-  {/* 記事下のエリア：以前の通り「関連記事」「編集部のおすすめ(大)」「あわせて読みたい」 */}
+  {/* 記事下のエリア：以前の通り「3つのブロック」を並べます */}
   <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews recentPosts={recentPosts} />
     <EditorPicks recentPosts={recentPosts} />
