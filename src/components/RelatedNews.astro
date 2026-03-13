@@ -13,7 +13,6 @@ const getImageUrl = (content) => {
 <div class="bottom-section">
   <h3 class="section-title">関連記事</h3>
   <div class="related-grid">
-    {/* リンク先を日本版（/jp/jp/）に対応させた記事リストを表示します */}
     {recentPosts && recentPosts.map((rp) => (
       <a href={`/jp/jp/news/${rp.id}/`} class="related-card">
         <div class="related-img-wrapper">
