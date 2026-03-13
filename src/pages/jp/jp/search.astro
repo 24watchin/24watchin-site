@@ -1,7 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 
-// 1. 記事データを取得
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
@@ -14,10 +13,11 @@ const allPosts = data.items || [];
 <Layout title="検索結果">
   <div class="search-main-wrapper">
     <div class="search-header-area">
-      <h1 class="search-title">「<span id="displayWord"></span>」の検索結果：<span id="resultCount">0</span>件</h1>
+      <h1 class="search-title">
+        「<span id="displayWord"></span>」の検索結果：<span id="resultCount">0</span>件
+      </h1>
     </div>
 
-    {/* 4列のグリッド */}
     <div class="results-grid" id="resultsGrid"></div>
 
     <div id="noResults" class="no-results" style="display: none;">
@@ -52,10 +52,10 @@ const allPosts = data.items || [];
 
   function displayItems(limit) {
     const nextItems = filtered.slice(currentCount, currentCount + limit);
+
     nextItems.forEach(post => {
-      const match = post.content.match(/<img[^>]+src="([^">]+)"/);
+      const match = (post.content || '').match(/<img[^>]+src="([^">]+)"/);
       const imgUrl = match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
-      
       const dateStr = new Date(post.published).toLocaleDateString('ja-JP');
 
       const card = document.createElement('a');
@@ -63,13 +63,12 @@ const allPosts = data.items || [];
       card.className = 'grid-item';
       card.innerHTML = `
         <div class="post-image-box"><img src="${imgUrl}" alt=""></div>
-        <div class="post-meta-line">
-          <time>${dateStr}</time>
-        </div>
-        <h2 class="post-title-text">${post.title}</h2>
+        <div class="post-meta-line"><time>${dateStr}</time></div>
+        <h2 class="post-title-text">${post.title || ''}</h2>
       `;
       grid.appendChild(card);
     });
+
     currentCount += nextItems.length;
     document.getElementById('loadMoreArea').style.display = currentCount < filtered.length ? 'block' : 'none';
   }
@@ -80,108 +79,32 @@ const allPosts = data.items || [];
     document.getElementById('noResults').style.display = 'block';
   }
 
-  document.getElementById('loadMoreBtn')?.addEventListener('click', () => displayItems(20));
+  document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
+    displayItems(20);
+  });
 </script>
 
 <style is:global>
-  /* ▼▼▼ 今回の修正箇所：空白を消して一番上に固定します ▼▼▼ */
-  .search-main-wrapper {
-    width: 100%;
-    max-width: 100%;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    /* 親の箱の中で、自分自身を強制的に「一番上（start）」に配置します */
-    align-self: flex-start !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-
-  .search-main-wrapper .search-header-area {
-    margin-top: 0 !important;
-    margin-bottom: 25px !important;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-    width: 100%;
-  }
-
-  .search-main-wrapper .search-title {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #333;
-    line-height: 1.2;
-  }
-  /* ▲▲▲ ここまで ▲▲▲ */
-
-  /* 以下は、前回OKだった画像と文字のスタイル（変更なし）です */
-  .search-main-wrapper .results-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 20px !important;
-    width: 100%;
-    align-items: start !important; 
-  }
-
-  .search-main-wrapper .grid-item {
-    display: block !important; 
-    text-decoration: none !important; 
-    color: inherit !important;
-    width: 100%;
-  }
-
-  .search-main-wrapper .post-image-box {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: #f0f0f0;
-    border-radius: 4px;
-    margin-top: 0 !important; 
-    margin-bottom: 0 !important;
-  }
-
-  .search-main-wrapper .post-image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .search-main-wrapper .post-meta-line {
-    margin: 8px 0 4px 0 !important;
-    font-size: 13px;
-    color: #999 !important;
-  }
-
-  .search-main-wrapper .post-meta-line time {
-    color: #999 !important; 
-    text-decoration: none !important;
-  }
-
-  .search-main-wrapper .post-title-text {
-    font-size: 16px !important;
-    line-height: 1.4 !important;
-    font-weight: bold !important;
-    color: #333 !important;
-    margin: 0 !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 3 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-  }
-
-  .search-main-wrapper .load-more-area { text-align: center; margin: 40px 0 !important; }
-  .search-main-wrapper .load-more-btn {
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 10px 30px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-
-  @media (max-width: 1024px) { .search-main-wrapper .results-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-  @media (max-width: 768px) { .search-main-wrapper .results-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-  @media (max-width: 480px) { .search-main-wrapper .results-grid { grid-template-columns: 1fr !important; } }
+  .search-main-wrapper { width: 100%; min-width: 0; margin: 0; padding: 0; }
+  .search-header-area { margin: 0 0 25px 0 !important; padding: 0 0 10px 0; border-bottom: 1px solid #ddd; }
+  .search-title { margin: 0 !important; font-size: 1.25rem; font-weight: bold; color: #333; line-height: 1.5; }
+  
+  .results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; width: 100%; align-items: start; }
+  .grid-item { display: block; width: 100%; min-width: 0; text-decoration: none !important; color: inherit !important; }
+  
+  .post-image-box { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #f0f0f0; border-radius: 4px; margin: 0; }
+  .post-image-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  
+  .post-meta-line { margin: 8px 0 4px 0; font-size: 13px; color: #999 !important; }
+  .post-meta-line time { color: #999 !important; text-decoration: none !important; }
+  
+  .post-title-text { margin: 0; font-size: 16px !important; line-height: 1.4 !important; font-weight: bold !important; color: #333 !important; display: -webkit-box !important; -webkit-line-clamp: 3 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; }
+  
+  .no-results { margin-top: 20px; font-size: 15px; color: #666; }
+  .load-more-area { text-align: center; margin: 40px 0; }
+  .load-more-btn { background: #fff; border: 1px solid #ccc; padding: 10px 30px; font-size: 14px; cursor: pointer; border-radius: 4px; }
+  
+  @media (max-width: 1024px) { .results-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .results-grid { grid-template-columns: 1fr; } }
 </style>
