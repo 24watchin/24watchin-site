@@ -19,7 +19,7 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
     <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-      /* BKのデザイン設定を完全に復元 */
+      /* BKのデザイン設定をそのまま復元 */
       body { background-color: #f4f4f4; margin: 0; font-family: sans-serif; color: #333; }
       .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
       
@@ -33,7 +33,7 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
 
       .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 40px; margin-top: 30px; align-items: flex-start; }
       
-      /* サイドバーを以前のような「ブロック形式」にする設定 */
+      /* サイドバーを「ブロック形式」にする設定 */
       aside > :global(*) { 
         background: #fff; 
         padding: 20px; 
@@ -54,6 +54,7 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       <div class="container">
         <div class="top-bar">
           <a href="/jp/jp/" class="logo">24Watchin</a>
+          {/* オレンジ色の申し込みボタンを復活 */}
           <button style="background:#f97316; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold;">申し込み</button>
         </div>
         <nav>
@@ -77,8 +78,9 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       <div class="main-layout">
         <main><slot /></main>
         <aside>
-          {/* ここにサイドバー用の「編集部のおすすめ」などが入ります */}
+          {/* ★ ここがサイドバーの「編集部のおすすめ」を表示するための受け皿です */}
           <slot name="sidebar-top" />
+          
           {sidebarType === 'category' ? <CategorySidebar /> : 
            sidebarType === 'article' ? <ArticleSidebar /> : <Sidebar />}
         </aside>
