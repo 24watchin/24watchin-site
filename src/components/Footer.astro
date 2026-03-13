@@ -1,6 +1,5 @@
 ---
 // フッター（サイトの一番下の部分）の部品です。
-// リンク先はすべて「#」としてダミーにしています。
 ---
 
 <footer class="site-footer">
@@ -15,7 +14,6 @@
       </p>
       <div class="footer-sns">
         <span class="sns-label">公式SNS</span>
-        {/* 背景を透明にして、白い丸枠と文字だけのアイコンにしました */}
         <a href="#" class="sns-icon">X</a>
         <a href="#" class="sns-icon">f</a>
         <a href="#" class="sns-icon" style="font-size: 10px;">LINE</a>
@@ -28,7 +26,8 @@
     <div class="footer-column">
       <h3 class="footer-heading">カテゴリー</h3>
       <ul class="footer-links">
-        <li><a href="#">トップ</a></li>
+        {/* ★ トップページへのリンクを日本版（/jp/jp/）に修正しました！ */}
+        <li><a href="/jp/jp/">トップ</a></li>
         <li><a href="#">テクノロジー</a></li>
         <li><a href="#">ビジネス</a></li>
         <li><a href="#">スポーツ</a></li>
@@ -60,109 +59,25 @@
 
   {/* 一番下のコピーライト部分 */}
   <div class="footer-bottom">
-    <p>&copy; 2026 The Dexent Media Enterprises. All rights reserved.</p>
+    {/* ★ コピーライトを W-Studio Global Media Enterprises に更新しました！ */}
+    <p>&copy; 2026 W-Studio Global Media Enterprises. All rights reserved.</p>
   </div>
 </footer>
 
 <style>
   /* フッター全体の背景色と文字色 */
-  .site-footer {
-    background-color: #111827; /* 濃いネイビー */
-    color: #ffffff; /* 白文字 */
-    font-family: sans-serif;
-    padding-top: 40px;
-  }
-
-  /* 4つの列を横に並べる設定 */
-  .footer-content {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 auto; /* 中央寄せ */
-    padding: 0 20px 40px 20px;
-    gap: 20px;
-  }
-
-  /* 各列の幅を均等にする */
-  .footer-column {
-    flex: 1;
-  }
-
-  /* ロゴ部分のデザイン */
-  .footer-logo {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .logo-icon {
-    color: #ef3332; /* 赤いアクセント */
-  }
-
-  /* サイト説明文 */
-  .footer-desc {
-    font-size: 13px;
-    color: #9ca3af; /* 少し暗い白（グレー） */
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-
-  /* SNSアイコンを並べるエリア */
-  .footer-sns {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .sns-label {
-    font-size: 12px;
-    font-weight: bold;
-    margin-right: 5px;
-  }
-
-  /* SNSアイコン（白文字・背景透過）の設定 */
-  .sns-icon {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    width: 30px;
-    height: 30px;
-    border: 1px solid #ffffff; /* 白い枠線 */
-    border-radius: 50%; /* 丸くする */
-    color: #ffffff; /* 白文字 */
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-  }
-
-  /* 各列の見出し（カテゴリー、情報など） */
-  .footer-heading {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-
-  /* リンクのリスト（縦並び） */
-  .footer-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .footer-links li {
-    margin-bottom: 10px;
-  }
-  .footer-links a {
-    color: #9ca3af; /* 少し暗い白（グレー） */
-    text-decoration: none;
-    font-size: 13px;
-  }
-
-  /* 一番下のコピーライト部分 */
-  .footer-bottom {
-    text-align: center;
-    border-top: 1px solid #1f2937; /* うっすらとした区切り線 */
-    padding: 20px 0;
-    font-size: 12px;
-    color: #6b7280;
-  }
+  .site-footer { background-color: #111827; color: #ffffff; font-family: sans-serif; padding-top: 40px; }
+  .footer-content { display: flex; justify-content: space-between; margin: 0 auto; padding: 0 20px 40px 20px; gap: 20px; }
+  .footer-column { flex: 1; }
+  .footer-logo { font-size: 20px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+  .logo-icon { color: #ef3332; }
+  .footer-desc { font-size: 13px; color: #9ca3af; line-height: 1.6; margin-bottom: 20px; }
+  .footer-sns { display: flex; align-items: center; gap: 10px; }
+  .sns-label { font-size: 12px; font-weight: bold; margin-right: 5px; }
+  .sns-icon { display: inline-flex; justify-content: center; align-items: center; width: 30px; height: 30px; border: 1px solid #ffffff; border-radius: 50%; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; }
+  .footer-heading { font-size: 16px; font-weight: bold; margin-bottom: 15px; }
+  .footer-links { list-style: none; padding: 0; margin: 0; }
+  .footer-links li { margin-bottom: 10px; }
+  .footer-links a { color: #9ca3af; text-decoration: none; font-size: 13px; }
+  .footer-bottom { text-align: center; border-top: 1px solid #1f2937; padding: 20px 0; font-size: 12px; color: #6b7280; }
 </style>
