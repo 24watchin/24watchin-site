@@ -1,33 +1,43 @@
 ---
-// ここで呼び出すファイル名は、実際のファイル名と完全に一致させる必要があります
-import EditorPicks from './EditorPicks.astro';
+// ランキング部品を読み込みます
 import AccessRanking from './AccessRanking.astro';
+// サイドバー用の広告部品を読み込みます
+import SidebarAd from './SidebarAd.astro';
+// ★新しく作った「編集部のおすすめ」部品を読み込みます
+import EditorsPick from './EditorsPick.astro';
 ---
 
-<div class="article-sidebar">
-  <section class="sidebar-block">
-    <EditorPicks />
-  </section>
+{/* Layoutの外枠（aside）の中にさらに入る箱なので、divに変更してタグをスッキリさせました */}
+<div class="sidebar-wrapper">
+  {/* 1. 一番上にランキング部品を配置します */}
+  <AccessRanking />
 
-  <section class="sidebar-block ranking-bottom">
-    <AccessRanking />
-  </section>
+  {/* 2. ランキングの下に上部広告を配置します */}
+  <SidebarAd />
+
+  {/* 3. ★上部広告の下に「編集部のおすすめ」を配置します */}
+  <EditorsPick />
 </div>
 
 <style>
-  .article-sidebar { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 20px; 
+  /* サイドバー全体をピシッと整列させるための設定です */
+  .sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* パーツとパーツの間の隙間を均等に「40px」空けて、窮屈さをなくしました */
+    width: 100%; /* サイドバーの枠（300px）いっぱいに広げます */
+    margin: 0;
+    padding: 0;
   }
-  .sidebar-block { 
-    background: #fff; 
-    padding: 20px; 
-    border-radius: 8px; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-    display: block;
+
+  /* ▼▼▼ ここが今回の魔法です ▼▼▼ */
+  /* 中に入る3つのパーツに対して、「自分勝手な幅やズレをなくして、強制的に100%に揃えなさい」と指示します */
+  .sidebar-wrapper > :global(*) {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
   }
-  .ranking-bottom { 
-    margin-top: 10px; 
-  }
+  /* ▲▲▲ ここまで ▲▲▲ */
 </style>
