@@ -1,10 +1,5 @@
 ---
-const { 
-  title, 
-  description = '24Watchinは、世界中の最新ニュースを日本語でお届けするグローバルメディアです。', 
-  sidebarType = 'top' 
-} = Astro.props;
-
+const { title, description = '24Watchin', sidebarType = 'top' } = Astro.props;
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
@@ -17,34 +12,24 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
-    <meta name="description" content={description} />
-    <meta property="og:title" content={title ? `${title} | 24Watchin` : '24Watchin'} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="24Watchin" />
-    <meta name="twitter:card" content="summary_large_image" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-      body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+      body { background-color: #f4f4f4; margin: 0; font-family: sans-serif; }
       .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-      header { background-color: #fff; border-bottom: 1px solid #eee; padding: 20px 0; position: sticky; top: 0; z-index: 1000; }
-      .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-      .logo { font-size: 32px; font-weight: 800; color: #872732; text-decoration: none; letter-spacing: -1px; }
-      .search-form { display: flex; }
-      .search-form input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; outline: none; width: 200px; }
-      .search-form button { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 0 4px 4px 0; cursor: pointer; }
-      nav { border-top: 1px solid #eee; padding-top: 15px; }
-      .nav-categories { list-style: none; padding: 0; margin: 0; display: flex; gap: 20px; overflow-x: auto; white-space: nowrap; }
-      .nav-categories li a { text-decoration: none; color: #555; font-size: 14px; font-weight: bold; transition: color 0.2s; }
-      .nav-categories li a:hover { color: #872732; }
-
-      /* メインとサイドバーを分けるレイアウト設定 */
-      .main-layout { 
-        display: grid; 
-        grid-template-columns: 1fr 300px; 
-        gap: 40px; 
-        margin-top: 20px; 
-        align-items: flex-start; 
+      header { background: #fff; border-bottom: 1px solid #ddd; padding: 20px 0; }
+      .logo { font-size: 32px; font-weight: bold; color: #872732; text-decoration: none; }
+      
+      /* メインとサイドバーを分離させる設定 */
+      .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 30px; margin-top: 30px; }
+      
+      /* サイドバーの中身を「ブロック（カード）」にするデザイン */
+      aside > :global(*) { 
+        background: #fff; 
+        padding: 20px; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        display: block;
       }
 
       @media (max-width: 900px) {
@@ -56,54 +41,29 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
   <body>
     <header>
       <div class="container">
-        <div class="header-top">
-          <a href="/jp/jp/" class="logo">24Watchin</a>
-          <form action="/jp/jp/search" method="get" class="search-form">
-            <input type="text" name="q" placeholder="検索..." required />
-            <button type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-          </form>
-        </div>
-        <nav>
-          <ul class="nav-categories">
-            <li><a href="/jp/jp/">TOP</a></li>
-            <li><a href="/jp/jp/category/international">国際</a></li>
-            <li><a href="/jp/jp/category/business">ビジネス</a></li>
-            <li><a href="/jp/jp/category/science">科学</a></li>
-            <li><a href="/jp/jp/category/local">地域</a></li>
-            <li><a href="/jp/jp/category/politics">政治経済</a></li>
-            <li><a href="/jp/jp/category/industry">産業</a></li>
-            <li><a href="/jp/jp/category/life">ライフ・教養</a></li>
-            <li><a href="/jp/jp/category/special">特集</a></li>
-          </ul>
-        </nav>
+        <a href="/jp/jp/" class="logo">24Watchin</a>
       </div>
     </header>
 
-    <div class="container" style="margin-top: 30px;">
-      {/* ページ上部の全幅エリア */}
+    <div class="container">
       <slot name="top-full" />
 
       <div class="main-layout">
-        <main>
-          {/* ここに記事本文などが入ります */}
-          <slot />
-        </main>
+        <main><slot /></main>
         
         <aside>
-          {/* サイドバーの切り替え機能 */}
+          {/* ページ側から送られた「編集部のおすすめ」を表示する場所 */}
+          <slot name="sidebar-top" />
+          
           {sidebarType === 'category' ? <CategorySidebar /> : 
-           (sidebarType === 'article' ? <ArticleSidebar /> : <Sidebar />)}
+           sidebarType === 'article' ? <ArticleSidebar /> : <Sidebar />}
         </aside>
       </div>
 
-      {/* ★ ここが重要！ 記事下の3つのブロックが表示されるための「受け皿」です */}
-      <div style="margin-top: 50px; width: 100%;">
+      <div style="margin-top: 50px;">
         <slot name="bottom-wide" />
       </div>
     </div>
-
     <Footer />
   </body>
 </html>
