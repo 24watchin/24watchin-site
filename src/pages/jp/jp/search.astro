@@ -1,7 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 
-// 1. 記事データを取得（サーバー側）
+// 1. 記事データを取得
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
@@ -17,7 +17,7 @@ const allPosts = data.items || [];
       <h1 class="search-title">「<span id="displayWord"></span>」の検索結果：<span id="resultCount">0</span>件</h1>
     </div>
 
-    {/* 4列のグリッド。サイドバーを突き破らないよう、container-typeを設定します */}
+    {/* 4列のグリッド */}
     <div class="results-grid" id="resultsGrid"></div>
 
     <div id="noResults" class="no-results" style="display: none;">
@@ -38,7 +38,6 @@ const allPosts = data.items || [];
   document.getElementById('displayWord').textContent = q;
   document.getElementById('displayWordNo').textContent = q;
 
-  // タグは含めず、タイトルと本文のみで絞り込み
   const filtered = allPosts.filter(post => {
     if (!searchWord) return false;
     const title = (post.title || '').toLowerCase();
@@ -57,14 +56,16 @@ const allPosts = data.items || [];
       const match = post.content.match(/<img[^>]+src="([^">]+)"/);
       const imgUrl = match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
       
+      // ★修正ポイント1：時刻とサイト名を消し、日付（年月日）だけにしました
+      const dateStr = new Date(post.published).toLocaleDateString('ja-JP');
+
       const card = document.createElement('a');
       card.href = `/jp/jp/news/${post.id}`;
       card.className = 'grid-item';
       card.innerHTML = `
         <div class="post-image-box"><img src="${imgUrl}" alt=""></div>
         <div class="post-meta-line">
-          <time>${new Date(post.published).toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})}</time>
-          <span class="site-name">24Watchin</span>
+          <time>${dateStr}</time>
         </div>
         <h2 class="post-title-text">${post.title}</h2>
       `;
@@ -83,46 +84,44 @@ const allPosts = data.items || [];
   document.getElementById('loadMoreBtn')?.addEventListener('click', () => displayItems(20));
 </script>
 
-<style>
-  /* メインの幅をサイドバーがある前提の100%に固定します */
+{/* ★修正ポイント2：is:global を追加し、プログラムで作った部分にもデザインを強制適用します */}
+<style is:global>
   .search-main-wrapper {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
   }
 
-  .search-header-area {
+  .search-main-wrapper .search-header-area {
     margin-bottom: 25px;
     border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
   }
 
-  .search-title {
+  .search-main-wrapper .search-title {
     font-size: 1.25rem;
     font-weight: bold;
     color: #333;
     margin: 0;
   }
 
-  /* 4列グリッド：1つが大きくなりすぎないよう1fr（均等）で固定 */
-  .results-grid {
+  .search-main-wrapper .results-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 15px;
     width: 100%;
   }
 
-  .grid-item {
-    text-decoration: none;
-    color: inherit;
+  /* ★修正ポイント3：青いリンク色や下線を強制的に打ち消します */
+  .search-main-wrapper .grid-item {
+    text-decoration: none !important; 
+    color: inherit !important;
     display: flex;
     flex-direction: column;
     width: 100%;
-    overflow: hidden;
   }
 
-  /* 画像の大きさを16:9で強制的に揃えます */
-  .post-image-box {
+  .search-main-wrapper .post-image-box {
     width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
@@ -130,38 +129,41 @@ const allPosts = data.items || [];
     border-radius: 4px;
   }
 
-  .post-image-box img {
+  .search-main-wrapper .post-image-box img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
 
-  /* 薄いグレーの時刻表示 */
-  .post-meta-line {
+  /* ★修正ポイント4：日付の文字サイズと色 */
+  .search-main-wrapper .post-meta-line {
     margin: 8px 0 4px 0;
-    font-size: 12px;
-    color: #999;
-    display: flex;
-    gap: 8px;
+    font-size: 13px;
+    color: #999 !important; /* 薄いグレー */
   }
 
-  /* タイトル：16px / 3行制限 */
-  .post-title-text {
+  .search-main-wrapper .post-meta-line time {
+    color: #999 !important; 
+    text-decoration: none !important;
+  }
+
+  /* ★修正ポイント5：タイトルの文字サイズを16pxに固定 */
+  .search-main-wrapper .post-title-text {
     font-size: 16px !important;
-    line-height: 1.4;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-    /* 3行以上は省略 */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    word-break: break-all;
+    line-height: 1.4 !important;
+    font-weight: bold !important;
+    color: #333 !important; /* 黒系の文字色に固定 */
+    margin: 0 !important;
+    /* 3行以上は省略（...）にする */
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
   }
 
-  .load-more-area { text-align: center; margin-top: 40px; }
-  .load-more-btn {
+  .search-main-wrapper .load-more-area { text-align: center; margin-top: 40px; margin-bottom: 40px; }
+  .search-main-wrapper .load-more-btn {
     background: #fff;
     border: 1px solid #ccc;
     padding: 10px 30px;
@@ -170,7 +172,7 @@ const allPosts = data.items || [];
     border-radius: 4px;
   }
 
-  /* 画面幅が狭い場合のレスポンシブ対応 */
-  @media (max-width: 1024px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 1024px) { .search-main-wrapper .results-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) { .search-main-wrapper .results-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .search-main-wrapper .results-grid { grid-template-columns: 1fr; } }
 </style>
