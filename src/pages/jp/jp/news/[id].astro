@@ -4,26 +4,62 @@ import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
 
-export async function getStaticPaths() {
+async function fetchAllPosts() {
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
-  const response = await fetch(url);
-  const data = await response.json();
-  const posts = data.items || [];
 
-  return posts.map((post) => ({
+  let allPosts = [];
+  let pageToken = '';
+
+  while (true) {
+    const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
+    url.searchParams.set('key', API_KEY);
+    url.searchParams.set('maxResults', '100');
+
+    if (pageToken) {
+      url.searchParams.set('pageToken', pageToken);
+    }
+
+    const response = await fetch(url.toString());
+
+    if (!response.ok) {
+      throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const items = data.items || [];
+
+    allPosts.push(...items);
+
+    if (!data.nextPageToken) {
+      break;
+    }
+
+    pageToken = data.nextPageToken;
+  }
+
+  return allPosts;
+}
+
+export async function getStaticPaths() {
+  const posts = await fetchAllPosts();
+
+  const sortedPosts = [...posts].sort((a, b) => {
+    return new Date(b.published).getTime() - new Date(a.published).getTime();
+  });
+
+  const recentPosts = sortedPosts.slice(0, 10);
+
+  return sortedPosts.map((post) => ({
     params: { id: post.id },
-    props: { post, recentPosts: posts.slice(0, 10) },
+    props: { post, recentPosts },
   }));
 }
 
 const { post, recentPosts } = Astro.props;
 ---
 
-{/* ★ sidebarType を "top" にすることで、トップページと同じサイドバーを呼び出します */}
 <Layout title={post.title} sidebarType="article">
-  
   <article class="post-container">
     <header class="post-header">
       <div class="post-meta">
@@ -32,26 +68,73 @@ const { post, recentPosts } = Astro.props;
       </div>
       <h1 class="post-title">{post.title}</h1>
     </header>
+
     <div class="post-content" set:html={post.content} />
   </article>
 
-  {/* 記事下のエリア：以前の通り「3つのブロック」を並べます */}
   <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews recentPosts={recentPosts} />
     <EditorPicks recentPosts={recentPosts} />
     <RecommendedLinks />
   </div>
-
 </Layout>
 
 <style>
-  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .post-header { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
-  .post-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-  .category-tag { background: #1e3a8a; color: #fff; padding: 4px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; }
-  .post-date { color: #666; font-size: 14px; }
-  .post-title { font-size: 28px; line-height: 1.4; color: #333; margin: 0; }
-  .post-content { font-size: 16px; line-height: 1.8; color: #444; }
-  .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; margin: 20px 0; }
-  .article-footer-blocks { margin-top: 50px; }
+  .post-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .post-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .category-tag {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 4px;
+  }
+
+  .post-date {
+    color: #666;
+    font-size: 14px;
+  }
+
+  .post-title {
+    font-size: 28px;
+    line-height: 1.4;
+    color: #333;
+    margin: 0;
+  }
+
+  .post-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+  }
+
+  .post-content :global(img) {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 4px;
+    margin: 20px 0;
+  }
+
+  .article-footer-blocks {
+    margin-top: 50px;
+  }
 </style>
