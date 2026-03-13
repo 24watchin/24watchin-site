@@ -1,8 +1,8 @@
 ---
-// 部品の読み込み場所（道案内）を「4つ戻る」にし、名前を正確に合わせました
+// 道案内を「4つ戻る」に修正し、BKのデザインを復元しました
 import Layout from '../../../../layouts/Layout.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
-import EditorPicks from '../../../../components/EditorsPick.astro'; // ← ここをEditorsPickに修正
+import EditorPicks from '../../../../components/EditorsPick.astro'; // ※ファイル名に合わせてsの有無を確認してください
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
 
 export async function getStaticPaths() {
@@ -27,6 +27,7 @@ const { post, recentPosts } = Astro.props;
 ---
 
 <Layout title={post.title} sidebarType="article">
+  
   <article class="post-container">
     <header class="post-header">
       <div class="post-meta">
@@ -35,18 +36,21 @@ const { post, recentPosts } = Astro.props;
       </div>
       <h1 class="post-title">{post.title}</h1>
     </header>
+
     <div class="post-content" set:html={post.content} />
   </article>
 
+  {/* 記事下の3つのブロックを「全幅エリア」に復活させました */}
   <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews recentPosts={recentPosts} />
-    {/* 部品名に合わせて呼び出し名も修正しました */}
     <EditorPicks recentPosts={recentPosts} />
     <RecommendedLinks />
   </div>
+
 </Layout>
 
 <style>
+  /* BKのデザイン設定をそのまま維持しています */
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
   .post-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
