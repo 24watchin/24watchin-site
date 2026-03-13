@@ -1,8 +1,8 @@
 ---
 // 関連記事を表示する専用の部品です
-const { recentPosts } = Astro.props; // 記事のページからデータを受け取ります
+const { recentPosts } = Astro.props;
 
-// 画像URLを取り出す機能（安全に動くように修正しました）
+// 画像URLを取り出す機能
 const getImageUrl = (content) => {
   if (!content) return 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
   const match = content.match(/<img[^>]+src="([^">]+)"/);
@@ -13,8 +13,8 @@ const getImageUrl = (content) => {
 <div class="bottom-section">
   <h3 class="section-title">関連記事</h3>
   <div class="related-grid">
-    {/* recentPostsが存在する場合だけ表示するようにしました */}
-    {(recentPosts || []).map((rp) => (
+    {/* リンク先を日本版（/jp/jp/）に対応させた記事リストを表示します */}
+    {recentPosts && recentPosts.map((rp) => (
       <a href={`/jp/jp/news/${rp.id}/`} class="related-card">
         <div class="related-img-wrapper">
           <img src={getImageUrl(rp.content)} alt={rp.title} />
@@ -30,12 +30,37 @@ const getImageUrl = (content) => {
 
 <style>
   .bottom-section { margin-bottom: 50px; }
-  .section-title { font-size: 22px; color: #333; margin-bottom: 20px; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; display: inline-block; }
-  .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+  .section-title { 
+    font-size: 22px; 
+    color: #333; 
+    margin-bottom: 20px; 
+    border-bottom: 3px solid #1e3a8a; 
+    padding-bottom: 10px; 
+    display: inline-block; 
+  }
+  .related-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    gap: 20px; 
+  }
   .related-card { text-decoration: none; color: #333; display: block; }
-  .related-img-wrapper { height: 160px; overflow: hidden; background: #eee; margin-bottom: 10px; }
+  .related-img-wrapper { 
+    height: 160px; 
+    overflow: hidden; 
+    background: #eee; 
+    margin-bottom: 10px; 
+  }
   .related-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
   .related-text h4 { font-size: 15px; margin: 0; line-height: 1.4; }
-  .tag-link { font-size: 12px; color: #d97706; font-weight: bold; margin-top: 10px; display: block; }
-  @media (max-width: 768px) { .related-grid { grid-template-columns: 1fr; } }
+  .tag-link { 
+    font-size: 12px; 
+    color: #d97706; 
+    font-weight: bold; 
+    margin-top: 10px; 
+    display: block; 
+  }
+  
+  @media (max-width: 768px) { 
+    .related-grid { grid-template-columns: 1fr; } 
+  }
 </style>
