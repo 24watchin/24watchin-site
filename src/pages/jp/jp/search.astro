@@ -1,22 +1,22 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 
-// 1. データの取得設定 [cite: 8]
+// 1. データの取得設定
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
-const response = await fetch(url); [cite: 8]
-const data = await response.json(); [cite: 9]
-const allPosts = data.items || []; [cite: 9]
+const response = await fetch(url);
+const data = await response.json();
+const allPosts = data.items || [];
 
-// 2. 検索とラジオボタンの状態取得
+// 2. 検索条件の取得
 const { searchParams } = Astro.url;
 const q = searchParams.get('q') || '';
 const searchWord = q.toLowerCase();
 const includeTags = searchParams.get('includeTags') === 'true';
 
-// 3. 検索フィルタリング [cite: 10]
+// 3. 検索フィルタリング
 const filteredPosts = allPosts.filter((post) => {
   if (!searchWord) return false;
   const title = post.title.toLowerCase();
@@ -27,7 +27,7 @@ const filteredPosts = allPosts.filter((post) => {
   return includeTags ? (matchText || matchTags) : matchText;
 });
 
-// 画像取得の道具 [cite: 11]
+// 画像取得の関数
 const getImageUrl = (content) => {
   const match = content.match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
@@ -52,7 +52,7 @@ const getImageUrl = (content) => {
       </form>
     </div>
 
-    {/* スクリーンショット通りのグリッドレイアウト */}
+    {/* グリッドレイアウト */}
     <div class="results-grid" id="resultsGrid">
       {filteredPosts.map((post, index) => (
         <a href={`/jp/jp/news/${post.id}`} class="grid-item" style={index >= 20 ? "display: none;" : ""}>
@@ -68,7 +68,7 @@ const getImageUrl = (content) => {
       ))}
     </div>
 
-    {/* もっと見るボタン（20件以上ある場合のみ表示） */}
+    {/* もっと見るボタン */}
     {filteredPosts.length > 20 && (
       <div class="load-more-area">
         <button id="loadMoreBtn" class="load-more-btn">さらに検索結果を表示</button>
@@ -81,22 +81,26 @@ const getImageUrl = (content) => {
   </div>
 </Layout>
 
-<script>
-  // 「もっと見る」の動作
+<script is:inline>
+  // エラーを防ぐため、標準的なJavaScriptの書き方に変更しました
   const btn = document.getElementById('loadMoreBtn');
   const grid = document.getElementById('resultsGrid');
   let currentVisible = 20;
 
-  if (btn) {
-    btn.addEventListener('click', () => {
-      const items = grid.querySelectorAll('.grid-item');
+  if (btn && grid) {
+    btn.addEventListener('click', function() {
+      const items = grid.getElementsByClassName('grid-item');
       let count = 0;
+      
       for (let i = currentVisible; i < items.length && count < 20; i++) {
-        (items[i] as HTMLElement).style.display = 'block';
+        items[i].style.display = 'block';
         count++;
       }
+      
       currentVisible += count;
-      if (currentVisible >= items.length) btn.style.display = 'none';
+      if (currentVisible >= items.length) {
+        btn.style.display = 'none';
+      }
     });
   }
 </script>
@@ -112,44 +116,27 @@ const getImageUrl = (content) => {
   .search-radio-options { display: flex; gap: 20px; font-size: 14px; }
   .search-radio-options label { cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-  /* スクリーンショットを再現したグリッド */
   .results-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4列表示 */
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
   }
 
   .grid-item { text-decoration: none; color: inherit; display: block; }
-  .post-image img { 
-    width: 100%; 
-    aspect-ratio: 16 / 9; 
-    object-fit: cover; 
-    background: #eee; 
-  }
+  .post-image img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #eee; }
 
-  /* メタ情報（薄いグレーの文字） */
-  .post-meta { 
-    margin: 8px 0; 
-    font-size: 13px; 
-    color: #888; /* 薄いグレー */
-    display: flex;
-    gap: 10px;
-  }
-
-  /* タイトル設定（16px、3行まで） */
+  .post-meta { margin: 8px 0; font-size: 13px; color: #888; display: flex; gap: 10px; }
   .post-title {
     font-size: 16px; 
     font-weight: bold;
     line-height: 1.4;
     color: #333;
-    /* 3行以上は「...」にする魔法 */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  /* もっと見るボタン */
   .load-more-area { text-align: center; margin-top: 50px; }
   .load-more-btn {
     background: #fff;
@@ -158,9 +145,7 @@ const getImageUrl = (content) => {
     font-weight: bold;
     cursor: pointer;
     border-radius: 4px;
-    transition: 0.2s;
   }
-  .load-more-btn:hover { background: #f4f4f4; border-color: #bbb; }
 
   @media (max-width: 1000px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
