@@ -56,7 +56,6 @@ const allPosts = data.items || [];
       const match = post.content.match(/<img[^>]+src="([^">]+)"/);
       const imgUrl = match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
       
-      // ★修正ポイント1：時刻とサイト名を消し、日付（年月日）だけにしました
       const dateStr = new Date(post.published).toLocaleDateString('ja-JP');
 
       const card = document.createElement('a');
@@ -84,7 +83,6 @@ const allPosts = data.items || [];
   document.getElementById('loadMoreBtn')?.addEventListener('click', () => displayItems(20));
 </script>
 
-{/* ★修正ポイント2：is:global を追加し、プログラムで作った部分にもデザインを強制適用します */}
 <style is:global>
   .search-main-wrapper {
     width: 100%;
@@ -110,15 +108,18 @@ const allPosts = data.items || [];
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 15px;
     width: 100%;
+    /* ★修正ポイント1：グリッドの箱全体を「上揃え」に強制します */
+    align-items: flex-start !important; 
   }
 
-  /* ★修正ポイント3：青いリンク色や下線を強制的に打ち消します */
   .search-main-wrapper .grid-item {
     text-decoration: none !important; 
     color: inherit !important;
     display: flex;
     flex-direction: column;
     width: 100%;
+    /* ★修正ポイント2：箱の中身（写真や文字）も「上から順に詰める」ように強制します */
+    justify-content: flex-start !important;
   }
 
   .search-main-wrapper .post-image-box {
@@ -127,6 +128,8 @@ const allPosts = data.items || [];
     overflow: hidden;
     background: #f0f0f0;
     border-radius: 4px;
+    /* 写真が勝手に動かないように固定します */
+    margin-bottom: 0 !important;
   }
 
   .search-main-wrapper .post-image-box img {
@@ -136,11 +139,10 @@ const allPosts = data.items || [];
     display: block;
   }
 
-  /* ★修正ポイント4：日付の文字サイズと色 */
   .search-main-wrapper .post-meta-line {
-    margin: 8px 0 4px 0;
+    margin: 8px 0 4px 0 !important; /* 上下の隙間を固定 */
     font-size: 13px;
-    color: #999 !important; /* 薄いグレー */
+    color: #999 !important;
   }
 
   .search-main-wrapper .post-meta-line time {
@@ -148,14 +150,12 @@ const allPosts = data.items || [];
     text-decoration: none !important;
   }
 
-  /* ★修正ポイント5：タイトルの文字サイズを16pxに固定 */
   .search-main-wrapper .post-title-text {
     font-size: 16px !important;
     line-height: 1.4 !important;
     font-weight: bold !important;
-    color: #333 !important; /* 黒系の文字色に固定 */
-    margin: 0 !important;
-    /* 3行以上は省略（...）にする */
+    color: #333 !important;
+    margin: 0 !important; /* 余計な隙間を消去 */
     display: -webkit-box !important;
     -webkit-line-clamp: 3 !important;
     -webkit-box-orient: vertical !important;
