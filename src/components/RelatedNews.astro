@@ -1,8 +1,6 @@
 ---
-// 関連記事を表示する専用の部品です
 const { recentPosts } = Astro.props;
 
-// 画像URLを取り出す機能
 const getImageUrl = (content) => {
   if (!content) return 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
   const match = content.match(/<img[^>]+src="([^">]+)"/);
@@ -58,7 +56,6 @@ const getImageUrl = (content) => {
     margin-top: 10px; 
     display: block; 
   }
-  
   @media (max-width: 768px) { 
     .related-grid { grid-template-columns: 1fr; } 
   }
