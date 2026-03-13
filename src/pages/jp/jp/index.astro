@@ -10,6 +10,7 @@ import RegionNewsBlock from '../../../components/RegionNewsBlock.astro';
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+
 const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
@@ -24,6 +25,7 @@ const northAmericaData = [
   { cityName: "デトロイト", posts: allPosts.slice(6, 9) },
   { cityName: "ニューヨーク", posts: allPosts.slice(9, 12) }
 ];
+
 const europeData = [
   { cityName: "ロンドン", posts: allPosts.slice(12, 15) },
   { cityName: "パリ", posts: allPosts.slice(15, 18) },
@@ -35,16 +37,16 @@ const pageDescription = "24Watchinのトップページです。国際、ビジ�
 
 <Layout title="TOP" description={pageDescription}>
   
-  {/* SEO対策のURLも日本版（/jp/jp/）になるように修正しました */}
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "24Watchin",
-    "url": "https://your-domain.com/jp/jp/"
+    "url": "https://24watchin.com/jp/jp/"
   })} />
 
   <div slot="top-full">
-    <MainNewsLayout />
+    {/* ★ ここを修正：allPosts データを部品に渡すようにしました */}
+    <MainNewsLayout posts={allPosts} />
     <TrendScroll />
   </div>
 
