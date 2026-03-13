@@ -1,4 +1,5 @@
 ---
+// 部品を呼び出すための道案内を「3つ戻る（../../../）」に変更しました
 import Layout from '../../../layouts/Layout.astro';
 
 const API_KEY = import.meta.env.API_KEY;
@@ -46,40 +47,49 @@ const BLOG_ID = import.meta.env.BLOG_ID;
     try {
       const response = await fetch(url);
       const data = await response.json();
-      const posts = data.items || [];
 
-      if (posts.length === 0 && !nextToken) {
-        resultsContainer.innerHTML = '<p>該当する記事が見つかりませんでした。</p>';
-        isFull = true;
-      } else {
-        posts.forEach(post => {
-          const card = createCard(post);
-          resultsContainer.appendChild(card);
+      if (data.items && data.items.length > 0) {
+        data.items.forEach(post => {
+          resultsContainer.appendChild(createResultCard(post));
         });
         nextToken = data.nextPageToken || '';
-        if (!nextToken) isFull = true;
+        if (!nextToken) {
+          isFull = true;
+          loadingIndicator.textContent = 'すべての結果を表示しました';
+        } else {
+          loadingIndicator.style.display = 'none';
+        }
+      } else {
+        if (!resultsContainer.hasChildNodes()) {
+          searchTitle.textContent = '記事が見つかりませんでした';
+        }
+        isFull = true;
+        loadingIndicator.style.display = 'none';
       }
     } catch (error) {
       console.error('検索エラー:', error);
+      searchTitle.textContent = 'エラーが発生しました';
+      loadingIndicator.style.display = 'none';
     } finally {
       isLoading = false;
-      loadingIndicator.style.display = 'none';
     }
   }
 
-  function createCard(post) {
+  function createResultCard(post) {
     const div = document.createElement('div');
     div.className = 'result-item';
-    const imgMatch = (post.content || '').match(/<img[^>]+src="([^">]+)"/);
-    const imgSrc = imgMatch ? imgMatch[1] : 'https://placehold.co/300x200/eeeeee/999999?text=No+Image';
+
+    const match = (post.content || '').match(/<img[^>]+src="([^">]+)"/);
+    const imgSrc = match ? match[1] : 'https://placehold.co/300x200/eeeeee/999999?text=No+Image';
     const date = new Date(post.published).toLocaleDateString('ja-JP');
 
+    // ★ 検索結果のリンク先を日本版の住所（/jp/jp/）に修正しました！
     div.innerHTML = `
       <a href="/jp/jp/news/${post.id}/">
         <div class="img-wrapper">
-          <img src="${imgSrc}" alt="" loading="lazy" />
+          <img src="${imgSrc}" alt="${post.title}" loading="lazy" />
         </div>
-        <div class="text-content">
+        <div class="post-info">
           <span class="post-date">${date}</span>
           <h2 class="post-title">${post.title}</h2>
         </div>
@@ -111,17 +121,17 @@ const BLOG_ID = import.meta.env.BLOG_ID;
   .post-date { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
   
   .post-title {
-    font-size: 14px; font-weight: bold; line-height: 1.4; margin: 0; text-decoration: none;
+    font-size: 14px; font-weight: bold; line-height: 1.4; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  /* 全行に下線を出す修正 */
-  .result-item a:hover .post-title {
-    text-decoration: underline;
-    text-decoration-color: #ccc;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
-  }
+  .result-item a:hover .post-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 
-  .loading-status { text-align: center; padding: 30px 0; color: #999; }
-  @media (max-width: 1000px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 900px) {
+    .results-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+  }
+  @media (max-width: 480px) {
+    .results-grid { grid-template-columns: 1fr; }
+    .search-results-section h1 { font-size: 18px; }
+  }
+  .loading-status { text-align: center; padding: 20px; color: #666; font-size: 14px; }
 </style>
