@@ -1,32 +1,26 @@
 ---
-// 記事ページ専用のサイドバー部品です
+// 記事ページ専用のサイドバー
+// アクセスランキングを一番下に移動しました
+import AccessRanking from './AccessRanking.astro'; // ファイル名が違う場合は調整してください
+import EditorPicksSidebar from './EditorPicks.astro'; // サイドバー用の「おすすめ」
 ---
-<div class="article-sidebar">
-  {/* サイドバー用の広告スペース */}
-  <div class="ad-space">
-    <p style="text-align:center; color:#999; font-size:12px; margin:0 0 5px 0;">広告</p>
-    <div style="background:#ddd; height:250px; display:flex; align-items:center; justify-content:center; color:#666;">
-      記事用 300x250 バナー
-    </div>
-  </div>
 
-  {/* おすすめ記事などの仮のリストです */}
-  <div class="recommend-box">
-    <h3 class="side-title">この記事を読んだ人におすすめ</h3>
-    <ul class="side-list">
-      <li><a href="#">おすすめ記事のタイトルがここに入ります...</a></li>
-      <li><a href="#">おすすめ記事のタイトルがここに入ります...</a></li>
-      <li><a href="#">おすすめ記事のタイトルがここに入ります...</a></li>
-    </ul>
-  </div>
+<div class="article-sidebar">
+  {/* 1. 編集部のおすすめ（サイドバー用）を上に配置 */}
+  <section class="sidebar-block">
+    <EditorPicksSidebar />
+  </section>
+
+  {/* 2. その他の広告やバナーなど（あればここに） */}
+
+  {/* 3. アクセスランキングを最後に配置 */}
+  <section class="sidebar-block ranking-bottom">
+    <AccessRanking />
+  </section>
 </div>
 
 <style>
-  .article-sidebar { display: flex; flex-direction: column; gap: 30px; }
-  .side-title { font-size: 16px; font-weight: bold; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 15px; }
-  .side-list { list-style: none; padding: 0; margin: 0; }
-  .side-list li { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
-  .side-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .side-list a { color: #333; text-decoration: none; font-size: 14px; transition: color 0.2s; }
-  .side-list a:hover { color: #1e3a8a; }
+  .article-sidebar { display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-block { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .ranking-bottom { margin-top: 10px; }
 </style>
