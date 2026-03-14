@@ -11,11 +11,6 @@ const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
-
-const getExcerpt = (content) => {
-  if (!content) return '';
-  return content.replace(/<[^>]*>/g, '').substring(0, 70) + '...';
-};
 ---
 
 <div class="top-news-container">
@@ -28,7 +23,6 @@ const getExcerpt = (content) => {
           </div>
           <div class="hero-text">
             <h2>{posts[0].title}</h2>
-            <p>{getExcerpt(posts[0].content)}</p>
           </div>
         </a>
       </article>
@@ -51,7 +45,7 @@ const getExcerpt = (content) => {
   </div>
 
   <div class="side-list-column">
-    {posts.slice(5, 15).map((post) => (
+    {posts.slice(5, 11).map((post) => (
       <article class="list-item">
         <a href={`/jp/jp/news/${post.id}/`}>
           <h4>{post.title}</h4>
@@ -64,7 +58,7 @@ const getExcerpt = (content) => {
 <style>
   .top-news-container {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) 410px;
     gap: 24px;
     margin-bottom: 40px;
     align-items: start;
@@ -98,16 +92,8 @@ const getExcerpt = (content) => {
   }
 
   .hero-text h2 {
-    font-size: 16px;
+    font-size: 24px;
     line-height: 1.45;
-    font-weight: 700;
-    margin: 0 0 10px;
-    color: #111111;
-  }
-
-  .hero-text p {
-    font-size: 16px;
-    line-height: 1.5;
     font-weight: 700;
     margin: 0;
     color: #111111;
