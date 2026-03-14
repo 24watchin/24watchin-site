@@ -65,18 +65,18 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 }
 
 const categoryItems = [
-  { href: '/jp/jp/search?category=政治', label: '政治' },
-  { href: '/jp/jp/search?category=社会', label: '社会' },
-  { href: '/jp/jp/search?category=国際', label: '国際' },
-  { href: '/jp/jp/search?category=経済', label: '経済' },
-  { href: '/jp/jp/search?category=環境・エネルギー', label: '環境・エネルギー' },
-  { href: '/jp/jp/search?category=ビジネス', label: 'ビジネス' },
-  { href: '/jp/jp/search?category=テクノロジー・AI', label: 'テクノロジー・AI' },
-  { href: '/jp/jp/search?category=文化・エンタメ', label: '文化・エンタメ' },
-  { href: '/jp/jp/search?category=スポーツ', label: 'スポーツ' },
+  { href: '/jp/jp/category/politics', label: '政治' },
+  { href: '/jp/jp/category/society', label: '社会' },
+  { href: '/jp/jp/category/international', label: '国際' },
+  { href: '/jp/jp/category/economy', label: '経済' },
+  { href: '/jp/jp/category/environment-energy', label: '環境・エネルギー' },
+  { href: '/jp/jp/category/business', label: 'ビジネス' },
+  { href: '/jp/jp/category/technology-ai', label: 'テクノロジー・AI' },
+  { href: '/jp/jp/category/entertainment', label: '文化・エンタメ' },
+  { href: '/jp/jp/category/sports', label: 'スポーツ' },
 ];
 
-const currentCategory = Astro.url.searchParams.get('category') ?? '';
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
 <header class="site-header">
@@ -123,7 +123,10 @@ const currentCategory = Astro.url.searchParams.get('category') ?? '';
       {categoryItems.map((item) => (
         <a
           href={item.href}
-          class:list={['category-link', currentCategory === item.label && 'active']}
+          class:list={[
+            'category-link',
+            currentPath === item.href && 'active'
+          ]}
         >
           {item.label}
         </a>
