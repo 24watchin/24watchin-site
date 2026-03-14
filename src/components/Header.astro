@@ -1,282 +1,263 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 
-const countryLabel = 'JAPAN';
-const languageLabel = '日本語';
-const searchAction = '/jp/jp/search';
-const homeHref = '/jp/jp/';
+const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
+const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
 
-const navCategories = [
-  { label: '政治', slug: 'politics' },
-  { label: '社会', slug: 'society' },
-  { label: '国際', slug: 'international' },
-  { label: '経済', slug: 'economy' },
-  { label: '環境・エネルギー', slug: 'environment-energy' },
-  { label: 'ビジネス', slug: 'business' },
-  { label: 'テクノロジー・AI', slug: 'technology-ai' },
-  { label: '文化・エンタメ', slug: 'culture-entertainment' },
-  { label: 'スポーツ', slug: 'sports' },
-];
+const siteId = 'jp-ja';
+const slot = 'header_words';
 
-const headerWords = [
-  // ここに今後ワードや特集を入れます
-  // 例:
-  // { label: 'イラン情勢', href: '/jp/jp/search?q=イラン情勢' },
-  // { label: '特集ページ', href: '/jp/jp/special/example' },
+type HeaderWordItem = {
+  label: string;
+  url: string;
+  displayOrder: number;
+};
+
+let headerWords: HeaderWordItem[] = [];
+
+if (SPACE_ID && DELIVERY_TOKEN) {
+  try {
+    const query = new URLSearchParams({
+      content_type: 'headerWord',
+      'fields.siteId': siteId,
+      'fields.slot': slot,
+      'fields.enabled': 'true',
+      order: 'fields.displayOrder',
+      limit: '20',
+    });
+
+    const response = await fetch(
+      `https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${query.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${DELIVERY_TOKEN}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+
+      headerWords = (data.items ?? [])
+        .map((item: any) => ({
+          label: item?.fields?.label ?? '',
+          url: item?.fields?.url ?? '#',
+          displayOrder: Number(item?.fields?.displayOrder ?? 9999),
+          enabled: item?.fields?.enabled ?? false,
+          itemSiteId: item?.fields?.siteId ?? '',
+          itemSlot: item?.fields?.slot ?? '',
+        }))
+        .filter(
+          (item: any) =>
+            item.enabled === true &&
+            item.itemSiteId === siteId &&
+            item.itemSlot === slot &&
+            item.label
+        )
+        .sort((a: HeaderWordItem, b: HeaderWordItem) => a.displayOrder - b.displayOrder)
+        .map(({ label, url, displayOrder }: HeaderWordItem) => ({
+          label,
+          url,
+          displayOrder,
+        }));
+    }
+  } catch (error) {
+    headerWords = [];
+  }
+}
+
+const menuItems = [
+  { href: '/jp/jp/', label: 'ホーム' },
+  { href: '/jp/jp/search?category=international', label: '国際' },
+  { href: '/jp/jp/search?category=politics', label: '政治' },
+  { href: '/jp/jp/search?category=economy', label: '経済' },
+  { href: '/jp/jp/search?category=society', label: '社会' },
+  { href: '/jp/jp/search?category=technology', label: 'テクノロジー' },
+  { href: '/jp/jp/search?category=entertainment', label: 'エンタメ' },
+  { href: '/jp/jp/search?category=sports', label: 'スポーツ' },
 ];
 ---
 
 <header class="site-header">
-  <div class="container header-inner">
-    <div class="header-top">
-      <a href={homeHref} class="brand-link" aria-label="24Watchin ホーム">
-        <img
-          src="/images/logo-24watchin.png"
-          alt="24Watchin"
-          class="brand-logo"
-        />
-        <div class="brand-country">{countryLabel}</div>
-      </a>
+  <div class="top-area">
+    <a href="/jp/jp/" class="logo-area" aria-label="24Watchin Japan ホーム">
+      <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
+      <div class="country-name">JAPAN</div>
+    </a>
 
-      <div class="header-tools">
-        <div class="language-label">{languageLabel}</div>
+    <div class="language-name">日本語</div>
+  </div>
 
-        <form action={searchAction} method="get" class="search-form">
-          <input type="text" name="q" placeholder="検索" required />
-          <button type="submit" aria-label="検索">
-            <i class="fas fa-search"></i>
-          </button>
-        </form>
-      </div>
-    </div>
+  <div class="header-word-bar" aria-label="注目ワード">
+    {
+      headerWords.length > 0 ? (
+        <div class="header-word-list">
+          {headerWords.map((item) => (
+            <a href={item.url} class="header-word-link">
+              {item.label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="header-word-empty"></div>
+      )
+    }
+  </div>
 
-    <nav class="global-nav" aria-label="主要カテゴリ">
-      <div class="nav-scroll">
-        {navCategories.map((category) => (
-          <HeaderLink
-            href={`/jp/jp/category/${category.slug}`}
-            activeMatch={`/jp/jp/category/${category.slug}`}
-          >
-            {category.label}
-          </HeaderLink>
-        ))}
-      </div>
-    </nav>
-
-    <div class="header-word-row">
-      {headerWords.map((word) => (
-        <a href={word.href} class="header-word-link">{word.label}</a>
+  <nav class="menu-bar" aria-label="メインメニュー">
+    <div class="menu-inner">
+      {menuItems.map((item) => (
+        <HeaderLink href={item.href}>{item.label}</HeaderLink>
       ))}
     </div>
+  </nav>
 
-    <div class="header-accent-line" aria-hidden="true"></div>
-  </div>
+  <div class="bottom-line"></div>
 </header>
 
 <style>
   .site-header {
-    background: #fff;
-    border-bottom: 1px solid #e5e5e5;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    width: 100%;
+    background: #ffffff;
   }
 
-  .container {
+  .top-area {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
-  }
-
-  .header-inner {
-    padding-top: 18px;
-    padding-bottom: 0;
-  }
-
-  .header-top {
+    padding: 18px 16px 14px;
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px;
-    margin-bottom: 14px;
+    gap: 16px;
   }
 
-  .brand-link {
+  .logo-area {
     display: inline-flex;
     flex-direction: column;
+    align-items: flex-start;
     text-decoration: none;
     color: inherit;
-    min-width: 0;
   }
 
-  .brand-logo {
+  .logo-image {
     display: block;
-    height: 72px;
-    width: auto;
+    width: 220px;
     max-width: 100%;
-    object-fit: contain;
-    border-radius: 0;
+    height: auto;
   }
 
-  .brand-country {
-    margin-top: 8px;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    color: #111;
-    line-height: 1;
-    text-align: right;
-    align-self: flex-end;
-    padding-right: 2px;
-  }
-
-  .header-tools {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-  }
-
-  .language-label {
-    font-size: 16px;
-    font-weight: 800;
-    color: #111;
-    line-height: 1;
-  }
-
-  .search-form {
-    display: flex;
-    align-items: center;
-    gap: 0;
-  }
-
-  .search-form input {
-    width: 180px;
-    height: 38px;
-    padding: 0 14px;
-    border: none;
-    background: #d7d1ca;
-    color: #111;
+  .country-name {
+    margin-top: 6px;
     font-size: 14px;
-    outline: none;
-    border-radius: 8px 0 0 8px;
-    box-sizing: border-box;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #393737;
   }
 
-  .search-form button {
-    width: 42px;
-    height: 38px;
-    border: none;
-    background: #d7d1ca;
-    color: #111;
-    cursor: pointer;
-    border-radius: 0 8px 8px 0;
-  }
-
-  .global-nav {
-    background: #393737;
-    overflow: hidden;
-  }
-
-  .nav-scroll {
-    display: flex;
-    align-items: stretch;
-    overflow-x: auto;
+  .language-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #393737;
     white-space: nowrap;
-    scrollbar-width: none;
+    padding-top: 4px;
   }
 
-  .nav-scroll::-webkit-scrollbar {
-    display: none;
+  .header-word-bar {
+    width: 100%;
+    background: #ffffff;
+    border-top: 1px solid #ececec;
+    border-bottom: 1px solid #ececec;
   }
 
-  .header-word-row {
-    min-height: 46px;
-    background: #fff;
+  .header-word-list {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
-    gap: 32px;
-    padding: 0 18px;
+    gap: 18px;
     overflow-x: auto;
     white-space: nowrap;
-    scrollbar-width: none;
-  }
-
-  .header-word-row::-webkit-scrollbar {
-    display: none;
+    scrollbar-width: thin;
   }
 
   .header-word-link {
-    font-size: 16px;
-    font-weight: 700;
-    color: #111;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #393737;
     text-decoration: none;
-    line-height: 1;
   }
 
   .header-word-link:hover {
-    text-decoration: underline;
+    color: #e8383d;
   }
 
-  .header-accent-line {
-    height: 14px;
+  .header-word-empty {
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 42px;
+    padding: 0 16px;
+  }
+
+  .menu-bar {
+    width: 100%;
+    background: #393737;
+  }
+
+  .menu-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+
+  .bottom-line {
+    width: 100%;
+    height: 4px;
     background: #872732;
   }
 
-  @media (max-width: 900px) {
-    .header-top {
-      flex-direction: column;
-      align-items: flex-start;
+  @media (max-width: 767px) {
+    .top-area {
+      padding: 14px 12px 12px;
+      gap: 12px;
     }
 
-    .header-tools {
-      width: 100%;
-      align-items: flex-start;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .container {
-      padding: 0 14px;
+    .logo-image {
+      width: 180px;
     }
 
-    .header-inner {
-      padding-top: 14px;
+    .country-name {
+      font-size: 12px;
     }
 
-    .brand-logo {
-      height: 58px;
+    .language-name {
+      font-size: 12px;
     }
 
-    .brand-country {
-      font-size: 17px;
-    }
-
-    .language-label {
-      font-size: 15px;
-    }
-
-    .search-form {
-      width: 100%;
-    }
-
-    .search-form input {
-      width: 100%;
-      min-width: 0;
-    }
-
-    .header-word-row {
-      min-height: 42px;
-      padding: 0 14px;
-      gap: 24px;
+    .header-word-list {
+      padding: 9px 12px;
+      gap: 14px;
     }
 
     .header-word-link {
-      font-size: 16px;
+      font-size: 13px;
     }
 
-    .header-accent-line {
-      height: 12px;
+    .header-word-empty {
+      min-height: 38px;
+      padding: 0 12px;
+    }
+
+    .menu-inner {
+      padding: 0 12px;
+      gap: 16px;
     }
   }
 </style>
