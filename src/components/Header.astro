@@ -1,6 +1,4 @@
 ---
-import HeaderLink from './HeaderLink.astro';
-
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
 
@@ -77,6 +75,8 @@ const categoryItems = [
   { href: '/jp/jp/search?category=文化・エンタメ', label: '文化・エンタメ' },
   { href: '/jp/jp/search?category=スポーツ', label: 'スポーツ' },
 ];
+
+const currentCategory = Astro.url.searchParams.get('category') ?? '';
 ---
 
 <header class="site-header">
@@ -121,7 +121,12 @@ const categoryItems = [
   <nav class="category-bar" aria-label="カテゴリ">
     <div class="category-inner">
       {categoryItems.map((item) => (
-        <HeaderLink href={item.href}>{item.label}</HeaderLink>
+        <a
+          href={item.href}
+          class:list={['category-link', currentCategory === item.label && 'active']}
+        >
+          {item.label}
+        </a>
       ))}
     </div>
   </nav>
@@ -174,14 +179,14 @@ const categoryItems = [
 
   .logo-image {
     display: block;
-    width: 220px;
+    width: 160px;
     max-width: 100%;
     height: auto;
   }
 
   .country-name {
     margin-top: 6px;
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 700;
     line-height: 1.1;
     color: #000000;
@@ -200,7 +205,7 @@ const categoryItems = [
   }
 
   .language-name {
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 700;
     line-height: 1.1;
     color: #000000;
@@ -213,7 +218,7 @@ const categoryItems = [
   }
 
   .search-input {
-    width: 210px;
+    width: 190px;
     height: 36px;
     padding: 0 12px;
     border: 1px solid #c7c1ba;
@@ -271,8 +276,7 @@ const categoryItems = [
     scrollbar-width: thin;
   }
 
-  .category-inner :global(a) {
-    position: relative;
+  .category-link {
     display: inline-flex;
     align-items: center;
     height: 54px;
@@ -282,28 +286,24 @@ const categoryItems = [
     font-size: 18px;
     font-weight: 700;
     line-height: 1;
+    border-bottom: none;
+    box-shadow: none;
   }
 
-  .category-inner :global(a:hover) {
+  .category-link::before,
+  .category-link::after {
+    display: none;
+    content: none;
+  }
+
+  .category-link:hover,
+  .category-link.active {
     color: #ffffff;
-  }
-
-  .category-inner :global(a::after) {
-    content: '';
-    position: absolute;
-    left: 18px;
-    right: 18px;
-    bottom: 9px;
-    height: 3px;
-    background: transparent;
-  }
-
-  .category-inner :global(a:hover::after) {
-    background: #e8383d;
-  }
-
-  .category-inner :global(a[aria-current='page']::after) {
-    background: #e8383d;
+    text-decoration-line: underline;
+    text-decoration-color: #e8383d;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 10px;
+    text-decoration-skip-ink: none;
   }
 
   .header-word-bar {
@@ -360,15 +360,15 @@ const categoryItems = [
     }
 
     .language-name {
-      font-size: 20px;
+      font-size: 16px;
     }
 
     .country-name {
-      font-size: 20px;
+      font-size: 16px;
     }
 
     .logo-image {
-      width: 190px;
+      width: 140px;
     }
 
     .search-form {
@@ -387,15 +387,15 @@ const categoryItems = [
     }
 
     .logo-image {
-      width: 170px;
+      width: 130px;
     }
 
     .country-name {
-      font-size: 18px;
+      font-size: 16px;
     }
 
     .language-name {
-      font-size: 18px;
+      font-size: 16px;
     }
 
     .search-input,
@@ -408,17 +408,16 @@ const categoryItems = [
       padding: 0 12px;
     }
 
-    .category-inner :global(a) {
+    .category-link {
       height: 48px;
       padding: 0 14px;
       font-size: 16px;
     }
 
-    .category-inner :global(a::after) {
-      left: 14px;
-      right: 14px;
-      bottom: 8px;
-      height: 3px;
+    .category-link:hover,
+    .category-link.active {
+      text-decoration-thickness: 3px;
+      text-underline-offset: 9px;
     }
 
     .header-word-inner {
@@ -427,7 +426,7 @@ const categoryItems = [
     }
 
     .header-word-link {
-      font-size: 15px;
+      font-size: 16px;
     }
 
     .bottom-line {
