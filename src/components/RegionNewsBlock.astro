@@ -1,18 +1,44 @@
 ---
-// 画像デザインに基づいた「地域別・都市別」ブロック
-// title: 地域名 (北米 など)
-// cityData: [{ cityName: "シカゴ", posts: [...] }, { cityName: "アトランタ", posts: [...] }] のようなデータ
 const { title, cityData = [] } = Astro.props;
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/120x80/eeeeee/999999?text=No+Image';
 };
+
+const formatPostTime = (dateString) => {
+  if (!dateString) return '';
+  try {
+    return new Date(dateString).toLocaleString('ja-JP', {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return '';
+  }
+};
+
+const getDisplayCategory = (post) => {
+  const labels = post?.labels || [];
+
+  const visibleLabel = labels.find((label) => {
+    if (!label) return false;
+    if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false;
+    if (/^world-/i.test(label)) return false;
+    if (/-idw\d+$/i.test(label)) return false;
+    if (/^(soc|pol|eco|biz|tech|env|cul|spo|int)-/i.test(label)) return false;
+    return true;
+  });
+
+  return visibleLabel || 'ニュース';
+};
 ---
 
 <section class="region-section">
-  <div class="region-main-header">
-    <div class="region-badge">{title}</div>
+  <div class="region-header">
+    <h2 class="region-title">{title}</h2>
     <div class="region-line"></div>
   </div>
 
@@ -20,21 +46,25 @@ const getImageUrl = (content) => {
     {cityData.map((city) => (
       <div class="city-block">
         <h3 class="city-name">{city.cityName}</h3>
-        
+
         <div class="article-3-grid">
           {city.posts.slice(0, 3).map((post) => (
-            /* ★ リンク先を /jp/jp/news/ に修正しました */
             <a href={`/jp/jp/news/${post.id}/`} class="news-item">
               <div class="thumbnail">
                 <img src={getImageUrl(post.content)} alt={post.title} />
               </div>
+
               <div class="info">
-                <h4>{post.title}</h4>
-                <p class="summary">{post.title.substring(0, 30)}...</p>
-                <div class="meta">
-                  <span class="time"><i class="far fa-clock"></i> 15:00</span>
-                  <span class="badge-new">NEW</span>
-                  <span class="tag">国際</span>
+                <h4 class="news-title">{post.title}</h4>
+
+                <div class="category-row">
+                  <span class="category-badge">{getDisplayCategory(post)}</span>
+                </div>
+
+                <div class="date-row">
+                  {post.published && (
+                    <span class="post-time">{formatPostTime(post.published)}</span>
+                  )}
                 </div>
               </div>
             </a>
@@ -46,22 +76,150 @@ const getImageUrl = (content) => {
 </section>
 
 <style>
-  /* 元のデザイン（BK）を100%維持しています */
-  .region-section { margin-bottom: 60px; width: 100%; }
-  .region-main-header { display: flex; align-items: center; margin-bottom: 30px; }
-  .region-badge { background: #e11d48; color: #fff; padding: 6px 20px; font-weight: bold; font-size: 18px; border-radius: 2px; }
-  .region-line { flex-grow: 1; height: 2px; background: #e11d48; margin-left: -2px; }
-  .city-name { font-size: 20px; font-weight: bold; margin: 0 0 15px 10px; color: #111; }
-  .city-block { margin-bottom: 40px; }
-  .article-3-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .news-item { display: flex; gap: 12px; text-decoration: none; color: #333; }
-  .thumbnail { width: 120px; height: 80px; flex-shrink: 0; border-radius: 4px; overflow: hidden; background: #eee; }
-  .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-  .info h4 { font-size: 14px; margin: 0 0 4px; line-height: 1.4; font-weight: bold; }
-  .summary { font-size: 12px; color: #666; margin: 0 0 8px; line-height: 1.4; }
-  .meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
-  .badge-new { background: #e11d48; color: #fff; padding: 0 4px; border-radius: 2px; font-weight: bold; }
+  .region-section {
+    width: 100%;
+    margin-bottom: 56px;
+  }
 
-  @media (max-width: 1024px) { .article-3-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 700px) { .article-3-grid { grid-template-columns: 1fr; } }
+  .region-header {
+    margin-bottom: 24px;
+  }
+
+  .region-title {
+    margin: 0 0 10px;
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #111111;
+  }
+
+  .region-line {
+    width: 100%;
+    height: 3px;
+    background: #872732;
+  }
+
+  .city-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .city-block {
+    width: 100%;
+  }
+
+  .city-name {
+    margin: 0 0 16px;
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 400;
+    color: #111111;
+  }
+
+  .article-3-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px 24px;
+  }
+
+  .news-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    text-decoration: none;
+    color: #111111;
+    min-width: 0;
+  }
+
+  .thumbnail {
+    width: 120px;
+    height: 80px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #eeeeee;
+  }
+
+  .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .info {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .news-title {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.45;
+    font-weight: 700;
+    color: #111111;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(1.45em * 2);
+  }
+
+  .category-row {
+    margin-top: 6px;
+    text-align: right;
+    min-height: 24px;
+  }
+
+  .category-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: #f4a460;
+    color: #696969;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 400;
+  }
+
+  .date-row {
+    margin-top: 6px;
+    text-align: left;
+    min-height: 24px;
+  }
+
+  .post-time {
+    font-size: 16px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: #8a8a8a;
+  }
+
+  .news-item:hover .news-title {
+    text-decoration-line: underline;
+    text-decoration-color: #000000;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 1024px) {
+    .article-3-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .article-3-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .thumbnail {
+      width: 110px;
+      height: 74px;
+    }
+  }
 </style>
