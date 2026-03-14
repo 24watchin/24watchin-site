@@ -1,98 +1,230 @@
 ---
-import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
+
+const countryLabel = 'JAPAN';
+const languageLabel = '日本語';
+const searchAction = '/jp/jp/search';
+const homeHref = '/jp/jp/';
+
+const navCategories = [
+  { label: '文化・エンタメ', slug: 'culture-entertainment' },
+  { label: '政治', slug: 'politics' },
+  { label: '社会', slug: 'society' },
+  { label: '国際', slug: 'international' },
+  { label: '経済', slug: 'economy' },
+  { label: '環境・エネルギー', slug: 'environment-energy' },
+  { label: 'ビジネス', slug: 'business' },
+  { label: 'テクノロジー・AI', slug: 'technology-ai' },
+  { label: 'スポーツ', slug: 'sports' },
+  { label: '健康・ライフ', slug: 'health-life' },
+];
 ---
 
-<header>
-	<nav>
-		<h2><a href="/">{SITE_TITLE}</a></h2>
-		<div class="internal-links">
-			<HeaderLink href="/">Home</HeaderLink>
-			<HeaderLink href="/blog">Blog</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
-		</div>
-		
-		<div class="search-container">
-			<form action="/search" method="get" class="search-form">
-				<input type="text" name="q" placeholder="検索..." required />
-				<button type="submit" aria-label="検索">
-					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="11" cy="11" r="8"></circle>
-						<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-					</svg>
-				</button>
-			</form>
-		</div>
-	</nav>
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="header-top">
+      <a href={homeHref} class="brand-link" aria-label="24Watchin ホーム">
+        <img
+          src="/images/logo-24watchin.png"
+          alt="24Watchin"
+          class="brand-logo"
+        />
+        <div class="brand-country">{countryLabel}</div>
+      </a>
+
+      <div class="header-tools">
+        <div class="language-label">{languageLabel}</div>
+
+        <form action={searchAction} method="get" class="search-form">
+          <input type="text" name="q" placeholder="検索" required />
+          <button type="submit" aria-label="検索">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <nav class="global-nav" aria-label="主要カテゴリ">
+      <div class="nav-scroll">
+        {navCategories.map((category) => (
+          <HeaderLink
+            href={`/jp/jp/category/${category.slug}`}
+            activeMatch={`/jp/jp/category/${category.slug}`}
+          >
+            {category.label}
+          </HeaderLink>
+        ))}
+      </div>
+    </nav>
+
+    <div class="header-accent-line" aria-hidden="true"></div>
+  </div>
 </header>
 
 <style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-		background: white;
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
-	}
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	nav a {
-		padding: 1em 0.5em;
-		color: var(--black);
-		border-bottom: 4px solid transparent;
-		text-decoration: none;
-	}
-	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
-	}
-	
-	.search-container {
-		display: flex;
-		align-items: center;
-	}
-	.search-form {
-		display: flex;
-		align-items: center;
-		background: #f0f0f0;
-		border-radius: 20px;
-		padding: 4px 12px;
-	}
-	.search-form input {
-		border: none;
-		background: transparent;
-		outline: none;
-		font-size: 14px;
-		width: 150px;
-		color: #333;
-	}
-	.search-form button {
-		background: transparent;
-		border: none;
-		cursor: pointer;
-		padding: 4px;
-		color: #666;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.search-form button:hover {
-		color: #111;
-	}
+  .site-header {
+    background: #fff;
+    border-bottom: 1px solid #e5e5e5;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
 
-	@media (max-width: 720px) {
-		.search-form input {
-			width: 100px;
-		}
-	}
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .header-inner {
+    padding-top: 18px;
+    padding-bottom: 0;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 14px;
+  }
+
+  .brand-link {
+    display: inline-flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+  }
+
+  .brand-logo {
+    display: block;
+    height: 72px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 0;
+  }
+
+  .brand-country {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #111;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .header-tools {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .language-label {
+    font-size: 16px;
+    font-weight: 800;
+    color: #111;
+    line-height: 1;
+  }
+
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .search-form input {
+    width: 180px;
+    height: 38px;
+    padding: 0 14px;
+    border: none;
+    background: #d7d1ca;
+    color: #111;
+    font-size: 14px;
+    outline: none;
+    border-radius: 8px 0 0 8px;
+    box-sizing: border-box;
+  }
+
+  .search-form button {
+    width: 42px;
+    height: 38px;
+    border: none;
+    background: #d7d1ca;
+    color: #111;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .global-nav {
+    background: #393737;
+    overflow: hidden;
+  }
+
+  .nav-scroll {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .nav-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-accent-line {
+    height: 12px;
+    background: #872732;
+  }
+
+  @media (max-width: 900px) {
+    .header-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .header-tools {
+      width: 100%;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .container {
+      padding: 0 14px;
+    }
+
+    .header-inner {
+      padding-top: 14px;
+    }
+
+    .brand-logo {
+      height: 58px;
+    }
+
+    .brand-country {
+      font-size: 13px;
+    }
+
+    .language-label {
+      font-size: 15px;
+    }
+
+    .search-form {
+      width: 100%;
+    }
+
+    .search-form input {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .header-accent-line {
+      height: 10px;
+    }
+  }
 </style>
