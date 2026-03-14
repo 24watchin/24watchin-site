@@ -103,7 +103,17 @@ const categoryItems = [
           placeholder="検索"
           aria-label="検索"
         />
-        <button type="submit" class="search-button">検索</button>
+        <button type="submit" class="search-button" aria-label="検索">
+          <svg
+            class="search-icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="11" cy="11" r="6.5"></circle>
+            <line x1="16" y1="16" x2="21" y2="21"></line>
+          </svg>
+        </button>
       </form>
     </div>
   </div>
@@ -164,7 +174,7 @@ const categoryItems = [
 
   .logo-image {
     display: block;
-    width: 310px;
+    width: 220px;
     max-width: 100%;
     height: auto;
   }
@@ -190,9 +200,9 @@ const categoryItems = [
   }
 
   .language-name {
-    font-size: 23px;
+    font-size: 22px;
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.1;
     color: #000000;
   }
 
@@ -203,7 +213,7 @@ const categoryItems = [
   }
 
   .search-input {
-    width: 230px;
+    width: 210px;
     height: 36px;
     padding: 0 12px;
     border: 1px solid #c7c1ba;
@@ -221,16 +231,27 @@ const categoryItems = [
   }
 
   .search-button {
+    width: 36px;
     height: 36px;
-    padding: 0 16px;
-    border: 1px solid #c7c1ba;
+    padding: 0;
+    border: 1px solid #d8d8d8;
     border-radius: 8px;
-    background: #d8d3cc;
-    color: #000000;
-    font-size: 16px;
-    font-weight: 500;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     box-sizing: border-box;
+  }
+
+  .search-icon {
+    width: 18px;
+    height: 18px;
+    stroke: #393737;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .category-bar {
@@ -347,7 +368,7 @@ const categoryItems = [
     }
 
     .logo-image {
-      width: 270px;
+      width: 190px;
     }
 
     .search-form {
@@ -366,7 +387,7 @@ const categoryItems = [
     }
 
     .logo-image {
-      width: 230px;
+      width: 170px;
     }
 
     .country-name {
