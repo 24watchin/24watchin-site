@@ -4,30 +4,30 @@ import HeaderLink from './HeaderLink.astro';
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
 
-const siteId = 'jp-ja';
-const slot = 'header_words';
+const SITE_ID = 'jp-ja';
+const SLOT = 'header_words';
 
-type HeaderWordItem = {
+type HeaderWord = {
   label: string;
   url: string;
   displayOrder: number;
 };
 
-let headerWords: HeaderWordItem[] = [];
+let headerWords: HeaderWord[] = [];
 
 if (SPACE_ID && DELIVERY_TOKEN) {
   try {
-    const query = new URLSearchParams({
+    const params = new URLSearchParams({
       content_type: 'headerWord',
-      'fields.siteId': siteId,
-      'fields.slot': slot,
+      'fields.siteId': SITE_ID,
+      'fields.slot': SLOT,
       'fields.enabled': 'true',
       order: 'fields.displayOrder',
       limit: '20',
     });
 
-    const response = await fetch(
-      `https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${query.toString()}`,
+    const res = await fetch(
+      `https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`,
       {
         headers: {
           Authorization: `Bearer ${DELIVERY_TOKEN}`,
@@ -35,8 +35,8 @@ if (SPACE_ID && DELIVERY_TOKEN) {
       }
     );
 
-    if (response.ok) {
-      const data = await response.json();
+    if (res.ok) {
+      const data = await res.json();
 
       headerWords = (data.items ?? [])
         .map((item: any) => ({
@@ -44,73 +44,93 @@ if (SPACE_ID && DELIVERY_TOKEN) {
           url: item?.fields?.url ?? '#',
           displayOrder: Number(item?.fields?.displayOrder ?? 9999),
           enabled: item?.fields?.enabled ?? false,
-          itemSiteId: item?.fields?.siteId ?? '',
-          itemSlot: item?.fields?.slot ?? '',
+          siteId: item?.fields?.siteId ?? '',
+          slot: item?.fields?.slot ?? '',
         }))
         .filter(
           (item: any) =>
             item.enabled === true &&
-            item.itemSiteId === siteId &&
-            item.itemSlot === slot &&
+            item.siteId === SITE_ID &&
+            item.slot === SLOT &&
             item.label
         )
-        .sort((a: HeaderWordItem, b: HeaderWordItem) => a.displayOrder - b.displayOrder)
-        .map(({ label, url, displayOrder }: HeaderWordItem) => ({
-          label,
-          url,
-          displayOrder,
+        .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+        .map((item: any) => ({
+          label: item.label,
+          url: item.url,
+          displayOrder: item.displayOrder,
         }));
     }
-  } catch (error) {
+  } catch (e) {
     headerWords = [];
   }
 }
 
-const menuItems = [
-  { href: '/jp/jp/', label: 'ホーム' },
-  { href: '/jp/jp/search?category=international', label: '国際' },
-  { href: '/jp/jp/search?category=politics', label: '政治' },
-  { href: '/jp/jp/search?category=economy', label: '経済' },
-  { href: '/jp/jp/search?category=society', label: '社会' },
-  { href: '/jp/jp/search?category=technology', label: 'テクノロジー' },
-  { href: '/jp/jp/search?category=entertainment', label: 'エンタメ' },
-  { href: '/jp/jp/search?category=sports', label: 'スポーツ' },
+const categoryItems = [
+  { href: '/jp/jp/search?category=政治', label: '政治' },
+  { href: '/jp/jp/search?category=社会', label: '社会' },
+  { href: '/jp/jp/search?category=国際', label: '国際' },
+  { href: '/jp/jp/search?category=経済', label: '経済' },
+  { href: '/jp/jp/search?category=環境・エネルギー', label: '環境・エネルギー' },
+  { href: '/jp/jp/search?category=ビジネス', label: 'ビジネス' },
+  { href: '/jp/jp/search?category=テクノロジー・AI', label: 'テクノロジー・AI' },
+  { href: '/jp/jp/search?category=文化・エンタメ', label: '文化・エンタメ' },
+  { href: '/jp/jp/search?category=スポーツ', label: 'スポーツ' },
 ];
 ---
 
 <header class="site-header">
-  <div class="top-area">
-    <a href="/jp/jp/" class="logo-area" aria-label="24Watchin Japan ホーム">
-      <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
+  <div class="header-top">
+    <div class="brand-area">
+      <a href="/jp/jp/" class="logo-link" aria-label="24Watchin JAPAN">
+        <img
+          src="/images/logo-24watchin.png"
+          alt="24Watchin"
+          class="logo-image"
+        />
+      </a>
       <div class="country-name">JAPAN</div>
-    </a>
+    </div>
 
-    <div class="language-name">日本語</div>
+    <div class="right-area">
+      <div class="language-name">日本語</div>
+
+      <form action="/jp/jp/search" method="get" class="search-form">
+        <input
+          type="text"
+          name="q"
+          class="search-input"
+          placeholder="検索"
+          aria-label="検索"
+        />
+        <button type="submit" class="search-button">検索</button>
+      </form>
+    </div>
   </div>
 
-  <div class="header-word-bar" aria-label="注目ワード">
-    {
-      headerWords.length > 0 ? (
-        <div class="header-word-list">
-          {headerWords.map((item) => (
-            <a href={item.url} class="header-word-link">
-              {item.label}
-            </a>
-          ))}
-        </div>
-      ) : (
-        <div class="header-word-empty"></div>
-      )
-    }
-  </div>
-
-  <nav class="menu-bar" aria-label="メインメニュー">
-    <div class="menu-inner">
-      {menuItems.map((item) => (
+  <nav class="category-bar" aria-label="カテゴリ">
+    <div class="category-inner">
+      {categoryItems.map((item) => (
         <HeaderLink href={item.href}>{item.label}</HeaderLink>
       ))}
     </div>
   </nav>
+
+  <div class="header-word-bar">
+    <div class="header-word-inner">
+      {
+        headerWords.length > 0 ? (
+          headerWords.map((item) => (
+            <a href={item.url} class="header-word-link">
+              {item.label}
+            </a>
+          ))
+        ) : (
+          <div class="header-word-empty"></div>
+        )
+      }
+    </div>
+  </div>
 
   <div class="bottom-line"></div>
 </header>
@@ -121,143 +141,271 @@ const menuItems = [
     background: #ffffff;
   }
 
-  .top-area {
-    max-width: 1200px;
+  .header-top {
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 18px 16px 14px;
+    padding: 10px 14px 8px;
     display: flex;
-    align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
+    align-items: flex-start;
+    gap: 24px;
   }
 
-  .logo-area {
-    display: inline-flex;
+  .brand-area {
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .logo-link {
+    display: inline-block;
     text-decoration: none;
-    color: inherit;
   }
 
   .logo-image {
     display: block;
-    width: 220px;
+    width: 330px;
     max-width: 100%;
     height: auto;
   }
 
   .country-name {
-    margin-top: 6px;
-    font-size: 14px;
+    margin-top: 8px;
+    margin-left: 2px;
+    font-size: 23px;
     font-weight: 700;
-    letter-spacing: 0.18em;
-    color: #393737;
+    line-height: 1.1;
+    color: #000000;
+    letter-spacing: 0;
+  }
+
+  .right-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 14px;
+    padding-top: 8px;
+    flex-shrink: 0;
   }
 
   .language-name {
-    font-size: 14px;
+    font-size: 23px;
     font-weight: 700;
-    color: #393737;
+    line-height: 1;
+    color: #000000;
+  }
+
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .search-input {
+    width: 260px;
+    height: 40px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 10px;
+    background: #d8d3cc;
+    color: #000000;
+    font-size: 18px;
+    outline: none;
+  }
+
+  .search-input::placeholder {
+    color: #000000;
+    opacity: 1;
+  }
+
+  .search-button {
+    height: 40px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: #d8d3cc;
+    color: #000000;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .category-bar {
+    width: 100%;
+    background: #393737;
+  }
+
+  .category-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
     white-space: nowrap;
-    padding-top: 4px;
+    scrollbar-width: thin;
+  }
+
+  .category-inner :global(a) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 54px;
+    padding: 0 18px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .category-inner :global(a:hover) {
+    color: #ffffff;
+  }
+
+  .category-inner :global(a::after) {
+    content: '';
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 8px;
+    height: 4px;
+    background: transparent;
+  }
+
+  .category-inner :global(a:hover::after) {
+    background: #e8383d;
+  }
+
+  .category-inner :global(a[aria-current='page']::after) {
+    background: #e8383d;
   }
 
   .header-word-bar {
     width: 100%;
     background: #ffffff;
-    border-top: 1px solid #ececec;
-    border-bottom: 1px solid #ececec;
   }
 
-  .header-word-list {
-    max-width: 1200px;
+  .header-word-inner {
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 10px 16px;
+    padding: 11px 14px 13px;
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 34px;
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: thin;
   }
 
   .header-word-link {
-    display: inline-block;
-    font-size: 14px;
-    line-height: 1.4;
-    color: #393737;
-    text-decoration: none;
+    color: #111111;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   .header-word-link:hover {
-    color: #e8383d;
+    color: #111111;
   }
 
   .header-word-empty {
-    max-width: 1200px;
-    margin: 0 auto;
-    min-height: 42px;
-    padding: 0 16px;
-  }
-
-  .menu-bar {
+    min-height: 24px;
     width: 100%;
-    background: #393737;
-  }
-
-  .menu-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: thin;
   }
 
   .bottom-line {
     width: 100%;
-    height: 4px;
+    height: 16px;
     background: #872732;
   }
 
-  @media (max-width: 767px) {
-    .top-area {
-      padding: 14px 12px 12px;
-      gap: 12px;
-    }
-
-    .logo-image {
-      width: 180px;
-    }
-
-    .country-name {
-      font-size: 12px;
-    }
-
-    .language-name {
-      font-size: 12px;
-    }
-
-    .header-word-list {
-      padding: 9px 12px;
+  @media (max-width: 900px) {
+    .header-top {
+      flex-direction: column;
+      align-items: stretch;
       gap: 14px;
     }
 
+    .right-area {
+      align-items: flex-start;
+      padding-top: 0;
+    }
+
+    .language-name {
+      font-size: 20px;
+    }
+
+    .country-name {
+      font-size: 20px;
+    }
+
+    .logo-image {
+      width: 280px;
+    }
+
+    .search-form {
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      flex: 1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .header-top {
+      padding: 10px 12px 8px;
+    }
+
+    .logo-image {
+      width: 240px;
+    }
+
+    .country-name {
+      font-size: 18px;
+    }
+
+    .language-name {
+      font-size: 18px;
+    }
+
+    .search-input,
+    .search-button {
+      height: 38px;
+      font-size: 16px;
+    }
+
+    .category-inner {
+      padding: 0 12px;
+    }
+
+    .category-inner :global(a) {
+      height: 48px;
+      padding: 0 14px;
+      font-size: 16px;
+    }
+
+    .category-inner :global(a::after) {
+      left: 14px;
+      right: 14px;
+      bottom: 7px;
+    }
+
+    .header-word-inner {
+      padding: 10px 12px 12px;
+      gap: 22px;
+    }
+
     .header-word-link {
-      font-size: 13px;
+      font-size: 15px;
     }
 
-    .header-word-empty {
-      min-height: 38px;
-      padding: 0 12px;
-    }
-
-    .menu-inner {
-      padding: 0 12px;
-      gap: 16px;
+    .bottom-line {
+      height: 14px;
     }
   }
 </style>
