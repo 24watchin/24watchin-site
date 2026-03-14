@@ -11,6 +11,20 @@ const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
+
+const formatPostTime = (dateString) => {
+  if (!dateString) return '';
+  try {
+    return new Date(dateString).toLocaleString('ja-JP', {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return '';
+  }
+};
 ---
 
 <div class="top-news-container">
@@ -22,7 +36,12 @@ const getImageUrl = (content) => {
             <img src={getImageUrl(posts[0].content)} alt={posts[0].title} />
           </div>
           <div class="hero-text">
-            <h2>{posts[0].title}</h2>
+            <h2>
+              {posts[0].title}
+              {posts[0].published && (
+                <span class="post-time">{formatPostTime(posts[0].published)}</span>
+              )}
+            </h2>
           </div>
         </a>
       </article>
@@ -36,7 +55,12 @@ const getImageUrl = (content) => {
               <img src={getImageUrl(post.content)} alt={post.title} />
             </div>
             <div class="grid-text">
-              <h3>{post.title}</h3>
+              <h3>
+                {post.title}
+                {post.published && (
+                  <span class="post-time">{formatPostTime(post.published)}</span>
+                )}
+              </h3>
             </div>
           </a>
         </article>
@@ -45,10 +69,15 @@ const getImageUrl = (content) => {
   </div>
 
   <div class="side-list-column">
-    {posts.slice(5, 13).map((post) => (
+    {posts.slice(5, 12).map((post) => (
       <article class="list-item">
         <a href={`/jp/jp/news/${post.id}/`}>
-          <h4>{post.title}</h4>
+          <h4>
+            {post.title}
+            {post.published && (
+              <span class="post-time">{formatPostTime(post.published)}</span>
+            )}
+          </h4>
         </a>
       </article>
     ))}
@@ -136,6 +165,10 @@ const getImageUrl = (content) => {
     font-weight: 700;
     margin: 0;
     color: #111111;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .side-list-column {
@@ -165,6 +198,14 @@ const getImageUrl = (content) => {
     font-weight: 700;
     margin: 0;
     color: #111111;
+  }
+
+  .post-time {
+    margin-left: 8px;
+    font-size: 16px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: #8a8a8a;
   }
 
   .hero-post a:hover .hero-text h2,
