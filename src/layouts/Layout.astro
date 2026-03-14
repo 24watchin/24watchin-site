@@ -5,6 +5,21 @@ const {
   sidebarType = 'top'
 } = Astro.props;
 
+const navCategories = [
+  { label: '文化・エンタメ', slug: 'culture-entertainment' },
+  { label: '政治', slug: 'politics' },
+  { label: '社会', slug: 'society' },
+  { label: '国際', slug: 'international' },
+  { label: '経済', slug: 'economy' },
+  { label: '環境・エネルギー', slug: 'environment-energy' },
+  { label: 'ビジネス', slug: 'business' },
+  { label: 'テクノロジー・AI', slug: 'technology-ai' },
+  { label: 'スポーツ', slug: 'sports' },
+  { label: '健康・ライフ', slug: 'health-life' },
+  { label: '交通', slug: 'transport' },
+  { label: '天気', slug: 'weather' },
+];
+
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
@@ -153,15 +168,11 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
 
         <nav>
           <ul class="nav-categories">
-            <li><a href="/jp/jp/">TOP</a></li>
-            <li><a href="/jp/jp/category/international">国際</a></li>
-            <li><a href="/jp/jp/category/business">ビジネス</a></li>
-            <li><a href="/jp/jp/category/science">科学</a></li>
-            <li><a href="/jp/jp/category/local">地域</a></li>
-            <li><a href="/jp/jp/category/politics">政治経済</a></li>
-            <li><a href="/jp/jp/category/industry">産業</a></li>
-            <li><a href="/jp/jp/category/life">ライフ・教養</a></li>
-            <li><a href="/jp/jp/category/special">特集</a></li>
+            {navCategories.map((category) => (
+              <li>
+                <a href={`/jp/jp/category/${category.slug}`}>{category.label}</a>
+              </li>
+            ))}
           </ul>
         </nav>
       </div>
