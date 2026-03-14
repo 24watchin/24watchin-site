@@ -3,7 +3,7 @@ const { title, cityData = [] } = Astro.props;
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
-  return match ? match[1] : 'https://placehold.co/120x80/eeeeee/999999?text=No+Image';
+  return match ? match[1] : 'https://placehold.co/124x83/eeeeee/999999?text=No+Image';
 };
 
 const formatPostTime = (dateString) => {
@@ -50,8 +50,16 @@ const getDisplayCategory = (post) => {
         <div class="article-3-grid">
           {city.posts.slice(0, 3).map((post) => (
             <a href={`/jp/jp/news/${post.id}/`} class="news-item">
-              <div class="thumbnail">
-                <img src={getImageUrl(post.content)} alt={post.title} />
+              <div class="media-column">
+                <div class="thumbnail">
+                  <img src={getImageUrl(post.content)} alt={post.title} />
+                </div>
+
+                <div class="image-date-row">
+                  {post.published && (
+                    <span class="post-time">{formatPostTime(post.published)}</span>
+                  )}
+                </div>
               </div>
 
               <div class="info">
@@ -59,12 +67,6 @@ const getDisplayCategory = (post) => {
 
                 <div class="category-row">
                   <span class="category-badge">{getDisplayCategory(post)}</span>
-                </div>
-
-                <div class="date-row">
-                  {post.published && (
-                    <span class="post-time">{formatPostTime(post.published)}</span>
-                  )}
                 </div>
               </div>
             </a>
@@ -82,7 +84,7 @@ const getDisplayCategory = (post) => {
   }
 
   .region-header {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .region-title {
@@ -102,25 +104,30 @@ const getDisplayCategory = (post) => {
   .city-groups {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 0;
   }
 
   .city-block {
     width: 100%;
+    padding: 12px 0;
+  }
+
+  .city-block + .city-block {
+    border-top: 1px solid #d9d9d9;
   }
 
   .city-name {
-    margin: 0 0 16px;
+    margin: 0 0 14px;
     font-size: 20px;
     line-height: 1.2;
-    font-weight: 400;
+    font-weight: 700;
     color: #111111;
   }
 
   .article-3-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px 24px;
+    gap: 16px 24px;
   }
 
   .news-item {
@@ -132,10 +139,14 @@ const getDisplayCategory = (post) => {
     min-width: 0;
   }
 
-  .thumbnail {
-    width: 120px;
-    height: 80px;
+  .media-column {
+    width: 124px;
     flex-shrink: 0;
+  }
+
+  .thumbnail {
+    width: 124px;
+    aspect-ratio: 3 / 2;
     overflow: hidden;
     border-radius: 4px;
     background: #eeeeee;
@@ -146,6 +157,13 @@ const getDisplayCategory = (post) => {
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  .image-date-row {
+    margin-top: 5px;
+    width: 124px;
+    text-align: right;
+    min-height: 24px;
   }
 
   .info {
@@ -179,17 +197,11 @@ const getDisplayCategory = (post) => {
     display: inline-block;
     padding: 2px 8px;
     border-radius: 2px;
-    background: #f4a460;
-    color: #696969;
+    background: #4d4d4d;
+    color: #ffffff;
     font-size: 14px;
     line-height: 1.2;
     font-weight: 400;
-  }
-
-  .date-row {
-    margin-top: 6px;
-    text-align: left;
-    min-height: 24px;
   }
 
   .post-time {
@@ -217,9 +229,10 @@ const getDisplayCategory = (post) => {
       grid-template-columns: 1fr;
     }
 
-    .thumbnail {
-      width: 110px;
-      height: 74px;
+    .media-column,
+    .thumbnail,
+    .image-date-row {
+      width: 116px;
     }
   }
 </style>
