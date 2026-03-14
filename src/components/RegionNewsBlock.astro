@@ -45,8 +45,6 @@ const getDisplayCategory = (post) => {
   <div class="city-groups">
     {cityData.map((city) => (
       <div class="city-block">
-        <h3 class="city-name">{city.cityName}</h3>
-
         <div class="article-3-grid">
           {city.posts.slice(0, 3).map((post) => (
             <a href={`/jp/jp/news/${post.id}/`} class="news-item">
@@ -83,8 +81,12 @@ const getDisplayCategory = (post) => {
     margin-bottom: 56px;
   }
 
+  .region-section + .region-section {
+    margin-top: 10px;
+  }
+
   .region-header {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .region-title {
@@ -97,7 +99,7 @@ const getDisplayCategory = (post) => {
 
   .region-line {
     width: 100%;
-    height: 3px;
+    height: 4px;
     background: #872732;
   }
 
@@ -109,19 +111,11 @@ const getDisplayCategory = (post) => {
 
   .city-block {
     width: 100%;
-    padding: 12px 0;
+    padding: 10px 0;
   }
 
   .city-block + .city-block {
     border-top: 1px solid #d9d9d9;
-  }
-
-  .city-name {
-    margin: 0 0 14px;
-    font-size: 20px;
-    line-height: 1.2;
-    font-weight: 700;
-    color: #111111;
   }
 
   .article-3-grid {
@@ -160,10 +154,10 @@ const getDisplayCategory = (post) => {
   }
 
   .image-date-row {
-    margin-top: 5px;
+    margin-top: 3px;
     width: 124px;
     text-align: right;
-    min-height: 24px;
+    min-height: 20px;
   }
 
   .info {
@@ -205,8 +199,8 @@ const getDisplayCategory = (post) => {
   }
 
   .post-time {
-    font-size: 16px;
-    line-height: 1.45;
+    font-size: 14px;
+    line-height: 1.35;
     font-weight: 400;
     color: #8a8a8a;
   }
