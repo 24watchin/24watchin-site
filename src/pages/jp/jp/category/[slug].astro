@@ -3,21 +3,21 @@ import Layout from '../../../../layouts/Layout.astro';
 import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
 
-const categories = [
-  { slug: 'politics', name: '政治' },
-  { slug: 'society', name: '社会' },
-  { slug: 'international', name: '国際' },
-  { slug: 'economy', name: '経済' },
-  { slug: 'environment-energy', name: '環境・エネルギー' },
-  { slug: 'business', name: 'ビジネス' },
-  { slug: 'technology-ai', name: 'テクノロジー・AI' },
-  { slug: 'entertainment', name: '文化・エンタメ' },
-  { slug: 'sports', name: 'スポーツ' },
-  { slug: 'traffic', name: '交通' },
-  { slug: 'weather', name: '天気' },
-];
-
 export async function getStaticPaths() {
+  const categories = [
+    { slug: 'politics', name: '政治' },
+    { slug: 'society', name: '社会' },
+    { slug: 'international', name: '国際' },
+    { slug: 'economy', name: '経済' },
+    { slug: 'environment-energy', name: '環境・エネルギー' },
+    { slug: 'business', name: 'ビジネス' },
+    { slug: 'technology-ai', name: 'テクノロジー・AI' },
+    { slug: 'entertainment', name: '文化・エンタメ' },
+    { slug: 'sports', name: 'スポーツ' },
+    { slug: 'traffic', name: '交通' },
+    { slug: 'weather', name: '天気' },
+  ];
+
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
