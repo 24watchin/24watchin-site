@@ -45,7 +45,7 @@ const getImageUrl = (content) => {
   </div>
 
   <div class="side-list-column">
-    {posts.slice(5, 11).map((post) => (
+    {posts.slice(5, 13).map((post) => (
       <article class="list-item">
         <a href={`/jp/jp/news/${post.id}/`}>
           <h4>{post.title}</h4>
@@ -70,7 +70,7 @@ const getImageUrl = (content) => {
 
   .hero-post a {
     display: grid;
-    grid-template-columns: 1.05fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.03fr);
     gap: 18px;
     text-decoration: none;
     color: #111111;
