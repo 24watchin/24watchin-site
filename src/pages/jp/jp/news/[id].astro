@@ -4,44 +4,44 @@ import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
 
-async function fetchAllPosts() {
-  const API_KEY = import.meta.env.API_KEY;
-  const BLOG_ID = import.meta.env.BLOG_ID;
+export async function getStaticPaths() {
+  async function fetchAllPosts() {
+    const API_KEY = import.meta.env.API_KEY;
+    const BLOG_ID = import.meta.env.BLOG_ID;
 
-  let allPosts = [];
-  let pageToken = '';
+    let allPosts = [];
+    let pageToken = '';
 
-  while (true) {
-    const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
-    url.searchParams.set('key', API_KEY);
-    url.searchParams.set('maxResults', '100');
+    while (true) {
+      const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
+      url.searchParams.set('key', API_KEY);
+      url.searchParams.set('maxResults', '100');
 
-    if (pageToken) {
-      url.searchParams.set('pageToken', pageToken);
+      if (pageToken) {
+        url.searchParams.set('pageToken', pageToken);
+      }
+
+      const response = await fetch(url.toString());
+
+      if (!response.ok) {
+        throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const items = data.items || [];
+
+      allPosts.push(...items);
+
+      if (!data.nextPageToken) {
+        break;
+      }
+
+      pageToken = data.nextPageToken;
     }
 
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const items = data.items || [];
-
-    allPosts.push(...items);
-
-    if (!data.nextPageToken) {
-      break;
-    }
-
-    pageToken = data.nextPageToken;
+    return allPosts;
   }
 
-  return allPosts;
-}
-
-export async function getStaticPaths() {
   const posts = await fetchAllPosts();
 
   const sortedPosts = [...posts].sort((a, b) => {
