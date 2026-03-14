@@ -7,7 +7,6 @@ const searchAction = '/jp/jp/search';
 const homeHref = '/jp/jp/';
 
 const navCategories = [
-  { label: '文化・エンタメ', slug: 'culture-entertainment' },
   { label: '政治', slug: 'politics' },
   { label: '社会', slug: 'society' },
   { label: '国際', slug: 'international' },
@@ -15,8 +14,15 @@ const navCategories = [
   { label: '環境・エネルギー', slug: 'environment-energy' },
   { label: 'ビジネス', slug: 'business' },
   { label: 'テクノロジー・AI', slug: 'technology-ai' },
+  { label: '文化・エンタメ', slug: 'culture-entertainment' },
   { label: 'スポーツ', slug: 'sports' },
-  { label: '健康・ライフ', slug: 'health-life' },
+];
+
+const headerWords = [
+  // ここに今後ワードや特集を入れます
+  // 例:
+  // { label: 'イラン情勢', href: '/jp/jp/search?q=イラン情勢' },
+  // { label: '特集ページ', href: '/jp/jp/special/example' },
 ];
 ---
 
@@ -56,6 +62,12 @@ const navCategories = [
         ))}
       </div>
     </nav>
+
+    <div class="header-word-row">
+      {headerWords.map((word) => (
+        <a href={word.href} class="header-word-link">{word.label}</a>
+      ))}
+    </div>
 
     <div class="header-accent-line" aria-hidden="true"></div>
   </div>
@@ -107,13 +119,15 @@ const navCategories = [
   }
 
   .brand-country {
-    margin-top: 6px;
-    font-size: 14px;
+    margin-top: 8px;
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.04em;
     color: #111;
     line-height: 1;
-    text-align: center;
+    text-align: right;
+    align-self: flex-end;
+    padding-right: 2px;
   }
 
   .header-tools {
@@ -176,8 +190,36 @@ const navCategories = [
     display: none;
   }
 
+  .header-word-row {
+    min-height: 46px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 0 18px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .header-word-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-word-link {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    text-decoration: none;
+    line-height: 1;
+  }
+
+  .header-word-link:hover {
+    text-decoration: underline;
+  }
+
   .header-accent-line {
-    height: 12px;
+    height: 14px;
     background: #872732;
   }
 
@@ -207,7 +249,7 @@ const navCategories = [
     }
 
     .brand-country {
-      font-size: 13px;
+      font-size: 17px;
     }
 
     .language-label {
@@ -223,8 +265,18 @@ const navCategories = [
       min-width: 0;
     }
 
+    .header-word-row {
+      min-height: 42px;
+      padding: 0 14px;
+      gap: 24px;
+    }
+
+    .header-word-link {
+      font-size: 16px;
+    }
+
     .header-accent-line {
-      height: 10px;
+      height: 12px;
     }
   }
 </style>
