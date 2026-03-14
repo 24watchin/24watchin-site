@@ -3,32 +3,50 @@ import Layout from '../../../../layouts/Layout.astro';
 import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
 
+const categories = [
+  { slug: 'politics', name: '政治' },
+  { slug: 'society', name: '社会' },
+  { slug: 'international', name: '国際' },
+  { slug: 'economy', name: '経済' },
+  { slug: 'environment-energy', name: '環境・エネルギー' },
+  { slug: 'business', name: 'ビジネス' },
+  { slug: 'technology-ai', name: 'テクノロジー・AI' },
+  { slug: 'entertainment', name: '文化・エンタメ' },
+  { slug: 'sports', name: 'スポーツ' },
+];
+
 export async function getStaticPaths() {
-  const categories = [
-    { slug: 'international', name: '国際' }, { slug: 'business', name: 'ビジネス' },
-    { slug: 'science', name: '科学' }, { slug: 'local', name: '地域' },
-    { slug: 'politics', name: '政治経済' }, { slug: 'industry', name: '産業' },
-    { slug: 'life', name: 'ライフ・教養' }, { slug: 'special', name: '特集' },
-  ];
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+
   const response = await fetch(url);
   const data = await response.json();
   const allPosts = data.items || [];
+
   return categories.map((category) => {
-    const filteredPosts = allPosts.filter((post) => post.labels && post.labels.includes(category.name));
-    return { params: { slug: category.slug }, props: { categoryName: category.name, posts: filteredPosts } };
+    const filteredPosts = allPosts.filter(
+      (post) => post.labels && post.labels.includes(category.name)
+    );
+
+    return {
+      params: { slug: category.slug },
+      props: {
+        categoryName: category.name,
+        posts: filteredPosts,
+      },
+    };
   });
 }
+
 const { categoryName, posts } = Astro.props;
+
 const getImageUrl = (content) => {
-  const match = content.match(/<img[^>]+src="([^">]+)"/);
+  const match = content?.match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
 ---
 
-{/* ここがポイント！ sidebarType="category" と指定することで、自動でサイドバーが切り替わります */}
 <Layout title={categoryName} sidebarType="category">
   {posts.length > 0 ? (
     <>
@@ -43,6 +61,17 @@ const getImageUrl = (content) => {
 </Layout>
 
 <style>
-  .divider { border: 0; border-top: 1px solid #eee; margin: 3rem 0; }
-  .section-title { font-size: 1.5rem; border-left: 5px solid #1e3a8a; padding-left: 1rem; font-weight: bold; margin-bottom: 2rem; }
+  .divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 3rem 0;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    border-left: 5px solid #1e3a8a;
+    padding-left: 1rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
 </style>
