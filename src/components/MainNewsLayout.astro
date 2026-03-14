@@ -36,12 +36,10 @@ const formatPostTime = (dateString) => {
             <img src={getImageUrl(posts[0].content)} alt={posts[0].title} />
           </div>
           <div class="hero-text">
-            <h2>
-              {posts[0].title}
-              {posts[0].published && (
-                <span class="post-time">{formatPostTime(posts[0].published)}</span>
-              )}
-            </h2>
+            <h2 class="hero-title">{posts[0].title}</h2>
+            {posts[0].published && (
+              <div class="hero-time">{formatPostTime(posts[0].published)}</div>
+            )}
           </div>
         </a>
       </article>
@@ -55,12 +53,10 @@ const formatPostTime = (dateString) => {
               <img src={getImageUrl(post.content)} alt={post.title} />
             </div>
             <div class="grid-text">
-              <h3>
-                {post.title}
-                {post.published && (
-                  <span class="post-time">{formatPostTime(post.published)}</span>
-                )}
-              </h3>
+              <h3 class="grid-title">{post.title}</h3>
+              {post.published && (
+                <div class="grid-time">{formatPostTime(post.published)}</div>
+              )}
             </div>
           </a>
         </article>
@@ -69,15 +65,13 @@ const formatPostTime = (dateString) => {
   </div>
 
   <div class="side-list-column">
-    {posts.slice(5, 12).map((post) => (
+    {posts.slice(5, 10).map((post) => (
       <article class="list-item">
         <a href={`/jp/jp/news/${post.id}/`}>
-          <h4>
-            {post.title}
-            {post.published && (
-              <span class="post-time">{formatPostTime(post.published)}</span>
-            )}
-          </h4>
+          <h4 class="list-title">{post.title}</h4>
+          {post.published && (
+            <div class="list-time">{formatPostTime(post.published)}</div>
+          )}
         </a>
       </article>
     ))}
@@ -120,12 +114,29 @@ const formatPostTime = (dateString) => {
     display: block;
   }
 
-  .hero-text h2 {
+  .hero-text {
+    min-width: 0;
+  }
+
+  .hero-title {
     font-size: 24px;
     line-height: 1.45;
     font-weight: 700;
     margin: 0;
     color: #111111;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hero-time {
+    margin-top: 6px;
+    font-size: 16px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: #8a8a8a;
+    text-align: left;
   }
 
   .sub-grid {
@@ -159,7 +170,14 @@ const formatPostTime = (dateString) => {
     display: block;
   }
 
-  .grid-text h3 {
+  .grid-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .grid-title {
     font-size: 16px;
     line-height: 1.45;
     font-weight: 700;
@@ -169,6 +187,15 @@ const formatPostTime = (dateString) => {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .grid-time {
+    margin-top: 4px;
+    font-size: 16px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: #8a8a8a;
+    text-align: left;
   }
 
   .side-list-column {
@@ -192,25 +219,30 @@ const formatPostTime = (dateString) => {
     display: block;
   }
 
-  .list-item h4 {
+  .list-title {
     font-size: 16px;
     line-height: 1.45;
     font-weight: 700;
     margin: 0;
     color: #111111;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .post-time {
-    margin-left: 8px;
+  .list-time {
+    margin-top: 4px;
     font-size: 16px;
     line-height: 1.45;
     font-weight: 400;
     color: #8a8a8a;
+    text-align: left;
   }
 
-  .hero-post a:hover .hero-text h2,
-  .grid-item a:hover .grid-text h3,
-  .list-item a:hover h4 {
+  .hero-post a:hover .hero-title,
+  .grid-item a:hover .grid-title,
+  .list-item a:hover .list-title {
     text-decoration-line: underline;
     text-decoration-color: #000000;
     text-decoration-thickness: 1px;
