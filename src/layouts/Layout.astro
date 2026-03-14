@@ -1,8 +1,8 @@
 ---
-const { 
-  title, 
-  description = '24Watchinは、世界中の最新ニュースを日本語でお届けするグローバルメディアです。', 
-  sidebarType = 'top' 
+const {
+  title,
+  description = '24Watchinは、世界中の最新ニュースを日本語でお届けするグローバルメディアです。',
+  sidebarType = 'top'
 } = Astro.props;
 
 import '../styles/global.css';
@@ -19,65 +19,138 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
     <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
     <meta name="description" content={description} />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
     <style>
-      body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
-      .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-      header { background-color: #fff; border-bottom: 1px solid #eee; padding: 20px 0; position: sticky; top: 0; z-index: 1000; }
-      .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-      .logo { font-size: 32px; font-weight: 800; color: #872732; text-decoration: none; letter-spacing: -1px; }
-      .search-form { display: flex; }
-      .search-form input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; outline: none; width: 200px; }
-      .search-form button { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 0 4px 4px 0; cursor: pointer; }
-      nav { border-top: 1px solid #eee; padding-top: 15px; }
-      .nav-categories { list-style: none; padding: 0; margin: 0; display: flex; gap: 20px; overflow-x: auto; white-space: nowrap; }
-      .nav-categories li a { text-decoration: none; color: #555; font-size: 14px; font-weight: bold; }
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        background-color: #f8f9fa;
+        color: #333;
+      }
 
-      /* ▼▼▼ ここからが「根本解決」のコードです ▼▼▼ */
-      .main-layout { 
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      header {
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .logo {
+        font-size: 32px;
+        font-weight: 800;
+        color: #872732;
+        text-decoration: none;
+        letter-spacing: -1px;
+      }
+
+      .search-form {
+        display: flex;
+      }
+
+      .search-form input {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px 0 0 4px;
+        outline: none;
+        width: 200px;
+      }
+
+      .search-form button {
+        background: #333;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+      }
+
+      nav {
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+      }
+
+      .nav-categories {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .nav-categories li a {
+        text-decoration: none;
+        color: #555;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .page-shell {
+        margin-top: 30px;
+      }
+
+      .main-layout {
         display: grid;
-        /* はみ出し防止のため 1fr を minmax(0, 1fr) に変更 */
-        grid-template-columns: minmax(0, 1fr) 300px; 
-        gap: 40px; 
-        margin-top: 30px; 
-        align-items: start !important; /* 全体を強制的に上揃え */
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 40px;
+        align-items: start;
       }
 
-      /* global.css にある「中央寄せ」などの悪影響を完全にブロックします */
-      .main-layout > main {
-        display: block !important;
+      .content-area,
+      .sidebar-area {
+        display: block;
         width: 100%;
         min-width: 0;
-        margin: 0 !important;
-        padding: 0 !important;
-        align-self: start !important; /* 本文の箱を一番上に固定 */
+        margin: 0;
+        padding: 0;
+        align-self: start;
       }
 
-      .main-layout > aside {
-        display: block !important;
+      .bottom-wide {
+        margin-top: 50px;
         width: 100%;
-        min-width: 0;
-        margin: 0 !important;
-        padding: 0 !important;
-        align-self: start !important; /* サイドバーの箱を一番上に固定 */
       }
-      /* ▲▲▲ ここまで ▲▲▲ */
 
       @media (max-width: 900px) {
-        .main-layout { grid-template-columns: minmax(0, 1fr); }
-        aside { display: none; }
+        .main-layout {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .sidebar-area {
+          display: none;
+        }
       }
     </style>
   </head>
+
   <body>
     <header>
       <div class="container">
         <div class="header-top">
           <a href="/jp/jp/" class="logo">24Watchin</a>
+
           <form action="/jp/jp/search" method="get" class="search-form">
             <input type="text" name="q" placeholder="検索..." required />
             <button type="submit"><i class="fas fa-search"></i></button>
           </form>
         </div>
+
         <nav>
           <ul class="nav-categories">
             <li><a href="/jp/jp/">TOP</a></li>
@@ -94,19 +167,28 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
       </div>
     </header>
 
-    <div class="container" style="margin-top: 30px;">
+    <div class="container page-shell">
       <slot name="top-full" />
+
       <div class="main-layout">
-        <main><slot /></main>
-        <aside>
-          {sidebarType === 'category' ? <CategorySidebar /> : 
-           sidebarType === 'article' ? <ArticleSidebar /> : <Sidebar />}
+        <main class="content-area">
+          <slot />
+        </main>
+
+        <aside class="sidebar-area">
+          {sidebarType === 'category'
+            ? <CategorySidebar />
+            : sidebarType === 'article'
+              ? <ArticleSidebar />
+              : <Sidebar />}
         </aside>
       </div>
-      <div style="margin-top: 50px; width: 100%;">
+
+      <div class="bottom-wide">
         <slot name="bottom-wide" />
       </div>
     </div>
+
     <Footer />
   </body>
 </html>
