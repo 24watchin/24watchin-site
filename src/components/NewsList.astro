@@ -7,16 +7,16 @@ const { posts, getImageUrl } = Astro.props;
   <div class="more-news-list" id="news-list">
     {posts.map((post, index) => (
       <article class={`list-item ${index >= 5 ? 'is-hidden' : ''}`}>
-        {/* ★ ここを日本版の住所（/jp/jp/）に修正しました！ */}
         <a href={`/jp/jp/news/${post.id}/`} class="item-link">
           <div class="image-wrapper">
-            <img 
-              src={getImageUrl(post.content)} 
-              alt={post.title} 
+            <img
+              src={getImageUrl(post.content)}
+              alt={post.title}
               class="list-image"
-              loading="lazy" 
+              loading="lazy"
             />
           </div>
+
           <div class="list-content">
             <h4 class="list-title">{post.title}</h4>
             <time datetime={post.published} class="date">
@@ -28,7 +28,6 @@ const { posts, getImageUrl } = Astro.props;
     ))}
   </div>
 
-  {/* リストに6記事目（全体で11記事目）があればボタンを出します */}
   {posts.length > 5 && (
     <div class="button-container">
       <button id="load-more-btn" class="load-more-button">
@@ -40,11 +39,9 @@ const { posts, getImageUrl } = Astro.props;
 
 <script>
   const btn = document.getElementById('load-more-btn');
-  // 隠れている記事をすべて取得します
   const listItems = Array.from(document.querySelectorAll('.list-item.is-hidden'));
   let currentVisible = 0;
   const increment = 5;
-  // ボタンを押すごとに5件ずつ出す設定
 
   if (btn) {
     btn.addEventListener('click', () => {
@@ -63,21 +60,74 @@ const { posts, getImageUrl } = Astro.props;
 </script>
 
 <style>
-  .more-news-list { display: flex; flex-direction: column; gap: 1.5rem; }
-  .list-item.is-hidden { display: none; }
-  .item-link { display: flex; gap: 1.2rem; text-decoration: none; color: #333; }
-  .image-wrapper { width: 140px; height: 90px; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
-  .list-image { width: 100%; height: 100%; object-fit: cover; }
-  .list-title { font-size: 1.1rem; margin: 0 0 0.5rem 0; line-height: 1.4; font-weigh.list-title {
-  font-size: 1.1rem;
-  margin: 0 0 0.5rem 0;
-  line-height: 1.4;
-  font-weight: bold;
-  color: #333;
-}t: bold; }
-  .date { font-size: 0.85rem; color: #888; }
+  .more-news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-  .button-container { text-align: center; margin-top: 3rem; }
+  .list-item.is-hidden {
+    display: none;
+  }
+
+  .item-link {
+    display: flex;
+    gap: 1.2rem;
+    text-decoration: none;
+    color: #333;
+  }
+
+  .item-link:hover,
+  .item-link:focus-visible {
+    text-decoration: none;
+    color: #333;
+  }
+
+  .item-link:hover .list-title,
+  .item-link:focus-visible .list-title {
+    text-decoration: underline;
+    text-decoration-color: #000;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  .image-wrapper {
+    width: 140px;
+    height: 90px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .list-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .list-content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .list-title {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+
+  .button-container {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
   .load-more-button {
     background: #fff;
     border: 2px solid #1e3a8a;
@@ -89,10 +139,20 @@ const { posts, getImageUrl } = Astro.props;
     cursor: pointer;
     transition: all 0.3s;
   }
-  .load-more-button:hover { background: #1e3a8a; color: #fff; }
+
+  .load-more-button:hover {
+    background: #1e3a8a;
+    color: #fff;
+  }
 
   @media (max-width: 600px) {
-    .image-wrapper { width: 100px; height: 70px; }
-    .list-title { font-size: 0.95rem; }
+    .image-wrapper {
+      width: 100px;
+      height: 70px;
+    }
+
+    .list-title {
+      font-size: 0.95rem;
+    }
   }
 </style>
