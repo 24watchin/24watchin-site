@@ -125,7 +125,7 @@ const searchAction = `${basePath}/search`;
     </div>
   </div>
 
-  <nav class="category-bar" aria-label={labels.categoryBarAriaLabel}>
+  <nav class:list={['category-bar', `locale-${locale}`]} aria-label={labels.categoryBarAriaLabel}>
     <div class="category-inner">
       {categoryItems.map((item) => (
         <a
@@ -290,18 +290,23 @@ const searchAction = `${basePath}/search`;
   }
 
   .category-link {
-    display: inline-flex;
-    align-items: center;
-    height: 54px;
-    padding: 0 18px;
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1;
-    border-bottom: none;
-    box-shadow: none;
-  }
+  display: inline-flex;
+  align-items: center;
+  height: 54px;
+  padding: 0 18px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.locale-en .category-link {
+  padding: 0 8px;
+  font-size: 14px;
+}
 
   .category-link::before,
   .category-link::after {
