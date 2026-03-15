@@ -1,11 +1,21 @@
 ---
-const { countryLabel = '日本', categoryLabel = 'ニュース' } = Astro.props;
+const {
+  countryLabel = '日本',
+  countryHref = '/jp/jp/',
+  categoryLabel = 'ニュース',
+  categoryHref = '',
+} = Astro.props;
 ---
 
 <nav class="breadcrumb" aria-label="パンくずリスト">
-  <span class="breadcrumb-item">{countryLabel}</span>
+  <a href={countryHref} class="breadcrumb-link">{countryLabel}</a>
   <span class="breadcrumb-separator">＞</span>
-  <span class="breadcrumb-item current">{categoryLabel}</span>
+
+  {categoryHref ? (
+    <a href={categoryHref} class="breadcrumb-link current">{categoryLabel}</a>
+  ) : (
+    <span class="breadcrumb-link current">{categoryLabel}</span>
+  )}
 </nav>
 
 <style>
@@ -20,13 +30,23 @@ const { countryLabel = '日本', categoryLabel = 'ニュース' } = Astro.props;
     flex-wrap: wrap;
   }
 
-  .breadcrumb-item {
+  .breadcrumb-link {
     color: #666;
+    text-decoration: none;
   }
 
-  .breadcrumb-item.current {
+  .breadcrumb-link.current {
     color: #1a1a1a;
     font-weight: 700;
+  }
+
+  .breadcrumb-link:hover,
+  .breadcrumb-link:focus-visible {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: #000;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
   }
 
   .breadcrumb-separator {
