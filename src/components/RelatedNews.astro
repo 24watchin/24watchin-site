@@ -1,5 +1,5 @@
 ---
-const { recentPosts } = Astro.props;
+const { relatedPosts = [] } = Astro.props;
 
 const getImageUrl = (content) => {
   if (!content) return 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
@@ -10,53 +10,138 @@ const getImageUrl = (content) => {
 
 <div class="bottom-section">
   <h3 class="section-title">関連記事</h3>
-  <div class="related-grid">
-    {recentPosts && recentPosts.map((rp) => (
-      <a href={`/jp/jp/news/${rp.id}/`} class="related-card">
-        <div class="related-img-wrapper">
-          <img src={getImageUrl(rp.content)} alt={rp.title} />
-        </div>
-        <div class="related-text">
-          <h4>{rp.title}</h4>
-          <span class="tag-link"># 関連ニュース</span>
-        </div>
-      </a>
-    ))}
-  </div>
+
+  {relatedPosts.length > 0 ? (
+    <div class="related-grid">
+      {relatedPosts.map((rp) => (
+        <a href={`/jp/jp/news/${rp.id}/`} class="related-card">
+          <div class="related-img-wrapper">
+            <img src={getImageUrl(rp.content)} alt={rp.title} />
+          </div>
+
+          <div class="related-text">
+            <h4>{rp.title}</h4>
+
+            {rp.matchedKeywordLabels && rp.matchedKeywordLabels.length > 0 && (
+              <div class="tag-row" aria-label="関連キーワード">
+                {rp.matchedKeywordLabels.slice(0, 3).map((tag) => (
+                  <span class="tag-chip">#{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  ) : (
+    <p class="empty-text">関連記事はまだありません。</p>
+  )}
 </div>
 
 <style>
-  .bottom-section { margin-bottom: 50px; }
-  .section-title { 
-    font-size: 22px; 
-    color: #333; 
-    margin-bottom: 20px; 
-    border-bottom: 3px solid #1e3a8a; 
-    padding-bottom: 10px; 
-    display: inline-block; 
+  .bottom-section {
+    margin-bottom: 50px;
   }
-  .related-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-    gap: 20px; 
+
+  .section-title {
+    font-size: 22px;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #872732;
+    padding-bottom: 10px;
+    display: inline-block;
   }
-  .related-card { text-decoration: none; color: #333; display: block; }
-  .related-img-wrapper { 
-    height: 160px; 
-    overflow: hidden; 
-    background: #eee; 
-    margin-bottom: 10px; 
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
   }
-  .related-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-  .related-text h4 { font-size: 15px; margin: 0; line-height: 1.4; }
-  .tag-link { 
-    font-size: 12px; 
-    color: #d97706; 
-    font-weight: bold; 
-    margin-top: 10px; 
-    display: block; 
+
+  .related-card {
+    text-decoration: none;
+    color: #1a1a1a;
+    display: block;
   }
-  @media (max-width: 768px) { 
-    .related-grid { grid-template-columns: 1fr; } 
+
+  .related-card:hover,
+  .related-card:focus-visible {
+    text-decoration: none;
+    color: #1a1a1a;
+  }
+
+  .related-card:hover .related-text h4,
+  .related-card:focus-visible .related-text h4 {
+    text-decoration: underline;
+    text-decoration-color: #000;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  .related-img-wrapper {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #eee;
+    margin-bottom: 10px;
+    border-radius: 6px;
+  }
+
+  .related-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .related-text h4 {
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.5;
+    color: #1a1a1a;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tag-row {
+    margin-top: 10px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: 4px 8px;
+    background: #666666;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 4px;
+    flex: 0 0 auto;
+  }
+
+  .empty-text {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  @media (max-width: 900px) {
+    .related-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
