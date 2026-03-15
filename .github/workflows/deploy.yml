@@ -26,6 +26,9 @@ jobs:
 
       - name: Build Astro
         run: npm run build
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          BLOG_ID: ${{ secrets.BLOG_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
