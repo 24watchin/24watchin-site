@@ -1,0 +1,140 @@
+---
+const { articleUrl, articleTitle } = Astro.props;
+
+const encodedUrl = encodeURIComponent(articleUrl || '');
+const encodedTitle = encodeURIComponent(articleTitle || '');
+
+const xUrl = `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+const hatenaUrl = `https://b.hatena.ne.jp/entry/panel/?url=${encodedUrl}`;
+const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`;
+const blueskyUrl = `https://bsky.app/intent/compose?text=${encodedTitle}%20${encodedUrl}`;
+const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encodedUrl}`;
+---
+
+<div class="share-wrap">
+  <div class="share-main">
+    <a href={xUrl} class="share-btn" target="_blank" rel="noopener noreferrer">X</a>
+    <a href={facebookUrl} class="share-btn" target="_blank" rel="noopener noreferrer">FB</a>
+    <a href={mailUrl} class="share-btn">メール</a>
+    <button type="button" class="share-btn share-more-btn" aria-expanded="false" aria-controls="share-more-menu">
+      ・・・
+    </button>
+  </div>
+
+  <div id="share-more-menu" class="share-more" hidden>
+    <a href={hatenaUrl} class="share-btn" target="_blank" rel="noopener noreferrer">はてな</a>
+    <a href={lineUrl} class="share-btn" target="_blank" rel="noopener noreferrer">LINE</a>
+    <a href={blueskyUrl} class="share-btn" target="_blank" rel="noopener noreferrer">Bluesky</a>
+    <button
+      type="button"
+      class="share-btn copy-btn"
+      data-copy-url={articleUrl}
+      data-copy-title={articleTitle}
+    >
+      リンクをコピー
+    </button>
+  </div>
+</div>
+
+<script>
+  const shareWrap = document.querySelector('.share-wrap');
+  const moreBtn = shareWrap?.querySelector('.share-more-btn');
+  const moreMenu = shareWrap?.querySelector('.share-more');
+  const copyBtn = shareWrap?.querySelector('.copy-btn');
+
+  moreBtn?.addEventListener('click', () => {
+    const isOpen = moreBtn.getAttribute('aria-expanded') === 'true';
+    moreBtn.setAttribute('aria-expanded', String(!isOpen));
+    if (moreMenu) {
+      moreMenu.hidden = isOpen;
+    }
+  });
+
+  copyBtn?.addEventListener('click', async () => {
+    const url = copyBtn.getAttribute('data-copy-url') || '';
+    const title = copyBtn.getAttribute('data-copy-title') || '';
+    const text = `${title}\n${url}`.trim();
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'コピーしました';
+      setTimeout(() => {
+        copyBtn.textContent = 'リンクをコピー';
+      }, 1600);
+    } catch {
+      copyBtn.textContent = 'コピー失敗';
+      setTimeout(() => {
+        copyBtn.textContent = 'リンクをコピー';
+      }, 1600);
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!shareWrap || !moreBtn || !moreMenu) return;
+    if (shareWrap.contains(event.target)) return;
+
+    moreBtn.setAttribute('aria-expanded', 'false');
+    moreMenu.hidden = true;
+  });
+</script>
+
+<style>
+  .share-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .share-main,
+  .share-more {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #d6d6d6;
+    border-radius: 18px;
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .share-btn:hover,
+  .share-btn:focus-visible {
+    background: #f3f3f3;
+    border-color: #bdbdbd;
+    text-decoration: none;
+    color: #1a1a1a;
+  }
+
+  .share-more-btn,
+  .copy-btn {
+    font-family: inherit;
+  }
+
+  @media (max-width: 768px) {
+    .share-wrap {
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .share-main,
+    .share-more {
+      justify-content: flex-start;
+    }
+  }
+</style>
