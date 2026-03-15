@@ -1,4 +1,5 @@
 ---
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import Layout from '../../../../layouts/Layout.astro';
 import ShareButtons from '../../../../components/ShareButtons.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
@@ -48,6 +49,7 @@ function formatDateTimeJP(dateString) {
 }
 
 const { post, relatedPosts = [] } = Astro.props;
+const postCategory = getCategoryLabels(post?.labels)[0] || 'ニュース';
 const articleKeywordLabels = getKeywordLabels(post?.labels).slice(0, 5);
 const articleUrl = `https://24watchin.com/jp/jp/news/${post?.id}/`;
 
@@ -184,6 +186,7 @@ export async function getStaticPaths() {
 <Layout title={post.title} sidebarType="article">
   <article class="post-container">
     <header class="post-header">
+      <Breadcrumb countryLabel="日本" categoryLabel={postCategory} />
       <h1 class="post-title">{post.title}</h1>
 
       <div class="post-submeta">
