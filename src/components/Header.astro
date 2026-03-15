@@ -1,5 +1,5 @@
 ---
-import { categoryLabelMap } from '../lib/categoryLabels';
+import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
 
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
@@ -66,21 +66,30 @@ if (SPACE_ID && DELIVERY_TOKEN) {
   }
 }
 
-const locale = 'jp';
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+// /jp/jp/... or /jp/en/... を想定
+const pathParts = currentPath.split('/').filter(Boolean);
+const detectedLocale = pathParts[1] as SiteLanguageKey | undefined;
+const locale: SiteLanguageKey =
+  detectedLocale && detectedLocale in categoryLabelMap ? detectedLocale : 'jp';
+
 const labels = categoryLabelMap[locale];
+const basePath = `/jp/${locale}`;
 
 const categoryItems = labels.headerCategories.map((item) => ({
-  href: `/jp/jp/category/${item.slug}`,
+  href: `${basePath}/category/${item.slug}`,
   label: item.label,
 }));
 
-const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const homeHref = `${basePath}/`;
+const searchAction = `${basePath}/search`;
 ---
 
 <header class="site-header">
   <div class="header-top">
     <div class="brand-area">
-      <a href="/jp/jp/" class="logo-link" aria-label="24Watchin JAPAN">
+      <a href={homeHref} class="logo-link" aria-label={`24Watchin ${labels.countryName}`}>
         <img
           src="/images/logo-24watchin.png"
           alt="24Watchin"
@@ -93,7 +102,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     <div class="right-area">
       <div class="language-name">{labels.languageName}</div>
 
-      <form action="/jp/jp/search" method="get" class="search-form">
+      <form action={searchAction} method="get" class="search-form">
         <input
           type="text"
           name="q"
