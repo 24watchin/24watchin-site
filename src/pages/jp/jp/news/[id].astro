@@ -1,5 +1,6 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
+import ShareButtons from '../../../../components/ShareButtons.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
@@ -28,8 +29,27 @@ function getCategoryLabels(labels) {
   return normalizeLabels(labels).filter((label) => CATEGORY_LABELS.includes(label));
 }
 
+function getKeywordLabels(labels) {
+  return normalizeLabels(labels).filter((label) => {
+    if (CATEGORY_LABELS.includes(label)) return false;
+    if (MANAGEMENT_LABEL_PATTERN.test(label)) return false;
+    return true;
+  });
+}
+
+function formatDateTimeJP(dateString) {
+  const date = new Date(dateString);
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${y}/${m}/${d} ${hh}:${mm}`;
+}
+
 const { post, relatedPosts = [] } = Astro.props;
-const postCategory = getCategoryLabels(post?.labels)[0] || 'ニュース';
+const articleKeywordLabels = getKeywordLabels(post?.labels).slice(0, 5);
+const articleUrl = `https://24watchin.com/jp/jp/news/${post?.id}/`;
 
 export async function getStaticPaths() {
   const CATEGORY_LABELS_LOCAL = [
@@ -164,14 +184,38 @@ export async function getStaticPaths() {
 <Layout title={post.title} sidebarType="article">
   <article class="post-container">
     <header class="post-header">
-      <div class="post-meta">
-        <span class="category-tag">{postCategory}</span>
-        <time class="post-date">{new Date(post.published).toLocaleDateString('ja-JP')}</time>
-      </div>
       <h1 class="post-title">{post.title}</h1>
+
+      <div class="post-submeta">
+        <div class="post-submeta-left">
+          <time class="post-date" datetime={post.published}>
+            {formatDateTimeJP(post.published)}
+          </time>
+        </div>
+
+        <div class="post-submeta-right">
+          <ShareButtons articleUrl={articleUrl} articleTitle={post.title} />
+        </div>
+      </div>
     </header>
 
     <div class="post-content" set:html={post.content} />
+
+    <div class="article-keywords">
+      <div class="keyword-row">
+        <span class="keyword-label">関連ワード：</span>
+
+        {articleKeywordLabels.length > 0 ? (
+          <div class="keyword-list">
+            {articleKeywordLabels.map((label) => (
+              <span class="keyword-chip">{label}</span>
+            ))}
+          </div>
+        ) : (
+          <span class="keyword-empty">なし</span>
+        )}
+      </div>
+    </div>
   </article>
 
   <div slot="bottom-wide" class="article-footer-blocks">
@@ -195,33 +239,33 @@ export async function getStaticPaths() {
     padding-bottom: 20px;
   }
 
-  .post-meta {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-  }
-
-  .category-tag {
-    background: #1e3a8a;
-    color: #fff;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 4px;
-  }
-
-  .post-date {
-    color: #666;
-    font-size: 14px;
-  }
-
   .post-title {
     font-size: 28px;
     line-height: 1.4;
     color: #1a1a1a;
-    margin: 0;
+    margin: 0 0 20px 0;
+  }
+
+  .post-submeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .post-submeta-left {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .post-submeta-right {
+    flex-shrink: 0;
+  }
+
+  .post-date {
+    display: block;
+    color: #666;
+    font-size: 14px;
   }
 
   .post-content {
@@ -252,7 +296,76 @@ export async function getStaticPaths() {
     margin: 20px 0;
   }
 
+  .article-keywords {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid #eee;
+  }
+
+  .keyword-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .keyword-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.8;
+    flex-shrink: 0;
+  }
+
+  .keyword-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .keyword-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 16px;
+    background: #f1f1f1;
+    color: #1a1a1a;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .keyword-empty {
+    color: #888;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
   .article-footer-blocks {
     margin-top: 50px;
+  }
+
+  @media (max-width: 768px) {
+    .post-container {
+      padding: 22px 18px;
+    }
+
+    .post-title {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .post-submeta {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .post-submeta-right {
+      width: 100%;
+    }
+
+    .keyword-row {
+      gap: 8px;
+    }
   }
 </style>
