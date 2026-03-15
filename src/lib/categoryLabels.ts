@@ -6,7 +6,6 @@ export const categoryLabelMap = {
     searchAriaLabel: '検索',
     categoryBarAriaLabel: 'カテゴリ',
 
-    // 全カテゴリ
     allCategories: [
       { slug: 'politics', label: '政治' },
       { slug: 'society', label: '社会' },
@@ -22,7 +21,6 @@ export const categoryLabelMap = {
       { slug: 'weather', label: '天気' },
     ],
 
-    // ヘッダーに出すカテゴリだけ
     headerCategories: [
       { slug: 'politics', label: '政治' },
       { slug: 'society', label: '社会' },
@@ -34,6 +32,42 @@ export const categoryLabelMap = {
       { slug: 'entertainment', label: '文化・エンタメ' },
       { slug: 'sports', label: 'スポーツ' },
       { slug: 'health-life', label: '健康・ライフ' },
+    ],
+  },
+
+  en: {
+    countryName: 'JAPAN',
+    languageName: 'English',
+    searchPlaceholder: 'Search',
+    searchAriaLabel: 'Search',
+    categoryBarAriaLabel: 'Categories',
+
+    allCategories: [
+      { slug: 'politics', label: 'Politics' },
+      { slug: 'society', label: 'Society' },
+      { slug: 'international', label: 'World' },
+      { slug: 'economy', label: 'Economy' },
+      { slug: 'environment-energy', label: 'Environment & Energy' },
+      { slug: 'business', label: 'Business' },
+      { slug: 'technology-ai', label: 'Technology & AI' },
+      { slug: 'entertainment', label: 'Culture & Entertainment' },
+      { slug: 'sports', label: 'Sports' },
+      { slug: 'health-life', label: 'Health & Lifestyle' },
+      { slug: 'traffic', label: 'Traffic' },
+      { slug: 'weather', label: 'Weather' },
+    ],
+
+    headerCategories: [
+      { slug: 'politics', label: 'Politics' },
+      { slug: 'society', label: 'Society' },
+      { slug: 'international', label: 'World' },
+      { slug: 'economy', label: 'Economy' },
+      { slug: 'environment-energy', label: 'Environment & Energy' },
+      { slug: 'business', label: 'Business' },
+      { slug: 'technology-ai', label: 'Technology & AI' },
+      { slug: 'entertainment', label: 'Culture & Entertainment' },
+      { slug: 'sports', label: 'Sports' },
+      { slug: 'health-life', label: 'Health & Lifestyle' },
     ],
   },
 } as const;
