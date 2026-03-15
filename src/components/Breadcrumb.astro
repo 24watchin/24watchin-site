@@ -1,0 +1,35 @@
+---
+const { countryLabel = '日本', categoryLabel = 'ニュース' } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label="パンくずリスト">
+  <span class="breadcrumb-item">{countryLabel}</span>
+  <span class="breadcrumb-separator">＞</span>
+  <span class="breadcrumb-item current">{categoryLabel}</span>
+</nav>
+
+<style>
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #666;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-item {
+    color: #666;
+  }
+
+  .breadcrumb-item.current {
+    color: #1a1a1a;
+    font-weight: 700;
+  }
+
+  .breadcrumb-separator {
+    color: #999;
+  }
+</style>
