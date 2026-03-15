@@ -1,0 +1,55 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const pageDescription =
+  'This is a temporary English preview page for checking multilingual header switching on 24Watchin.';
+---
+
+<Layout title="TOP" description={pageDescription}>
+  <section class="preview-box">
+    <h1 class="preview-title">English Preview</h1>
+    <p class="preview-text">
+      This page is for checking the multilingual header display.
+    </p>
+    <p class="preview-text">
+      Confirm these three items in the header:
+    </p>
+
+    <ul class="preview-list">
+      <li>Country name under the logo</li>
+      <li>Language name above the search box</li>
+      <li>Search placeholder text</li>
+    </ul>
+  </section>
+</Layout>
+
+<style>
+  .preview-box {
+    background: #fff;
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .preview-title {
+    margin: 0 0 16px;
+    font-size: 28px;
+    line-height: 1.4;
+    color: #1a1a1a;
+  }
+
+  .preview-text {
+    margin: 0 0 12px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #1a1a1a;
+  }
+
+  .preview-list {
+    margin: 12px 0 0 20px;
+    padding: 0;
+    color: #1a1a1a;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+</style>
