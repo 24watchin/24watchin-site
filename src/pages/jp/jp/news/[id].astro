@@ -77,44 +77,44 @@ function buildRelatedPosts(currentPost, allPosts) {
   return scoredPosts.slice(0, 6);
 }
 
-export async function getStaticPaths() {
-  async function fetchAllPosts() {
-    const API_KEY = import.meta.env.API_KEY;
-    const BLOG_ID = import.meta.env.BLOG_ID;
+async function fetchAllPosts() {
+  const API_KEY = import.meta.env.API_KEY;
+  const BLOG_ID = import.meta.env.BLOG_ID;
 
-    let allPosts = [];
-    let pageToken = '';
+  let allPosts = [];
+  let pageToken = '';
 
-    while (true) {
-      const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
-      url.searchParams.set('key', API_KEY);
-      url.searchParams.set('maxResults', '100');
+  while (true) {
+    const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
+    url.searchParams.set('key', API_KEY);
+    url.searchParams.set('maxResults', '100');
 
-      if (pageToken) {
-        url.searchParams.set('pageToken', pageToken);
-      }
-
-      const response = await fetch(url.toString());
-
-      if (!response.ok) {
-        throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const items = data.items || [];
-
-      allPosts.push(...items);
-
-      if (!data.nextPageToken) {
-        break;
-      }
-
-      pageToken = data.nextPageToken;
+    if (pageToken) {
+      url.searchParams.set('pageToken', pageToken);
     }
 
-    return allPosts;
+    const response = await fetch(url.toString());
+
+    if (!response.ok) {
+      throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const items = data.items || [];
+
+    allPosts.push(...items);
+
+    if (!data.nextPageToken) {
+      break;
+    }
+
+    pageToken = data.nextPageToken;
   }
 
+  return allPosts;
+}
+
+export async function getStaticPaths() {
   const posts = await fetchAllPosts();
 
   const sortedPosts = [...posts].sort((a, b) => {
@@ -150,7 +150,7 @@ const postCategory = getCategoryLabels(post.labels)[0] || 'ニュース';
 
   <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews relatedPosts={relatedPosts} />
-    <EditorPicks recentPosts={relatedPosts} />
+    <EditorPicks />
     <RecommendedLinks />
   </div>
 </Layout>
