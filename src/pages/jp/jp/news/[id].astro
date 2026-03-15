@@ -28,101 +28,130 @@ function getCategoryLabels(labels) {
   return normalizeLabels(labels).filter((label) => CATEGORY_LABELS.includes(label));
 }
 
-function getKeywordLabels(labels) {
-  return normalizeLabels(labels).filter((label) => {
-    if (CATEGORY_LABELS.includes(label)) return false;
-    if (MANAGEMENT_LABEL_PATTERN.test(label)) return false;
-    return true;
-  });
-}
-
-function buildRelatedPosts(currentPost, allPosts) {
-  const currentKeywordLabels = getKeywordLabels(currentPost.labels);
-  const currentCategoryLabels = getCategoryLabels(currentPost.labels);
-
-  const scoredPosts = allPosts
-    .filter((candidate) => candidate.id !== currentPost.id)
-    .map((candidate) => {
-      const candidateKeywordLabels = getKeywordLabels(candidate.labels);
-      const candidateCategoryLabels = getCategoryLabels(candidate.labels);
-
-      const matchedKeywordLabels = currentKeywordLabels.filter((label) =>
-        candidateKeywordLabels.includes(label)
-      );
-
-      const hasCategoryMatch = currentCategoryLabels.some((label) =>
-        candidateCategoryLabels.includes(label)
-      );
-
-      return {
-        ...candidate,
-        matchedKeywordLabels,
-        keywordMatchCount: matchedKeywordLabels.length,
-        categoryMatchCount: hasCategoryMatch ? 1 : 0,
-        publishedTime: new Date(candidate.published).getTime() || 0,
-      };
-    })
-    .sort((a, b) => {
-      if (b.keywordMatchCount !== a.keywordMatchCount) {
-        return b.keywordMatchCount - a.keywordMatchCount;
-      }
-
-      if (b.categoryMatchCount !== a.categoryMatchCount) {
-        return b.categoryMatchCount - a.categoryMatchCount;
-      }
-
-      return b.publishedTime - a.publishedTime;
-    });
-
-  return scoredPosts.slice(0, 6);
-}
-
-async function fetchAllPosts() {
-  const API_KEY = import.meta.env.API_KEY;
-  const BLOG_ID = import.meta.env.BLOG_ID;
-
-  let allPosts = [];
-  let pageToken = '';
-
-  while (true) {
-    const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
-    url.searchParams.set('key', API_KEY);
-    url.searchParams.set('maxResults', '100');
-
-    if (pageToken) {
-      url.searchParams.set('pageToken', pageToken);
-    }
-
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const items = data.items || [];
-
-    allPosts.push(...items);
-
-    if (!data.nextPageToken) {
-      break;
-    }
-
-    pageToken = data.nextPageToken;
-  }
-
-  return allPosts;
-}
+const { post, relatedPosts = [] } = Astro.props;
+const postCategory = getCategoryLabels(post?.labels)[0] || 'ニュース';
 
 export async function getStaticPaths() {
-  const posts = await fetchAllPosts();
+  const CATEGORY_LABELS_LOCAL = [
+    '政治',
+    '社会',
+    '国際',
+    '経済',
+    '環境・エネルギー',
+    'ビジネス',
+    'テクノロジー・AI',
+    '文化・エンタメ',
+    'スポーツ',
+    '交通',
+    '天気',
+  ];
+
+  const MANAGEMENT_LABEL_PATTERN_LOCAL = /^[a-z]{2,}(?:-[a-z0-9]{2,})+$/i;
+
+  function normalizeLabelsLocal(labels) {
+    return Array.isArray(labels) ? labels.filter(Boolean) : [];
+  }
+
+  function getCategoryLabelsLocal(labels) {
+    return normalizeLabelsLocal(labels).filter((label) =>
+      CATEGORY_LABELS_LOCAL.includes(label)
+    );
+  }
+
+  function getKeywordLabelsLocal(labels) {
+    return normalizeLabelsLocal(labels).filter((label) => {
+      if (CATEGORY_LABELS_LOCAL.includes(label)) return false;
+      if (MANAGEMENT_LABEL_PATTERN_LOCAL.test(label)) return false;
+      return true;
+    });
+  }
+
+  async function fetchAllPostsLocal() {
+    const API_KEY = import.meta.env.API_KEY;
+    const BLOG_ID = import.meta.env.BLOG_ID;
+
+    let allPosts = [];
+    let pageToken = '';
+
+    while (true) {
+      const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
+      url.searchParams.set('key', API_KEY);
+      url.searchParams.set('maxResults', '100');
+
+      if (pageToken) {
+        url.searchParams.set('pageToken', pageToken);
+      }
+
+      const response = await fetch(url.toString());
+
+      if (!response.ok) {
+        throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const items = data.items || [];
+
+      allPosts.push(...items);
+
+      if (!data.nextPageToken) {
+        break;
+      }
+
+      pageToken = data.nextPageToken;
+    }
+
+    return allPosts;
+  }
+
+  function buildRelatedPostsLocal(currentPost, allPosts) {
+    const currentKeywordLabels = getKeywordLabelsLocal(currentPost.labels);
+    const currentCategoryLabels = getCategoryLabelsLocal(currentPost.labels);
+
+    const scoredPosts = allPosts
+      .filter((candidate) => candidate.id !== currentPost.id)
+      .map((candidate) => {
+        const candidateKeywordLabels = getKeywordLabelsLocal(candidate.labels);
+        const candidateCategoryLabels = getCategoryLabelsLocal(candidate.labels);
+
+        const matchedKeywordLabels = currentKeywordLabels.filter((label) =>
+          candidateKeywordLabels.includes(label)
+        );
+
+        const hasCategoryMatch = currentCategoryLabels.some((label) =>
+          candidateCategoryLabels.includes(label)
+        );
+
+        return {
+          ...candidate,
+          matchedKeywordLabels,
+          keywordMatchCount: matchedKeywordLabels.length,
+          categoryMatchCount: hasCategoryMatch ? 1 : 0,
+          publishedTime: new Date(candidate.published).getTime() || 0,
+        };
+      })
+      .sort((a, b) => {
+        if (b.keywordMatchCount !== a.keywordMatchCount) {
+          return b.keywordMatchCount - a.keywordMatchCount;
+        }
+
+        if (b.categoryMatchCount !== a.categoryMatchCount) {
+          return b.categoryMatchCount - a.categoryMatchCount;
+        }
+
+        return b.publishedTime - a.publishedTime;
+      });
+
+    return scoredPosts.slice(0, 6);
+  }
+
+  const posts = await fetchAllPostsLocal();
 
   const sortedPosts = [...posts].sort((a, b) => {
     return new Date(b.published).getTime() - new Date(a.published).getTime();
   });
 
   return sortedPosts.map((post) => {
-    const relatedPosts = buildRelatedPosts(post, sortedPosts);
+    const relatedPosts = buildRelatedPostsLocal(post, sortedPosts);
 
     return {
       params: { id: post.id },
@@ -130,9 +159,6 @@ export async function getStaticPaths() {
     };
   });
 }
-
-const { post, relatedPosts } = Astro.props;
-const postCategory = getCategoryLabels(post.labels)[0] || 'ニュース';
 ---
 
 <Layout title={post.title} sidebarType="article">
