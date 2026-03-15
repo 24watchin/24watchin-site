@@ -176,7 +176,7 @@ export async function getStaticPaths() {
 
   <div slot="bottom-wide" class="article-footer-blocks">
     <RelatedNews relatedPosts={relatedPosts} />
-    <EditorPicks />
+    <EditorPicks recentPosts={relatedPosts} />
     <RecommendedLinks />
   </div>
 </Layout>
