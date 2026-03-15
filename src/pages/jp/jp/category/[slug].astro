@@ -1,4 +1,5 @@
 ---
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import Layout from '../../../../layouts/Layout.astro';
 import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
@@ -14,6 +15,7 @@ export async function getStaticPaths() {
     { slug: 'technology-ai', name: 'テクノロジー・AI' },
     { slug: 'entertainment', name: '文化・エンタメ' },
     { slug: 'sports', name: 'スポーツ' },
+    { slug: 'health-life', name: '健康・ライフ' },
     { slug: 'traffic', name: '交通' },
     { slug: 'weather', name: '天気' },
   ];
@@ -23,6 +25,11 @@ export async function getStaticPaths() {
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
   const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
+  }
+
   const data = await response.json();
   const allPosts = data.items || [];
 
@@ -34,6 +41,7 @@ export async function getStaticPaths() {
     return {
       params: { slug: category.slug },
       props: {
+        slug: category.slug,
         categoryName: category.name,
         posts: filteredPosts,
       },
@@ -41,7 +49,7 @@ export async function getStaticPaths() {
   });
 }
 
-const { categoryName, posts } = Astro.props;
+const { slug, categoryName, posts } = Astro.props;
 
 const getImageUrl = (content) => {
   const match = content?.match(/<img[^>]+src="([^">]+)"/);
@@ -50,6 +58,13 @@ const getImageUrl = (content) => {
 ---
 
 <Layout title={categoryName} sidebarType="category">
+  <Breadcrumb
+    countryLabel="日本"
+    countryHref="/jp/jp/"
+    categoryLabel={categoryName}
+    categoryHref={`/jp/jp/category/${slug}/`}
+  />
+
   {posts.length > 0 ? (
     <>
       <CategoryHero posts={posts} categoryName={categoryName} getImageUrl={getImageUrl} />
@@ -58,22 +73,29 @@ const getImageUrl = (content) => {
       <NewsList posts={posts.slice(5)} getImageUrl={getImageUrl} />
     </>
   ) : (
-    <p>現在、この記事は準備中です。</p>
+    <p class="empty-message">現在、この記事は準備中です。</p>
   )}
 </Layout>
 
 <style>
   .divider {
-  border: 0;
-  border-top: 1px solid #eee;
-  margin: 1rem 0 1.5rem;
-}
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 1rem 0 1.5rem;
+  }
 
   .section-title {
     font-size: 1.5rem;
     border-left: 5px solid #1e3a8a;
     padding-left: 1rem;
     font-weight: bold;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
+    color: #1a1a1a;
+  }
+
+  .empty-message {
+    color: #666;
+    font-size: 16px;
+    margin: 20px 0 0;
   }
 </style>
