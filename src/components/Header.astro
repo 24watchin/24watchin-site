@@ -1,4 +1,6 @@
 ---
+import { categoryLabelMap } from '../lib/categoryLabels';
+
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
 
@@ -64,17 +66,13 @@ if (SPACE_ID && DELIVERY_TOKEN) {
   }
 }
 
-const categoryItems = [
-  { href: '/jp/jp/category/politics', label: '政治' },
-  { href: '/jp/jp/category/society', label: '社会' },
-  { href: '/jp/jp/category/international', label: '国際' },
-  { href: '/jp/jp/category/economy', label: '経済' },
-  { href: '/jp/jp/category/environment-energy', label: '環境・エネルギー' },
-  { href: '/jp/jp/category/business', label: 'ビジネス' },
-  { href: '/jp/jp/category/technology-ai', label: 'テクノロジー・AI' },
-  { href: '/jp/jp/category/entertainment', label: '文化・エンタメ' },
-  { href: '/jp/jp/category/sports', label: 'スポーツ' },
-];
+const locale = 'jp';
+const labels = categoryLabelMap[locale];
+
+const categoryItems = labels.headerCategories.map((item) => ({
+  href: `/jp/jp/category/${item.slug}`,
+  label: item.label,
+}));
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
@@ -89,21 +87,21 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
           class="logo-image"
         />
       </a>
-      <div class="country-name">JAPAN</div>
+      <div class="country-name">{labels.countryName}</div>
     </div>
 
     <div class="right-area">
-      <div class="language-name">日本語</div>
+      <div class="language-name">{labels.languageName}</div>
 
       <form action="/jp/jp/search" method="get" class="search-form">
         <input
           type="text"
           name="q"
           class="search-input"
-          placeholder="検索"
-          aria-label="検索"
+          placeholder={labels.searchPlaceholder}
+          aria-label={labels.searchAriaLabel}
         />
-        <button type="submit" class="search-button" aria-label="検索">
+        <button type="submit" class="search-button" aria-label={labels.searchAriaLabel}>
           <svg
             class="search-icon"
             viewBox="0 0 24 24"
@@ -118,7 +116,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     </div>
   </div>
 
-  <nav class="category-bar" aria-label="カテゴリ">
+  <nav class="category-bar" aria-label={labels.categoryBarAriaLabel}>
     <div class="category-inner">
       {categoryItems.map((item) => (
         <a
@@ -419,37 +417,20 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
       font-size: 15px;
     }
 
-    .category-inner {
-      padding: 0 12px;
-    }
-
     .category-link {
       height: 48px;
       padding: 0 14px;
-      font-size: 16px;
-    }
-
-    .category-link:hover,
-    .category-link.active {
-      text-decoration-thickness: 3px;
-      text-underline-offset: 9px;
+      font-size: 14px;
+      text-underline-offset: 8px;
     }
 
     .header-word-inner {
-      padding: 10px 26px 12px;
+      padding: 10px 14px 12px;
     }
 
-    .header-word-link {
-      font-size: 16px;
-    }
-
+    .header-word-link,
     .header-word-separator {
-      font-size: 16px;
-      margin: 0 0.9em;
-    }
-
-    .bottom-line {
-      height: 8px;
+      font-size: 14px;
     }
   }
 </style>
