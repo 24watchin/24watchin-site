@@ -21,7 +21,7 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     </a>
 
     <a href={facebookUrl} class="share-icon-btn facebook-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" title="Share on Facebook">
-      <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon facebook-icon">
         <path fill="currentColor" d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.6 1.6-1.6H16.8V4.8c-.3 0-.9-.1-1.8-.1-1.8 0-3.1 1.1-3.1 3.3V11H9.3v3h2.6v8h1.6Z"/>
       </svg>
     </a>
@@ -34,14 +34,16 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
 
     <details class="share-more-details">
       <summary class="share-icon-btn more-btn" aria-label="More share options" title="More share options">
-        <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
-          <circle cx="5" cy="12" r="2" fill="currentColor"></circle>
-          <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
-          <circle cx="19" cy="12" r="2" fill="currentColor"></circle>
-        </svg>
+        <span class="dots">・・・</span>
       </summary>
 
       <div class="share-more-menu">
+        <div class="share-more-header">
+          <button type="button" class="close-menu-btn" aria-label="Close share menu" title="Close">
+            ×
+          </button>
+        </div>
+
         <a href={hatenaUrl} class="share-menu-btn hatena-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Hatena">
           <span class="hatena-mark">B!</span>
           <span class="menu-text">Hatena</span>
@@ -79,7 +81,15 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
 </div>
 
 <script>
+  const shareDetails = document.querySelector('.share-more-details');
+  const closeBtn = document.querySelector('.close-menu-btn');
   const copyBtn = document.querySelector('.copy-btn');
+
+  closeBtn?.addEventListener('click', () => {
+    if (shareDetails) {
+      shareDetails.removeAttribute('open');
+    }
+  });
 
   copyBtn?.addEventListener('click', async () => {
     const url = copyBtn.getAttribute('data-copy-url') || '';
@@ -105,6 +115,12 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
       }
     }
   });
+
+  document.addEventListener('click', (event) => {
+    if (!shareDetails) return;
+    if (shareDetails.contains(event.target)) return;
+    shareDetails.removeAttribute('open');
+  });
 </script>
 
 <style>
@@ -126,23 +142,22 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
-    border: 1px solid #d7d7d7;
+    width: 40px;
+    height: 40px;
+    border: none;
     border-radius: 999px;
-    background: #fff;
     text-decoration: none;
     cursor: pointer;
     box-sizing: border-box;
-    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    color: #fff;
   }
 
   .share-icon-btn:hover,
   .share-icon-btn:focus-visible {
-    background: #f7f7f7;
-    border-color: #c8c8c8;
     text-decoration: none;
     transform: translateY(-1px);
+    opacity: 0.9;
   }
 
   .share-icon {
@@ -151,20 +166,35 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     display: block;
   }
 
+  .facebook-icon {
+    width: 24px;
+    height: 24px;
+  }
+
   .x-btn {
-    color: #111111;
+    background: #111111;
   }
 
   .facebook-btn {
-    color: #1877f2;
+    background: #1877f2;
   }
 
   .mail-btn {
-    color: #d44638;
+    background: #d44638;
   }
 
   .more-btn {
-    color: #666666;
+    background: #666666;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .dots {
+    color: #fff;
+    line-height: 1;
+    letter-spacing: 0;
+    transform: translateY(-1px);
   }
 
   .share-more-details {
@@ -186,7 +216,7 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-width: 170px;
+    min-width: 152px;
     padding: 10px;
     border: 1px solid #e2e2e2;
     border-radius: 12px;
@@ -195,13 +225,40 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     z-index: 20;
   }
 
+  .share-more-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2px;
+  }
+
+  .close-menu-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 999px;
+    background: #f3f3f3;
+    color: #666666;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .close-menu-btn:hover,
+  .close-menu-btn:focus-visible {
+    background: #e8e8e8;
+  }
+
   .share-menu-btn {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     min-height: 38px;
-    padding: 0 12px;
+    padding: 0 10px;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     background: #fff;
@@ -222,16 +279,16 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
   }
 
   .menu-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     display: block;
     flex-shrink: 0;
   }
 
   .hatena-mark {
-    width: 18px;
+    width: 20px;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 800;
     line-height: 1;
     color: #00a4de;
@@ -268,8 +325,8 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     }
 
     .share-icon-btn {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
     }
 
     .share-icon {
@@ -277,9 +334,15 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
       height: 21px;
     }
 
+    .facebook-icon {
+      width: 23px;
+      height: 23px;
+    }
+
     .share-more-menu {
       right: auto;
       left: 0;
+      min-width: 148px;
     }
   }
 </style>
