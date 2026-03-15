@@ -1,4 +1,5 @@
 ---
+import ReactionBar from '../../../../components/ReactionBar.astro';
 import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import Layout from '../../../../layouts/Layout.astro';
 import ShareButtons from '../../../../components/ShareButtons.astro';
@@ -229,11 +230,13 @@ export async function getStaticPaths() {
       </div>
     </header>
 
-    <div class="post-content" set:html={post.content} />
+<div class="post-content" set:html={post.content} />
 
-    <div class="article-keywords">
-      <div class="keyword-row">
-        <span class="keyword-label">関連ワード：</span>
+<ReactionBar articleId={post.id} />
+
+<div class="article-keywords">
+  <div class="keyword-row">
+    <span class="keyword-label">関連ワード：</span>
 
         {articleKeywordLabels.length > 0 ? (
           <div class="keyword-list">
