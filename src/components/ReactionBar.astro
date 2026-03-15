@@ -1,0 +1,191 @@
+---
+const { articleId } = Astro.props;
+---
+
+<div class="reaction-bar" data-article-id={articleId}>
+  <button type="button" class="reaction-btn smile-btn" data-reaction="smile" aria-label="Smile reaction">
+    <svg viewBox="0 0 48 48" class="reaction-icon" aria-hidden="true">
+      <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/>
+      <circle cx="18" cy="20" r="2.4" fill="currentColor"/>
+      <circle cx="30" cy="20" r="2.4" fill="currentColor"/>
+      <path d="M16 28c2.2 3.2 5 4.8 8 4.8s5.8-1.6 8-4.8" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+    </svg>
+    <span class="reaction-count" data-count="smile">0</span>
+  </button>
+
+  <button type="button" class="reaction-btn troubled-btn" data-reaction="troubled" aria-label="Troubled reaction">
+    <svg viewBox="0 0 48 48" class="reaction-icon" aria-hidden="true">
+      <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.2"/>
+      <path d="M16 16c2.2-1.8 4.4-2.4 6.6-1.8" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M32 16c-2.2-1.8-4.4-2.4-6.6-1.8" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+      <circle cx="19" cy="22" r="2.4" fill="currentColor"/>
+      <circle cx="29" cy="22" r="2.4" fill="currentColor"/>
+      <path d="M17 31c2.2-3 4.8-4.4 7-4.4s4.8 1.4 7 4.4" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+    </svg>
+    <span class="reaction-count" data-count="troubled">0</span>
+  </button>
+</div>
+
+<script>
+  const bar = document.querySelector('.reaction-bar');
+  const articleId = bar?.getAttribute('data-article-id');
+
+  const smileBtn = bar?.querySelector('.smile-btn');
+  const troubledBtn = bar?.querySelector('.troubled-btn');
+  const smileCountEl = bar?.querySelector('[data-count="smile"]');
+  const troubledCountEl = bar?.querySelector('[data-count="troubled"]');
+
+  const STORAGE_KEY = 'watchin_device_id';
+  const REACTION_KEY_PREFIX = 'watchin_reaction_';
+
+  function getDeviceId() {
+    let id = localStorage.getItem(STORAGE_KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem(STORAGE_KEY, id);
+    }
+    return id;
+  }
+
+  function getSavedReaction(articleId) {
+    return localStorage.getItem(`${REACTION_KEY_PREFIX}${articleId}`) || '';
+  }
+
+  function setSavedReaction(articleId, reaction) {
+    const key = `${REACTION_KEY_PREFIX}${articleId}`;
+    if (reaction) {
+      localStorage.setItem(key, reaction);
+    } else {
+      localStorage.removeItem(key);
+    }
+  }
+
+  function applyActiveState(reaction) {
+    smileBtn?.classList.toggle('is-active', reaction === 'smile');
+    troubledBtn?.classList.toggle('is-active', reaction === 'troubled');
+  }
+
+  async function loadCounts() {
+    if (!articleId) return;
+
+    const res = await fetch(`/api/reactions/${articleId}`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (smileCountEl) smileCountEl.textContent = String(data.smile_count ?? 0);
+    if (troubledCountEl) troubledCountEl.textContent = String(data.troubled_count ?? 0);
+
+    applyActiveState(getSavedReaction(articleId));
+  }
+
+  async function sendReaction(nextReaction) {
+    if (!articleId) return;
+
+    const deviceId = getDeviceId();
+    const currentReaction = getSavedReaction(articleId);
+
+    const res = await fetch(`/api/reactions/${articleId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        device_id: deviceId,
+        current_reaction: currentReaction,
+        next_reaction: nextReaction,
+      }),
+    });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    if (smileCountEl) smileCountEl.textContent = String(data.smile_count ?? 0);
+    if (troubledCountEl) troubledCountEl.textContent = String(data.troubled_count ?? 0);
+
+    setSavedReaction(articleId, data.active_reaction || '');
+    applyActiveState(data.active_reaction || '');
+  }
+
+  smileBtn?.addEventListener('click', () => {
+    const current = getSavedReaction(articleId);
+    const next = current === 'smile' ? '' : 'smile';
+    sendReaction(next);
+  });
+
+  troubledBtn?.addEventListener('click', () => {
+    const current = getSavedReaction(articleId);
+    const next = current === 'troubled' ? '' : 'troubled';
+    sendReaction(next);
+  });
+
+  loadCounts();
+</script>
+
+<style>
+  .reaction-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+    margin-bottom: 18px;
+  }
+
+  .reaction-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    color: #888;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .reaction-btn:hover,
+  .reaction-btn:focus-visible {
+    transform: translateY(-1px);
+    opacity: 0.9;
+  }
+
+  .reaction-icon {
+    width: 34px;
+    height: 34px;
+    display: block;
+  }
+
+  .smile-btn {
+    color: #d63b3b;
+  }
+
+  .troubled-btn {
+    color: #2f6edb;
+  }
+
+  .reaction-btn:not(.is-active) {
+    opacity: 0.65;
+  }
+
+  .reaction-btn.is-active {
+    opacity: 1;
+  }
+
+  .reaction-count {
+    font-size: 12px;
+    line-height: 1;
+    color: #1a1a1a;
+    min-width: 1ch;
+  }
+
+  @media (max-width: 768px) {
+    .reaction-bar {
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .reaction-icon {
+      width: 32px;
+      height: 32px;
+    }
+  }
+</style>
