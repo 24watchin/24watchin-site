@@ -1,7 +1,5 @@
 ---
 // ジャンルページの「顔」となる、ヒーローエリアの部品です
-// SEO対策：正しいHTML構造
-// スマホ対策：フレキシブルなグリッド表示
 const { posts, categoryName, getImageUrl } = Astro.props;
 
 // 最初の1記事を「メイン」、続く4記事を「サブ」に分けます
@@ -17,7 +15,6 @@ const subPosts = posts.slice(1, 5);
 <div class="hero-grid">
   {mainPost && (
     <article class="main-featured">
-      {/* ★ 1箇所目：メイン記事のリンクを日本版（/jp/jp/）に修正しました！ */}
       <a href={`/jp/jp/news/${mainPost.id}/`} class="hero-link">
         <div class="main-image-wrapper">
           <img
@@ -39,7 +36,6 @@ const subPosts = posts.slice(1, 5);
   <div class="sub-featured-list">
     {subPosts.map((post) => (
       <article class="sub-item">
-        {/* ★ 2箇所目：横に並ぶサブ記事リストのリンクを日本版（/jp/jp/）に修正しました！ */}
         <a href={`/jp/jp/news/${post.id}/`} class="hero-link sub-link">
           <div class="sub-image-wrapper">
             <img src={getImageUrl(post.content)} alt={post.title} class="hero-image" />
@@ -57,7 +53,6 @@ const subPosts = posts.slice(1, 5);
 </div>
 
 <style>
-  /* ジャンル見出しのデザイン */
   .category-header {
     display: flex;
     justify-content: space-between;
@@ -79,7 +74,6 @@ const subPosts = posts.slice(1, 5);
     color: #666;
   }
 
-  /* レイアウト：PCでは1.2対1の2列 */
   .hero-grid {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -108,7 +102,6 @@ const subPosts = posts.slice(1, 5);
     text-underline-offset: 2px;
   }
 
-  /* 写真の共通設定 */
   .main-image-wrapper,
   .sub-image-wrapper {
     background: #eee;
@@ -133,7 +126,6 @@ const subPosts = posts.slice(1, 5);
     object-fit: cover;
   }
 
-  /* メイン記事のテキスト */
   .main-info {
     padding: 1rem 0;
   }
@@ -142,10 +134,10 @@ const subPosts = posts.slice(1, 5);
     font-size: 1.5rem;
     margin: 0 0 0.5rem 0;
     line-height: 1.4;
-    color: #333;
+    font-weight: bold;
+    color: #222;
   }
 
-  /* サブ記事のリスト表示 */
   .sub-featured-list {
     display: flex;
     flex-direction: column;
@@ -162,7 +154,8 @@ const subPosts = posts.slice(1, 5);
     font-size: 1rem;
     margin: 0 0 0.3rem 0;
     line-height: 1.4;
-    color: #333;
+    font-weight: bold;
+    color: #222;
   }
 
   .hero-date {
@@ -171,7 +164,6 @@ const subPosts = posts.slice(1, 5);
     display: block;
   }
 
-  /* 【スマホ対策】画面が小さい時は1列にする */
   @media (max-width: 768px) {
     .hero-grid {
       grid-template-columns: 1fr;
