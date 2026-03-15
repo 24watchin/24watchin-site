@@ -16,9 +16,25 @@ const CATEGORY_LABELS = [
   'テクノロジー・AI',
   '文化・エンタメ',
   'スポーツ',
+  '健康・ライフ',
   '交通',
   '天気',
 ];
+
+const CATEGORY_SLUG_MAP = {
+  '政治': 'politics',
+  '社会': 'society',
+  '国際': 'international',
+  '経済': 'economy',
+  '環境・エネルギー': 'environment-energy',
+  'ビジネス': 'business',
+  'テクノロジー・AI': 'technology-ai',
+  '文化・エンタメ': 'entertainment',
+  'スポーツ': 'sports',
+  '健康・ライフ': 'health-life',
+  '交通': 'traffic',
+  '天気': 'weather',
+};
 
 const MANAGEMENT_LABEL_PATTERN = /^[a-z]{2,}(?:-[a-z0-9]{2,})+$/i;
 
@@ -50,6 +66,8 @@ function formatDateTimeJP(dateString) {
 
 const { post, relatedPosts = [] } = Astro.props;
 const postCategory = getCategoryLabels(post?.labels)[0] || 'ニュース';
+const postCategorySlug = CATEGORY_SLUG_MAP[postCategory] || '';
+const postCategoryHref = postCategorySlug ? `/jp/jp/category/${postCategorySlug}/` : '';
 const articleKeywordLabels = getKeywordLabels(post?.labels).slice(0, 5);
 const articleUrl = `https://24watchin.com/jp/jp/news/${post?.id}/`;
 
@@ -64,6 +82,7 @@ export async function getStaticPaths() {
     'テクノロジー・AI',
     '文化・エンタメ',
     'スポーツ',
+    '健康・ライフ',
     '交通',
     '天気',
   ];
@@ -186,7 +205,13 @@ export async function getStaticPaths() {
 <Layout title={post.title} sidebarType="article">
   <article class="post-container">
     <header class="post-header">
-      <Breadcrumb countryLabel="日本" categoryLabel={postCategory} />
+      <Breadcrumb
+        countryLabel="日本"
+        countryHref="/jp/jp/"
+        categoryLabel={postCategory}
+        categoryHref={postCategoryHref}
+      />
+
       <h1 class="post-title">{post.title}</h1>
 
       <div class="post-submeta">
