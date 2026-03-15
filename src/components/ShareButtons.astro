@@ -14,64 +14,64 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
 
 <div class="share-wrap">
   <div class="share-main">
-    <a href={xUrl} class="share-btn icon-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on X">
+    <a href={xUrl} class="share-icon-btn x-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on X" title="Share on X">
       <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
         <path fill="currentColor" d="M18.244 2H21l-6.56 7.497L22.16 22h-6.045l-4.734-6.185L5.97 22H3.21l7.016-8.018L1.84 2h6.198l4.28 5.65L18.244 2Zm-1.06 18h1.676L7.13 3.895H5.332L17.184 20Z"/>
       </svg>
-      <span class="btn-text">X</span>
     </a>
 
-    <a href={facebookUrl} class="share-btn icon-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+    <a href={facebookUrl} class="share-icon-btn facebook-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" title="Share on Facebook">
       <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
         <path fill="currentColor" d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.6 1.6-1.6H16.8V4.8c-.3 0-.9-.1-1.8-.1-1.8 0-3.1 1.1-3.1 3.3V11H9.3v3h2.6v8h1.6Z"/>
       </svg>
-      <span class="btn-text">Facebook</span>
     </a>
 
-    <a href={mailUrl} class="share-btn icon-btn" aria-label="Share by email">
+    <a href={mailUrl} class="share-icon-btn mail-btn" aria-label="Share by email" title="Share by email">
       <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
         <path fill="currentColor" d="M3 6h18a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a1 1 0 0 1 1-1Zm0 2v.5l9 5.6 9-5.6V8l-9 5.6L3 8Z"/>
       </svg>
-      <span class="btn-text">Mail</span>
     </a>
 
     <details class="share-more-details">
-      <summary class="share-btn more-summary" aria-label="More share options">
-        <span class="dots">•••</span>
-        <span class="btn-text">More</span>
+      <summary class="share-icon-btn more-btn" aria-label="More share options" title="More share options">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
+          <circle cx="5" cy="12" r="2" fill="currentColor"></circle>
+          <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+          <circle cx="19" cy="12" r="2" fill="currentColor"></circle>
+        </svg>
       </summary>
 
       <div class="share-more-menu">
-        <a href={hatenaUrl} class="share-btn icon-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Hatena">
-          <span class="hatena-icon">B!</span>
-          <span class="btn-text">Hatena</span>
+        <a href={hatenaUrl} class="share-menu-btn hatena-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Hatena">
+          <span class="hatena-mark">B!</span>
+          <span class="menu-text">Hatena</span>
         </a>
 
-        <a href={lineUrl} class="share-btn icon-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on LINE">
-          <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
+        <a href={lineUrl} class="share-menu-btn line-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on LINE">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="menu-icon">
             <path fill="currentColor" d="M12 3C6.48 3 2 6.79 2 11.47c0 4.2 3.6 7.72 8.47 8.38l-.36 2.16c-.06.33.29.58.58.4l2.48-1.72c5.07-.26 9.13-3.72 9.13-8.43C22.3 6.79 17.52 3 12 3Zm-4.2 10.2H6.4V9.5h1.4v3.7Zm2.8 0H9.2V9.5h1.4v3.7Zm3.6 0h-3V9.5h1.4v2.5h1.6v1.2Zm3.4-2.6h-1.6v.6h1.6v1h-1.6v.6h1.6v1h-3V9.5h3v1.1Z"/>
           </svg>
-          <span class="btn-text">LINE</span>
+          <span class="menu-text">LINE</span>
         </a>
 
-        <a href={blueskyUrl} class="share-btn icon-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Bluesky">
-          <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
+        <a href={blueskyUrl} class="share-menu-btn bluesky-btn" target="_blank" rel="noopener noreferrer" aria-label="Share on Bluesky">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="menu-icon">
             <path fill="currentColor" d="M12 11.3c1.3-2.5 4.8-6.3 7.1-7.9 1.7-1.2 2.9-.9 2.9.5 0 .3-.2 2.8-.4 3.2-.7 2.5-3.1 3.2-5.2 2.8 3.7.6 4.6 2.5 2.6 4.4-3.9 3.7-5.6-.9-6-2.1-.1-.2-.2-.2-.3 0-.4 1.2-2.1 5.8-6 2.1-2-1.9-1.1-3.8 2.6-4.4-2.1.4-4.5-.3-5.2-2.8C4 6.7 3.8 4.2 3.8 3.9c0-1.4 1.2-1.7 2.9-.5 2.3 1.6 5.8 5.4 7.1 7.9Z"/>
           </svg>
-          <span class="btn-text">Bluesky</span>
+          <span class="menu-text">Bluesky</span>
         </a>
 
         <button
           type="button"
-          class="share-btn icon-btn copy-btn"
+          class="share-menu-btn copy-btn"
           data-copy-url={articleUrl}
           data-copy-title={articleTitle}
           aria-label="Copy link"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="menu-icon copy-color">
             <path fill="currentColor" d="M8 7a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-1v-2h1a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-7a1 1 0 0 0-1 1v1H8V7Zm-5 4a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-7Zm3-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1H6Z"/>
           </svg>
-          <span class="btn-text">Copy Link</span>
+          <span class="menu-text">Copy Link</span>
         </button>
       </div>
     </details>
@@ -88,7 +88,7 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
 
     try {
       await navigator.clipboard.writeText(text);
-      const textNode = copyBtn.querySelector('.btn-text');
+      const textNode = copyBtn.querySelector('.menu-text');
       if (textNode) {
         textNode.textContent = 'Copied';
         setTimeout(() => {
@@ -96,7 +96,7 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
         }, 1500);
       }
     } catch {
-      const textNode = copyBtn.querySelector('.btn-text');
+      const textNode = copyBtn.querySelector('.menu-text');
       if (textNode) {
         textNode.textContent = 'Failed';
         setTimeout(() => {
@@ -118,61 +118,53 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
   }
 
-  .share-btn {
+  .share-icon-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    height: 32px;
-    min-width: 0;
-    padding: 0 12px;
-    border: 1px solid #d0d0d0;
-    border-radius: 18px;
+    width: 38px;
+    height: 38px;
+    border: 1px solid #d7d7d7;
+    border-radius: 999px;
     background: #fff;
-    color: #1a1a1a;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1;
     text-decoration: none;
     cursor: pointer;
     box-sizing: border-box;
-    white-space: nowrap;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   }
 
-  .share-btn:hover,
-  .share-btn:focus-visible {
-    background: #f5f5f5;
-    color: #1a1a1a;
+  .share-icon-btn:hover,
+  .share-icon-btn:focus-visible {
+    background: #f7f7f7;
+    border-color: #c8c8c8;
     text-decoration: none;
-  }
-
-  .icon-btn {
-    font-family: inherit;
+    transform: translateY(-1px);
   }
 
   .share-icon {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: block;
   }
 
-  .hatena-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 14px;
-    font-size: 12px;
-    font-weight: 800;
-    line-height: 1;
-    flex-shrink: 0;
+  .x-btn {
+    color: #111111;
   }
 
-  .btn-text {
-    display: inline-block;
+  .facebook-btn {
+    color: #1877f2;
+  }
+
+  .mail-btn {
+    color: #d44638;
+  }
+
+  .more-btn {
+    color: #666666;
   }
 
   .share-more-details {
@@ -187,15 +179,6 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     display: none;
   }
 
-  .more-summary {
-    padding: 0 12px;
-  }
-
-  .dots {
-    letter-spacing: 1px;
-    line-height: 1;
-  }
-
   .share-more-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -203,7 +186,7 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-width: 160px;
+    min-width: 170px;
     padding: 10px;
     border: 1px solid #e2e2e2;
     border-radius: 12px;
@@ -212,9 +195,63 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
     z-index: 20;
   }
 
-  .share-more-menu .share-btn {
-    justify-content: flex-start;
+  .share-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     width: 100%;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    color: #1a1a1a;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .share-menu-btn:hover,
+  .share-menu-btn:focus-visible {
+    background: #f7f7f7;
+    text-decoration: none;
+    color: #1a1a1a;
+  }
+
+  .menu-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .hatena-mark {
+    width: 18px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+    color: #00a4de;
+    flex-shrink: 0;
+  }
+
+  .line-btn .menu-icon {
+    color: #06c755;
+  }
+
+  .bluesky-btn .menu-icon {
+    color: #1185fe;
+  }
+
+  .copy-color {
+    color: #666666;
+  }
+
+  .menu-text {
+    line-height: 1;
   }
 
   .copy-btn {
@@ -230,10 +267,14 @@ const mailUrl = `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encode
       justify-content: flex-start;
     }
 
-    .share-btn {
-      height: 30px;
-      padding: 0 10px;
-      font-size: 12px;
+    .share-icon-btn {
+      width: 36px;
+      height: 36px;
+    }
+
+    .share-icon {
+      width: 21px;
+      height: 21px;
     }
 
     .share-more-menu {
