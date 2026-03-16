@@ -41,15 +41,14 @@ const getDayName = (dateStr) => {
   return days[new Date(dateStr).getDay()];
 };
 
-// ラベルの多言語化
 const labels = {
   title: lang === 'en' ? `${targetCity.display} 3-Day Forecast` : `${targetCity.display} 3日間の天気予報`,
-  tableDate: lang === 'en' ? 'Date' : '日付',
-  tableWeather: lang === 'en' ? 'Weather' : '天気',
-  tableTemp: lang === 'en' ? 'High/Low' : '最高 / 最低',
-  tableRain: lang === 'en' ? 'Rain' : '降水確率',
-  hourlyTitle: lang === 'en' ? 'Hourly Forecast' : '1時間ごとの予報',
+  hourlyBadge: lang === 'en' ? 'Hourly' : '1時間ごと',
   alertTitle: lang === 'en' ? 'Weather Alerts' : '気象注意報・警報',
+  tableTime: lang === 'en' ? 'Time' : '時刻',
+  tableWeather: lang === 'en' ? 'Weather' : '天気',
+  tableTemp: lang === 'en' ? 'Temp' : '気温',
+  tableRain: lang === 'en' ? 'Rain' : '降水',
 };
 ---
 
@@ -78,7 +77,9 @@ const labels = {
               <div class="rain-info">
                 <span class="rain-val">{day.day.daily_chance_of_rain}%</span>
               </div>
-              <div class="arrow-icon">▼</div>
+              <div class="badge-wrapper">
+                <span class="hourly-badge">{labels.hourlyBadge}</span>
+              </div>
             </button>
 
             <div id={`hourly-${index}`} class="hourly-details" hidden>
@@ -86,14 +87,14 @@ const labels = {
                 <table class="hourly-table">
                   <thead>
                     <tr>
-                      <th>時刻</th>
-                      <th>天気</th>
-                      <th>気温</th>
-                      <th>降水</th>
+                      <th>{labels.tableTime}</th>
+                      <th>{labels.tableWeather}</th>
+                      <th>{labels.tableTemp}</th>
+                      <th>{labels.tableRain}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {day.hour.filter((_, i) => i % 1 === 0).map((h) => (
+                    {day.hour.map((h) => (
                       <tr>
                         <td class="h-time">{h.time.split(' ')[1]}</td>
                         <td class="h-icon">
@@ -128,7 +129,6 @@ const labels = {
 </Layout>
 
 <script>
-  // クリックで詳細を開閉する動き
   const buttons = document.querySelectorAll('.day-summary-btn');
   buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -136,13 +136,8 @@ const labels = {
       const targetEl = document.getElementById(targetId);
       const isExpanded = button.getAttribute('aria-expanded') === 'true';
 
-      // 状態を切り替え
       button.setAttribute('aria-expanded', !isExpanded);
       targetEl.hidden = isExpanded;
-      
-      // 矢印の向きを変える
-      const arrow = button.querySelector('.arrow-icon');
-      arrow.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
     });
   });
 </script>
@@ -152,21 +147,20 @@ const labels = {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    font-family: sans-serif;
   }
   .section-title {
     font-size: 1.4rem;
     margin-bottom: 24px;
     border-left: 6px solid #872732;
     padding-left: 12px;
-    color: #333;
   }
   .forecast-container {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
   }
   .day-group {
     border-bottom: 1px solid #e5e7eb;
@@ -177,13 +171,13 @@ const labels = {
   .day-summary-btn {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1.2fr 1fr 0.3fr;
+    /* バッジの幅に合わせて列の比率を調整しました */
+    grid-template-columns: 0.8fr 1.4fr 1.1fr 0.7fr 1.2fr;
     align-items: center;
     padding: 16px;
     background: none;
     border: none;
     cursor: pointer;
-    text-align: left;
     transition: background 0.2s;
   }
   .day-summary-btn:hover {
@@ -191,12 +185,12 @@ const labels = {
   }
   .date-info {
     font-weight: bold;
-    font-size: 1.1rem;
+    text-align: left;
   }
   .date-day {
     font-size: 0.85rem;
     color: #666;
-    margin-left: 4px;
+    display: block;
   }
   .weather-info {
     display: flex;
@@ -209,7 +203,6 @@ const labels = {
   }
   .condition-text {
     font-size: 0.9rem;
-    color: #333;
   }
   .temp-info {
     text-align: center;
@@ -232,63 +225,52 @@ const labels = {
     text-align: center;
     color: #007bb5;
     font-weight: bold;
-    font-size: 1rem;
   }
-  .arrow-icon {
+  
+  /* 1時間ごとバッジのデザイン */
+  .badge-wrapper {
+    text-align: right;
+  }
+  .hourly-badge {
+    background-color: #4141e0;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
     font-size: 0.8rem;
-    color: #999;
-    transition: transform 0.3s;
+    font-weight: bold;
+    display: inline-block;
   }
 
-  /* 1時間ごとの詳細エリア */
   .hourly-details {
-    background: #fcfcfc;
-    border-top: 1px solid #f0f0f0;
+    background: #f8f9fa;
     padding: 0 16px 16px 16px;
   }
   .hourly-scroll-wrapper {
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
   .hourly-table {
     width: 100%;
-    min-width: 400px;
+    min-width: 450px;
     border-collapse: collapse;
-    margin-top: 12px;
   }
   .hourly-table th {
+    padding: 12px 4px;
     font-size: 0.75rem;
     color: #888;
-    padding-bottom: 8px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ddd;
   }
   .hourly-table td {
     padding: 10px 4px;
     text-align: center;
-    font-size: 0.9rem;
-    border-bottom: 1px dashed #f0f0f0;
+    border-bottom: 1px solid #eee;
   }
-  .h-time {
-    color: #666;
-    font-weight: 500;
-  }
-  .h-icon img {
-    width: 32px;
-    height: 32px;
-    vertical-align: middle;
-  }
-  .h-temp {
-    font-weight: bold;
-    color: #333;
-  }
-  .h-rain {
-    color: #007bb5;
-    font-size: 0.85rem;
-  }
+  .h-time { color: #666; }
+  .h-icon img { width: 32px; height: 32px; }
+  .h-temp { font-weight: bold; }
+  .h-rain { color: #007bb5; }
 
   .alert-section {
-    margin-top: 32px;
+    margin-top: 30px;
     background: #fff5f5;
     border: 1px solid #feb2b2;
     border-radius: 12px;
@@ -296,13 +278,10 @@ const labels = {
   }
   .alert-title {
     color: #c53030;
-    margin: 0 0 12px 0;
-    font-size: 1.1rem;
-    font-weight: bold;
+    margin: 0 0 10px 0;
   }
   .alert-item {
     font-size: 0.9rem;
-    color: #4a5568;
     line-height: 1.6;
   }
 </style>
