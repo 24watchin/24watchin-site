@@ -44,8 +44,6 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
   
   {current ? (
     <div class="widget-body">
-      <a href={weatherLink} class="city-link">{targetCity.display}</a>
-      
       <div class="widget-content">
         <div class="widget-left">
           {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
@@ -56,6 +54,7 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
         </div>
         
         <div class="widget-right">
+          <a href={weatherLink} class="city-link">{targetCity.display}</a>
           <div class="detail-line">
             <span class="detail-label">{feelsLikeLabel}</span>
             <span class="detail-value">{current.feelslike_c}℃</span>
@@ -77,52 +76,42 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    padding: 16px;
+    padding: 12px 16px 16px 16px;
     margin-bottom: 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
   .widget-title {
     font-size: 1rem;
     font-weight: bold;
-    margin: 0 0 20px 0; 
+    margin: 0 0 12px 0;
     color: #1a1a1a;
     border-bottom: 4px solid #872732; 
     padding-bottom: 6px; 
-    display: inline-block;
-  }
-  .city-link {
-    display: inline-block;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #1a1a1a;
-    text-decoration: none;
-    margin-bottom: 12px;
-  }
-  .city-link:hover {
-    text-decoration: underline;
-    text-decoration-color: #000;
-    text-decoration-thickness: 1px;
+    display: block;
   }
   .widget-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    padding-top: 4px;
   }
   .widget-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
   .widget-icon {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
   }
   .widget-info {
     display: flex;
     flex-direction: column;
+    justify-content: center;
   }
   .widget-temp {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: bold;
     line-height: 1;
     color: #1a1a1a;
@@ -136,6 +125,20 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
     display: flex;
     flex-direction: column;
     gap: 6px;
+    padding-top: 4px;
+  }
+  .city-link {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1a1a1a;
+    text-decoration: none;
+    margin-bottom: 6px;
+  }
+  .city-link:hover {
+    text-decoration: underline;
+    text-decoration-color: #000;
+    text-decoration-thickness: 1px;
   }
   .detail-line {
     font-size: 0.85rem;
