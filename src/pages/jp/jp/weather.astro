@@ -10,12 +10,13 @@ const lang = pathParts[1] || 'jp';
 const apiLangMap = { jp: 'ja', en: 'en', cn: 'zh', fr: 'fr', de: 'de', es: 'es', ru: 'ru' };
 const apiLang = apiLangMap[lang] || 'ja';
 
+// 単位の判定：英語（en）なら華氏・mph、それ以外は摂氏・km/h
 const isImperial = lang === 'en';
 
 const cityMap = {
   jp: { name: 'Tokyo', tz: 'Asia/Tokyo', display: { jp: '東京', en: 'Tokyo', cn: '东京', fr: 'Tokyo', de: 'Tokio', es: 'Tokio', ru: 'Токио' } },
   us: { name: 'New_York', tz: 'America/New_York', display: { jp: 'ニューヨーク', en: 'New York', cn: '纽约', fr: 'New York', de: 'New York', es: 'Nueva York', ru: 'Нью-Йорк' } },
-  de: { name: 'Berlin', tz: 'Europe/Berlin', display: { jp: 'ベルリン', en: 'Berlin', cn: '柏林', fr: 'Berlin', de: 'Berlin', es: 'Berlín', ru: 'Берлин' } },
+  de: { name: 'Berlin', tz: 'Europe/Berlin', display: { jp: 'ベルリン', en: 'Berlin', cn: '柏林', fr: 'Berlin', de: 'Berlin', es: 'Berlín', ru: 'Берリン' } },
 };
 
 const targetCity = cityMap[region] || cityMap.jp;
@@ -49,6 +50,7 @@ const allLabels = {
 
 const labels = allLabels[lang] || allLabels.en;
 const tempUnit = isImperial ? '℉' : '℃';
+const windUnit = isImperial ? 'mph' : 'km/h'; // 風速の単位
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -118,7 +120,8 @@ const getDayName = (dateStr) => {
                       <th>{labels.weather}</th>
                       <th>{labels.temp}({tempUnit})</th>
                       <th>{labels.humidity}</th>
-                      <th>{labels.wind}</th>
+                      {/* ▼ 風速の見出しに単位を追加しました ▼ */}
+                      <th>{labels.wind}({windUnit})</th>
                       <th>{labels.rain}</th>
                     </tr>
                   </thead>
@@ -137,7 +140,6 @@ const getDayName = (dateStr) => {
                           <td class="h-humidity value-text">{h.humidity}%</td>
                           <td class="h-wind value-text">
                             {isImperial ? Math.round(h.wind_mph) : Math.round(h.wind_kph)}
-                            <small>{isImperial ? 'mph' : 'km/h'}</small>
                           </td>
                           <td class="h-rain value-text">{h.chance_of_rain}%</td>
                         </tr>
@@ -172,7 +174,7 @@ const getDayName = (dateStr) => {
     const page = document.querySelector('.weather-page');
     const timezone = page?.getAttribute('data-timezone') || 'Asia/Tokyo';
     
-    // 現在の「現地の時間」をリアルタイムに計算します
+    // 現地の時間を正確に取得
     const nowInCity = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
       year: 'numeric', month: '2-digit', day: '2-digit',
@@ -185,15 +187,14 @@ const getDayName = (dateStr) => {
     const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
     const cityFullDate = `${cityYear}-${cityMonth}-${cityDay}`;
 
-    // 各日のグループをチェック
     document.querySelectorAll('.day-group').forEach(group => {
       const groupDate = group.getAttribute('data-date');
       const isToday = groupDate === cityFullDate;
 
       if (isToday) {
-        // 今日なら、今の時間より前を非表示にする
         group.querySelectorAll('.hourly-row').forEach(row => {
           const rowHour = parseInt(row.getAttribute('data-hour'));
+          // 今の時間より前を確実に非表示にする
           if (rowHour < cityHour) {
             row.style.display = 'none';
           }
@@ -201,7 +202,7 @@ const getDayName = (dateStr) => {
       }
     });
 
-    // アコーディオンの初期化
+    // アコーディオンの再設定
     document.querySelectorAll('.day-summary-btn').forEach(button => {
       button.addEventListener('click', (event) => {
         const btn = event.currentTarget;
@@ -246,11 +247,10 @@ const getDayName = (dateStr) => {
   .hourly-table td { padding: 4px 4px; text-align: center; border-bottom: 1px solid #eee; }
   .h-time { color: #333; font-weight: bold; }
   .h-icon img { width: 64px; height: 64px; vertical-align: middle; object-fit: contain; }
-  /* 気温は黒文字に統一 */
-  .h-temp { color: #1a1a1a !important; font-size: 1.2rem !important; }
+  .h-temp { color: #1a1a1a !important; font-size: 1.25rem !important; }
   .h-humidity { color: #555; }
   .h-rain { color: #007bb5; }
-  .h-wind small { font-size: 0.65rem; margin-left: 2px; color: #666; font-weight: normal; }
+  .h-wind { color: #1a1a1a; }
   .alert-section { margin-top: 30px; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 12px; padding: 20px; }
   .alert-title { color: #c53030; margin: 0 0 10px 0; font-weight: bold; }
   .alert-item { font-size: 0.9rem; line-height: 1.6; }
