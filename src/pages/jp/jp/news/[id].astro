@@ -15,16 +15,11 @@ export async function getStaticPaths() {
   const response = await fetch(url);
   const data = await response.json();
   const posts = data.items || [];
-
-  return posts.map((post) => ({
-    params: { id: post.id },
-    props: { post, allPosts: posts },
-  }));
+  return posts.map((post) => ({ params: { id: post.id }, props: { post, allPosts: posts } }));
 }
 
 const { post, allPosts = [] } = Astro.props;
 
-// ▼ キーワードを使って、この記事の正しいカテゴリを特定します
 const currentCategory = categoryLabelMap.jp.allCategories.find(cat => {
   if (!post.labels) return false;
   return post.labels.some(label => cat.keywords.some(key => label.includes(key)));
@@ -67,8 +62,7 @@ function formatDateTimeJP(dateString) {
   .article-breadcrumb-wrap { margin: -10px 0 6px; }
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
-  .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; }
-  .post-submeta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
   .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
