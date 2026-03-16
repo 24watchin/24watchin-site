@@ -1,0 +1,229 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { getWeatherCondition } from '../../../lib/weatherConditions';
+
+// 1. GitHubのSecretsに保存したAPIキーを呼び出します
+const API_KEY = import.meta.env.WEATHER_API_KEY;
+
+// 2. 天気データを一時的に入れておく箱を用意します
+let weatherData = null;
+let errorMessage = '';
+
+// 3. APIキーがあれば、WeatherAPIから「東京」の今の天気を取得します
+if (API_KEY) {
+  try {
+    const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=Tokyo&aqi=no`;
+    const response = await fetch(url);
+    if (response.ok) {
+      weatherData = await response.json();
+    } else {
+      errorMessage = '天気データの取得に失敗しました。';
+    }
+  } catch (e) {
+    errorMessage = '天気データの読み込み中にエラーが発生しました。';
+  }
+} else {
+  errorMessage = 'APIキーが設定されていません。';
+}
+
+// 4. 取得したデータから、画面に出すものだけを整理します
+const current = weatherData?.current;
+const conditionCode = current?.condition?.code;
+// 先ほど作った辞書を使って、数字のコードを「晴れ」などの日本語に変換します
+const conditionText = conditionCode ? getWeatherCondition(conditionCode, 'jp') : '';
+// 天気アイコンのURLを作ります
+const iconUrl = current?.condition?.icon ? `https:${current.condition.icon}` : '';
+---
+
+<Layout title="日本の天気情報 | 24Watchin" sidebarType="top">
+  {/* パンくずリストを表示します */}
+  <Breadcrumb
+    countryLabel="日本"
+    countryHref="/jp/jp/"
+    categoryLabel="天気"
+    categoryHref="/jp/jp/weather/"
+  />
+
+  <div class="weather-page-container">
+    <header class="weather-header">
+      <h1 class="page-title">日本の天気情報</h1>
+      <p class="attribution">データ提供：<a href="https://www.weatherapi.com/" target="_blank" rel="noopener">WeatherAPI.com</a></p>
+    </header>
+
+    {/* エラーがあればエラー文を、成功していれば天気を表示します */}
+    {errorMessage ? (
+      <p class="error-text">{errorMessage}</p>
+    ) : current ? (
+      <section class="main-city-card">
+        <h2 class="city-name">東京 (Tokyo)</h2>
+        
+        <div class="weather-main-info">
+          <div class="icon-and-condition">
+            {iconUrl && <img src={iconUrl} alt={conditionText} class="weather-icon" />}
+            <span class="condition-text">{conditionText}</span>
+          </div>
+          <div class="temperature-block">
+            <span class="temp-value">{current.temp_c}</span>
+            <span class="temp-unit">℃</span>
+          </div>
+        </div>
+
+        <div class="weather-details">
+          <div class="detail-item">
+            <span class="detail-label">体感温度</span>
+            <span class="detail-value">{current.feelslike_c} ℃</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">湿度</span>
+            <span class="detail-value">{current.humidity} %</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">風速</span>
+            <span class="detail-value">{current.wind_kph} km/h</span>
+          </div>
+        </div>
+      </section>
+    ) : (
+      <p>データを読み込んでいます...</p>
+    )}
+  </div>
+</Layout>
+
+<style>
+  /* 天気ページ全体のデザイン */
+  .weather-page-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+  }
+  .weather-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+  .page-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1a1a1a;
+  }
+  .attribution {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .attribution a {
+    color: #1e3a8a;
+    text-decoration: underline;
+  }
+  
+  /* 東京のカード部分のデザイン */
+  .main-city-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 24px;
+    border: 1px solid #eee;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .city-name {
+    margin: 0 0 16px 0;
+    font-size: 1.25rem;
+    text-align: center;
+    color: #333;
+  }
+  .weather-main-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .icon-and-condition {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .weather-icon {
+    width: 64px;
+    height: 64px;
+  }
+  .condition-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1a1a1a;
+  }
+  .temperature-block {
+    display: flex;
+    align-items: flex-start;
+  }
+  .temp-value {
+    font-size: 3rem;
+    font-weight: bold;
+    line-height: 1;
+    color: #1a1a1a;
+  }
+  .temp-unit {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 4px;
+    margin-left: 2px;
+    color: #666;
+  }
+  
+  /* 詳細情報（体感温度・湿度・風速）のデザイン */
+  .weather-details {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid #ddd;
+    padding-top: 16px;
+  }
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .detail-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 4px;
+  }
+  .detail-value {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+  }
+  .error-text {
+    color: #e8383d;
+    font-weight: bold;
+  }
+
+  /* スマホ用の調整 */
+  @media (max-width: 600px) {
+    .weather-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .weather-details {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .detail-item {
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      border-bottom: 1px dashed #ddd;
+      padding-bottom: 4px;
+    }
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+  }
+</style>
