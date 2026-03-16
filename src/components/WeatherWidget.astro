@@ -46,26 +46,28 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
   </div>
   
   {current ? (
-    <div class="widget-content">
-      <div class="widget-left">
-        {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
-        <span class="widget-desc">{conditionText}</span>
-      </div>
-      
-      <div class="widget-right">
-        <span class="widget-temp">{current.temp_c}℃</span>
-        <div class="widget-details">
-          <div class="detail-line">
-            <span class="detail-label">{feelsLikeLabel}</span>
-            <span class="detail-value">{current.feelslike_c}℃</span>
-          </div>
-          <div class="detail-line">
-            <span class="detail-label">{humidityLabel}</span>
-            <span class="detail-value">{current.humidity}%</span>
+    <a href={weatherLink} class="widget-body-link">
+      <div class="widget-content">
+        <div class="widget-left">
+          {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
+          <span class="widget-desc">{conditionText}</span>
+        </div>
+        
+        <div class="widget-right">
+          <span class="widget-temp">{current.temp_c}℃</span>
+          <div class="widget-details">
+            <div class="detail-line">
+              <span class="detail-label">{feelsLikeLabel}</span>
+              <span class="detail-value">{current.feelslike_c}℃</span>
+            </div>
+            <div class="detail-line">
+              <span class="detail-label">{humidityLabel}</span>
+              <span class="detail-value">{current.humidity}%</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </a>
   ) : (
     <p class="widget-error">{errorText}</p>
   )}
@@ -83,7 +85,6 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
   .widget-header {
     display: flex;
     justify-content: space-between;
-    /* ▼ ここを修正しました（文字の底辺を基準に揃えます） ▼ */
     align-items: baseline; 
     border-bottom: 4px solid #872732;
     padding-bottom: 6px;
@@ -107,6 +108,22 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
     text-decoration-color: #000;
     text-decoration-thickness: 1px;
   }
+  
+  /* ▼ 新しく追加したエリア全体リンクの設定 ▼ */
+  .widget-body-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    /* 見た目のレイアウトを変えずに、クリックできる範囲を「各枠から5px内側」まで広げる設定です */
+    margin: -15px -15px -19px -15px;
+    padding: 15px 15px 19px 15px;
+    border-radius: 6px;
+  }
+  .widget-body-link:hover {
+    text-decoration: none; /* マウスを当てても黒い下線は出しません */
+  }
+  /* ▲ ここまで ▲ */
+
   .widget-content {
     display: flex;
     justify-content: center;
