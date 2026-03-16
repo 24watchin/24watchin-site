@@ -6,407 +6,70 @@ import ShareButtons from '../../../../components/ShareButtons.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
+import { categoryLabelMap } from '../../../../lib/categoryLabels';
 
-const CATEGORY_LABELS = [
-  '政治',
-  '社会',
-  '国際',
-  '経済',
-  '環境・エネルギー',
-  'ビジネス',
-  'テクノロジー・AI',
-  '文化・エンタメ',
-  'スポーツ',
-  '健康・ライフ',
-  '交通',
-  '天気',
-];
+export async function getStaticPaths() {
+  const API_KEY = import.meta.env.API_KEY;
+  const BLOG_ID = import.meta.env.BLOG_ID;
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+  const response = await fetch(url);
+  const data = await response.json();
+  const posts = data.items || [];
 
-const CATEGORY_SLUG_MAP = {
-  '政治': 'politics',
-  '社会': 'society',
-  '国際': 'international',
-  '経済': 'economy',
-  '環境・エネルギー': 'environment-energy',
-  'ビジネス': 'business',
-  'テクノロジー・AI': 'technology-ai',
-  '文化・エンタメ': 'entertainment',
-  'スポーツ': 'sports',
-  '健康・ライフ': 'health-life',
-  '交通': 'traffic',
-  '天気': 'weather',
-};
-
-const MANAGEMENT_LABEL_PATTERN = /^[a-z]{2,}(?:-[a-z0-9]{2,})+$/i;
-
-function normalizeLabels(labels) {
-  return Array.isArray(labels) ? labels.filter(Boolean) : [];
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post, allPosts: posts },
+  }));
 }
 
-function getCategoryLabels(labels) {
-  return normalizeLabels(labels).filter((label) => CATEGORY_LABELS.includes(label));
-}
+const { post, allPosts = [] } = Astro.props;
 
-function getKeywordLabels(labels) {
-  return normalizeLabels(labels).filter((label) => {
-    if (CATEGORY_LABELS.includes(label)) return false;
-    if (MANAGEMENT_LABEL_PATTERN.test(label)) return false;
-    return true;
-  });
-}
+// ▼ キーワードを使って、この記事の正しいカテゴリを特定します
+const currentCategory = categoryLabelMap.jp.allCategories.find(cat => {
+  if (!post.labels) return false;
+  return post.labels.some(label => cat.keywords.some(key => label.includes(key)));
+});
+
+const categoryLabel = currentCategory ? currentCategory.label : 'ニュース';
+const categorySlug = currentCategory ? currentCategory.slug : '';
+const categoryHref = categorySlug ? `/jp/jp/category/${categorySlug}/` : '';
 
 function formatDateTimeJP(dateString) {
   const date = new Date(dateString);
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const hh = String(date.getHours()).padStart(2, '0');
-  const mm = String(date.getMinutes()).padStart(2, '0');
-  return `${y}/${m}/${d} ${hh}:${mm}`;
-}
-
-const { post, relatedPosts = [] } = Astro.props;
-const postCategory = getCategoryLabels(post?.labels)[0] || 'ニュース';
-const postCategorySlug = CATEGORY_SLUG_MAP[postCategory] || '';
-const postCategoryHref = postCategorySlug ? `/jp/jp/category/${postCategorySlug}/` : '';
-const articleKeywordLabels = getKeywordLabels(post?.labels).slice(0, 5);
-const articleUrl = `https://24watchin.com/jp/jp/news/${post?.id}/`;
-
-export async function getStaticPaths() {
-  const CATEGORY_LABELS_LOCAL = [
-    '政治',
-    '社会',
-    '国際',
-    '経済',
-    '環境・エネルギー',
-    'ビジネス',
-    'テクノロジー・AI',
-    '文化・エンタメ',
-    'スポーツ',
-    '健康・ライフ',
-    '交通',
-    '天気',
-  ];
-
-  const MANAGEMENT_LABEL_PATTERN_LOCAL = /^[a-z]{2,}(?:-[a-z0-9]{2,})+$/i;
-
-  function normalizeLabelsLocal(labels) {
-    return Array.isArray(labels) ? labels.filter(Boolean) : [];
-  }
-
-  function getCategoryLabelsLocal(labels) {
-    return normalizeLabelsLocal(labels).filter((label) =>
-      CATEGORY_LABELS_LOCAL.includes(label)
-    );
-  }
-
-  function getKeywordLabelsLocal(labels) {
-    return normalizeLabelsLocal(labels).filter((label) => {
-      if (CATEGORY_LABELS_LOCAL.includes(label)) return false;
-      if (MANAGEMENT_LABEL_PATTERN_LOCAL.test(label)) return false;
-      return true;
-    });
-  }
-
-  async function fetchAllPostsLocal() {
-    const API_KEY = import.meta.env.API_KEY;
-    const BLOG_ID = import.meta.env.BLOG_ID;
-
-    let allPosts = [];
-    let pageToken = '';
-
-    while (true) {
-      const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
-      url.searchParams.set('key', API_KEY);
-      url.searchParams.set('maxResults', '100');
-
-      if (pageToken) {
-        url.searchParams.set('pageToken', pageToken);
-      }
-
-      const response = await fetch(url.toString());
-
-      if (!response.ok) {
-        throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const items = data.items || [];
-
-      allPosts.push(...items);
-
-      if (!data.nextPageToken) {
-        break;
-      }
-
-      pageToken = data.nextPageToken;
-    }
-
-    return allPosts;
-  }
-
-  function buildRelatedPostsLocal(currentPost, allPosts) {
-    const currentKeywordLabels = getKeywordLabelsLocal(currentPost.labels);
-    const currentCategoryLabels = getCategoryLabelsLocal(currentPost.labels);
-
-    const scoredPosts = allPosts
-      .filter((candidate) => candidate.id !== currentPost.id)
-      .map((candidate) => {
-        const candidateKeywordLabels = getKeywordLabelsLocal(candidate.labels);
-        const candidateCategoryLabels = getCategoryLabelsLocal(candidate.labels);
-
-        const matchedKeywordLabels = currentKeywordLabels.filter((label) =>
-          candidateKeywordLabels.includes(label)
-        );
-
-        const hasCategoryMatch = currentCategoryLabels.some((label) =>
-          candidateCategoryLabels.includes(label)
-        );
-
-        return {
-          ...candidate,
-          matchedKeywordLabels,
-          keywordMatchCount: matchedKeywordLabels.length,
-          categoryMatchCount: hasCategoryMatch ? 1 : 0,
-          publishedTime: new Date(candidate.published).getTime() || 0,
-        };
-      })
-      .sort((a, b) => {
-        if (b.keywordMatchCount !== a.keywordMatchCount) {
-          return b.keywordMatchCount - a.keywordMatchCount;
-        }
-
-        if (b.categoryMatchCount !== a.categoryMatchCount) {
-          return b.categoryMatchCount - a.categoryMatchCount;
-        }
-
-        return b.publishedTime - a.publishedTime;
-      });
-
-    return scoredPosts.slice(0, 6);
-  }
-
-  const posts = await fetchAllPostsLocal();
-
-  const sortedPosts = [...posts].sort((a, b) => {
-    return new Date(b.published).getTime() - new Date(a.published).getTime();
-  });
-
-  return sortedPosts.map((post) => {
-    const relatedPosts = buildRelatedPostsLocal(post, sortedPosts);
-
-    return {
-      params: { id: post.id },
-      props: { post, relatedPosts },
-    };
-  });
+  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 ---
 
 <Layout title={post.title} sidebarType="article">
   <div class="article-breadcrumb-wrap">
-    <Breadcrumb
-      countryLabel="日本"
-      countryHref="/jp/jp/"
-      categoryLabel={postCategory}
-      categoryHref={postCategoryHref}
-    />
+    <Breadcrumb countryLabel="日本" countryHref="/jp/jp/" categoryLabel={categoryLabel} categoryHref={categoryHref} />
   </div>
 
   <article class="post-container">
     <header class="post-header">
       <h1 class="post-title">{post.title}</h1>
-
       <div class="post-submeta">
-        <div class="post-submeta-left">
-          <time class="post-date" datetime={post.published}>
-            {formatDateTimeJP(post.published)}
-          </time>
-        </div>
-
-        <div class="post-submeta-right">
-          <ShareButtons articleUrl={articleUrl} articleTitle={post.title} />
-        </div>
+        <time class="post-date">{formatDateTimeJP(post.published)}</time>
+        <ShareButtons articleUrl={`https://24watchin.com/jp/jp/news/${post.id}/`} articleTitle={post.title} />
       </div>
     </header>
-
-<div class="post-content" set:html={post.content} />
-
-<ReactionBar articleId={post.id} />
-
-<div class="article-keywords">
-  <div class="keyword-row">
-    <span class="keyword-label">関連ワード：</span>
-
-        {articleKeywordLabels.length > 0 ? (
-          <div class="keyword-list">
-            {articleKeywordLabels.map((label) => (
-              <span class="keyword-chip">{label}</span>
-            ))}
-          </div>
-        ) : (
-          <span class="keyword-empty">なし</span>
-        )}
-      </div>
-    </div>
+    <div class="post-content" set:html={post.content} />
+    <ReactionBar articleId={post.id} />
   </article>
 
-  <div slot="bottom-wide" class="article-footer-blocks">
-    <RelatedNews relatedPosts={relatedPosts} />
-    <EditorPicks recentPosts={relatedPosts} />
+  <div slot="bottom-wide">
+    <RelatedNews relatedPosts={allPosts.slice(0, 6)} />
     <RecommendedLinks />
   </div>
 </Layout>
 
 <style>
-  .article-breadcrumb-wrap {
-    margin: -10px 0 6px;
-  }
-
-  .post-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-
-  .post-header {
-    margin-bottom: 16px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 12px;
-  }
-
-  .post-title {
-    font-size: 28px;
-    line-height: 1.4;
-    color: #1a1a1a;
-    margin: 0 0 12px 0;
-  }
-
-  .post-submeta {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .post-submeta-left {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .post-submeta-right {
-    flex-shrink: 0;
-  }
-
-  .post-date {
-    display: block;
-    color: #666;
-    font-size: 14px;
-  }
-
-  .post-content {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #1a1a1a;
-  }
-
-  .post-content :global(h2),
-  .post-content :global(h3),
-  .post-content :global(h4),
-  .post-content :global(h5),
-  .post-content :global(h6),
-  .post-content :global(p),
-  .post-content :global(li),
-  .post-content :global(blockquote) {
-    color: #1a1a1a;
-  }
-
-  .post-content :global(a) {
-    color: #1a1a1a;
-  }
-
-  .post-content :global(img) {
-    max-width: 100% !important;
-    height: auto !important;
-    border-radius: 4px;
-    margin: 8px 0 20px;
-  }
-
-  .article-keywords {
-    margin-top: 28px;
-    padding-top: 18px;
-    border-top: 1px solid #eee;
-  }
-
-  .keyword-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .keyword-label {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1a1a1a;
-    line-height: 1.8;
-    flex-shrink: 0;
-  }
-
-  .keyword-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    min-width: 0;
-  }
-
-  .keyword-chip {
-    display: inline-flex;
-    align-items: center;
-    padding: 5px 10px;
-    border-radius: 16px;
-    background: #f1f1f1;
-    color: #1a1a1a;
-    font-size: 13px;
-    line-height: 1.2;
-  }
-
-  .keyword-empty {
-    color: #888;
-    font-size: 14px;
-    line-height: 1.8;
-  }
-
-  .article-footer-blocks {
-    margin-top: 50px;
-  }
-
-  @media (max-width: 768px) {
-    .article-breadcrumb-wrap {
-      margin: -8px 0 4px;
-    }
-
-    .post-container {
-      padding: 22px 18px;
-    }
-
-    .post-title {
-      font-size: 24px;
-      margin-bottom: 16px;
-    }
-
-    .post-submeta {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .post-submeta-right {
-      width: 100%;
-    }
-
-    .keyword-row {
-      gap: 8px;
-    }
-  }
+  .article-breadcrumb-wrap { margin: -10px 0 6px; }
+  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+  .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; }
+  .post-submeta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .post-date { color: #666; font-size: 14px; }
+  .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
+  .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 </style>
