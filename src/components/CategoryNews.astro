@@ -1,6 +1,5 @@
 ---
 const { title, slug, posts = [] } = Astro.props;
-
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/120x80/eeeeee/999999?text=No+Image';
@@ -23,7 +22,7 @@ const getImageUrl = (content) => {
           <h4>{post.title}</h4>
           <div class="article-meta">
             <span class="date">{new Date(post.published).toLocaleDateString('ja-JP')}</span>
-            {/* タグ表示を削除しました */}
+            {/* タグを削除しました */}
           </div>
         </div>
       </a>
@@ -40,6 +39,6 @@ const getImageUrl = (content) => {
   .article-item { display: flex; gap: 12px; text-decoration: none; color: #333; }
   .article-img { width: 120px; height: 80px; flex-shrink: 0; border-radius: 4px; overflow: hidden; }
   .article-img img { width: 100%; height: 100%; object-fit: cover; }
-  .article-info h4 { font-size: 14px; margin: 0 0 5px; line-height: 1.4; font-weight: bold; color: #1a1a1a; }
+  .article-info h4 { font-size: 14px; margin: 0 0 5px; line-height: 1.4; font-weight: bold; }
   .article-meta { font-size: 11px; color: #888; }
 </style>
