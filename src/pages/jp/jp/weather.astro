@@ -40,50 +40,81 @@ const getDayName = (dateStr) => {
   const days = lang === 'en' ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['日', '月', '火', '水', '木', '金', '土'];
   return days[new Date(dateStr).getDay()];
 };
+
+// ラベルの多言語化
+const labels = {
+  title: lang === 'en' ? `${targetCity.display} 3-Day Forecast` : `${targetCity.display} 3日間の天気予報`,
+  tableDate: lang === 'en' ? 'Date' : '日付',
+  tableWeather: lang === 'en' ? 'Weather' : '天気',
+  tableTemp: lang === 'en' ? 'High/Low' : '最高 / 最低',
+  tableRain: lang === 'en' ? 'Rain' : '降水確率',
+  hourlyTitle: lang === 'en' ? 'Hourly Forecast' : '1時間ごとの予報',
+  alertTitle: lang === 'en' ? 'Weather Alerts' : '気象注意報・警報',
+};
 ---
 
 <Layout title={`${targetCity.display}${lang === 'en' ? ' Weather' : 'の天気'}`}>
   <main class="weather-page">
     <section class="forecast-section">
-      <h2 class="section-title">{targetCity.display} 3日間の天気予報</h2>
+      <h2 class="section-title">{labels.title}</h2>
       
-      <table class="forecast-table">
-        <thead>
-          <tr>
-            <th>日付</th>
-            <th>天気</th>
-            <th>最高 / 最低</th>
-            <th>降水確率</th>
-          </tr>
-        </thead>
-        <tbody>
-          {forecastDays.map((day) => (
-            <tr>
-              <td class="date-col">
+      <div class="forecast-container">
+        {forecastDays.map((day, index) => (
+          <div class="day-group">
+            <button class="day-summary-btn" aria-expanded="false" data-target={`hourly-${index}`}>
+              <div class="date-info">
                 <span class="date-num">{formatDate(day.date)}</span>
                 <span class="date-day">({getDayName(day.date)})</span>
-              </td>
-              <td class="icon-col">
-                <img src={`https:${day.day.condition.icon}`} alt={day.day.condition.text} />
+              </div>
+              <div class="weather-info">
+                <img src={`https:${day.day.condition.icon}`} alt="" />
                 <span class="condition-text">{getWeatherCondition(day.day.condition.code, lang)}</span>
-              </td>
-              <td class="temp-col">
+              </div>
+              <div class="temp-info">
                 <span class="temp-max">{Math.round(day.day.maxtemp_c)}°</span>
                 <span class="temp-sep">/</span>
                 <span class="temp-min">{Math.round(day.day.mintemp_c)}°</span>
-              </td>
-              <td class="rain-col">
-                {day.day.daily_chance_of_rain}%
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <div class="rain-info">
+                <span class="rain-val">{day.day.daily_chance_of_rain}%</span>
+              </div>
+              <div class="arrow-icon">▼</div>
+            </button>
+
+            <div id={`hourly-${index}`} class="hourly-details" hidden>
+              <div class="hourly-scroll-wrapper">
+                <table class="hourly-table">
+                  <thead>
+                    <tr>
+                      <th>時刻</th>
+                      <th>天気</th>
+                      <th>気温</th>
+                      <th>降水</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {day.hour.filter((_, i) => i % 1 === 0).map((h) => (
+                      <tr>
+                        <td class="h-time">{h.time.split(' ')[1]}</td>
+                        <td class="h-icon">
+                          <img src={`https:${h.condition.icon}`} alt="" />
+                        </td>
+                        <td class="h-temp">{Math.round(h.temp_c)}°</td>
+                        <td class="h-rain">{h.chance_of_rain}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
 
     {alerts.length > 0 && (
       <section class="alert-section">
-        <h3 class="alert-title">気象注意報・警報</h3>
+        <h3 class="alert-title">{labels.alertTitle}</h3>
         <div class="alert-list">
           {alerts.map((alert) => (
             <div class="alert-item">
@@ -96,95 +127,182 @@ const getDayName = (dateStr) => {
   </main>
 </Layout>
 
+<script>
+  // クリックで詳細を開閉する動き
+  const buttons = document.querySelectorAll('.day-summary-btn');
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetId = button.getAttribute('data-target');
+      const targetEl = document.getElementById(targetId);
+      const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+      // 状態を切り替え
+      button.setAttribute('aria-expanded', !isExpanded);
+      targetEl.hidden = isExpanded;
+      
+      // 矢印の向きを変える
+      const arrow = button.querySelector('.arrow-icon');
+      arrow.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+  });
+</script>
+
 <style>
   .weather-page {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    font-family: sans-serif;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
   }
   .section-title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    font-size: 1.4rem;
+    margin-bottom: 24px;
     border-left: 6px solid #872732;
     padding-left: 12px;
+    color: #333;
   }
-  .forecast-table {
-    width: 100%;
-    border-collapse: collapse;
+  .forecast-container {
     background: #fff;
-    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
-  .forecast-table th {
-    background: #f8f9fa;
-    padding: 12px;
-    text-align: center;
-    border-bottom: 2px solid #eee;
-    font-size: 0.9rem;
-    color: #666;
+  .day-group {
+    border-bottom: 1px solid #e5e7eb;
   }
-  .forecast-table td {
-    padding: 16px 12px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    vertical-align: middle;
+  .day-group:last-child {
+    border-bottom: none;
   }
-  .date-col {
+  .day-summary-btn {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1.2fr 1fr 0.3fr;
+    align-items: center;
+    padding: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+  }
+  .day-summary-btn:hover {
+    background: #f9fafb;
+  }
+  .date-info {
     font-weight: bold;
+    font-size: 1.1rem;
   }
   .date-day {
     font-size: 0.85rem;
+    color: #666;
     margin-left: 4px;
   }
-  .icon-col {
+  .weather-info {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
   }
-  .icon-col img {
-    width: 48px;
-    height: 48px;
+  .weather-info img {
+    width: 44px;
+    height: 44px;
   }
   .condition-text {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: #333;
+  }
+  .temp-info {
+    text-align: center;
   }
   .temp-max {
     color: #d32f2f;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
   .temp-min {
     color: #1976d2;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
   .temp-sep {
     color: #ccc;
     margin: 0 4px;
   }
-  .rain-col {
-    font-weight: bold;
+  .rain-info {
+    text-align: center;
     color: #007bb5;
+    font-weight: bold;
+    font-size: 1rem;
   }
+  .arrow-icon {
+    font-size: 0.8rem;
+    color: #999;
+    transition: transform 0.3s;
+  }
+
+  /* 1時間ごとの詳細エリア */
+  .hourly-details {
+    background: #fcfcfc;
+    border-top: 1px solid #f0f0f0;
+    padding: 0 16px 16px 16px;
+  }
+  .hourly-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .hourly-table {
+    width: 100%;
+    min-width: 400px;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+  .hourly-table th {
+    font-size: 0.75rem;
+    color: #888;
+    padding-bottom: 8px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  .hourly-table td {
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 0.9rem;
+    border-bottom: 1px dashed #f0f0f0;
+  }
+  .h-time {
+    color: #666;
+    font-weight: 500;
+  }
+  .h-icon img {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+  }
+  .h-temp {
+    font-weight: bold;
+    color: #333;
+  }
+  .h-rain {
+    color: #007bb5;
+    font-size: 0.85rem;
+  }
+
   .alert-section {
-    margin-top: 30px;
+    margin-top: 32px;
     background: #fff5f5;
     border: 1px solid #feb2b2;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 20px;
   }
   .alert-title {
     color: #c53030;
-    margin: 0 0 10px 0;
+    margin: 0 0 12px 0;
     font-size: 1.1rem;
+    font-weight: bold;
   }
   .alert-item {
     font-size: 0.9rem;
     color: #4a5568;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 </style>
