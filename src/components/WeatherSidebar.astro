@@ -1,0 +1,35 @@
+---
+// サイドバー用の広告部品を読み込みます
+import SidebarAd from './SidebarAd.astro';
+// 天気パーツを読み込みます
+import WeatherWidget from './WeatherWidget.astro';
+---
+
+<div class="sidebar-wrapper">
+  {/* 1. 一番上に天気パーツを配置 */}
+  <WeatherWidget />
+
+  {/* 2. その下に広告を配置 */}
+  <SidebarAd />
+
+  {/* 必要に応じて、ここにさらに「防災情報」などのパーツを追加できます */}
+</div>
+
+<style>
+  .sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar-wrapper > :global(*) {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+</style>
