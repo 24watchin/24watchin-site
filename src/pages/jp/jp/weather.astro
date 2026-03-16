@@ -7,21 +7,35 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const region = pathParts[0] || 'jp';
 const lang = pathParts[1] || 'jp';
 
+// API用の言語コード変換（URLがjpならja、cnならzhに変換してAPIに伝えます）
+const apiLangMap = {
+  jp: 'ja',
+  en: 'en',
+  cn: 'zh',
+  fr: 'fr',
+  de: 'de',
+  es: 'es',
+  ru: 'ru'
+};
+const apiLang = apiLangMap[lang] || 'ja';
+
 const cityMap = {
-  jp: { name: 'Tokyo', display: lang === 'en' ? 'Tokyo' : '東京' },
-  us: { name: 'New_York', display: lang === 'en' ? 'New York' : 'ニューヨーク' },
-  de: { name: 'Berlin', display: lang === 'en' ? 'Berlin' : 'ベルリン' },
+  jp: { name: 'Tokyo', display: { jp: '東京', en: 'Tokyo', cn: '东京', fr: 'Tokyo', de: 'Tokio', es: 'Tokio', ru: 'Токио' } },
+  us: { name: 'New_York', display: { jp: 'ニューヨーク', en: 'New York', cn: '纽约', fr: 'New York', de: 'New York', es: 'Nueva York', ru: 'Нью-Йорк' } },
+  de: { name: 'Berlin', display: { jp: 'ベルリン', en: 'Berlin', cn: '柏林', fr: 'Berlin', de: 'Berlin', es: 'Berlín', ru: 'Берлин' } },
 };
 
 const targetCity = cityMap[region] || cityMap.jp;
-const API_KEY = import.meta.env.WEATHER_API_KEY;
+const cityDisplayName = targetCity.display[lang] || targetCity.display.en;
 
+const API_KEY = import.meta.env.WEATHER_API_KEY;
 let forecastDays = [];
 let alerts = [];
 
 if (API_KEY) {
   try {
-    const url = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${targetCity.name}&days=3&aqi=no&alerts=yes&lang=ja`;
+    // APIを呼び出す際、apiLang（ja, fr, ruなど）を渡すことで天気の言葉が自動翻訳されます
+    const url = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${targetCity.name}&days=3&aqi=no&alerts=yes&lang=${apiLang}`;
     const response = await fetch(url);
     if (response.ok) {
       const data = await response.json();
@@ -31,31 +45,43 @@ if (API_KEY) {
   } catch (e) {}
 }
 
+// 7ヶ国語分のラベル辞書
+const allLabels = {
+  jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象注意報・警報', time: '時刻', temp: '気温', rain: '降水' },
+  en: { title: '3-Day Forecast', hourly: 'Hourly', alert: 'Weather Alerts', time: 'Time', temp: 'Temp', rain: 'Rain' },
+  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', temp: '气温', rain: '降水' },
+  fr: { title: 'Prévisions sur 3 jours', hourly: 'Par heure', alert: 'Alertes météo', time: 'Heure', temp: 'Temp', rain: 'Pluie' },
+  de: { title: '3-Tage-Vorhersage', hourly: 'Stündlich', alert: 'Wetterwarnungen', time: 'Zeit', temp: 'Temp', rain: 'Regen' },
+  es: { title: 'Pronóstico de 3 días', hourly: 'Por hora', alert: 'Alertas meteorológicas', time: 'Hora', temp: 'Temp', rain: 'Lluvia' },
+  ru: { title: 'Прогноз на 3 дня', hourly: 'По часам', alert: 'Метеопредупреждения', time: 'Время', temp: 'Темп', rain: 'Осадки' }
+};
+
+const labels = allLabels[lang] || allLabels.en;
+
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getMonth() + 1}/${date.getDate()}`;
 };
 
 const getDayName = (dateStr) => {
-  const days = lang === 'en' ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['日', '月', '火', '水', '木', '金', '土'];
-  return days[new Date(dateStr).getDay()];
-};
-
-const labels = {
-  title: lang === 'en' ? `${targetCity.display} 3-Day Forecast` : `${targetCity.display} 3日間の天気予報`,
-  hourlyBadge: lang === 'en' ? 'Hourly' : '1時間ごと',
-  alertTitle: lang === 'en' ? 'Weather Alerts' : '気象注意報・警報',
-  tableTime: lang === 'en' ? 'Time' : '時刻',
-  tableWeather: lang === 'en' ? 'Weather' : '天気',
-  tableTemp: lang === 'en' ? 'Temp' : '気温',
-  tableRain: lang === 'en' ? 'Rain' : '降水',
+  const dayIndex = new Date(dateStr).getDay();
+  const dayNames = {
+    jp: ['日', '月', '火', '水', '木', '金', '土'],
+    en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    cn: ['日', '一', '二', '三', '四', '五', '六'],
+    fr: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+    de: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+    es: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+    ru: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
+  };
+  return (dayNames[lang] || dayNames.en)[dayIndex];
 };
 ---
 
-<Layout title={`${targetCity.display}${lang === 'en' ? ' Weather' : 'の天気'}`}>
+<Layout title={`${cityDisplayName} | ${labels.title}`}>
   <main class="weather-page">
     <section class="forecast-section">
-      <h2 class="section-title">{labels.title}</h2>
+      <h2 class="section-title">{cityDisplayName} {labels.title}</h2>
       
       <div class="forecast-container">
         {forecastDays.map((day, index) => (
@@ -78,7 +104,7 @@ const labels = {
                 <span class="rain-val">{day.day.daily_chance_of_rain}%</span>
               </div>
               <div class="badge-wrapper">
-                <span class="hourly-badge">{labels.hourlyBadge}</span>
+                <span class="hourly-badge">{labels.hourly}</span>
               </div>
             </button>
 
@@ -87,10 +113,10 @@ const labels = {
                 <table class="hourly-table">
                   <thead>
                     <tr>
-                      <th>{labels.tableTime}</th>
-                      <th>{labels.tableWeather}</th>
-                      <th>{labels.tableTemp}</th>
-                      <th>{labels.tableRain}</th>
+                      <th>{labels.time}</th>
+                      <th>{labels.title.split(' ')[0]}</th> {/* 天気/Weather */}
+                      <th>{labels.temp}</th>
+                      <th>{labels.rain}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -115,7 +141,7 @@ const labels = {
 
     {alerts.length > 0 && (
       <section class="alert-section">
-        <h3 class="alert-title">{labels.alertTitle}</h3>
+        <h3 class="alert-title">{labels.alert}</h3>
         <div class="alert-list">
           {alerts.map((alert) => (
             <div class="alert-item">
@@ -135,7 +161,6 @@ const labels = {
       const targetId = button.getAttribute('data-target');
       const targetEl = document.getElementById(targetId);
       const isExpanded = button.getAttribute('aria-expanded') === 'true';
-
       button.setAttribute('aria-expanded', !isExpanded);
       targetEl.hidden = isExpanded;
     });
@@ -143,145 +168,32 @@ const labels = {
 </script>
 
 <style>
-  .weather-page {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: sans-serif;
-  }
-  .section-title {
-    font-size: 1.4rem;
-    margin-bottom: 24px;
-    border-left: 6px solid #872732;
-    padding-left: 12px;
-  }
-  .forecast-container {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  }
-  .day-group {
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .day-group:last-child {
-    border-bottom: none;
-  }
-  .day-summary-btn {
-    width: 100%;
-    display: grid;
-    /* バッジの幅に合わせて列の比率を調整しました */
-    grid-template-columns: 0.8fr 1.4fr 1.1fr 0.7fr 1.2fr;
-    align-items: center;
-    padding: 16px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .day-summary-btn:hover {
-    background: #f9fafb;
-  }
-  .date-info {
-    font-weight: bold;
-    text-align: left;
-  }
-  .date-day {
-    font-size: 0.85rem;
-    color: #666;
-    display: block;
-  }
-  .weather-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .weather-info img {
-    width: 44px;
-    height: 44px;
-  }
-  .condition-text {
-    font-size: 0.9rem;
-  }
-  .temp-info {
-    text-align: center;
-  }
-  .temp-max {
-    color: #d32f2f;
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-  .temp-min {
-    color: #1976d2;
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-  .temp-sep {
-    color: #ccc;
-    margin: 0 4px;
-  }
-  .rain-info {
-    text-align: center;
-    color: #007bb5;
-    font-weight: bold;
-  }
-  
-  /* 1時間ごとバッジのデザイン */
-  .badge-wrapper {
-    text-align: right;
-  }
-  .hourly-badge {
-    background-color: #4141e0;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    display: inline-block;
-  }
-
-  .hourly-details {
-    background: #f8f9fa;
-    padding: 0 16px 16px 16px;
-  }
-  .hourly-scroll-wrapper {
-    overflow-x: auto;
-  }
-  .hourly-table {
-    width: 100%;
-    min-width: 450px;
-    border-collapse: collapse;
-  }
-  .hourly-table th {
-    padding: 12px 4px;
-    font-size: 0.75rem;
-    color: #888;
-    border-bottom: 1px solid #ddd;
-  }
-  .hourly-table td {
-    padding: 10px 4px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-  }
-  .h-time { color: #666; }
-  .h-icon img { width: 32px; height: 32px; }
+  /* スタイルは共通なので以前と同じものを維持 */
+  .weather-page { max-width: 800px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
+  .section-title { font-size: 1.4rem; margin-bottom: 24px; border-left: 6px solid #872732; padding-left: 12px; }
+  .forecast-container { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  .day-group { border-bottom: 1px solid #e5e7eb; }
+  .day-summary-btn { width: 100%; display: grid; grid-template-columns: 0.8fr 1.4fr 1.1fr 0.7fr 1.2fr; align-items: center; padding: 16px; background: none; border: none; cursor: pointer; }
+  .day-summary-btn:hover { background: #f9fafb; }
+  .date-info { font-weight: bold; text-align: left; }
+  .date-day { font-size: 0.85rem; color: #666; display: block; }
+  .weather-info { display: flex; align-items: center; gap: 8px; }
+  .weather-info img { width: 44px; height: 44px; }
+  .condition-text { font-size: 0.9rem; }
+  .temp-max { color: #d32f2f; font-weight: bold; font-size: 1.2rem; }
+  .temp-min { color: #1976d2; font-weight: bold; font-size: 1.2rem; }
+  .temp-sep { color: #ccc; margin: 0 4px; }
+  .rain-info { text-align: center; color: #007bb5; font-weight: bold; }
+  .badge-wrapper { text-align: right; }
+  .hourly-badge { background-color: #4141e0; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
+  .hourly-details { background: #f8f9fa; padding: 0 16px 16px 16px; }
+  .hourly-scroll-wrapper { overflow-x: auto; }
+  .hourly-table { width: 100%; min-width: 450px; border-collapse: collapse; }
+  .hourly-table th { padding: 12px 4px; font-size: 0.75rem; color: #888; border-bottom: 1px solid #ddd; }
+  .hourly-table td { padding: 10px 4px; text-align: center; border-bottom: 1px solid #eee; }
   .h-temp { font-weight: bold; }
   .h-rain { color: #007bb5; }
-
-  .alert-section {
-    margin-top: 30px;
-    background: #fff5f5;
-    border: 1px solid #feb2b2;
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .alert-title {
-    color: #c53030;
-    margin: 0 0 10px 0;
-  }
-  .alert-item {
-    font-size: 0.9rem;
-    line-height: 1.6;
-  }
+  .alert-section { margin-top: 30px; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 12px; padding: 20px; }
+  .alert-title { color: #c53030; margin: 0 0 10px 0; }
+  .alert-item { font-size: 0.9rem; line-height: 1.6; }
 </style>
