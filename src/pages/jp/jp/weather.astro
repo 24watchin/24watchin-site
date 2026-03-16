@@ -34,7 +34,6 @@ if (API_KEY) {
       forecastDays = data.forecast.forecastday;
       alerts = data.alerts.alert;
       
-      // 現地の現在時刻（例: "2026-03-16 13:57"）を取得して基準にします
       const localTimeStr = data.location.localtime;
       localDateStr = localTimeStr.split(' ')[0];
       localHour = parseInt(localTimeStr.split(' ')[1].split(':')[0]);
@@ -43,13 +42,13 @@ if (API_KEY) {
 }
 
 const allLabels = {
-  jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象注意報・警報', time: '時刻', temp: '気温', rain: '降水', humidity: '湿度' },
-  en: { title: '3-Day Forecast', hourly: 'Hourly', alert: 'Weather Alerts', time: 'Time', temp: 'Temp', rain: 'Rain', humidity: 'Humid' },
-  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', temp: '气温', rain: '降水', humidity: '湿度' },
-  fr: { title: 'Prévisions sur 3 jours', hourly: 'Par heure', alert: 'Alertes météo', time: 'Heure', temp: 'Temp', rain: 'Pluie', humidity: 'Humid' },
-  de: { title: '3-Tage-Vorhersage', hourly: 'Stündlich', alert: 'Wetterwarnungen', time: 'Zeit', temp: 'Temp', rain: 'Regen', humidity: 'Luftf' },
-  es: { title: 'Pronóstico de 3 días', hourly: 'Por hora', alert: 'Alertas meteorológicas', time: 'Hora', temp: 'Temp', rain: 'Lluvia', humidity: 'Humed' },
-  ru: { title: 'Прогноз на 3 дня', hourly: 'По часам', alert: 'Метеопредупреждения', time: 'Время', temp: 'Темп', rain: 'Осадки', humidity: 'Влаж' }
+  jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象注意報・警報', time: '時刻', weather: '天気', temp: '気温', rain: '降水', humidity: '湿度' },
+  en: { title: '3-Day Forecast', hourly: 'Hourly', alert: 'Weather Alerts', time: 'Time', weather: 'Weather', temp: 'Temp', rain: 'Rain', humidity: 'Humid' },
+  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', weather: '天气', temp: '气温', rain: '降水', humidity: '湿度' },
+  fr: { title: 'Prévisions sur 3 jours', hourly: 'Par heure', alert: 'Alertes météo', time: 'Heure', weather: 'Météo', temp: 'Temp', rain: 'Pluie', humidity: 'Humid' },
+  de: { title: '3-Tage-Vorhersage', hourly: 'Stündlich', alert: 'Wetterwarnungen', time: 'Zeit', weather: 'Wetter', temp: 'Temp', rain: 'Regen', humidity: 'Luftf' },
+  es: { title: 'Pronóstico de 3 días', hourly: 'Por hora', alert: 'Alertas meteorológicas', time: 'Hora', weather: 'Clima', temp: 'Temp', rain: 'Lluvia', humidity: 'Humed' },
+  ru: { title: 'Прогноз на 3 дня', hourly: 'По часам', alert: 'Метеопредупреждения', time: 'Время', weather: 'Погода', temp: 'Темп', rain: 'Осадки', humidity: 'Влаж' }
 };
 
 const labels = allLabels[lang] || allLabels.en;
@@ -81,9 +80,7 @@ const getDayName = (dateStr) => {
       
       <div class="forecast-container">
         {forecastDays.map((day, index) => {
-          // 現地の今日かどうかを判定
           const isTodayInCity = day.date === localDateStr;
-          // 現地の今より前の時間を消します
           const filteredHours = isTodayInCity 
             ? day.hour.filter(h => parseInt(h.time.split(' ')[1].split(':')[0]) >= localHour)
             : day.hour;
@@ -117,7 +114,7 @@ const getDayName = (dateStr) => {
                     <thead>
                       <tr>
                         <th>{labels.time}</th>
-                        <th>{labels.title.split(' ')[0]}</th>
+                        <th>{labels.weather}</th>
                         <th>{labels.temp}</th>
                         <th>{labels.humidity}</th>
                         <th>{labels.rain}</th>
@@ -126,7 +123,7 @@ const getDayName = (dateStr) => {
                     <tbody>
                       {filteredHours.map((h) => (
                         <tr>
-                          <td class="h-time">{h.time.split(' ')[1]}</td>
+                          <td class="h-time value-text">{h.time.split(' ')[1]}</td>
                           <td class="h-icon">
                             <img src={`https:${h.condition.icon}`} alt="" />
                           </td>
@@ -174,7 +171,6 @@ const getDayName = (dateStr) => {
 </script>
 
 <style>
-  /* 数値のフォントサイズを統一するための変数 */
   :root {
     --weather-value-size: 1.15rem;
   }
@@ -190,22 +186,20 @@ const getDayName = (dateStr) => {
     display: grid; 
     grid-template-columns: 1fr 1.5fr 1.2fr 0.8fr 1fr; 
     align-items: center; 
-    padding: 16px; 
+    padding: 12px 16px; 
     background: none; 
     border: none; 
     cursor: pointer; 
   }
   .day-summary-btn:hover { background: #f9fafb; }
 
-  /* 日付を横並びに */
   .date-info { text-align: left; }
   .date-text { font-weight: bold; font-size: 1.05rem; white-space: nowrap; }
 
   .weather-info { display: flex; align-items: center; gap: 8px; }
-  .summary-icon { width: 54px; height: 54px; } /* アイコンを少し大きく */
+  .summary-icon { width: 60px; height: 60px; } 
   .condition-text { font-size: 0.9rem; color: #333; }
 
-  /* 数値の統一スタイル */
   .value-text {
     font-size: var(--weather-value-size);
     font-weight: bold;
@@ -221,15 +215,25 @@ const getDayName = (dateStr) => {
   .badge-wrapper { text-align: right; }
   .hourly-badge { background-color: #4141e0; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
 
-  /* 1時間ごとの詳細 */
-  .hourly-details { background: #f8f9fa; padding: 0 16px 16px 16px; }
+  /* 1時間ごとの詳細 - 余白を詰めてスッキリさせました */
+  .hourly-details { background: #f8f9fa; padding: 0 16px 8px 16px; }
   .hourly-scroll-wrapper { overflow-x: auto; }
   .hourly-table { width: 100%; min-width: 500px; border-collapse: collapse; }
-  .hourly-table th { padding: 12px 4px; font-size: 0.75rem; color: #888; border-bottom: 1px solid #ddd; }
-  .hourly-table td { padding: 12px 4px; text-align: center; border-bottom: 1px solid #eee; }
+  .hourly-table th { padding: 8px 4px; font-size: 0.75rem; color: #888; border-bottom: 1px solid #ddd; }
+  .hourly-table td { 
+    padding: 6px 4px; /* ここを詰めて縦を短くしました */
+    text-align: center; 
+    border-bottom: 1px solid #eee; 
+  }
   
-  .h-time { color: #666; font-size: 0.9rem; }
-  .h-icon img { width: 40px; height: 40px; }
+  .h-time { color: #666; }
+  /* アイコンを大きくし、位置を微調整 */
+  .h-icon img { 
+    width: 48px; 
+    height: 48px; 
+    vertical-align: middle;
+    object-fit: contain;
+  }
   .h-humidity { color: #666; }
   .h-rain { color: #007bb5; }
 
