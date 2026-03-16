@@ -1,0 +1,120 @@
+---
+import { getWeatherCondition } from '../lib/weatherConditions';
+
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const region = pathParts[0] || 'jp';
+const lang = pathParts[1] || 'jp';
+
+const cityMap = {
+  jp: { name: 'Tokyo', display: lang === 'en' ? 'Tokyo' : '東京' },
+  us: { name: 'New_York', display: lang === 'en' ? 'New York' : 'ニューヨーク' },
+  de: { name: 'Berlin', display: lang === 'en' ? 'Berlin' : 'ベルリン' },
+};
+
+const targetCity = cityMap[region] || cityMap.jp;
+const API_KEY = import.meta.env.WEATHER_API_KEY;
+let weatherData = null;
+
+if (API_KEY) {
+  try {
+    const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${targetCity.name}&aqi=no`;
+    const response = await fetch(url);
+    if (response.ok) {
+      weatherData = await response.json();
+    }
+  } catch (e) {}
+}
+
+const current = weatherData?.current;
+const conditionCode = current?.condition?.code;
+const conditionText = conditionCode ? getWeatherCondition(conditionCode, lang) : '';
+const iconUrl = current?.condition?.icon ? `https:${current.condition.icon}` : '';
+
+const weatherLink = `/${region}/${lang}/weather/`;
+const titleText = lang === 'en' ? 'Current Weather' : '現在の天気';
+const detailText = lang === 'en' ? 'Details >' : '詳細を見る ＞';
+const errorText = lang === 'en' ? 'Data unavailable' : '情報が取得できません';
+---
+
+<div class="weather-widget">
+  <h3 class="widget-title">{titleText} ({targetCity.display})</h3>
+  {current ? (
+    <a href={weatherLink} class="widget-link">
+      <div class="widget-content">
+        {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
+        <div class="widget-info">
+          <span class="widget-temp">{current.temp_c}℃</span>
+          <span class="widget-desc">{conditionText}</span>
+        </div>
+      </div>
+      <div class="widget-action">{detailText}</div>
+    </a>
+  ) : (
+    <p class="widget-error">{errorText}</p>
+  )}
+</div>
+
+<style>
+  .weather-widget {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  .widget-title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0 0 12px 0;
+    color: #1a1a1a;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 4px;
+    display: inline-block;
+  }
+  .widget-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .widget-link:hover .widget-action {
+    text-decoration: underline;
+  }
+  .widget-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .widget-icon {
+    width: 48px;
+    height: 48px;
+  }
+  .widget-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .widget-temp {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+    color: #1a1a1a;
+  }
+  .widget-desc {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+  }
+  .widget-action {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #1e3a8a;
+    margin-top: 12px;
+    font-weight: bold;
+  }
+  .widget-error {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+  }
+</style>
