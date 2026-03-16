@@ -31,7 +31,7 @@ if (API_KEY) {
     if (response.ok) {
       const data = await response.json();
       forecastDays = data.forecast.forecastday;
-      alerts = data.alerts.alert;
+      alerts = data.alerts.alert || [];
     }
   } catch (e) {}
 }
@@ -73,15 +73,15 @@ const getDayName = (dateStr) => {
 <Layout title={`${cityDisplayName} | ${labels.title}`}>
   <main class="weather-page" data-timezone={targetCity.tz}>
     
-    {/* ▼ 【新規】災害アラートセクション（最上部） ▼ */}
-    {alerts.length > 0 && (
-      <div class="alert-banner-container">
-        <div class="alert-banner-header">
-          <span class="alert-icon">⚠️</span>
-          <h2 class="alert-main-title">{labels.alertTitle}</h2>
-        </div>
-        <div class="alert-scroll-area">
-          {alerts.map((alert) => (
+    {/* ▼ 災害情報セクション（常設） ▼ */}
+    <div class={`alert-banner-container ${alerts.length > 0 ? 'has-alerts' : 'no-alerts'}`}>
+      <div class="alert-banner-header">
+        <span class="alert-icon">{alerts.length > 0 ? '⚠️' : 'ℹ️'}</span>
+        <h2 class="alert-main-title">{labels.alertTitle} ({cityDisplayName})</h2>
+      </div>
+      <div class="alert-content-area">
+        {alerts.length > 0 ? (
+          alerts.map((alert) => (
             <div class="alert-card">
               <h3 class="alert-headline">{alert.headline}</h3>
               <p class="alert-desc">{alert.desc}</p>
@@ -91,10 +91,12 @@ const getDayName = (dateStr) => {
                 </div>
               )}
             </div>
-          ))}
-        </div>
+          ))
+        ) : (
+          <div class="empty-alert-box"></div>
+        )}
       </div>
-    )}
+    </div>
 
     <section class="forecast-section">
       <h2 class="section-title">{cityDisplayName} {labels.title}</h2>
@@ -107,7 +109,7 @@ const getDayName = (dateStr) => {
                 <span class="date-text">{formatDate(day.date)}({getDayName(day.date)})</span>
               </div>
               <div class="weather-info">
-                <img src={`https:${day.day.condition.icon}`} alt="" class="summary-icon icon-filter" />
+                <img src={`https:${day.day.condition.icon}`} alt="" class="summary-icon" />
                 <span class="condition-text">{getWeatherCondition(day.day.condition.code, lang)}</span>
               </div>
               <div class="temp-info">
@@ -153,7 +155,7 @@ const getDayName = (dateStr) => {
                         <tr class="hourly-row" data-hour={hHour}>
                           <td class="h-time value-text">{h.time.split(' ')[1]}</td>
                           <td class="h-icon">
-                            <img src={`https:${h.condition.icon}`} alt="" class="icon-filter" />
+                            <img src={`https:${h.condition.icon}`} alt="" />
                           </td>
                           <td class="h-temp value-text">
                             {isImperial ? Math.round(h.temp_f) : Math.round(h.temp_c)}°
@@ -174,19 +176,6 @@ const getDayName = (dateStr) => {
         ))}
       </div>
     </section>
-
-    {alerts.length > 0 && (
-      <section class="alert-section">
-        <h3 class="alert-title">{labels.alertTitle}</h3>
-        <div class="alert-list">
-          {alerts.map((alert) => (
-            <div class="alert-item">
-              <span class="alert-headline">{alert.headline}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-    )}
   </main>
 </Layout>
 
@@ -195,7 +184,6 @@ const getDayName = (dateStr) => {
     const page = document.querySelector('.weather-page');
     const timezone = page?.getAttribute('data-timezone') || 'Asia/Tokyo';
     
-    // 現地の時間を正確に取得
     const nowInCity = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
       year: 'numeric', month: '2-digit', day: '2-digit',
@@ -215,7 +203,6 @@ const getDayName = (dateStr) => {
       if (isToday) {
         group.querySelectorAll('.hourly-row').forEach(row => {
           const rowHour = parseInt(row.getAttribute('data-hour'));
-          // 今の時間より前を確実に非表示にする
           if (rowHour < cityHour) {
             row.style.display = 'none';
           }
@@ -223,7 +210,6 @@ const getDayName = (dateStr) => {
       }
     });
 
-    // アコーディオンの再設定
     document.querySelectorAll('.day-summary-btn').forEach(button => {
       button.addEventListener('click', (event) => {
         const btn = event.currentTarget;
@@ -236,7 +222,6 @@ const getDayName = (dateStr) => {
       });
     });
   }
-
   updateWeatherDisplay();
 </script>
 
@@ -248,45 +233,61 @@ const getDayName = (dateStr) => {
   .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
   .weather-page .day-summary-btn { width: 100%; display: grid; grid-template-columns: 0.9fr 1.6fr 1.6fr 0.6fr 0.9fr; align-items: center; padding: 6px 16px; background: none; border: none; cursor: pointer; }
   .weather-page .day-summary-btn:hover { background: #f9fafb; }
-  .weather-page .date-text { font-weight: bold; font-size: 1.15rem; white-space: nowrap; }
-  .weather-page .weather-info { display: flex; align-items: center; gap: 8px; }
-  .weather-page .summary-icon { width: 72px; height: 72px; } 
 
-  /* ▼ 【修正】災害アラートのスタイルに .weather-page クラスを追加 ▼ */
+  /* --- 災害アラート枠のデザイン --- */
   .weather-page .alert-banner-container {
-    background: #fff5f5;
-    border: 2px solid #f56565;
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 24px;
+    border-width: 1.5px;
+    border-style: solid;
+    transition: all 0.3s ease;
+  }
+  /* 警報あり：赤系 */
+  .weather-page .alert-banner-container.has-alerts {
+    background: #fff5f5;
+    border-color: #f56565;
     box-shadow: 0 4px 6px rgba(245, 101, 101, 0.1);
+  }
+  /* 警報なし：薄い青系 */
+  .weather-page .alert-banner-container.no-alerts {
+    background: #f0f7ff;
+    border-color: #bee3f8;
   }
   .weather-page .alert-banner-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 12px;
-    color: #c53030;
+    margin-bottom: 0;
   }
-  .weather-page .alert-icon { font-size: 1.5rem; }
-  .weather-page .alert-main-title { font-size: 1.2rem; font-weight: bold; margin: 0; }
+  .weather-page .has-alerts .alert-banner-header { color: #c53030; margin-bottom: 12px; }
+  .weather-page .no-alerts .alert-banner-header { color: #4299e1; }
+  
+  .weather-page .alert-icon { font-size: 1.3rem; }
+  .weather-page .alert-main-title { font-size: 1.1rem; font-weight: bold; margin: 0; }
+  
+  /* 情報がない時の「空欄」 */
+  .weather-page .empty-alert-box {
+    height: 8px; /* ほんの少しだけ隙間を開けて「器」を感じさせます */
+  }
+
+  /* 警報の中身カード */
   .weather-page .alert-card {
     background: #fff;
     border-left: 4px solid #f56565;
     padding: 12px;
     margin-bottom: 10px;
     border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
-  .weather-page .alert-headline { font-size: 1rem; color: #c53030; margin: 0 0 8px 0; }
-  .weather-page .alert-desc { font-size: 0.9rem; line-height: 1.5; color: #4a5568; margin-bottom: 8px; }
-  .weather-page .alert-instruction {
-    font-size: 0.85rem;
-    background: #edf2f7;
-    padding: 8px;
-    border-radius: 4px;
-    color: #2d3748;
-  }
+  .weather-page .alert-headline { font-size: 1rem; color: #c53030; margin: 0 0 4px 0; }
+  .weather-page .alert-desc { font-size: 0.9rem; line-height: 1.5; color: #4a5568; }
+  .weather-page .alert-instruction { font-size: 0.85rem; background: #edf2f7; padding: 8px; border-radius: 4px; color: #2d3748; margin-top: 8px; }
 
+  /* --- 既存の天気スタイル --- */
+  .weather-page .date-text { font-weight: bold; font-size: 1.15rem; white-space: nowrap; }
+  .weather-page .weather-info { display: flex; align-items: center; gap: 8px; }
+  .weather-page .summary-icon { width: 72px; height: 72px; } 
   .weather-page .temp-info { display: flex; align-items: center; justify-content: center; gap: 6px; }
   .weather-page .temp-item { display: flex; flex-direction: column; align-items: center; }
   .weather-page .temp-label { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: -2px; }
@@ -308,7 +309,4 @@ const getDayName = (dateStr) => {
   .weather-page .h-humidity { color: #555; }
   .weather-page .h-rain { color: #007bb5; }
   .weather-page .h-wind { color: #1a1a1a; }
-  .weather-page .alert-section { margin-top: 30px; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 12px; padding: 20px; }
-  .weather-page .alert-title { color: #c53030; margin: 0 0 10px 0; font-weight: bold; }
-  .weather-page .alert-item { font-size: 0.9rem; line-height: 1.6; }
 </style>
