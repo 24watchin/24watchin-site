@@ -10,7 +10,6 @@ const lang = pathParts[1] || 'jp';
 const apiLangMap = { jp: 'ja', en: 'en', cn: 'zh', fr: 'fr', de: 'de', es: 'es', ru: 'ru' };
 const apiLang = apiLangMap[lang] || 'ja';
 
-// 単位の判定：言語が英語（en）なら華氏、それ以外は摂氏
 const isImperial = lang === 'en';
 
 const cityMap = {
@@ -38,15 +37,16 @@ if (API_KEY) {
       alerts = data.alerts.alert;
       const localTimeStr = data.location.localtime;
       localDateStr = localTimeStr.split(' ')[0];
-      localHour = parseInt(localTimeStr.split(' ')[1].split(':')[0]);
+      // 現在の「時」を確実に取得（15:31なら15）
+      localHour = new Date(localTimeStr.replace(/-/g, '/')).getHours();
     }
   } catch (e) {}
 }
 
 const allLabels = {
-  jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象警報', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風', max: '最高', min: '最低', temp: '気温' },
+  jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象警報', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
   en: { title: '3-Day Forecast', hourly: 'Hourly', alert: 'Alerts', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
-  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风', max: '最高', min: '最低', temp: '气温' },
+  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
   fr: { title: 'Prévisions', hourly: 'Par heure', alert: 'Alertes', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humid', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
   de: { title: '3-Tage-Vorhersage', hourly: 'Stündlich', alert: 'Warnungen', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Luftf', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
   es: { title: 'Pronóstico', hourly: 'Por hora', alert: 'Alertas', time: 'Hora', weather: 'Clima', rain: 'Lluvia', humidity: 'Humed', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
@@ -84,8 +84,12 @@ const getDayName = (dateStr) => {
       <div class="forecast-container">
         {forecastDays.map((day, index) => {
           const isTodayInCity = day.date === localDateStr;
+          // 現地の「今」より前の時間をフィルタリング（厳密に比較）
           const filteredHours = isTodayInCity 
-            ? day.hour.filter(h => parseInt(h.time.split(' ')[1].split(':')[0]) >= localHour)
+            ? day.hour.filter(h => {
+                const hHour = parseInt(h.time.split(' ')[1].split(':')[0]);
+                return hHour >= localHour;
+              })
             : day.hour;
 
           return (
@@ -128,7 +132,7 @@ const getDayName = (dateStr) => {
                       <tr>
                         <th>{labels.time}</th>
                         <th>{labels.weather}</th>
-                        {/* ▼ ここを「気温(℃)」の形式に修正しました ▼ */}
+                        {/* ▼ タイトルを「気温(℃)」の形式に修正 ▼ */}
                         <th>{labels.temp}({tempUnit})</th>
                         <th>{labels.humidity}</th>
                         <th>{labels.wind}</th>
@@ -148,7 +152,7 @@ const getDayName = (dateStr) => {
                           <td class="h-humidity value-text">{h.humidity}%</td>
                           <td class="h-wind value-text">
                             {isImperial ? Math.round(h.wind_mph) : Math.round(h.wind_kph)}
-                            <small>{isImperial ? 'mph' : 'k/h'}</small>
+                            <small>{isImperial ? 'mph' : 'km/h'}</small>
                           </td>
                           <td class="h-rain value-text">{h.chance_of_rain}%</td>
                         </tr>
@@ -208,7 +212,6 @@ const getDayName = (dateStr) => {
   .date-text { font-weight: bold; font-size: 1.15rem; white-space: nowrap; }
   .weather-info { display: flex; align-items: center; gap: 8px; }
   .summary-icon { width: 72px; height: 72px; } 
-
   .temp-info { display: flex; align-items: center; justify-content: center; gap: 6px; }
   .temp-item { display: flex; flex-direction: column; align-items: center; }
   .temp-label { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: -2px; }
@@ -229,7 +232,7 @@ const getDayName = (dateStr) => {
   .h-temp { color: #1a1a1a !important; font-size: 1.25rem !important; }
   .h-humidity { color: #555; }
   .h-rain { color: #007bb5; }
-  .h-wind small { font-size: 0.6rem; margin-left: 1px; }
+  .h-wind small { font-size: 0.65rem; margin-left: 2px; color: #666; font-weight: normal; }
   .alert-section { margin-top: 30px; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 12px; padding: 20px; }
   .alert-title { color: #c53030; margin: 0 0 10px 0; font-weight: bold; }
   .alert-item { font-size: 0.9rem; line-height: 1.6; }
