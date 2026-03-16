@@ -3,19 +3,23 @@
 import AccessRanking from './AccessRanking.astro';
 // サイドバー用の広告部品を読み込みます
 import SidebarAd from './SidebarAd.astro';
-// ★新しく作った「編集部のおすすめ」部品を読み込みます
+// 「編集部のおすすめ」部品を読み込みます
 import EditorsPick from './EditorsPick.astro';
+// ★今回新しく作った「天気パーツ」を読み込みます
+import WeatherWidget from './WeatherWidget.astro';
 ---
 
-{/* Layoutの外枠（aside）の中にさらに入る箱なので、divに変更してタグをスッキリさせました */}
 <div class="sidebar-wrapper">
-  {/* 1. 一番上にランキング部品を配置します */}
+  {/* 1. 一番上に天気パーツを配置します */}
+  <WeatherWidget />
+
+  {/* 2. 天気の下にランキング部品を配置します */}
   <AccessRanking />
 
-  {/* 2. ランキングの下に上部広告を配置します */}
+  {/* 3. ランキングの下に上部広告を配置します */}
   <SidebarAd />
 
-  {/* 3. ★上部広告の下に「編集部のおすすめ」を配置します */}
+  {/* 4. 上部広告の下に「編集部のおすすめ」を配置します */}
   <EditorsPick />
 </div>
 
@@ -30,8 +34,7 @@ import EditorsPick from './EditorsPick.astro';
     padding: 0;
   }
 
-  /* ▼▼▼ ここが今回の魔法です ▼▼▼ */
-  /* 中に入る3つのパーツに対して、「自分勝手な幅やズレをなくして、強制的に100%に揃えなさい」と指示します */
+  /* 中に入るパーツに対して、「自分勝手な幅やズレをなくして、強制的に100%に揃えなさい」と指示します */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
@@ -39,5 +42,4 @@ import EditorsPick from './EditorsPick.astro';
     margin-right: 0 !important;
     box-sizing: border-box !important;
   }
-  /* ▲▲▲ ここまで ▲▲▲ */
 </style>
