@@ -83,7 +83,8 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
   .widget-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    /* ▼ ここを修正しました（文字の底辺を基準に揃えます） ▼ */
+    align-items: baseline; 
     border-bottom: 4px solid #872732;
     padding-bottom: 6px;
     margin-bottom: 20px;
