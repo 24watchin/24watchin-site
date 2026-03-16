@@ -13,9 +13,9 @@ const apiLang = apiLangMap[lang] || 'ja';
 const isImperial = lang === 'en';
 
 const cityMap = {
-  jp: { name: 'Tokyo', display: { jp: '東京', en: 'Tokyo', cn: '东京', fr: 'Tokyo', de: 'Tokio', es: 'Tokio', ru: 'Токио' } },
-  us: { name: 'New_York', display: { jp: 'ニューヨーク', en: 'New York', cn: '纽约', fr: 'New York', de: 'New York', es: 'Nueva York', ru: 'Нью-Йорк' } },
-  de: { name: 'Berlin', display: { jp: 'ベルリン', en: 'Berlin', cn: '柏林', fr: 'Berlin', de: 'Berlin', es: 'Berlín', ru: 'Берлин' } },
+  jp: { name: 'Tokyo', tz: 'Asia/Tokyo', display: { jp: '東京', en: 'Tokyo', cn: '东京', fr: 'Tokyo', de: 'Tokio', es: 'Tokio', ru: 'Токио' } },
+  us: { name: 'New_York', tz: 'America/New_York', display: { jp: 'ニューヨーク', en: 'New York', cn: '纽约', fr: 'New York', de: 'New York', es: 'Nueva York', ru: 'Нью-Йорк' } },
+  de: { name: 'Berlin', tz: 'Europe/Berlin', display: { jp: 'ベルリン', en: 'Berlin', cn: '柏林', fr: 'Berlin', de: 'Berlin', es: 'Berlín', ru: 'Берлин' } },
 };
 
 const targetCity = cityMap[region] || cityMap.jp;
@@ -24,8 +24,6 @@ const cityDisplayName = targetCity.display[lang] || targetCity.display.en;
 const API_KEY = import.meta.env.WEATHER_API_KEY;
 let forecastDays = [];
 let alerts = [];
-let localHour = 0;
-let localDateStr = '';
 
 if (API_KEY) {
   try {
@@ -35,10 +33,6 @@ if (API_KEY) {
       const data = await response.json();
       forecastDays = data.forecast.forecastday;
       alerts = data.alerts.alert;
-      const localTimeStr = data.location.localtime;
-      localDateStr = localTimeStr.split(' ')[0];
-      // 現在の「時」を確実に取得（15:31なら15）
-      localHour = new Date(localTimeStr.replace(/-/g, '/')).getHours();
     }
   } catch (e) {}
 }
@@ -77,71 +71,62 @@ const getDayName = (dateStr) => {
 ---
 
 <Layout title={`${cityDisplayName} | ${labels.title}`}>
-  <main class="weather-page">
+  <main class="weather-page" data-timezone={targetCity.tz}>
     <section class="forecast-section">
       <h2 class="section-title">{cityDisplayName} {labels.title}</h2>
       
       <div class="forecast-container">
-        {forecastDays.map((day, index) => {
-          const isTodayInCity = day.date === localDateStr;
-          // 現地の「今」より前の時間をフィルタリング（厳密に比較）
-          const filteredHours = isTodayInCity 
-            ? day.hour.filter(h => {
-                const hHour = parseInt(h.time.split(' ')[1].split(':')[0]);
-                return hHour >= localHour;
-              })
-            : day.hour;
+        {forecastDays.map((day, index) => (
+          <div class="day-group" data-date={day.date}>
+            <button class="day-summary-btn" aria-expanded="false" data-target={`hourly-${index}`}>
+              <div class="date-info">
+                <span class="date-text">{formatDate(day.date)}({getDayName(day.date)})</span>
+              </div>
+              <div class="weather-info">
+                <img src={`https:${day.day.condition.icon}`} alt="" class="summary-icon" />
+                <span class="condition-text">{getWeatherCondition(day.day.condition.code, lang)}</span>
+              </div>
+              <div class="temp-info">
+                <div class="temp-item">
+                  <span class="temp-label">{labels.max}</span>
+                  <span class="value-text temp-max">
+                    {isImperial ? Math.round(day.day.maxtemp_f) : Math.round(day.day.maxtemp_c)}°
+                  </span>
+                </div>
+                <span class="temp-sep">/</span>
+                <div class="temp-item">
+                  <span class="temp-label">{labels.min}</span>
+                  <span class="value-text temp-min">
+                    {isImperial ? Math.round(day.day.mintemp_f) : Math.round(day.day.mintemp_c)}°
+                  </span>
+                </div>
+              </div>
+              <div class="rain-info">
+                <span class="value-text rain-val">{day.day.daily_chance_of_rain}%</span>
+              </div>
+              <div class="badge-wrapper">
+                <span class="hourly-badge">{labels.hourly}</span>
+              </div>
+            </button>
 
-          return (
-            <div class="day-group">
-              <button class="day-summary-btn" aria-expanded="false" data-target={`hourly-${index}`}>
-                <div class="date-info">
-                  <span class="date-text">{formatDate(day.date)}({getDayName(day.date)})</span>
-                </div>
-                <div class="weather-info">
-                  <img src={`https:${day.day.condition.icon}`} alt="" class="summary-icon" />
-                  <span class="condition-text">{getWeatherCondition(day.day.condition.code, lang)}</span>
-                </div>
-                <div class="temp-info">
-                  <div class="temp-item">
-                    <span class="temp-label">{labels.max}</span>
-                    <span class="value-text temp-max">
-                      {isImperial ? Math.round(day.day.maxtemp_f) : Math.round(day.day.maxtemp_c)}°
-                    </span>
-                  </div>
-                  <span class="temp-sep">/</span>
-                  <div class="temp-item">
-                    <span class="temp-label">{labels.min}</span>
-                    <span class="value-text temp-min">
-                      {isImperial ? Math.round(day.day.mintemp_f) : Math.round(day.day.mintemp_c)}°
-                    </span>
-                  </div>
-                </div>
-                <div class="rain-info">
-                  <span class="value-text rain-val">{day.day.daily_chance_of_rain}%</span>
-                </div>
-                <div class="badge-wrapper">
-                  <span class="hourly-badge">{labels.hourly}</span>
-                </div>
-              </button>
-
-              <div id={`hourly-${index}`} class="hourly-details" hidden>
-                <div class="hourly-scroll-wrapper">
-                  <table class="hourly-table">
-                    <thead>
-                      <tr>
-                        <th>{labels.time}</th>
-                        <th>{labels.weather}</th>
-                        {/* ▼ タイトルを「気温(℃)」の形式に修正 ▼ */}
-                        <th>{labels.temp}({tempUnit})</th>
-                        <th>{labels.humidity}</th>
-                        <th>{labels.wind}</th>
-                        <th>{labels.rain}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredHours.map((h) => (
-                        <tr>
+            <div id={`hourly-${index}`} class="hourly-details" hidden>
+              <div class="hourly-scroll-wrapper">
+                <table class="hourly-table">
+                  <thead>
+                    <tr>
+                      <th>{labels.time}</th>
+                      <th>{labels.weather}</th>
+                      <th>{labels.temp}({tempUnit})</th>
+                      <th>{labels.humidity}</th>
+                      <th>{labels.wind}</th>
+                      <th>{labels.rain}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {day.hour.map((h) => {
+                      const hHour = parseInt(h.time.split(' ')[1].split(':')[0]);
+                      return (
+                        <tr class="hourly-row" data-hour={hHour}>
                           <td class="h-time value-text">{h.time.split(' ')[1]}</td>
                           <td class="h-icon">
                             <img src={`https:${h.condition.icon}`} alt="" />
@@ -156,14 +141,14 @@ const getDayName = (dateStr) => {
                           </td>
                           <td class="h-rain value-text">{h.chance_of_rain}%</td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </section>
 
@@ -183,22 +168,54 @@ const getDayName = (dateStr) => {
 </Layout>
 
 <script>
-  function initWeatherAccordion() {
-    const buttons = document.querySelectorAll('.day-summary-btn');
-    buttons.forEach(button => {
+  function updateWeatherDisplay() {
+    const page = document.querySelector('.weather-page');
+    const timezone = page?.getAttribute('data-timezone') || 'Asia/Tokyo';
+    
+    // 現在の「現地の時間」をリアルタイムに計算します
+    const nowInCity = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: 'numeric', hour12: false
+    }).formatToParts(new Date());
+
+    const cityYear = nowInCity.find(p => p.type === 'year').value;
+    const cityMonth = nowInCity.find(p => p.type === 'month').value;
+    const cityDay = nowInCity.find(p => p.type === 'day').value;
+    const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
+    const cityFullDate = `${cityYear}-${cityMonth}-${cityDay}`;
+
+    // 各日のグループをチェック
+    document.querySelectorAll('.day-group').forEach(group => {
+      const groupDate = group.getAttribute('data-date');
+      const isToday = groupDate === cityFullDate;
+
+      if (isToday) {
+        // 今日なら、今の時間より前を非表示にする
+        group.querySelectorAll('.hourly-row').forEach(row => {
+          const rowHour = parseInt(row.getAttribute('data-hour'));
+          if (rowHour < cityHour) {
+            row.style.display = 'none';
+          }
+        });
+      }
+    });
+
+    // アコーディオンの初期化
+    document.querySelectorAll('.day-summary-btn').forEach(button => {
       button.addEventListener('click', (event) => {
         const btn = event.currentTarget;
         const targetId = btn.getAttribute('data-target');
         const targetEl = document.getElementById(targetId);
         if (!targetEl) return;
-
         const isExpanded = btn.getAttribute('aria-expanded') === 'true';
         btn.setAttribute('aria-expanded', !isExpanded);
         targetEl.hidden = isExpanded;
       });
     });
   }
-  initWeatherAccordion();
+
+  updateWeatherDisplay();
 </script>
 
 <style>
@@ -229,7 +246,8 @@ const getDayName = (dateStr) => {
   .hourly-table td { padding: 4px 4px; text-align: center; border-bottom: 1px solid #eee; }
   .h-time { color: #333; font-weight: bold; }
   .h-icon img { width: 64px; height: 64px; vertical-align: middle; object-fit: contain; }
-  .h-temp { color: #1a1a1a !important; font-size: 1.25rem !important; }
+  /* 気温は黒文字に統一 */
+  .h-temp { color: #1a1a1a !important; font-size: 1.2rem !important; }
   .h-humidity { color: #555; }
   .h-rain { color: #007bb5; }
   .h-wind small { font-size: 0.65rem; margin-left: 2px; color: #666; font-weight: normal; }
