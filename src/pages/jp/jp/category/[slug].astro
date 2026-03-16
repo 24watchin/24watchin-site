@@ -1,101 +1,78 @@
 ---
-import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import Layout from '../../../../layouts/Layout.astro';
 import CategoryHero from '../../../../components/CategoryHero.astro';
-import NewsList from '../../../../components/NewsList.astro';
+import CategoryNewsList from '../../../../components/CategoryNewsList.astro';
+import { categoryLabelMap } from '../../../../lib/categoryLabels';
 
 export async function getStaticPaths() {
-  const categories = [
-    { slug: 'politics', name: '政治' },
-    { slug: 'society', name: '社会' },
-    { slug: 'international', name: '国際' },
-    { slug: 'economy', name: '経済' },
-    { slug: 'environment-energy', name: '環境・エネルギー' },
-    { slug: 'business', name: 'ビジネス' },
-    { slug: 'technology-ai', name: 'テクノロジー・AI' },
-    { slug: 'entertainment', name: '文化・エンタメ' },
-    { slug: 'sports', name: 'スポーツ' },
-    { slug: 'health-life', name: '健康・ライフ' },
-    { slug: 'traffic', name: '交通' },
-    { slug: 'weather', name: '天気' },
-  ];
-
-  const API_KEY = import.meta.env.API_KEY;
-  const BLOG_ID = import.meta.env.BLOG_ID;
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const allPosts = data.items || [];
-
-  return categories.map((category) => {
-    const filteredPosts = allPosts.filter(
-      (post) => post.labels && post.labels.includes(category.name)
-    );
-
-    return {
-      params: { slug: category.slug },
-      props: {
-        slug: category.slug,
-        categoryName: category.name,
-        posts: filteredPosts,
-      },
-    };
-  });
+  // 1. 辞書ファイル(categoryLabelMap)から全カテゴリのスラッグを取得します
+  const slugs = categoryLabelMap.jp.allCategories.map(cat => cat.slug);
+  
+  return slugs.map((slug) => ({
+    params: { slug },
+  }));
 }
 
-const { slug, categoryName, posts } = Astro.props;
+const { slug } = Astro.params;
+
+// 2. Bloggerから記事を取得します
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = import.meta.env.BLOG_ID;
+const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+
+const response = await fetch(url).catch(() => null);
+const data = response ? await response.json() : { items: [] };
+const allPosts = data.items || [];
+
+// 3. 辞書から、現在のカテゴリ名と「キーワード」を取り出します
+const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
+const categoryName = catData ? catData.label : 'ニュース';
+const keywords = catData ? catData.keywords : [slug];
+
+// 4. キーワードを使って、この記事がこのカテゴリに属するか判定します.astro]
+const categoryPosts = allPosts.filter(post => {
+  if (!post.labels) return false;
+  return post.labels.some(label => 
+    keywords.some(key => label.includes(key))
+  );
+});
 
 const getImageUrl = (content) => {
-  const match = content?.match(/<img[^>]+src="([^">]+)"/);
+  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
+
+const pageDescription = `24Watchinの${categoryName}カテゴリ。世界中の最新の${categoryName}ニュースをお届けします。`;
 ---
 
-<Layout title={categoryName} sidebarType="category">
-  <Breadcrumb
-    countryLabel="日本"
-    countryHref="/jp/jp/"
-    categoryLabel={categoryName}
-    categoryHref={`/jp/jp/category/${slug}/`}
-  />
+<Layout title={categoryName} description={pageDescription} sidebarType="category">
+  <div class="category-page">
+    {/* 上部のメイン記事エリア */}
+    <CategoryHero 
+      posts={categoryPosts} 
+      categoryName={categoryName} 
+      getImageUrl={getImageUrl} 
+    />
 
-  {posts.length > 0 ? (
-    <>
-      <CategoryHero posts={posts} categoryName={categoryName} getImageUrl={getImageUrl} />
-      <hr class="divider" />
-      <h2 class="section-title">その他の{categoryName}ニュース</h2>
-      <NewsList posts={posts.slice(5)} getImageUrl={getImageUrl} />
-    </>
-  ) : (
-    <p class="empty-message">現在、この記事は準備中です。</p>
-  )}
+    {/* その下の記事リストエリア */}
+    <div class="list-section">
+      <CategoryNewsList 
+        posts={categoryPosts.slice(5)} 
+        getImageUrl={getImageUrl} 
+      />
+    </div>
+  </div>
 </Layout>
 
 <style>
-  .divider {
-    border: 0;
-    border-top: 1px solid #eee;
-    margin: 1rem 0 1.5rem;
+  .category-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px 0;
   }
-
-  .section-title {
-    font-size: 1.5rem;
-    border-left: 5px solid #1e3a8a;
-    padding-left: 1rem;
-    font-weight: bold;
-    margin-bottom: 1.25rem;
-    color: #1a1a1a;
-  }
-
-  .empty-message {
-    color: #666;
-    font-size: 16px;
-    margin: 20px 0 0;
+  .list-section {
+    margin-top: 3rem;
+    border-top: 1px solid #ddd;
+    padding-top: 2rem;
   }
 </style>
