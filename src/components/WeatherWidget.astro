@@ -14,16 +14,36 @@ const cityMap = {
 
 const targetCity = cityMap[region] || cityMap.jp;
 const API_KEY = import.meta.env.WEATHER_API_KEY;
+
+if (!globalThis.weatherCache) {
+  globalThis.weatherCache = {};
+}
+
+const cityKey = targetCity.name;
+const CACHE_LIFETIME = 30 * 60 * 1000; 
+const now = Date.now();
+
 let weatherData = null;
 
-if (API_KEY) {
-  try {
-    const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${targetCity.name}&aqi=no`;
-    const response = await fetch(url);
-    if (response.ok) {
-      weatherData = await response.json();
-    }
-  } catch (e) {}
+if (
+  globalThis.weatherCache[cityKey] && 
+  (now - globalThis.weatherCache[cityKey].time < CACHE_LIFETIME)
+) {
+  weatherData = globalThis.weatherCache[cityKey].data;
+} else {
+  if (API_KEY) {
+    try {
+      const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${cityKey}&aqi=no`;
+      const response = await fetch(url);
+      if (response.ok) {
+        weatherData = await response.json();
+        globalThis.weatherCache[cityKey] = {
+          data: weatherData,
+          time: now,
+        };
+      }
+    } catch (e) {}
+  }
 }
 
 const current = weatherData?.current;
@@ -108,22 +128,17 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
     text-decoration-color: #000;
     text-decoration-thickness: 1px;
   }
-  
-  /* ▼ 新しく追加したエリア全体リンクの設定 ▼ */
   .widget-body-link {
     display: block;
     text-decoration: none;
     color: inherit;
-    /* 見た目のレイアウトを変えずに、クリックできる範囲を「各枠から5px内側」まで広げる設定です */
     margin: -15px -15px -19px -15px;
     padding: 15px 15px 19px 15px;
     border-radius: 6px;
   }
   .widget-body-link:hover {
-    text-decoration: none; /* マウスを当てても黒い下線は出しません */
+    text-decoration: none; 
   }
-  /* ▲ ここまで ▲ */
-
   .widget-content {
     display: flex;
     justify-content: center;
