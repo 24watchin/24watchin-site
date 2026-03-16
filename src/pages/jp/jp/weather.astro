@@ -10,7 +10,7 @@ const lang = pathParts[1] || 'jp';
 const apiLangMap = { jp: 'ja', en: 'en', cn: 'zh', fr: 'fr', de: 'de', es: 'es', ru: 'ru' };
 const apiLang = apiLangMap[lang] || 'ja';
 
-// ★ 単位の判定：言語が英語（en）なら華氏、それ以外は摂氏 ★
+// 単位の判定：言語が英語（en）なら華氏、それ以外は摂氏
 const isImperial = lang === 'en';
 
 const cityMap = {
@@ -175,6 +175,32 @@ const getDayName = (dateStr) => {
     )}
   </main>
 </Layout>
+
+<script>
+  // Astroのページ読み込み完了後に確実に実行されるようにします
+  function initWeatherAccordion() {
+    const buttons = document.querySelectorAll('.day-summary-btn');
+    buttons.forEach(button => {
+      // 既存のリスナーを一度リセットしてから貼り直します
+      button.removeEventListener('click', toggleAccordion);
+      button.addEventListener('click', toggleAccordion);
+    });
+  }
+
+  function toggleAccordion(event) {
+    const button = event.currentTarget;
+    const targetId = button.getAttribute('data-target');
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    const isExpanded = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', !isExpanded);
+    targetEl.hidden = isExpanded;
+  }
+
+  // 最初の読み込み時
+  initWeatherAccordion();
+</script>
 
 <style>
   :root { --weather-value-size: 1.15rem; }
