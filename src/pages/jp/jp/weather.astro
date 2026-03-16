@@ -44,16 +44,17 @@ if (API_KEY) {
 }
 
 const allLabels = {
-  jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象警報', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風', max: '最高', min: '最低' },
-  en: { title: '3-Day Forecast', hourly: 'Hourly', alert: 'Alerts', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min' },
-  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风', max: '最高', min: '最低' },
-  fr: { title: 'Prévisions', hourly: 'Par heure', alert: 'Alertes', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humid', wind: 'Vent', max: 'Max', min: 'Min' },
-  de: { title: '3-Tage-Vorhersage', hourly: 'Stündlich', alert: 'Warnungen', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Luftf', wind: 'Wind', max: 'Max', min: 'Min' },
-  es: { title: 'Pronóstico', hourly: 'Por hora', alert: 'Alertas', time: 'Hora', weather: 'Clima', rain: 'Lluvia', humidity: 'Humed', wind: 'Viento', max: 'Máx', min: 'Mín' },
-  ru: { title: 'Прогноз', hourly: 'По часам', alert: 'Оповещения', time: 'Время', weather: 'Погода', rain: 'Осадки', humidity: 'Влаж', wind: 'Ветер', max: 'Макс', min: 'Мин' }
+  jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象警報', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風', max: '最高', min: '最低', temp: '気温' },
+  en: { title: '3-Day Forecast', hourly: 'Hourly', alert: 'Alerts', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风', max: '最高', min: '最低', temp: '气温' },
+  fr: { title: 'Prévisions', hourly: 'Par heure', alert: 'Alertes', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humid', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
+  de: { title: '3-Tage-Vorhersage', hourly: 'Stündlich', alert: 'Warnungen', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Luftf', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  es: { title: 'Pronóstico', hourly: 'Por hora', alert: 'Alertas', time: 'Hora', weather: 'Clima', rain: 'Lluvia', humidity: 'Humed', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
+  ru: { title: 'Прогноз', hourly: 'По часам', alert: 'Оповещения', time: 'Время', weather: 'Погода', rain: 'Осадки', humidity: 'Влаж', wind: 'Ветер', max: 'Макс', min: 'Мин', temp: 'Темп' }
 };
 
 const labels = allLabels[lang] || allLabels.en;
+const tempUnit = isImperial ? '℉' : '℃';
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -94,7 +95,7 @@ const getDayName = (dateStr) => {
                   <span class="date-text">{formatDate(day.date)}({getDayName(day.date)})</span>
                 </div>
                 <div class="weather-info">
-                  <img src={`https:${day.day.condition.icon}`} alt="" class="summary-icon icon-filter" />
+                  <img src={`https:${day.day.condition.icon}`} alt="" class="summary-icon" />
                   <span class="condition-text">{getWeatherCondition(day.day.condition.code, lang)}</span>
                 </div>
                 <div class="temp-info">
@@ -127,7 +128,8 @@ const getDayName = (dateStr) => {
                       <tr>
                         <th>{labels.time}</th>
                         <th>{labels.weather}</th>
-                        <th>{isImperial ? '℉' : '℃'}</th>
+                        {/* ▼ ここを「気温(℃)」の形式に修正しました ▼ */}
+                        <th>{labels.temp}({tempUnit})</th>
                         <th>{labels.humidity}</th>
                         <th>{labels.wind}</th>
                         <th>{labels.rain}</th>
@@ -138,7 +140,7 @@ const getDayName = (dateStr) => {
                         <tr>
                           <td class="h-time value-text">{h.time.split(' ')[1]}</td>
                           <td class="h-icon">
-                            <img src={`https:${h.condition.icon}`} alt="" class="icon-filter" />
+                            <img src={`https:${h.condition.icon}`} alt="" />
                           </td>
                           <td class="h-temp value-text">
                             {isImperial ? Math.round(h.temp_f) : Math.round(h.temp_c)}°
@@ -177,28 +179,21 @@ const getDayName = (dateStr) => {
 </Layout>
 
 <script>
-  // Astroのページ読み込み完了後に確実に実行されるようにします
   function initWeatherAccordion() {
     const buttons = document.querySelectorAll('.day-summary-btn');
     buttons.forEach(button => {
-      // 既存のリスナーを一度リセットしてから貼り直します
-      button.removeEventListener('click', toggleAccordion);
-      button.addEventListener('click', toggleAccordion);
+      button.addEventListener('click', (event) => {
+        const btn = event.currentTarget;
+        const targetId = btn.getAttribute('data-target');
+        const targetEl = document.getElementById(targetId);
+        if (!targetEl) return;
+
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !isExpanded);
+        targetEl.hidden = isExpanded;
+      });
     });
   }
-
-  function toggleAccordion(event) {
-    const button = event.currentTarget;
-    const targetId = button.getAttribute('data-target');
-    const targetEl = document.getElementById(targetId);
-    if (!targetEl) return;
-
-    const isExpanded = button.getAttribute('aria-expanded') === 'true';
-    button.setAttribute('aria-expanded', !isExpanded);
-    targetEl.hidden = isExpanded;
-  }
-
-  // 最初の読み込み時
   initWeatherAccordion();
 </script>
 
@@ -212,9 +207,8 @@ const getDayName = (dateStr) => {
   .day-summary-btn:hover { background: #f9fafb; }
   .date-text { font-weight: bold; font-size: 1.15rem; white-space: nowrap; }
   .weather-info { display: flex; align-items: center; gap: 8px; }
-  .summary-icon { width: 76px; height: 76px; } 
-  .icon-filter[src*="day"] { filter: saturate(3) hue-rotate(-10deg) brightness(1.1) drop-shadow(0 0 1px #ff4500); }
-  .icon-filter[src*="night"] { filter: brightness(1.2) sepia(1) saturate(20) hue-rotate(-35deg) drop-shadow(0 0 1px gold); }
+  .summary-icon { width: 72px; height: 72px; } 
+
   .temp-info { display: flex; align-items: center; justify-content: center; gap: 6px; }
   .temp-item { display: flex; flex-direction: column; align-items: center; }
   .temp-label { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: -2px; }
@@ -228,10 +222,10 @@ const getDayName = (dateStr) => {
   .hourly-details { background: #f8f9fa; padding: 0 16px 4px 16px; border-top: 1px solid #eee; }
   .hourly-scroll-wrapper { overflow-x: auto; }
   .hourly-table { width: 100%; min-width: 550px; border-collapse: collapse; }
-  .hourly-table th { padding: 8px 4px; font-size: 0.75rem; color: #888; border-bottom: 1px solid #ddd; }
-  .hourly-table td { padding: 0px 4px; text-align: center; border-bottom: 1px solid #eee; }
+  .hourly-table th { padding: 8px 4px; font-size: 0.8rem; color: #888; border-bottom: 1px solid #ddd; }
+  .hourly-table td { padding: 4px 4px; text-align: center; border-bottom: 1px solid #eee; }
   .h-time { color: #333; font-weight: bold; }
-  .h-icon img { width: 64px; height: 64px; vertical-align: middle; object-fit: contain; transform: scale(1.25); }
+  .h-icon img { width: 64px; height: 64px; vertical-align: middle; object-fit: contain; }
   .h-temp { color: #1a1a1a !important; font-size: 1.25rem !important; }
   .h-humidity { color: #555; }
   .h-rain { color: #007bb5; }
