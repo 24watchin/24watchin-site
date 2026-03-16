@@ -33,23 +33,40 @@ const iconUrl = current?.condition?.icon ? `https:${current.condition.icon}` : '
 
 const weatherLink = `/${region}/${lang}/weather/`;
 const titleText = lang === 'en' ? 'Current Weather' : '現在の天気';
-const detailText = lang === 'en' ? 'Details >' : '詳細を見る ＞';
 const errorText = lang === 'en' ? 'Data unavailable' : '情報が取得できません';
+
+const feelsLikeLabel = lang === 'en' ? 'Feels:' : '体感:';
+const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
 ---
 
 <div class="weather-widget">
-  <h3 class="widget-title">{titleText} ({targetCity.display})</h3>
+  <h3 class="widget-title">{titleText}</h3>
+  
   {current ? (
-    <a href={weatherLink} class="widget-link">
+    <div class="widget-body">
+      <a href={weatherLink} class="city-link">{targetCity.display}</a>
+      
       <div class="widget-content">
-        {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
-        <div class="widget-info">
-          <span class="widget-temp">{current.temp_c}℃</span>
-          <span class="widget-desc">{conditionText}</span>
+        <div class="widget-left">
+          {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
+          <div class="widget-info">
+            <span class="widget-temp">{current.temp_c}℃</span>
+            <span class="widget-desc">{conditionText}</span>
+          </div>
+        </div>
+        
+        <div class="widget-right">
+          <div class="detail-line">
+            <span class="detail-label">{feelsLikeLabel}</span>
+            <span class="detail-value">{current.feelslike_c}℃</span>
+          </div>
+          <div class="detail-line">
+            <span class="detail-label">{humidityLabel}</span>
+            <span class="detail-value">{current.humidity}%</span>
+          </div>
         </div>
       </div>
-      <div class="widget-action">{detailText}</div>
-    </a>
+    </div>
   ) : (
     <p class="widget-error">{errorText}</p>
   )}
@@ -67,24 +84,34 @@ const errorText = lang === 'en' ? 'Data unavailable' : '情報が取得できま
   .widget-title {
     font-size: 1rem;
     font-weight: bold;
-    margin: 0 0 12px 0;
+    margin: 0 0 20px 0; 
     color: #1a1a1a;
-    border-bottom: 2px solid #1e3a8a;
-    padding-bottom: 4px;
+    border-bottom: 4px solid #872732; 
+    padding-bottom: 6px; 
     display: inline-block;
   }
-  .widget-link {
-    display: block;
+  .city-link {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1a1a1a;
     text-decoration: none;
-    color: inherit;
+    margin-bottom: 12px;
   }
-  .widget-link:hover .widget-action {
+  .city-link:hover {
     text-decoration: underline;
+    text-decoration-color: #000;
+    text-decoration-thickness: 1px;
   }
   .widget-content {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 12px;
+  }
+  .widget-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   .widget-icon {
     width: 48px;
@@ -105,12 +132,21 @@ const errorText = lang === 'en' ? 'Data unavailable' : '情報が取得できま
     color: #666;
     margin-top: 4px;
   }
-  .widget-action {
-    text-align: right;
+  .widget-right {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .detail-line {
     font-size: 0.85rem;
-    color: #1e3a8a;
-    margin-top: 12px;
+    color: #666;
+  }
+  .detail-label {
+    margin-right: 4px;
+  }
+  .detail-value {
     font-weight: bold;
+    color: #333;
   }
   .widget-error {
     font-size: 0.9rem;
