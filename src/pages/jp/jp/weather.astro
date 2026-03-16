@@ -16,7 +16,7 @@ const isImperial = lang === 'en';
 const cityMap = {
   jp: { name: 'Tokyo', tz: 'Asia/Tokyo', display: { jp: '東京', en: 'Tokyo', cn: '东京', fr: 'Tokyo', de: 'Tokio', es: 'Tokio', ru: 'Токио' } },
   us: { name: 'New_York', tz: 'America/New_York', display: { jp: 'ニューヨーク', en: 'New York', cn: '纽约', fr: 'New York', de: 'New York', es: 'Nueva York', ru: 'Нью-Йорк' } },
-  de: { name: 'Berlin', tz: 'Europe/Berlin', display: { jp: 'ベルリン', en: 'Berlin', cn: '柏林', fr: 'Berlin', de: 'Berlin', es: 'Berlín', ru: 'Берリン' } },
+  de: { name: 'Berlin', tz: 'Europe/Berlin', display: { jp: 'ベルリン', en: 'Berlin', cn: '柏林', fr: 'Berlin', de: 'Berlin', es: 'Berlín', ru: 'Берлин' } },
 };
 
 const targetCity = cityMap[region] || cityMap.jp;
@@ -41,7 +41,7 @@ if (API_KEY) {
 const allLabels = {
   jp: { title: '3日間の天気予報', hourly: '1時間ごと', alert: '気象警報', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
   en: { title: '3-Day Forecast', hourly: 'Hourly', alert: 'Alerts', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
-  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
+  cn: { title: '3日天气预报', hourly: '1小时预报', alert: '气象预警', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '气温' },
   fr: { title: 'Prévisions', hourly: 'Par heure', alert: 'Alertes', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humid', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
   de: { title: '3-Tage-Vorhersage', hourly: 'Stündlich', alert: 'Warnungen', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Luftf', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
   es: { title: 'Pronóstico', hourly: 'Por hora', alert: 'Alertas', time: 'Hora', weather: 'Clima', rain: 'Lluvia', humidity: 'Humed', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
@@ -50,7 +50,7 @@ const allLabels = {
 
 const labels = allLabels[lang] || allLabels.en;
 const tempUnit = isImperial ? '℉' : '℃';
-const windUnit = isImperial ? 'mph' : 'km/h'; // 風速の単位
+const windUnit = isImperial ? 'mph' : 'km/h';
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -120,7 +120,6 @@ const getDayName = (dateStr) => {
                       <th>{labels.weather}</th>
                       <th>{labels.temp}({tempUnit})</th>
                       <th>{labels.humidity}</th>
-                      {/* ▼ 風速の見出しに単位を追加しました ▼ */}
                       <th>{labels.wind}({windUnit})</th>
                       <th>{labels.rain}</th>
                     </tr>
@@ -174,7 +173,6 @@ const getDayName = (dateStr) => {
     const page = document.querySelector('.weather-page');
     const timezone = page?.getAttribute('data-timezone') || 'Asia/Tokyo';
     
-    // 現地の時間を正確に取得
     const nowInCity = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
       year: 'numeric', month: '2-digit', day: '2-digit',
@@ -194,7 +192,6 @@ const getDayName = (dateStr) => {
       if (isToday) {
         group.querySelectorAll('.hourly-row').forEach(row => {
           const rowHour = parseInt(row.getAttribute('data-hour'));
-          // 今の時間より前を確実に非表示にする
           if (rowHour < cityHour) {
             row.style.display = 'none';
           }
@@ -202,7 +199,6 @@ const getDayName = (dateStr) => {
       }
     });
 
-    // アコーディオンの再設定
     document.querySelectorAll('.day-summary-btn').forEach(button => {
       button.addEventListener('click', (event) => {
         const btn = event.currentTarget;
@@ -215,7 +211,6 @@ const getDayName = (dateStr) => {
       });
     });
   }
-
   updateWeatherDisplay();
 </script>
 
@@ -243,8 +238,17 @@ const getDayName = (dateStr) => {
   .hourly-details { background: #f8f9fa; padding: 0 16px 4px 16px; border-top: 1px solid #eee; }
   .hourly-scroll-wrapper { overflow-x: auto; }
   .hourly-table { width: 100%; min-width: 550px; border-collapse: collapse; }
-  .hourly-table th { padding: 8px 4px; font-size: 0.8rem; color: #888; border-bottom: 1px solid #ddd; }
+
+  /* ▼ 見出しの配置を中央揃えに固定しました ▼ */
+  .hourly-table th { 
+    padding: 8px 4px; 
+    font-size: 0.8rem; 
+    color: #888; 
+    border-bottom: 1px solid #ddd; 
+    text-align: center; 
+  }
   .hourly-table td { padding: 4px 4px; text-align: center; border-bottom: 1px solid #eee; }
+
   .h-time { color: #333; font-weight: bold; }
   .h-icon img { width: 64px; height: 64px; vertical-align: middle; object-fit: contain; }
   .h-temp { color: #1a1a1a !important; font-size: 1.25rem !important; }
