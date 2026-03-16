@@ -48,8 +48,8 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
         <div class="widget-left">
           {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
           <div class="widget-info">
-            <span class="widget-temp">{current.temp_c}℃</span>
             <span class="widget-desc">{conditionText}</span>
+            <span class="widget-temp">{current.temp_c}℃</span>
           </div>
         </div>
         
@@ -92,40 +92,42 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
   .widget-content {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     padding-top: 4px;
   }
   .widget-left {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 2px;
   }
   .widget-icon {
-    width: 60px;
-    height: 60px;
+    width: 72px;
+    height: 72px;
     object-fit: contain;
+    margin-bottom: -4px;
   }
   .widget-info {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-  }
-  .widget-temp {
-    font-size: 1.6rem;
-    font-weight: bold;
-    line-height: 1;
-    color: #1a1a1a;
+    align-items: center;
+    gap: 4px;
   }
   .widget-desc {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #1a1a1a;
+  }
+  .widget-temp {
+    font-size: 1.4rem;
+    font-weight: bold;
+    line-height: 1;
+    color: #333;
   }
   .widget-right {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding-top: 4px;
   }
   .city-link {
     display: inline-block;
