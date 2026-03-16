@@ -40,21 +40,21 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
 ---
 
 <div class="weather-widget">
-  <h3 class="widget-title">{titleText}</h3>
+  <div class="widget-header">
+    <h3 class="widget-title">{titleText}</h3>
+    <a href={weatherLink} class="city-link">{targetCity.display}</a>
+  </div>
   
   {current ? (
-    <div class="widget-body">
-      <div class="widget-content">
-        <div class="widget-left">
-          {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
-          <div class="widget-info">
-            <span class="widget-desc">{conditionText}</span>
-            <span class="widget-temp">{current.temp_c}℃</span>
-          </div>
-        </div>
-        
-        <div class="widget-right">
-          <a href={weatherLink} class="city-link">{targetCity.display}</a>
+    <div class="widget-content">
+      <div class="widget-left">
+        {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
+        <span class="widget-desc">{conditionText}</span>
+      </div>
+      
+      <div class="widget-right">
+        <span class="widget-temp">{current.temp_c}℃</span>
+        <div class="widget-details">
           <div class="detail-line">
             <span class="detail-label">{feelsLikeLabel}</span>
             <span class="detail-value">{current.feelslike_c}℃</span>
@@ -76,24 +76,41 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    padding: 12px 16px 16px 16px;
+    padding: 16px 20px 24px 20px;
     margin-bottom: 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
+  .widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 4px solid #872732;
+    padding-bottom: 6px;
+    margin-bottom: 20px;
+  }
   .widget-title {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    margin: 0 0 12px 0;
+    margin: 0;
     color: #1a1a1a;
-    border-bottom: 4px solid #872732; 
-    padding-bottom: 6px; 
-    display: block;
+  }
+  .city-link {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1a1a1a;
+    text-decoration: none;
+    margin: 0;
+  }
+  .city-link:hover {
+    text-decoration: underline;
+    text-decoration-color: #000;
+    text-decoration-thickness: 1px;
   }
   .widget-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding-top: 4px;
+    gap: 32px; 
   }
   .widget-left {
     display: flex;
@@ -102,60 +119,48 @@ const humidityLabel = lang === 'en' ? 'Humidity:' : '湿度:';
     gap: 2px;
   }
   .widget-icon {
-    width: 72px;
-    height: 72px;
+    width: 84px;
+    height: 84px;
     object-fit: contain;
-    margin-bottom: -4px;
-  }
-  .widget-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
+    margin-bottom: -6px;
   }
   .widget-desc {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: bold;
     color: #1a1a1a;
-  }
-  .widget-temp {
-    font-size: 1.4rem;
-    font-weight: bold;
-    line-height: 1;
-    color: #333;
   }
   .widget-right {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+  }
+  .widget-temp {
+    font-size: 2.2rem;
+    font-weight: bold;
+    line-height: 1;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+  .widget-details {
+    display: flex;
+    flex-direction: column;
     gap: 6px;
   }
-  .city-link {
-    display: inline-block;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #1a1a1a;
-    text-decoration: none;
-    margin-bottom: 6px;
-  }
-  .city-link:hover {
-    text-decoration: underline;
-    text-decoration-color: #000;
-    text-decoration-thickness: 1px;
-  }
   .detail-line {
-    font-size: 0.85rem;
-    color: #666;
+    font-size: 0.95rem;
+    color: #333;
   }
   .detail-label {
     margin-right: 4px;
   }
   .detail-value {
     font-weight: bold;
-    color: #333;
+    color: #1a1a1a;
   }
   .widget-error {
     font-size: 0.9rem;
     color: #666;
     margin: 0;
+    text-align: center;
   }
 </style>
