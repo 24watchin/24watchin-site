@@ -23,8 +23,18 @@ if (API_KEY && BLOG_ID) {
     if (bResponse.ok) {
       const bData = await bResponse.json();
       const allPosts = bData.items || [];
+
+      // ▼ 【追加】サイト全体のルール：海外タグが付いているかチェックする機能
+      const isForeignPost = (post) => {
+        if (!post.labels) return false;
+        return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+      };
+
+      // ▼ 【修正】海外記事を弾いた上で、「天気」関連のタグを持つ記事を探します
       relatedNews = allPosts.filter(post => 
-        post.labels && post.labels.some(label => ['天気', '気象', '災害', 'weather'].includes(label))
+        !isForeignPost(post) && 
+        post.labels && 
+        post.labels.some(label => ['天気', '気象', '災害', 'weather'].includes(label))
       ).slice(0, 5);
     }
   } catch (e) {}
@@ -186,30 +196,25 @@ const getDayName = (dateStr) => {
   </main>
 </Layout>
 
-{/* ▼ ここが修正されたスクリプトです ▼ */}
 <script>
   function updateWeatherDisplay() {
     const page = document.querySelector('.weather-page');
     if (!page) return;
 
     const timezone = page.getAttribute('data-timezone') || 'Asia/Tokyo';
-    // 時間の形式を確実に24時間表記（0〜23）にするために hourCycle を追加しました
     const nowInCity = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
       year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', hourCycle: 'h23'
     }).formatToParts(new Date());
-
     const cityFullDate = `${nowInCity.find(p => p.type === 'year').value}-${nowInCity.find(p => p.type === 'month').value}-${nowInCity.find(p => p.type === 'day').value}`;
     const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
 
     document.querySelectorAll('.day-group').forEach(group => {
       const groupDate = group.getAttribute('data-date');
 
-      // 1. 今日より「過去」の日付は、丸ごと非表示にする
       if (groupDate < cityFullDate) {
         group.style.display = 'none';
       }
-      // 2. 「今日」の場合は、過去の時間を非表示にする
       else if (groupDate === cityFullDate) {
         group.style.display = 'block';
         group.querySelectorAll('.hourly-row').forEach(row => {
@@ -218,7 +223,6 @@ const getDayName = (dateStr) => {
           }
         });
       }
-      // 3. 「未来」の日付はそのまま表示する
       else {
         group.style.display = 'block';
       }
