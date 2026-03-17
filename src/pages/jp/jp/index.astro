@@ -14,7 +14,7 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ▼ slugを使ってキーワード検索し、記事を抽出する賢い関数
+// ① 政治や経済など「カテゴリ」で記事を探す関数（今まで通り）
 const filterByCategory = (slug, count = 3) => {
   const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
@@ -24,6 +24,15 @@ const filterByCategory = (slug, count = 3) => {
     return post.labels.some(label => 
       keywords.some(key => label.includes(key))
     );
+  }).slice(0, count);
+};
+
+// ② 【新しく追加】「us-ja」などの国・言語タグだけでズバリ記事を探す関数
+const filterByCountryTag = (tag, count = 3) => {
+  return allPosts.filter(post => {
+    if (!post.labels) return false;
+    // 記事のラベルの中に、指定したタグ（例：us-ja）が含まれているかチェックします
+    return post.labels.includes(tag);
   }).slice(0, count);
 };
 ---
@@ -53,19 +62,19 @@ const filterByCategory = (slug, count = 3) => {
 
   <GoogleAdBanner position="下部" />
 
-  {/* ▼ 広告の下（1カラム全幅エリア）に、正しい「箱の形」でデータを渡すように修正しました ▼ */}
+  {/* ▼ 広告の下（1カラム全幅エリア）に、各国のトップニュースを配置しました ▼ */}
   <div slot="bottom-wide" class="region-section-container">
     <RegionNewsBlock 
-      title="アジア" 
-      cityData={[{ posts: filterByCategory("アジア", 3) }]} 
+      title="アメリカ" 
+      cityData={[{ posts: filterByCountryTag("us-ja", 3) }]} 
     />
     <RegionNewsBlock 
-      title="北米" 
-      cityData={[{ posts: filterByCategory("北米", 3) }]} 
+      title="台湾" 
+      cityData={[{ posts: filterByCountryTag("tw-ja", 3) }]} 
     />
     <RegionNewsBlock 
-      title="ヨーロッパ" 
-      cityData={[{ posts: filterByCategory("ヨーロッパ", 3) }]} 
+      title="ドイツ" 
+      cityData={[{ posts: filterByCountryTag("de-ja", 3) }]} 
     />
   </div>
 
