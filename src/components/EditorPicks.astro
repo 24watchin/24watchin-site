@@ -1,5 +1,5 @@
 ---
-// 編集部のおすすめ（横スクロール）を表示する専用の部品です
+// 編集部のおすすめ（横スクロール）部品
 const { recentPosts = [] } = Astro.props;
 
 const getImageUrl = (content) => {
@@ -11,10 +11,14 @@ const getImageUrl = (content) => {
 
 <div class="editor-picks-section">
   <h3 class="section-title">編集部のおすすめ</h3>
+  
   <div class="scroll-wrapper">
-    <div class="scroll-container">
+    <button class="nav-btn prev-btn" id="prev-btn" aria-label="前へ">
+      <span>&#10094;</span>
+    </button>
+
+    <div class="scroll-container" id="editor-picks-scroller">
       {recentPosts.map((rp) => (
-        /* ▼ リンクを修正（/jp/jp/news/） */
         <a href={`/jp/jp/news/${rp.id}/`} class="scroll-item">
           <div class="scroll-img-wrapper">
             <img src={getImageUrl(rp.content)} alt={rp.title} />
@@ -26,11 +30,33 @@ const getImageUrl = (content) => {
         </a>
       ))}
     </div>
+
+    <button class="nav-btn next-btn" id="next-btn" aria-label="次へ">
+      <span>&#10095;</span>
+    </button>
   </div>
 </div>
 
+<script>
+  // ボタンをクリックしたときに動かす命令です
+  const scroller = document.getElementById('editor-picks-scroller');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+
+  if (scroller && prevBtn && nextBtn) {
+    // 右へボタンを押した時
+    nextBtn.addEventListener('click', () => {
+      scroller.scrollBy({ left: 320, behavior: 'smooth' });
+    });
+
+    // 左へボタンを押した時
+    prevBtn.addEventListener('click', () => {
+      scroller.scrollBy({ left: -320, behavior: 'smooth' });
+    });
+  }
+</script>
+
 <style>
-  /* 全体の背景と余白 */
   .editor-picks-section { 
     background: #e5e7eb; 
     padding: 30px 20px; 
@@ -47,23 +73,26 @@ const getImageUrl = (content) => {
     display: inline-block; 
   }
 
-  /* 横スクロールの設定 */
+  .scroll-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
   .scroll-container { 
     display: flex; 
     gap: 20px; 
     overflow-x: auto; 
-    padding-bottom: 15px; 
-    /* スクロールを滑らかに、かつピッタリ止まるようにします */
+    padding: 10px 0 20px; 
     scroll-snap-type: x mandatory; 
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
-  /* スクロールバーを隠します */
   .scroll-container::-webkit-scrollbar { display: none; } 
 
-  /* ★ ここで形を固定しました！ */
   .scroll-item { 
-    width: 300px; /* 横幅を300pxに固定 */
-    flex-shrink: 0; 
+    width: 300px; 
+    flex: 0 0 300px; 
     background: #fff; 
     scroll-snap-align: start; 
     text-decoration: none; 
@@ -71,24 +100,40 @@ const getImageUrl = (content) => {
     border-radius: 8px; 
     overflow: hidden; 
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
   }
-  .scroll-item:hover { transform: translateY(-5px); }
 
   .scroll-img-wrapper { height: 180px; overflow: hidden; background: #ddd; }
   .scroll-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-
   .scroll-text { padding: 15px; }
-  .scroll-text h4 { 
-    font-size: 15px; 
-    line-height: 1.5; 
-    margin: 0; 
-    font-weight: bold; 
-    /* 3行以上は「...」にする設定 */
-    display: -webkit-box; 
-    -webkit-line-clamp: 3; 
-    -webkit-box-orient: vertical; 
-    overflow: hidden; 
-  }
+  .scroll-text h4 { font-size: 15px; line-height: 1.5; margin: 0; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .tag-link { font-size: 12px; color: #d97706; font-weight: bold; margin-top: 10px; display: block; }
+
+  /* ナビゲーションボタン（矢印）の見た目 */
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: background 0.2s;
+  }
+  .nav-btn:hover { background: rgba(0, 0, 0, 0.8); }
+  .prev-btn { left: -10px; }
+  .next-btn { right: -10px; }
+
+  /* スマホなどではボタンを隠して指でスワイプできるようにします */
+  @media (max-width: 768px) {
+    .nav-btn { display: none; }
+    .scroll-container { padding: 10px 0; }
+  }
 </style>
