@@ -6,7 +6,6 @@ const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const region = pathParts[0] || 'jp';
 const lang = pathParts[1] || 'jp';
-
 const apiLangMap = { jp: 'ja', en: 'en', cn: 'zh', fr: 'fr', de: 'de', es: 'es', ru: 'ru' };
 const apiLang = apiLangMap[lang] || 'ja';
 const isImperial = lang === 'en';
@@ -187,23 +186,41 @@ const getDayName = (dateStr) => {
   </main>
 </Layout>
 
+{/* ▼ ここが修正されたスクリプトです ▼ */}
 <script>
   function updateWeatherDisplay() {
     const page = document.querySelector('.weather-page');
-    const timezone = page?.getAttribute('data-timezone') || 'Asia/Tokyo';
+    if (!page) return;
+
+    const timezone = page.getAttribute('data-timezone') || 'Asia/Tokyo';
+    // 時間の形式を確実に24時間表記（0〜23）にするために hourCycle を追加しました
     const nowInCity = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
-      year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', hour12: false
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', hourCycle: 'h23'
     }).formatToParts(new Date());
 
     const cityFullDate = `${nowInCity.find(p => p.type === 'year').value}-${nowInCity.find(p => p.type === 'month').value}-${nowInCity.find(p => p.type === 'day').value}`;
     const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
 
     document.querySelectorAll('.day-group').forEach(group => {
-      if (group.getAttribute('data-date') === cityFullDate) {
+      const groupDate = group.getAttribute('data-date');
+
+      // 1. 今日より「過去」の日付は、丸ごと非表示にする
+      if (groupDate < cityFullDate) {
+        group.style.display = 'none';
+      }
+      // 2. 「今日」の場合は、過去の時間を非表示にする
+      else if (groupDate === cityFullDate) {
+        group.style.display = 'block';
         group.querySelectorAll('.hourly-row').forEach(row => {
-          if (parseInt(row.getAttribute('data-hour')) < cityHour) row.style.display = 'none';
+          if (parseInt(row.getAttribute('data-hour')) < cityHour) {
+            row.style.display = 'none';
+          }
         });
+      }
+      // 3. 「未来」の日付はそのまま表示する
+      else {
+        group.style.display = 'block';
       }
     });
 
@@ -212,7 +229,7 @@ const getDayName = (dateStr) => {
         const targetId = e.currentTarget.getAttribute('data-target');
         const targetEl = document.getElementById(targetId);
         const isExpanded = e.currentTarget.getAttribute('aria-expanded') === 'true';
-        e.currentTarget.setAttribute('aria-expanded', !isExpanded);
+        e.currentTarget.setAttribute('aria-expanded', String(!isExpanded));
         targetEl.hidden = isExpanded;
       });
     });
