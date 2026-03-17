@@ -2,15 +2,23 @@
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 
-// ▼ 確実に日本版の記事を10件確保できるよう、Bloggerから少し多め（50件）に記事をもらってきます
-const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+// 条件が厳しくなるため、Bloggerから最大の100件を読み込んで探します
+const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
 const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ▼ 【ここがフィルターです】もらってきた記事の中から「jp-ja」のタグがあるものだけを抜き出し、最新の10件に絞ります
-const posts = allPosts.filter(post => post.labels && post.labels.includes("jp-ja")).slice(0, 10);
+// ▼ 1. ここがトレンドタグの名前を決める場所です！
+// 後で決まったタグ名（例："trend"、"pickup"など）に自由に変更してください。
+const trendTagName = "トレンド"; 
+
+// ▼ 2. 記事の選別（2重の関所）
+const posts = allPosts.filter(post => 
+  post.labels && 
+  post.labels.includes("jp-ja") && // 関所①：日本版の記事であること
+  post.labels.includes(trendTagName) // 関所②：トレンドタグが付いていること
+).slice(0, 10);
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
