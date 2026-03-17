@@ -67,3 +67,18 @@ function formatDateTimeJP(dateString) {
   .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 </style>
+
+{/* ▼ アクセス数をカウントするための連絡係（読者には見えません） ▼ */}
+<script define:vars={{ postId: post.id }}>
+  // ページが完全に表示されたら、裏側でこっそり受付窓口（/api/pv）に連絡を入れます
+  fetch('/api/pv', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    // 「どの記事が読まれたか」のIDを一緒に送ります
+    body: JSON.stringify({ postId: postId })
+  }).catch(() => {
+    // もし通信エラーが起きても、読者の画面には何も影響を出さない（無視する）設定です
+  });
+</script>
