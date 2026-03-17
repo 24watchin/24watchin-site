@@ -13,7 +13,6 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
@@ -26,7 +25,17 @@ const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : 'ニュース';
 const keywords = catData ? catData.keywords : [slug];
 
-const categoryPosts = allPosts.filter(post => {
+// ▼ 【追加】トップページと同じ「us-ja」などの海外タグを弾くバリア機能です
+const isForeignPost = (post) => {
+  if (!post.labels) return false;
+  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+};
+
+// ▼ 全記事から海外記事を弾いた、安全な箱（mainSitePosts）を作ります
+const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
+
+// ▼ カテゴリに合う記事を探すとき、全記事からではなく「安全な箱」から探すように変更しました
+const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.some(label => keywords.some(key => label.includes(key)));
 });
