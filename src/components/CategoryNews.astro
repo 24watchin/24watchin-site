@@ -1,5 +1,6 @@
 ---
 const { title, slug, posts = [] } = Astro.props;
+
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/120x80/eeeeee/999999?text=No+Image';
@@ -19,10 +20,10 @@ const getImageUrl = (content) => {
           <img src={getImageUrl(post.content)} alt={post.title} />
         </div>
         <div class="article-info">
-          <h4>{post.title}</h4>
+          {/* cssを当てやすくするため class="article-title" を追加しました */}
+          <h4 class="article-title">{post.title}</h4>
           <div class="article-meta">
             <span class="date">{new Date(post.published).toLocaleDateString('ja-JP')}</span>
-            {/* タグを削除しました */}
           </div>
         </div>
       </a>
@@ -31,14 +32,51 @@ const getImageUrl = (content) => {
 </section>
 
 <style>
-  .category-block { margin-bottom: 30px; }
+  /* ① カテゴリ間のスペースを 30px から 15px に狭くしました */
+  .category-block { margin-bottom: 15px; }
+
   .category-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 5px; margin-bottom: 15px; }
   .category-header h3 { font-size: 18px; margin: 0; font-weight: bold; }
-  .view-all { font-size: 12px; color: #0066cc; text-decoration: none; font-weight: bold; }
+  
+  /* ③ 「〇〇 ページへ」をグレー(#666666)に変更 */
+  .view-all { font-size: 12px; color: #666666; text-decoration: none; font-weight: bold; }
+  /* ③ マウスを当てた時に黒い細線を出す */
+  .view-all:hover { text-decoration: underline; text-decoration-color: #000000; text-decoration-thickness: 1px; }
+
   .article-list { display: flex; flex-direction: column; gap: 15px; }
   .article-item { display: flex; gap: 12px; text-decoration: none; color: #333; }
+
   .article-img { width: 120px; height: 80px; flex-shrink: 0; border-radius: 4px; overflow: hidden; }
   .article-img img { width: 100%; height: 100%; object-fit: cover; }
-  .article-info h4 { font-size: 14px; margin: 0 0 5px; line-height: 1.4; font-weight: bold; }
+
+  /* ④ 日付を下に固定するための箱（レイアウト）の設定 */
+  .article-info { 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; /* タイトルは上、日付は下へ押し分ける */
+    height: 80px; /* 画像の高さと同じ80pxに固定 */
+    flex: 1;
+    min-width: 0; /* 長いタイトルでレイアウトが崩れないためのおまじない */
+  }
+
+  /* ② 文字の大きさを16pxにし、④ 3行までに制限する */
+  .article-title { 
+    font-size: 16px; 
+    margin: 0; 
+    line-height: 1.4; 
+    font-weight: bold; 
+    display: -webkit-box; 
+    -webkit-line-clamp: 3; /* ここで3行までに制限しています */
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+  }
+
+  /* ② マウスを当てた時に記事タイトルに黒い細線を出す */
+  .article-item:hover .article-title {
+    text-decoration: underline;
+    text-decoration-color: #000000;
+    text-decoration-thickness: 1px;
+  }
+
   .article-meta { font-size: 11px; color: #888; }
 </style>
