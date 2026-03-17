@@ -33,6 +33,15 @@ function formatDateTimeJP(dateString) {
   const date = new Date(dateString);
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
+
+// ▼ 【追加】ここにも海外記事（us-jaなど）を弾くバリアを追加します
+const isForeignPost = (p) => {
+  if (!p.labels) return false;
+  return p.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+};
+
+// ▼ 関連記事用に、海外記事を弾き、さらに「今読んでいる記事自体」も除外した安全な箱を作ります
+const relatedSitePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
 ---
 
 <Layout title={post.title} sidebarType="article">
@@ -53,7 +62,8 @@ function formatDateTimeJP(dateString) {
   </article>
 
   <div slot="bottom-wide">
-    <RelatedNews relatedPosts={allPosts.slice(0, 6)} />
+    {/* ▼ バリアを通った安全な記事だけを関連記事として渡します ▼ */}
+    <RelatedNews relatedPosts={relatedSitePosts.slice(0, 6)} />
     <RecommendedLinks />
   </div>
 </Layout>
@@ -68,17 +78,13 @@ function formatDateTimeJP(dateString) {
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 </style>
 
-{/* ▼ アクセス数をカウントするための連絡係（読者には見えません） ▼ */}
 <script define:vars={{ postId: post.id }}>
-  // ページが完全に表示されたら、裏側でこっそり受付窓口（/api/pv）に連絡を入れます
   fetch('/api/pv', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    // 「どの記事が読まれたか」のIDを一緒に送ります
     body: JSON.stringify({ postId: postId })
   }).catch(() => {
-    // もし通信エラーが起きても、読者の画面には何も影響を出さない（無視する）設定です
   });
 </script>
