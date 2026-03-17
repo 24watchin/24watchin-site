@@ -4,7 +4,6 @@ import CategoryNews from '../../../components/CategoryNews.astro';
 import MainNewsLayout from '../../../components/MainNewsLayout.astro';
 import TrendScroll from '../../../components/TrendScroll.astro';
 import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
-// ▼ 1. ここで「国や地域」のパーツを新しく読み込んでいます
 import RegionNewsBlock from '../../../components/RegionNewsBlock.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels';
 
@@ -15,7 +14,6 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ▼ slugを使ってキーワード検索し、記事を抽出する賢い関数
 const filterByCategory = (slug, count = 10) => {
   const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
@@ -38,35 +36,37 @@ const filterByCategory = (slug, count = 10) => {
   <GoogleAdBanner position="上部" />
 
   <div class="genre-grid">
-    <CategoryNews title="政治" slug="politics" posts={filterByCategory("politics", 4)} />
-    <CategoryNews title="社会" slug="society" posts={filterByCategory("society", 4)} />
-    <CategoryNews title="国際" slug="international" posts={filterByCategory("international", 4)} />
-    <CategoryNews title="経済" slug="economy" posts={filterByCategory("economy", 4)} />
-    <CategoryNews title="環境・エネルギー" slug="environment-energy" posts={filterByCategory("environment-energy", 4)} />
-    <CategoryNews title="ビジネス" slug="business" posts={filterByCategory("business", 4)} />
-    <CategoryNews title="テクノロジー・AI" slug="technology-ai" posts={filterByCategory("technology-ai", 4)} />
-    <CategoryNews title="文化・エンタメ" slug="entertainment" posts={filterByCategory("entertainment", 4)} />
-    <CategoryNews title="スポーツ" slug="sports" posts={filterByCategory("sports", 4)} />
-    <CategoryNews title="健康・ライフ" slug="health-life" posts={filterByCategory("health-life", 4)} />
-    <CategoryNews title="天気" slug="weather" posts={filterByCategory("weather", 4)} />
-    <CategoryNews title="交通" slug="traffic" posts={filterByCategory("traffic", 4)} />
+    {/* ▼ 各カテゴリの表示件数を「3」に修正しました ▼ */}
+    <CategoryNews title="政治" slug="politics" posts={filterByCategory("politics", 3)} />
+    <CategoryNews title="社会" slug="society" posts={filterByCategory("society", 3)} />
+    <CategoryNews title="国際" slug="international" posts={filterByCategory("international", 3)} />
+    <CategoryNews title="経済" slug="economy" posts={filterByCategory("economy", 3)} />
+    <CategoryNews title="環境・エネルギー" slug="environment-energy" posts={filterByCategory("environment-energy", 3)} />
+    <CategoryNews title="ビジネス" slug="business" posts={filterByCategory("business", 3)} />
+    <CategoryNews title="テクノロジー・AI" slug="technology-ai" posts={filterByCategory("technology-ai", 3)} />
+    <CategoryNews title="文化・エンタメ" slug="entertainment" posts={filterByCategory("entertainment", 3)} />
+    <CategoryNews title="スポーツ" slug="sports" posts={filterByCategory("sports", 3)} />
+    <CategoryNews title="健康・ライフ" slug="health-life" posts={filterByCategory("health-life", 3)} />
+    <CategoryNews title="天気" slug="weather" posts={filterByCategory("weather", 3)} />
+    <CategoryNews title="交通" slug="traffic" posts={filterByCategory("traffic", 3)} />
   </div>
 
   <GoogleAdBanner position="下部" />
 
-  {/* ▼ 2. 広告の下に「国・地域」のパーツ（1カラム全幅）を復旧しました ▼ */}
-  <div class="region-section-container">
+  {/* ▼ 2カラムエリアの下に、全く別の1カラム（全幅）エリアを作るためのおまじない（slot="bottom-wide"）を追加しました ▼ */}
+  <div slot="bottom-wide" class="region-section-container">
+    {/* ▼ 記事データ（cityData）の渡し方を、正しく中身が表示される形に修正しました ▼ */}
     <RegionNewsBlock 
       title="アジア" 
-      cityData={[{ posts: filterByCategory("asia", 3) }]} 
+      cityData={filterByCategory("asia", 3)} 
     />
     <RegionNewsBlock 
       title="北米" 
-      cityData={[{ posts: filterByCategory("north-america", 3) }]} 
+      cityData={filterByCategory("north-america", 3)} 
     />
     <RegionNewsBlock 
       title="ヨーロッパ" 
-      cityData={[{ posts: filterByCategory("europe", 3) }]} 
+      cityData={filterByCategory("europe", 3)} 
     />
   </div>
 
@@ -76,7 +76,6 @@ const filterByCategory = (slug, count = 10) => {
   .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
   @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
 
-  /* 復旧したエリアの上の余白を整えるCSSです */
   .region-section-container {
     margin-top: 40px;
     width: 100%;
