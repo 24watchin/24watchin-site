@@ -14,12 +14,22 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ① 政治や経済など「カテゴリ」で記事を探す関数（今まで通り）
+// ▼ 【サイト全体のルール】「us-ja」などの海外タグが付いているかチェックする機能
+const isForeignPost = (post) => {
+  if (!post.labels) return false;
+  // 「〇〇-ja」というタグがあり、それが「jp-ja」ではない場合、海外記事と判定します
+  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+};
+
+// ▼ 日本サイトのメインエリア用：海外記事（us-jaなど）を「弾いた」記事だけの箱を作ります
+const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
+
+// カテゴリ（政治や経済）は、海外記事を弾いた箱の中から探します
 const filterByCategory = (slug, count = 3) => {
   const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
 
-  return allPosts.filter(post => {
+  return mainSitePosts.filter(post => {
     if (!post.labels) return false;
     return post.labels.some(label => 
       keywords.some(key => label.includes(key))
@@ -27,11 +37,10 @@ const filterByCategory = (slug, count = 3) => {
   }).slice(0, count);
 };
 
-// ② 【新しく追加】「us-ja」などの国・言語タグだけでズバリ記事を探す関数
+// 一番下の国別ブロックは、すべての記事の中から指定の国タグ（us-jaなど）を探します
 const filterByCountryTag = (tag, count = 3) => {
   return allPosts.filter(post => {
     if (!post.labels) return false;
-    // 記事のラベルの中に、指定したタグ（例：us-ja）が含まれているかチェックします
     return post.labels.includes(tag);
   }).slice(0, count);
 };
@@ -39,7 +48,8 @@ const filterByCountryTag = (tag, count = 3) => {
 
 <Layout title="TOP">
   <div slot="top-full">
-    <MainNewsLayout posts={allPosts} />
+    {/* トップの大きな記事も、海外記事を弾いた箱から表示します */}
+    <MainNewsLayout posts={mainSitePosts} />
     <TrendScroll />
   </div>
 
@@ -62,7 +72,6 @@ const filterByCountryTag = (tag, count = 3) => {
 
   <GoogleAdBanner position="下部" />
 
-  {/* ▼ 広告の下（1カラム全幅エリア）に、各国のトップニュースを配置しました ▼ */}
   <div slot="bottom-wide" class="region-section-container">
     <RegionNewsBlock 
       title="アメリカ" 
@@ -83,9 +92,5 @@ const filterByCountryTag = (tag, count = 3) => {
 <style>
   .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
   @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
-
-  .region-section-container {
-    margin-top: 40px;
-    width: 100%;
-  }
+  .region-section-container { margin-top: 40px; width: 100%; }
 </style>
