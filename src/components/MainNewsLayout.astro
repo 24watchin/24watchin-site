@@ -8,14 +8,25 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// --- 記事の自動配置ロジック（ここを賢くしました） ---
+// ▼ 【追加したバリア機能】「us-ja」などの海外タグが付いているかチェックします
+const isForeignPost = (post) => {
+  if (!post.labels) return false;
+  // 「〇〇-ja」というタグがあり、それが「jp-ja」ではない場合、海外記事と判定して弾きます
+  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+};
+
+// ▼ 全ての記事の中から、海外記事を弾いた「安全な日本の記事」だけの箱を作ります
+const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
+
+
+// --- 記事の自動配置ロジック ---
 
 const topPostsMap = new Map();
 const topLabelRegex = /^TOP([①②③④⑤⑥⑦⑧⑨⑩])$/;
 const numMap = { '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10 };
 
-// ①〜⑩のラベルがついた記事を、最新優先で抽出
-allPosts.forEach(post => {
+// ①〜⑩のラベルがついた記事を、最新優先で抽出（※上で作った安全な箱の中から探します）
+mainSitePosts.forEach(post => {
   if (!post.labels) return;
   post.labels.forEach(label => {
     const match = label.match(topLabelRegex);
@@ -33,9 +44,10 @@ let finalPosts = Array.from(topPostsMap.entries())
   .sort((a, b) => a[0] - b[0])
   .map(entry => entry[1]);
 
-// 足りない分をTOPラベルなしの最新記事で埋める（二重表示防止）
+// 足りない分をTOPラベルなしの最新記事で埋める（※ここも安全な箱の中から探します）
 const usedIds = new Set(finalPosts.map(p => p.id));
-const normalPosts = allPosts.filter(p => !usedIds.has(p.id));
+const normalPosts = mainSitePosts.filter(p => !usedIds.has(p.id));
+
 while (finalPosts.length < 10 && normalPosts.length > 0) {
   finalPosts.push(normalPosts.shift());
 }
