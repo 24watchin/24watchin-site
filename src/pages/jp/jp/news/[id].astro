@@ -34,14 +34,14 @@ function formatDateTimeJP(dateString) {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-// ▼ 海外記事を弾くバリア機能
+// ▼ 海外記事（us-jaなど）を弾くバリア機能
 const isForeignPost = (p) => {
-  if (!p.labels) return false;
+  if (!p || !p.labels) return false;
   return p.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// ▼ 関連記事用に、海外記事と今読んでいる記事を除外
-const relatedSitePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
+// ▼ 日本版の安全な記事だけを抽出（関連記事・おすすめ用）
+const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
 ---
 
 <Layout title={post.title} sidebarType="article">
@@ -61,16 +61,16 @@ const relatedSitePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post
     <ReactionBar articleId={post.id} />
   </article>
 
-  {/* 1カラムで表示されるエリア */}
+  {/* 記事文章の下からの1カラムエリア */}
   <div slot="bottom-wide">
-    {/* 1. 関連記事 */}
-    <RelatedNews relatedPosts={relatedSitePosts.slice(0, 6)} />
+    {/* 1. 関連記事（日本版の安全な記事を表示） */}
+    <RelatedNews relatedPosts={safePosts.slice(0, 6)} />
     
-    {/* 2. あわせて読みたい */}
+    {/* 2. あわせて読みたい（PR枠） */}
     <RecommendedLinks />
 
-    {/* 3. 編集部のおすすめ（復活させました！） */}
-    <EditorPicks />
+    {/* 3. 編集部のおすすめ（日本版の記事データを渡して復活！） */}
+    <EditorPicks allPosts={allPosts} />
   </div>
 </Layout>
 
