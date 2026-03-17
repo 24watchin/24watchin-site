@@ -1,6 +1,6 @@
 ---
 // 編集部のおすすめ（横スクロール）を表示する専用の部品です
-const { recentPosts = [] } = Astro.props; // 記事データを受け取ります
+const { recentPosts = [] } = Astro.props;
 
 const getImageUrl = (content) => {
   if (!content) return 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
@@ -14,7 +14,7 @@ const getImageUrl = (content) => {
   <div class="scroll-wrapper">
     <div class="scroll-container">
       {recentPosts.map((rp) => (
-        /* ▼ リンク先を日本版のパスに修正しました */
+        /* ▼ リンクを修正（/jp/jp/news/） */
         <a href={`/jp/jp/news/${rp.id}/`} class="scroll-item">
           <div class="scroll-img-wrapper">
             <img src={getImageUrl(rp.content)} alt={rp.title} />
@@ -26,21 +26,69 @@ const getImageUrl = (content) => {
         </a>
       ))}
     </div>
-    <div class="scroll-arrow"><i class="fas fa-chevron-right"></i></div>
   </div>
 </div>
 
 <style>
-  .section-title { font-size: 22px; color: #333; margin-bottom: 20px; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; display: inline-block; }
-  .tag-link { font-size: 12px; color: #d97706; font-weight: bold; margin-top: 10px; display: block; }
-  .editor-picks-section { background: #e5e7eb; padding: 40px; margin: 0 0 50px; border-radius: 8px; }
-  .scroll-wrapper { position: relative; }
-  .scroll-container { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 15px; scroll-snap-type: x mandatory; }
+  /* 全体の背景と余白 */
+  .editor-picks-section { 
+    background: #e5e7eb; 
+    padding: 30px 20px; 
+    margin: 40px 0; 
+    border-radius: 12px; 
+  }
+  
+  .section-title { 
+    font-size: 20px; 
+    color: #333; 
+    margin-bottom: 20px; 
+    border-bottom: 3px solid #1e3a8a; 
+    padding-bottom: 8px; 
+    display: inline-block; 
+  }
+
+  /* 横スクロールの設定 */
+  .scroll-container { 
+    display: flex; 
+    gap: 20px; 
+    overflow-x: auto; 
+    padding-bottom: 15px; 
+    /* スクロールを滑らかに、かつピッタリ止まるようにします */
+    scroll-snap-type: x mandatory; 
+    -webkit-overflow-scrolling: touch;
+  }
+  /* スクロールバーを隠します */
   .scroll-container::-webkit-scrollbar { display: none; } 
-  .scroll-item { min-width: 280px; flex-shrink: 0; background: #fff; scroll-snap-align: start; text-decoration: none; color: #333; display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; }
-  .scroll-item:hover h4 { text-decoration: underline; }
+
+  /* ★ ここで形を固定しました！ */
+  .scroll-item { 
+    width: 300px; /* 横幅を300pxに固定 */
+    flex-shrink: 0; 
+    background: #fff; 
+    scroll-snap-align: start; 
+    text-decoration: none; 
+    color: #333; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+  .scroll-item:hover { transform: translateY(-5px); }
+
   .scroll-img-wrapper { height: 180px; overflow: hidden; background: #ddd; }
   .scroll-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-  .scroll-text { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-  .scroll-text h4 { font-size: 16px; line-height: 1.5; margin: 0; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+  .scroll-text { padding: 15px; }
+  .scroll-text h4 { 
+    font-size: 15px; 
+    line-height: 1.5; 
+    margin: 0; 
+    font-weight: bold; 
+    /* 3行以上は「...」にする設定 */
+    display: -webkit-box; 
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+  }
+  .tag-link { font-size: 12px; color: #d97706; font-weight: bold; margin-top: 10px; display: block; }
 </style>
