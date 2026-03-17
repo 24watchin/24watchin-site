@@ -34,13 +34,13 @@ function formatDateTimeJP(dateString) {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-// ▼ 【追加】ここにも海外記事（us-jaなど）を弾くバリアを追加します
+// ▼ 海外記事を弾くバリア機能
 const isForeignPost = (p) => {
   if (!p.labels) return false;
   return p.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// ▼ 関連記事用に、海外記事を弾き、さらに「今読んでいる記事自体」も除外した安全な箱を作ります
+// ▼ 関連記事用に、海外記事と今読んでいる記事を除外
 const relatedSitePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
 ---
 
@@ -61,10 +61,16 @@ const relatedSitePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post
     <ReactionBar articleId={post.id} />
   </article>
 
+  {/* 1カラムで表示されるエリア */}
   <div slot="bottom-wide">
-    {/* ▼ バリアを通った安全な記事だけを関連記事として渡します ▼ */}
+    {/* 1. 関連記事 */}
     <RelatedNews relatedPosts={relatedSitePosts.slice(0, 6)} />
+    
+    {/* 2. あわせて読みたい */}
     <RecommendedLinks />
+
+    {/* 3. 編集部のおすすめ（復活させました！） */}
+    <EditorPicks />
   </div>
 </Layout>
 
@@ -81,10 +87,7 @@ const relatedSitePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post
 <script define:vars={{ postId: post.id }}>
   fetch('/api/pv', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ postId: postId })
-  }).catch(() => {
-  });
+  }).catch(() => {});
 </script>
