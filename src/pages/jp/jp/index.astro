@@ -14,7 +14,8 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-const filterByCategory = (slug, count = 10) => {
+// ▼ slugを使ってキーワード検索し、記事を抽出する賢い関数
+const filterByCategory = (slug, count = 3) => {
   const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
 
@@ -36,7 +37,6 @@ const filterByCategory = (slug, count = 10) => {
   <GoogleAdBanner position="上部" />
 
   <div class="genre-grid">
-    {/* ▼ 各カテゴリの表示件数を「3」に修正しました ▼ */}
     <CategoryNews title="政治" slug="politics" posts={filterByCategory("politics", 3)} />
     <CategoryNews title="社会" slug="society" posts={filterByCategory("society", 3)} />
     <CategoryNews title="国際" slug="international" posts={filterByCategory("international", 3)} />
@@ -53,20 +53,19 @@ const filterByCategory = (slug, count = 10) => {
 
   <GoogleAdBanner position="下部" />
 
-  {/* ▼ 2カラムエリアの下に、全く別の1カラム（全幅）エリアを作るためのおまじない（slot="bottom-wide"）を追加しました ▼ */}
+  {/* ▼ 広告の下（1カラム全幅エリア）に、正しい「箱の形」でデータを渡すように修正しました ▼ */}
   <div slot="bottom-wide" class="region-section-container">
-    {/* ▼ 記事データ（cityData）の渡し方を、正しく中身が表示される形に修正しました ▼ */}
     <RegionNewsBlock 
       title="アジア" 
-      cityData={filterByCategory("asia", 3)} 
+      cityData={[{ posts: filterByCategory("アジア", 3) }]} 
     />
     <RegionNewsBlock 
       title="北米" 
-      cityData={filterByCategory("north-america", 3)} 
+      cityData={[{ posts: filterByCategory("北米", 3) }]} 
     />
     <RegionNewsBlock 
       title="ヨーロッパ" 
-      cityData={filterByCategory("europe", 3)} 
+      cityData={[{ posts: filterByCategory("ヨーロッパ", 3) }]} 
     />
   </div>
 
