@@ -38,20 +38,21 @@ const getImageUrl = (content) => {
 </div>
 
 <script>
-  // ボタンをクリックしたときに動かす命令です
+  // 1記事ずつ正確に動かすための設定です
   const scroller = document.getElementById('editor-picks-scroller');
   const prevBtn = document.getElementById('prev-btn');
   const nextBtn = document.getElementById('next-btn');
 
   if (scroller && prevBtn && nextBtn) {
-    // 右へボタンを押した時
+    // 1枚のカード（300px）＋ 隙間（20px）＝ 320px ずつ移動させます
+    const scrollAmount = 320;
+
     nextBtn.addEventListener('click', () => {
-      scroller.scrollBy({ left: 320, behavior: 'smooth' });
+      scroller.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
 
-    // 左へボタンを押した時
     prevBtn.addEventListener('click', () => {
-      scroller.scrollBy({ left: -320, behavior: 'smooth' });
+      scroller.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     });
   }
 </script>
@@ -68,7 +69,8 @@ const getImageUrl = (content) => {
     font-size: 20px; 
     color: #333; 
     margin-bottom: 20px; 
-    border-bottom: 3px solid #1e3a8a; 
+    /* 下線の色を赤色 (#872732) に変更しました */
+    border-bottom: 3px solid #872732; 
     padding-bottom: 8px; 
     display: inline-block; 
   }
@@ -108,15 +110,14 @@ const getImageUrl = (content) => {
   .scroll-text h4 { font-size: 15px; line-height: 1.5; margin: 0; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .tag-link { font-size: 12px; color: #d97706; font-weight: bold; margin-top: 10px; display: block; }
 
-  /* ナビゲーションボタン（矢印）の見た目 */
   .nav-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(135, 39, 50, 0.8); /* 矢印の背景も少し赤みを入れています */
     color: white;
     border: none;
     cursor: pointer;
@@ -125,13 +126,15 @@ const getImageUrl = (content) => {
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
-  .nav-btn:hover { background: rgba(0, 0, 0, 0.8); }
-  .prev-btn { left: -10px; }
-  .next-btn { right: -10px; }
+  .nav-btn:hover { background: rgba(135, 39, 50, 1); }
+  .nav-btn:active { transform: translateY(-50%) scale(0.9); }
+  
+  .prev-btn { left: -15px; }
+  .next-btn { right: -15px; }
 
-  /* スマホなどではボタンを隠して指でスワイプできるようにします */
   @media (max-width: 768px) {
     .nav-btn { display: none; }
     .scroll-container { padding: 10px 0; }
