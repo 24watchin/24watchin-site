@@ -32,13 +32,11 @@ async function fetchAllPosts() {
     const url = new URL(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`);
     url.searchParams.set('key', API_KEY);
     url.searchParams.set('maxResults', '100');
-
     if (pageToken) {
       url.searchParams.set('pageToken', pageToken);
     }
 
     const response = await fetch(url.toString());
-
     if (!response.ok) {
       throw new Error(`Blogger API error: ${response.status} ${response.statusText}`);
     }
@@ -47,7 +45,6 @@ async function fetchAllPosts() {
     const items = data.items || [];
 
     allPosts.push(...items);
-
     if (!data.nextPageToken) {
       break;
     }
@@ -60,7 +57,17 @@ async function fetchAllPosts() {
 
 const rawPosts = await fetchAllPosts();
 
-const searchIndex = rawPosts.map((post) => ({
+// ▼ 【追加】サイト全体のルール：海外タグが付いているかチェックする機能
+const isForeignPost = (post) => {
+  if (!post.labels) return false;
+  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+};
+
+// ▼ 【追加】すべての記事から、海外記事を弾いた安全な箱（mainSitePosts）を作ります
+const mainSitePosts = rawPosts.filter(post => !isForeignPost(post));
+
+// ▼ 検索用のデータ（searchIndex）は、その安全な箱の中から作ります
+const searchIndex = mainSitePosts.map((post) => ({
   id: post.id,
   title: post.title || '',
   published: post.published || '',
