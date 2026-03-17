@@ -25,7 +25,7 @@ const getImageUrl = (content) => {
           </div>
           <div class="scroll-text">
             <h4>{rp.title}</h4>
-            <span class="tag-link"># おすすめ</span>
+            {/* 「# おすすめ」のタグを削除しました */}
           </div>
         </a>
       ))}
@@ -38,13 +38,11 @@ const getImageUrl = (content) => {
 </div>
 
 <script>
-  // 1記事ずつ正確に動かすための設定です
   const scroller = document.getElementById('editor-picks-scroller');
   const prevBtn = document.getElementById('prev-btn');
   const nextBtn = document.getElementById('next-btn');
 
   if (scroller && prevBtn && nextBtn) {
-    // 1枚のカード（300px）＋ 隙間（20px）＝ 320px ずつ移動させます
     const scrollAmount = 320;
 
     nextBtn.addEventListener('click', () => {
@@ -58,20 +56,20 @@ const getImageUrl = (content) => {
 </script>
 
 <style>
+  /* グレーの背景エリアを縦に狭くしました（paddingを 30px -> 15px に変更） */
   .editor-picks-section { 
     background: #e5e7eb; 
-    padding: 30px 20px; 
-    margin: 40px 0; 
+    padding: 15px 20px; 
+    margin: 30px 0; 
     border-radius: 12px; 
   }
   
   .section-title { 
-    font-size: 20px; 
+    font-size: 19px; 
     color: #333; 
-    margin-bottom: 20px; 
-    /* 下線の色を赤色 (#872732) に変更しました */
+    margin-bottom: 15px; 
     border-bottom: 3px solid #872732; 
-    padding-bottom: 8px; 
+    padding-bottom: 5px; 
     display: inline-block; 
   }
 
@@ -85,7 +83,7 @@ const getImageUrl = (content) => {
     display: flex; 
     gap: 20px; 
     overflow-x: auto; 
-    padding: 10px 0 20px; 
+    padding: 5px 0 10px; 
     scroll-snap-type: x mandatory; 
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -106,9 +104,19 @@ const getImageUrl = (content) => {
 
   .scroll-img-wrapper { height: 180px; overflow: hidden; background: #ddd; }
   .scroll-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-  .scroll-text { padding: 15px; }
-  .scroll-text h4 { font-size: 15px; line-height: 1.5; margin: 0; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .tag-link { font-size: 12px; color: #d97706; font-weight: bold; margin-top: 10px; display: block; }
+  
+  /* テキストエリアの余白を詰めました */
+  .scroll-text { padding: 12px 15px; }
+  .scroll-text h4 { 
+    font-size: 15px; 
+    line-height: 1.4; 
+    margin: 0; 
+    font-weight: bold; 
+    display: -webkit-box; 
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+  }
 
   .nav-btn {
     position: absolute;
@@ -117,7 +125,7 @@ const getImageUrl = (content) => {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(135, 39, 50, 0.8); /* 矢印の背景も少し赤みを入れています */
+    background: rgba(135, 39, 50, 0.8);
     color: white;
     border: none;
     cursor: pointer;
@@ -130,13 +138,11 @@ const getImageUrl = (content) => {
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
   .nav-btn:hover { background: rgba(135, 39, 50, 1); }
-  .nav-btn:active { transform: translateY(-50%) scale(0.9); }
   
   .prev-btn { left: -15px; }
   .next-btn { right: -15px; }
 
   @media (max-width: 768px) {
     .nav-btn { display: none; }
-    .scroll-container { padding: 10px 0; }
   }
 </style>
