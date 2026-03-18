@@ -11,12 +11,14 @@ const getImageUrl = (content) => {
 <section class="category-block">
   <div class="category-header">
     <h3>{title}</h3>
-    <a href={`/jp/jp/category/${slug}/`} class="view-all">{title} ページへ <i class="fas fa-chevron-right"></i></a>
+    {/* ▼ ここを /ja/jp/ に修正しました！ */}
+    <a href={`/ja/jp/category/${slug}/`} class="view-all">{title} ページへ <i class="fas fa-chevron-right"></i></a>
   </div>
 
   <div class="article-list">
     {posts.map((post) => (
-      <a href={`/jp/jp/news/${post.id}/`} class="article-item">
+      {/* ▼ ここを /ja/jp/ に修正しました！ */}
+      <a href={`/ja/jp/news/${post.id}/`} class="article-item">
         <div class="article-img">
           <img src={getImageUrl(post.content)} alt={post.title} />
         </div>
