@@ -23,14 +23,11 @@ if (API_KEY && BLOG_ID) {
     if (bResponse.ok) {
       const bData = await bResponse.json();
       const allPosts = bData.items || [];
-
-      // ▼ 【追加】サイト全体のルール：海外タグが付いているかチェックする機能
       const isForeignPost = (post) => {
         if (!post.labels) return false;
         return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
       };
 
-      // ▼ 【修正】海外記事を弾いた上で、「天気」関連のタグを持つ記事を探します
       relatedNews = allPosts.filter(post => 
         !isForeignPost(post) && 
         post.labels && 
@@ -60,7 +57,8 @@ let alertFullText = "";
 
 if (WEATHER_API_KEY) {
   try {
-    const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${targetCity.name}&days=3&aqi=no&alerts=yes&lang=${apiLang}`;
+    // ▼ ここを「days=5」に変更し、余裕を持たせました
+    const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${targetCity.name}&days=5&aqi=no&alerts=yes&lang=${apiLang}`;
     const wResponse = await fetch(weatherUrl);
     if (wResponse.ok) {
       const wData = await wResponse.json();
@@ -209,22 +207,32 @@ const getDayName = (dateStr) => {
     const cityFullDate = `${nowInCity.find(p => p.type === 'year').value}-${nowInCity.find(p => p.type === 'month').value}-${nowInCity.find(p => p.type === 'day').value}`;
     const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
 
+    let visibleCount = 0; // 表示した日数を数えるカウンター
+
     document.querySelectorAll('.day-group').forEach(group => {
       const groupDate = group.getAttribute('data-date');
 
       if (groupDate < cityFullDate) {
+        // 過去の日は非表示
         group.style.display = 'none';
-      }
-      else if (groupDate === cityFullDate) {
-        group.style.display = 'block';
-        group.querySelectorAll('.hourly-row').forEach(row => {
-          if (parseInt(row.getAttribute('data-hour')) < cityHour) {
-            row.style.display = 'none';
+      } else {
+        // 今日以降の日付の場合、3日分に達するまでは表示する
+        if (visibleCount < 3) {
+          group.style.display = 'block';
+          visibleCount++;
+          
+          if (groupDate === cityFullDate) {
+            // 今日の場合は過去の時間を隠す
+            group.querySelectorAll('.hourly-row').forEach(row => {
+              if (parseInt(row.getAttribute('data-hour')) < cityHour) {
+                row.style.display = 'none';
+              }
+            });
           }
-        });
-      }
-      else {
-        group.style.display = 'block';
+        } else {
+          // 4日目以降は非表示
+          group.style.display = 'none';
+        }
       }
     });
 
@@ -242,6 +250,7 @@ const getDayName = (dateStr) => {
 </script>
 
 <style>
+  /* 以前のスタイルをそのまま維持しています */
   :root { --weather-value-size: 1.15rem; }
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid #872732; padding-left: 12px; }
