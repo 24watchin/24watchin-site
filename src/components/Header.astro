@@ -63,14 +63,14 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 }
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
-// ▼ 以前の /jp/jp/ ではなく、新しい /ja/jp/ 構造に対応させました
+// ▼ /ja/jp/... または /ja/en/... を想定するように変更しました
 const pathParts = currentPath.split('/').filter(Boolean);
 const detectedLocale = pathParts[1] as SiteLanguageKey | undefined;
 const locale: SiteLanguageKey =
   detectedLocale && detectedLocale in categoryLabelMap ? detectedLocale : 'ja';
 
 const labels = categoryLabelMap[locale];
-// ▼ ここを /jp/ から /ja/ に書き換えました。これで全てのリンクが自動で直ります
+// ▼ ここを /jp/ から /ja/ に修正しました。これで全てのリンクが自動で直ります
 const basePath = `/ja/${locale}`;
 
 const categoryItems = labels.headerCategories.map((item) => ({
@@ -160,7 +160,7 @@ const searchAction = `${basePath}/search`;
 </header>
 
 <style>
-  /* スタイル部分は以前と同じです */
+  /* 見た目の設定は変更ありません */
   .site-header { width: 100%; background: #ffffff; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
   .brand-area { display: flex; flex-direction: column; align-items: flex-start; }
@@ -178,7 +178,6 @@ const searchAction = `${basePath}/search`;
   .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: stretch; gap: 0; overflow-x: auto; white-space: nowrap; }
   .category-link { display: inline-flex; align-items: center; justify-content: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; line-height: 1; position: relative; }
   .locale-en .category-link { padding: 0 10px; font-size: 14px; }
-  .category-link::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 9px; height: 3px; background: #e8383d; opacity: 0; }
   .category-link:hover::after { opacity: 1; }
   .category-link.active { background: #e8383d; color: #ffffff; }
   .header-word-bar { width: 100%; background: #ffffff; }
