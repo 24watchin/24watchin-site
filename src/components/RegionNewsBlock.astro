@@ -47,7 +47,8 @@ const getDisplayCategory = (post) => {
       <div class="city-block">
         <div class="article-3-grid">
           {city.posts.slice(0, 3).map((post) => (
-            <a href={`/jp/jp/news/${post.id}/`} class="news-item">
+            /* ▼ ここを /ja/jp/ に修正しました！ */
+            <a href={`/ja/jp/news/${post.id}/`} class="news-item">
               <div class="media-column">
                 <div class="thumbnail">
                   <img src={getImageUrl(post.content)} alt={post.title} />
@@ -76,157 +77,27 @@ const getDisplayCategory = (post) => {
 </section>
 
 <style>
-  .region-section {
-    width: 100%;
-    margin-bottom: 56px;
-  }
-
-  .region-section + .region-section {
-    margin-top: 10px;
-  }
-
-  .region-header {
-    margin-bottom: 18px;
-  }
-
-  .region-title {
-    margin: 0 0 10px;
-    font-size: 20px;
-    line-height: 1.2;
-    font-weight: 700;
-    color: #111111;
-  }
-
-  .region-line {
-    width: 100%;
-    height: 4px;
-    background: #872732;
-  }
-
-  .city-groups {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .city-block {
-    width: 100%;
-    padding: 10px 0;
-  }
-
-  .city-block + .city-block {
-    border-top: 1px solid #d9d9d9;
-  }
-
-  .article-3-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px 24px;
-  }
-
-  .news-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    text-decoration: none;
-    color: #111111;
-    min-width: 0;
-  }
-
-  .media-column {
-    width: 124px;
-    flex-shrink: 0;
-  }
-
-  .thumbnail {
-    width: 124px;
-    aspect-ratio: 3 / 2;
-    overflow: hidden;
-    border-radius: 4px;
-    background: #eeeeee;
-  }
-
-  .thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .image-date-row {
-    margin-top: 3px;
-    width: 124px;
-    text-align: right;
-    min-height: 20px;
-  }
-
-  .info {
-    min-width: 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .news-title {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.45;
-    font-weight: 700;
-    color: #111111;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    min-height: calc(1.45em * 2);
-  }
-
-  .category-row {
-    margin-top: 6px;
-    text-align: right;
-    min-height: 24px;
-  }
-
-  .category-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 2px;
-    background: #4d4d4d;
-    color: #ffffff;
-    font-size: 14px;
-    line-height: 1.2;
-    font-weight: 400;
-  }
-
-  .post-time {
-    font-size: 14px;
-    line-height: 1.35;
-    font-weight: 400;
-    color: #8a8a8a;
-  }
-
-  .news-item:hover .news-title {
-    text-decoration-line: underline;
-    text-decoration-color: #000000;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
-  }
-
-  @media (max-width: 1024px) {
-    .article-3-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  @media (max-width: 700px) {
-    .article-3-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .media-column,
-    .thumbnail,
-    .image-date-row {
-      width: 116px;
-    }
-  }
+  /* 鳴川さんの元のデザインを100%継承しています */
+  .region-section { width: 100%; margin-bottom: 56px; }
+  .region-section + .region-section { margin-top: 10px; }
+  .region-header { margin-bottom: 18px; }
+  .region-title { margin: 0 0 10px; font-size: 20px; line-height: 1.2; font-weight: 700; color: #111111; }
+  .region-line { width: 100%; height: 4px; background: #872732; }
+  .city-groups { display: flex; flex-direction: column; gap: 0; }
+  .city-block { width: 100%; padding: 10px 0; }
+  .city-block + .city-block { border-top: 1px solid #d9d9d9; }
+  .article-3-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; }
+  .news-item { display: flex; align-items: flex-start; gap: 14px; text-decoration: none; color: #111111; min-width: 0; }
+  .media-column { width: 124px; flex-shrink: 0; }
+  .thumbnail { width: 124px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eeeeee; }
+  .thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .image-date-row { margin-top: 3px; width: 124px; text-align: right; min-height: 20px; }
+  .info { min-width: 0; flex: 1; display: flex; flex-direction: column; align-items: stretch; }
+  .news-title { margin: 0; font-size: 16px; line-height: 1.45; font-weight: 700; color: #111111; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: calc(1.45em * 2); }
+  .category-row { margin-top: 6px; text-align: right; min-height: 24px; }
+  .category-badge { display: inline-block; padding: 2px 8px; border-radius: 2px; background: #4d4d4d; color: #ffffff; font-size: 14px; line-height: 1.2; font-weight: 400; }
+  .post-time { font-size: 14px; line-height: 1.35; font-weight: 400; color: #8a8a8a; }
+  .news-item:hover .news-title { text-decoration-line: underline; text-decoration-color: #000000; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  @media (max-width: 1024px) { .article-3-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 700px) { .article-3-grid { grid-template-columns: 1fr; } .media-column, .thumbnail, .image-date-row { width: 116px; } }
 </style>
