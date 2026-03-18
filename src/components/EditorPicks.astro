@@ -7,6 +7,43 @@ const getImageUrl = (content) => {
   const match = content.match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
 };
+
+// ▼ ここから「編集部①」などのタグを探して並べ替える仕組みです
+const topPostsMap = new Map();
+const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩])$/;
+const numMap = { '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10 };
+
+// 1. 全ての記事の中から「編集部①」などのタグを持つ記事を探して確保します
+recentPosts.forEach(post => {
+  if (!post.labels) return;
+  post.labels.forEach(label => {
+    const match = label.match(topLabelRegex);
+    if (match) {
+      const num = numMap[match[1]];
+      // その番号の枠が空いていれば、記事をセットします
+      if (!topPostsMap.has(num)) {
+        topPostsMap.set(num, post);
+      }
+    }
+  });
+});
+
+// 2. 確保した記事を、①から順番に綺麗に並べ替えます
+let finalPosts = Array.from(topPostsMap.entries())
+  .sort((a, b) => a[0] - b[0])
+  .map(entry => entry[1]);
+
+// 3. 指定席に座った記事以外の「普通の記事（最新順）」を用意します
+const usedIds = new Set(finalPosts.map(p => p.id));
+const normalPosts = recentPosts.filter(p => !usedIds.has(p.id));
+
+// 4. 全部で10件になるまで、空いている枠に普通の記事を順番に補充します
+while (finalPosts.length < 10 && normalPosts.length > 0) {
+  finalPosts.push(normalPosts.shift());
+}
+
+// 5. 最終的に表示する10件を決定します
+const displayPosts = finalPosts.slice(0, 10);
 ---
 
 <div class="editor-picks-section">
@@ -18,14 +55,14 @@ const getImageUrl = (content) => {
     </button>
 
     <div class="scroll-container" id="editor-picks-scroller">
-      {recentPosts.map((rp) => (
+      {/* ▼ 並べ替えた displayPosts を使って画面に表示します */}
+      {displayPosts.map((rp) => (
         <a href={`/jp/jp/news/${rp.id}/`} class="scroll-item">
           <div class="scroll-img-wrapper">
             <img src={getImageUrl(rp.content)} alt={rp.title} />
           </div>
           <div class="scroll-text">
             <h4>{rp.title}</h4>
-            {/* 「# おすすめ」のタグを削除しました */}
           </div>
         </a>
       ))}
@@ -44,11 +81,9 @@ const getImageUrl = (content) => {
 
   if (scroller && prevBtn && nextBtn) {
     const scrollAmount = 320;
-
     nextBtn.addEventListener('click', () => {
       scroller.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
-
     prevBtn.addEventListener('click', () => {
       scroller.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     });
@@ -56,21 +91,20 @@ const getImageUrl = (content) => {
 </script>
 
 <style>
-  /* グレーの背景エリアを縦に狭くしました（paddingを 30px -> 15px に変更） */
   .editor-picks-section { 
-    background: #e5e7eb; 
+    background: #e5e7eb;
     padding: 15px 20px; 
     margin: 30px 0; 
     border-radius: 12px; 
   }
   
   .section-title { 
-    font-size: 19px; 
+    font-size: 19px;
     color: #333; 
     margin-bottom: 15px; 
     border-bottom: 3px solid #872732; 
     padding-bottom: 5px; 
-    display: inline-block; 
+    display: inline-block;
   }
 
   .scroll-wrapper {
@@ -83,7 +117,7 @@ const getImageUrl = (content) => {
     display: flex; 
     gap: 20px; 
     overflow-x: auto; 
-    padding: 5px 0 10px; 
+    padding: 5px 0 10px;
     scroll-snap-type: x mandatory; 
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -94,7 +128,7 @@ const getImageUrl = (content) => {
     width: 300px; 
     flex: 0 0 300px; 
     background: #fff; 
-    scroll-snap-align: start; 
+    scroll-snap-align: start;
     text-decoration: none; 
     color: #333; 
     border-radius: 8px; 
@@ -105,14 +139,13 @@ const getImageUrl = (content) => {
   .scroll-img-wrapper { height: 180px; overflow: hidden; background: #ddd; }
   .scroll-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
   
-  /* テキストエリアの余白を詰めました */
   .scroll-text { padding: 12px 15px; }
   .scroll-text h4 { 
     font-size: 15px; 
     line-height: 1.4; 
     margin: 0; 
     font-weight: bold; 
-    display: -webkit-box; 
+    display: -webkit-box;
     -webkit-line-clamp: 3; 
     -webkit-box-orient: vertical; 
     overflow: hidden; 
