@@ -1,7 +1,8 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import NewsCard from '../../../components/NewsCard.astro';
 
-// 英語の合鍵（EN）を使うように命令します
+// 英語の合鍵（EN）を使用
 const BLOG_ID = import.meta.env.BLOG_ID_EN;
 const API_KEY = import.meta.env.API_KEY;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
@@ -12,17 +13,26 @@ const posts = data.items || [];
 ---
 
 <Layout title="US News - 24Watchin'">
-  <main style="padding: 20px;">
-    <h1>US News</h1>
-    <ul style="list-style: none; padding: 0;">
+  <main>
+    <div class="news-grid">
       {posts.map((post) => (
-        <li style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-          <a href={`/ja/en/news/${post.id}/`} style="text-decoration: none; color: #007bff; font-size: 18px; font-weight: bold;">
-            {post.title}
-          </a>
-          <p style="color: #666; font-size: 14px;">{new Date(post.published).toLocaleDateString('en-US')}</p>
-        </li>
+        <NewsCard 
+          id={post.id} 
+          title={post.title} 
+          published={post.published}
+          {/* リンク先を ja/en に固定 */}
+          href={`/ja/en/news/${post.id}/`}
+        />
       ))}
-    </ul>
+    </div>
   </main>
 </Layout>
+
+<style>
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+  }
+</style>
