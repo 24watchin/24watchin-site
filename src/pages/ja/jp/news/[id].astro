@@ -10,43 +10,47 @@ import { categoryLabelMap } from '../../../../lib/categoryLabels';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
-  const BLOG_ID = import.meta.env.BLOG_ID;
+  // ▼ ここを「BLOG_ID」から「BLOG_ID_JA」に変更しました
+  const BLOG_ID = import.meta.env.BLOG_ID_JA;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+
   const response = await fetch(url);
   const data = await response.json();
   const posts = data.items || [];
+
   return posts.map((post) => ({ params: { id: post.id }, props: { post, allPosts: posts } }));
 }
 
 const { post, allPosts = [] } = Astro.props;
 
-const currentCategory = categoryLabelMap.jp.allCategories.find(cat => {
+// ▼ categoryLabelMap.jp だった部分を .ja に変更しました
+const currentCategory = categoryLabelMap.ja.allCategories.find(cat => {
   if (!post.labels) return false;
   return post.labels.some(label => cat.keywords.some(key => label.includes(key)));
 });
 
 const categoryLabel = currentCategory ? currentCategory.label : 'ニュース';
 const categorySlug = currentCategory ? currentCategory.slug : '';
-const categoryHref = categorySlug ? `/jp/jp/category/${categorySlug}/` : '';
+// ▼ URLの /jp/jp/ をすべて /ja/jp/ に変更しました
+const categoryHref = categorySlug ? `/ja/jp/category/${categorySlug}/` : '';
 
 function formatDateTimeJP(dateString) {
   const date = new Date(dateString);
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-// ▼ 【バリア】海外記事（us-jaなど）を弾く機能
 const isForeignPost = (p) => {
   if (!p || !p.labels) return false;
   return p.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// ▼ 日本版の安全な記事だけを抽出（今読んでいる記事も除外）
 const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
 ---
 
 <Layout title={post.title} sidebarType="article">
   <div class="article-breadcrumb-wrap">
-    <Breadcrumb countryLabel="日本" countryHref="/jp/jp/" categoryLabel={categoryLabel} categoryHref={categoryHref} />
+    {/* ▼ ここを /ja/jp/ に変更しました */}
+    <Breadcrumb countryLabel="日本" countryHref="/ja/jp/" categoryLabel={categoryLabel} categoryHref={categoryHref} />
   </div>
 
   <article class="post-container">
@@ -54,22 +58,17 @@ const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
       <h1 class="post-title">{post.title}</h1>
       <div class="post-submeta">
         <time class="post-date">{formatDateTimeJP(post.published)}</time>
-        <ShareButtons articleUrl={`https://24watchin.com/jp/jp/news/${post.id}/`} articleTitle={post.title} />
+        {/* ▼ ここを /ja/jp/ に変更しました */}
+        <ShareButtons articleUrl={`https://24watchin.com/ja/jp/news/${post.id}/`} articleTitle={post.title} />
       </div>
     </header>
     <div class="post-content" set:html={post.content} />
     <ReactionBar articleId={post.id} />
   </article>
 
-  {/* 記事文章の下からの1カラムエリア */}
   <div slot="bottom-wide">
-    {/* 1. 関連記事（6件表示） */}
     <RelatedNews relatedPosts={safePosts.slice(0, 6)} />
-    
-    {/* 2. あわせて読みたい（PR枠） */}
     <RecommendedLinks />
-
-    {/* 3. 編集部のおすすめ（▼ 10件に絞らず、安全な記事すべてを渡すように変更しました） */}
     <EditorPicks recentPosts={safePosts} />
   </div>
 </Layout>
