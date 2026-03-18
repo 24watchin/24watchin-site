@@ -1,8 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-import NewsCard from '../../../components/NewsCard.astro';
 
-// 英語の合鍵（EN）を使用
 const BLOG_ID = import.meta.env.BLOG_ID_EN;
 const API_KEY = import.meta.env.API_KEY;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
@@ -13,26 +11,27 @@ const posts = data.items || [];
 ---
 
 <Layout title="US News - 24Watchin'">
-  <main>
+  <main class="news-container">
+    <h1 class="page-title">US News</h1>
     <div class="news-grid">
       {posts.map((post) => (
-        <NewsCard 
-          id={post.id} 
-          title={post.title} 
-          published={post.published}
-          {/* リンク先を ja/en に固定 */}
-          href={`/ja/en/news/${post.id}/`}
-        />
+        <div class="news-card">
+          <a href={`/ja/en/news/${post.id}/`} class="news-link">
+            <h2 class="news-title">{post.title}</h2>
+            <time class="news-date">{new Date(post.published).toLocaleDateString('en-US')}</time>
+          </a>
+        </div>
       ))}
     </div>
   </main>
 </Layout>
 
 <style>
-  .news-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-    margin-top: 20px;
-  }
+  .news-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+  .page-title { font-size: 24px; border-bottom: 3px solid #872732; padding-bottom: 10px; margin-bottom: 30px; }
+  .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .news-card { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .news-link { text-decoration: none; color: inherit; }
+  .news-title { font-size: 18px; color: #007bff; margin-bottom: 10px; }
+  .news-date { font-size: 14px; color: #666; }
 </style>
