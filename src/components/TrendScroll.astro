@@ -35,7 +35,8 @@ const getImageUrl = (content) => {
 
     <div class="trend-scroll-container" id="trend-scroll">
       {posts.map((post) => (
-        <a href={`/jp/jp/news/${post.id}/`} class="trend-item">
+        {/* ▼ ここを /ja/jp/ に修正しました！ */}
+        <a href={`/ja/jp/news/${post.id}/`} class="trend-item">
           <div class="trend-img-wrapper">
             <img src={getImageUrl(post.content)} alt={post.title} />
           </div>
