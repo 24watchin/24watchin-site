@@ -1,7 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 
-// 日本の合鍵（JA）を使うように指定
+// 日本の合鍵（JA）を使う
 const BLOG_ID = import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
@@ -17,6 +17,7 @@ const posts = data.items || [];
     <ul style="list-style: none; padding: 0;">
       {posts.map((post) => (
         <li style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+          {/* ▼ リンクの住所を /ja/jp/ に変更しました */}
           <a href={`/ja/jp/news/${post.id}/`} style="text-decoration: none; color: #007bff; font-size: 18px; font-weight: bold;">
             {post.title}
           </a>
