@@ -6,8 +6,7 @@ const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${
 
 let allPosts = [];
 
-// ▼ 【重要】APIの「取得しすぎ（429エラー）」を防ぐための記憶（キャッシュ）機能です！
-// 100ページ分ビルドしても、Bloggerにデータを取りに行くのは最初の1回だけにします。
+// ▼ APIの「取得しすぎ（429エラー）」を防ぐための記憶（キャッシュ）機能
 if (!globalThis.editorsPickCache) {
   try {
     const response = await fetch(url);
@@ -22,19 +21,17 @@ if (!globalThis.editorsPickCache) {
     globalThis.editorsPickCache = [];
   }
 }
-// 記憶しておいたデータを、すべてのページで使い回します
 allPosts = globalThis.editorsPickCache;
 
-// ▼ 海外記事（us-jaなど）を弾くバリア
+// ▼ 海外記事を弾くバリア
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// 安全な日本版の記事だけを抽出します
 const safePosts = allPosts.filter(p => !isForeignPost(p));
 
-// ▼ ここから「編集部①」などのタグを探して並べ替える仕組みです
+// ▼ 「編集部①」などのタグを探して並べ替える仕組み
 const topPostsMap = new Map();
 const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩])$/;
 const numMap = { '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10 };
@@ -52,48 +49,36 @@ safePosts.forEach(post => {
   });
 });
 
-// 指定された記事を順番に並べます
 let finalPosts = Array.from(topPostsMap.entries())
   .sort((a, b) => a[0] - b[0])
   .map(entry => entry[1]);
 
-// 足りない枠に入れるための「普通の最新記事」を準備します
 const usedIds = new Set(finalPosts.map(p => p.id));
 const normalPosts = safePosts.filter(p => !usedIds.has(p.id));
 
-// 5件になるまで最新記事を補充します
 while (finalPosts.length < 5 && normalPosts.length > 0) {
   finalPosts.push(normalPosts.shift());
 }
 
 const displayPosts = finalPosts.slice(0, 5);
 
-// 補助機能（画像と時間）
+// 画像のサイズをランキングと全く同じ 64x48 の比率に変更しました
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
-  return match ? match[1] : 'https://placehold.co/80x60/eeeeee/999999?text=No+Image';
-};
-const formatTime = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return match ? match[1] : 'https://placehold.co/64x48/eeeeee/999999?text=No+Image';
 };
 ---
 
-<div class="editors-pick-container">
+<div class="ep-container">
   <div class="ep-header">
-    <h2>編集部のおすすめ</h2>
+    <h3 class="ep-title">編集部のおすすめ</h3>
   </div>
 
   <ul class="ep-list">
     {displayPosts.map((post) => (
       <li class="ep-item">
-        <div class="ep-text-area">
-          <a href={`/jp/jp/news/${post.id}/`} class="ep-title">{post.title}</a>
-          <div class="ep-meta">
-            <span class="ep-time">{formatTime(post.published)}</span>
-            <span class="ep-source">📰 24Watchin</span>
-          </div>
+        <div class="ep-info">
+          <a href={`/jp/jp/news/${post.id}/`} class="ep-post-title">{post.title}</a>
         </div>
         
         <div class="ep-thumbnail">
@@ -105,21 +90,66 @@ const formatTime = (dateString) => {
 </div>
 
 <style>
-  .editors-pick-container { background-color: #fff; font-family: sans-serif; }
+  /* 以下、AccessRanking.astro のCSSをそのまま引き継いで適用しています */
+  .ep-container { 
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px 16px 16px; 
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    font-family: sans-serif;
+  }
+
+  .ep-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 4px solid #872732;
+    padding-bottom: 6px;
+    margin-bottom: 12px; 
+  }
+  .ep-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0;
+    color: #1a1a1a;
+  }
+
+  .ep-list { list-style: none; padding: 0; margin: 0; }
   
-  .ep-header { background-color: #872732; color: #fff; padding: 10px 15px; border-radius: 8px 8px 0 0; }
-  .ep-header h2 { font-size: 16px; font-weight: bold; margin: 0; }
+  .ep-item { 
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #ccc; 
+    gap: 10px;
+  }
+  .ep-item:last-child { 
+    border-bottom: none; 
+    padding-bottom: 0;
+  }
   
-  .ep-list { list-style: none; padding: 0; margin: 0; border: 1px solid #ccc; border-top: none; }
-  .ep-item { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px dotted #ccc; gap: 10px; }
-  .ep-item:last-child { border-bottom: none; }
+  .ep-info { flex: 1; }
   
-  .ep-text-area { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-  .ep-title { font-size: 14px; color: #333; text-decoration: none; font-weight: bold; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .ep-title:hover { text-decoration: underline; }
+  .ep-post-title { 
+    font-size: 13px;
+    color: #000; 
+    text-decoration: none;
+    display: -webkit-box; 
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+    line-height: 1.4;
+  }
+  .ep-post-title:hover {
+    text-decoration: underline;
+  }
   
-  .ep-meta { font-size: 11px; color: #666; margin-top: 5px; }
-  .ep-time { margin-right: 8px; }
-  
-  .ep-thumbnail img { width: 80px; height: 60px; object-fit: cover; border: 1px solid #eee; border-radius: 4px;}
+  .ep-thumbnail img { 
+    width: 64px;
+    height: 48px; 
+    object-fit: cover; 
+    border-radius: 4px; 
+  }
 </style>
