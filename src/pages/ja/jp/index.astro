@@ -14,13 +14,11 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ▼ 【サイト全体のルール】「us-ja」などの海外タグが付いているかチェックする機能
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// ▼ 日本サイトのメインエリア用：海外記事（us-jaなど）を「弾いた」記事だけの箱を作ります
 const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
 
 const filterByCategory = (slug, count = 3) => {
@@ -35,7 +33,6 @@ const filterByCategory = (slug, count = 3) => {
   }).slice(0, count);
 };
 
-// 一番下の国別ブロックは、すべての記事の中から指定の国タグ（us-jaなど）を探します
 const filterByCountryTag = (tag, count = 3) => {
   return allPosts.filter(post => {
     if (!post.labels) return false;
@@ -46,7 +43,6 @@ const filterByCountryTag = (tag, count = 3) => {
 
 <Layout title="TOP" allPosts={mainSitePosts}>
   <div slot="top-full">
-    {/* トップの大きな記事も、海外記事を弾いた箱から表示します */}
     <MainNewsLayout posts={mainSitePosts} />
     <TrendScroll />
   </div>
