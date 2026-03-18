@@ -65,14 +65,12 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
 
-// URLが /ja/jp/ の場合、pathParts[1]（2番目）の 'jp' を取得するようにしました
-const countryCode = pathParts[1] || 'jp';
-const locale: SiteLanguageKey =
-  countryCode in categoryLabelMap ? (countryCode as SiteLanguageKey) : 'jp';
+// URLが /ja/jp/ でも /jp/jp/ でも、正しく 'jp' を取得するように調整
+const detectedLocale = pathParts.includes('en') ? 'en' : 'jp';
+const locale: SiteLanguageKey = detectedLocale as SiteLanguageKey;
 
-const labels = categoryLabelMap[locale];
-
-// ▼ ここを /ja/ に修正しました。これで全てのリンクが /ja/jp/ や /ja/en/ になります
+const labels = categoryLabelMap[locale] || categoryLabelMap.jp;
+// ▼ ここを /ja/ に固定しました。これでロゴもメニューも ja/jp になります
 const basePath = `/ja/${locale}`;
 
 const categoryItems = labels.headerCategories.map((item) => ({
