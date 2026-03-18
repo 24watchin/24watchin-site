@@ -63,18 +63,20 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 }
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
-// ▼ /ja/jp/... または /ja/en/... を想定するように変更しました
 const pathParts = currentPath.split('/').filter(Boolean);
-const detectedLocale = pathParts[1] as SiteLanguageKey | undefined;
+
+// URLが /ja/jp/ の場合、pathParts[1]（2番目）の 'jp' を取得するようにしました
+const countryCode = pathParts[1] || 'jp';
 const locale: SiteLanguageKey =
-  detectedLocale && detectedLocale in categoryLabelMap ? detectedLocale : 'ja';
+  countryCode in categoryLabelMap ? (countryCode as SiteLanguageKey) : 'jp';
 
 const labels = categoryLabelMap[locale];
-// ▼ ここを /jp/ から /ja/ に修正しました。これで全てのリンクが自動で直ります
+
+// ▼ ここを /ja/ に修正しました。これで全てのリンクが /ja/jp/ や /ja/en/ になります
 const basePath = `/ja/${locale}`;
 
 const categoryItems = labels.headerCategories.map((item) => ({
-  href: `${basePath}/category/${item.slug}`,
+  href: `${basePath}/category/${item.slug}/`,
   label: item.label,
 }));
 
@@ -160,7 +162,6 @@ const searchAction = `${basePath}/search`;
 </header>
 
 <style>
-  /* 見た目の設定は変更ありません */
   .site-header { width: 100%; background: #ffffff; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
   .brand-area { display: flex; flex-direction: column; align-items: flex-start; }
