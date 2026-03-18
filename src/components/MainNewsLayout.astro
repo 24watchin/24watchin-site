@@ -3,7 +3,6 @@
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
-
 const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
@@ -17,7 +16,6 @@ const isForeignPost = (post) => {
 
 // ▼ 全ての記事の中から、海外記事を弾いた「安全な日本の記事」だけの箱を作ります
 const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
-
 
 // --- 記事の自動配置ロジック ---
 
@@ -75,7 +73,8 @@ const formatPostTime = (dateString) => {
   <div class="main-column">
     {displayPosts.length > 0 && (
       <article class="hero-post">
-        <a href={`/jp/jp/news/${displayPosts[0].id}/`}>
+        {/* ▼ ここを /ja/jp/ に修正しました */}
+        <a href={`/ja/jp/news/${displayPosts[0].id}/`}>
           <div class="hero-image">
             <img src={getImageUrl(displayPosts[0].content)} alt={displayPosts[0].title} />
           </div>
@@ -92,7 +91,8 @@ const formatPostTime = (dateString) => {
     <div class="sub-grid">
       {displayPosts.slice(1, 5).map((post) => (
         <article class="grid-item">
-          <a href={`/jp/jp/news/${post.id}/`}>
+          {/* ▼ ここを /ja/jp/ に修正しました */}
+          <a href={`/ja/jp/news/${post.id}/`}>
             <div class="grid-image">
               <img src={getImageUrl(post.content)} alt={post.title} />
             </div>
@@ -111,7 +111,8 @@ const formatPostTime = (dateString) => {
   <div class="side-list-column">
     {displayPosts.slice(5, 10).map((post) => (
       <article class="list-item">
-        <a href={`/jp/jp/news/${post.id}/`}>
+        {/* ▼ ここを /ja/jp/ に修正しました */}
+        <a href={`/ja/jp/news/${post.id}/`}>
           <h4 class="list-title">{post.title}</h4>
           {post.published && (
             <div class="list-time">{formatPostTime(post.published)}</div>
