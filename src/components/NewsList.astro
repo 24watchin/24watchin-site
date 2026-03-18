@@ -7,7 +7,8 @@ const { posts, getImageUrl } = Astro.props;
   <div class="more-news-list" id="news-list">
     {posts.map((post, index) => (
       <article class={`list-item ${index >= 5 ? 'is-hidden' : ''}`}>
-        <a href={`/jp/jp/news/${post.id}/`} class="item-link">
+        {/* ▼ ここを /ja/jp/ に修正しました！ */}
+        <a href={`/ja/jp/news/${post.id}/`} class="item-link">
           <div class="image-wrapper">
             <img
               src={getImageUrl(post.content)}
@@ -60,99 +61,19 @@ const { posts, getImageUrl } = Astro.props;
 </script>
 
 <style>
-  .more-news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .list-item.is-hidden {
-    display: none;
-  }
-
-  .item-link {
-    display: flex;
-    gap: 1.2rem;
-    text-decoration: none;
-    color: #1a1a1a;
-  }
-
-  .item-link:hover,
-  .item-link:focus-visible {
-    text-decoration: none;
-    color: #1a1a1a;
-  }
-
-  .item-link:hover .list-title,
-  .item-link:focus-visible .list-title {
-    text-decoration: underline;
-    text-decoration-color: #000;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
-  }
-
-  .image-wrapper {
-    width: 140px;
-    height: 90px;
-    border-radius: 6px;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-
-  .list-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .list-content {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .list-title {
-    font-size: 1.1rem;
-    margin: 0 0 0.5rem 0;
-    line-height: 1.4;
-    font-weight: bold;
-    color: #1a1a1a;
-  }
-
-  .date {
-    font-size: 0.85rem;
-    color: #888;
-  }
-
-  .button-container {
-    text-align: center;
-    margin-top: 3rem;
-  }
-
-  .load-more-button {
-    background: #fff;
-    border: 2px solid #1e3a8a;
-    color: #1e3a8a;
-    padding: 12px 40px;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .load-more-button:hover {
-    background: #1e3a8a;
-    color: #fff;
-  }
-
-  @media (max-width: 600px) {
-    .image-wrapper {
-      width: 100px;
-      height: 70px;
-    }
-
-    .list-title {
-      font-size: 0.95rem;
-    }
-  }
+  /* 見た目のスタイルは元のままです */
+  .more-news-list { display: flex; flex-direction: column; gap: 1.5rem; }
+  .list-item.is-hidden { display: none; }
+  .item-link { display: flex; gap: 1.2rem; text-decoration: none; color: #1a1a1a; }
+  .item-link:hover, .item-link:focus-visible { text-decoration: none; color: #1a1a1a; }
+  .item-link:hover .list-title, .item-link:focus-visible .list-title { text-decoration: underline; text-decoration-color: #000; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  .image-wrapper { width: 140px; height: 90px; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+  .list-image { width: 100%; height: 100%; object-fit: cover; }
+  .list-content { min-width: 0; flex: 1; }
+  .list-title { font-size: 1.1rem; margin: 0 0 0.5rem 0; line-height: 1.4; font-weight: bold; color: #1a1a1a; }
+  .date { font-size: 0.85rem; color: #888; }
+  .button-container { text-align: center; margin-top: 3rem; }
+  .load-more-button { background: #fff; border: 2px solid #1e3a8a; color: #1e3a8a; padding: 12px 40px; font-size: 1rem; font-weight: bold; border-radius: 30px; cursor: pointer; transition: all 0.3s; }
+  .load-more-button:hover { background: #1e3a8a; color: #fff; }
+  @media (max-width: 600px) { .image-wrapper { width: 100px; height: 70px; } .list-title { font-size: 0.95rem; } }
 </style>
