@@ -7,6 +7,9 @@ import SidebarAd from './SidebarAd.astro';
 import EditorsPick from './EditorsPick.astro';
 // ★今回新しく作った「天気パーツ」を読み込みます
 import WeatherWidget from './WeatherWidget.astro';
+
+// ▼ 追加：Layoutから記事リストを受け取ります
+const { allPosts = [] } = Astro.props;
 ---
 
 <div class="sidebar-wrapper">
@@ -19,8 +22,8 @@ import WeatherWidget from './WeatherWidget.astro';
   {/* 3. ランキングの下に上部広告を配置します */}
   <SidebarAd />
 
-  {/* 4. 上部広告の下に「編集部のおすすめ」を配置します */}
-  <EditorsPick />
+  {/* 4. 上部広告の下に「編集部のおすすめ」を配置します（記事リストを渡します） */}
+  <EditorsPick allPosts={allPosts} />
 </div>
 
 <style>
@@ -43,4 +46,3 @@ import WeatherWidget from './WeatherWidget.astro';
     box-sizing: border-box !important;
   }
 </style>
-
