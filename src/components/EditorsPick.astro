@@ -1,40 +1,72 @@
 ---
-// 編集部のおすすめ用のダミーデータ（仮のデータ）を準備します。
-// 今回は5個の記事があるように見せかけます（将来本物のデータと入れ替えます）。
-const dummyPosts = [
-  { id: "dummy1", title: "前三原市長・天満祥典氏の公選法違反 竹原市長「公民権停止知らな…", time: "19時18分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" },
-  { id: "dummy2", title: "【事件】浜田の農道で橋の名板12枚盗まれる", time: "19時15分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" },
-  { id: "dummy3", title: "県民会館大ホールの空調が復旧、2月28日から通常利用を再開 防…", time: "19時10分", source: "新潟日報", img: "https://placehold.co/80x60?text=No+Image" },
-  { id: "dummy4", title: "茨城県内中学校で卒業式 潮来・牛堀中 最後の35人、学びやに別れ", time: "19時06分", source: "茨城新聞", img: "https://placehold.co/80x60?text=No+Image" },
-  { id: "dummy5", title: "3月10日の市長往来（広島県東部）", time: "19時05分", source: "中国新聞", img: "https://placehold.co/80x60?text=No+Image" }
-];
+// サイドバー用の「編集部のおすすめ」（縦並び）部品です
+const { allPosts = [] } = Astro.props;
+
+// ▼ 横スクロール版と全く同じ、並べ替えの魔法のコードです
+const topPostsMap = new Map();
+const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩])$/;
+const numMap = { '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10 };
+
+// 1. 全ての記事の中から「編集部①」などを探します
+allPosts.forEach(post => {
+  if (!post.labels) return;
+  post.labels.forEach(label => {
+    const match = label.match(topLabelRegex);
+    if (match) {
+      const num = numMap[match[1]];
+      if (!topPostsMap.has(num)) {
+        topPostsMap.set(num, post);
+      }
+    }
+  });
+});
+
+// 2. 確保した記事を番号順に並べ替えます
+let finalPosts = Array.from(topPostsMap.entries())
+  .sort((a, b) => a[0] - b[0])
+  .map(entry => entry[1]);
+
+// 3. 足りない分は最新記事（普通の記事）で埋めます
+const usedIds = new Set(finalPosts.map(p => p.id));
+const normalPosts = allPosts.filter(p => !usedIds.has(p.id));
+
+// 4. サイドバーはスペースが限られているので、表示は「5件」にします
+while (finalPosts.length < 5 && normalPosts.length > 0) {
+  finalPosts.push(normalPosts.shift());
+}
+
+const displayPosts = finalPosts.slice(0, 5);
+
+// 画像と時間を表示するための補助機能です
+const getImageUrl = (content) => {
+  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/80x60/eeeeee/999999?text=No+Image';
+};
+const formatTime = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+};
 ---
 
 <div class="editors-pick-container">
-  {/* 赤いタイトルの部分です */}
   <div class="ep-header">
     <h2>編集部のおすすめ</h2>
   </div>
 
-  {/* 記事のリスト部分です */}
   <ul class="ep-list">
-    {/* 用意したダミーデータを順番に表示させる魔法のコードです */}
-    {dummyPosts.map((post) => (
+    {displayPosts.map((post) => (
       <li class="ep-item">
-        {/* 左側の文字エリア */}
         <div class="ep-text-area">
-          {/* ★ ここを日本版の住所（/jp/jp/）に修正し、将来本物のデータが入った時用に備えました！ */}
           <a href={`/jp/jp/news/${post.id}/`} class="ep-title">{post.title}</a>
           <div class="ep-meta">
-            <span class="ep-time">{post.time}</span>
-            {/* アイコンはひとまず雪の結晶の絵文字で代用しています */}
-            <span class="ep-source">❄️ {post.source}</span>
+            <span class="ep-time">{formatTime(post.published)}</span>
+            <span class="ep-source">📰 24Watchin</span>
           </div>
         </div>
         
-        {/* 右側の画像エリア */}
         <div class="ep-thumbnail">
-          <img src={post.img} alt="サムネイル" />
+          <img src={getImageUrl(post.content)} alt="サムネイル" />
         </div>
       </li>
     ))}
@@ -45,8 +77,8 @@ const dummyPosts = [
   /* 全体の枠組みの設定です */
   .editors-pick-container { background-color: #fff; font-family: sans-serif; }
   
-  /* 赤いタイトルのデザインです */
-  .ep-header { background-color: #ef3332; color: #fff; padding: 10px 15px; border-radius: 8px 8px 0 0; border-bottom: 2px solid #ff9999; }
+  /* タイトルのデザインです（横スクロール版に合わせた赤色） */
+  .ep-header { background-color: #872732; color: #fff; padding: 10px 15px; border-radius: 8px 8px 0 0; }
   .ep-header h2 { font-size: 16px; font-weight: bold; margin: 0; }
   
   /* リスト全体と1行ごとの設定です */
@@ -57,9 +89,11 @@ const dummyPosts = [
   /* 左側の文字エリアの設定です */
   .ep-text-area { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
   .ep-title { font-size: 14px; color: #333; text-decoration: none; font-weight: bold; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ep-title:hover { text-decoration: underline; }
   
-  /* 時間と新聞社名、画像の設定です */
   .ep-meta { font-size: 11px; color: #666; margin-top: 5px; }
   .ep-time { margin-right: 8px; }
-  .ep-thumbnail img { width: 80px; height: 60px; object-fit: cover; border: 1px solid #eee; }
+  
+  /* 右側の画像エリアの設定です */
+  .ep-thumbnail img { width: 80px; height: 60px; object-fit: cover; border: 1px solid #eee; border-radius: 4px;}
 </style>
