@@ -46,7 +46,8 @@ const filterByCountryTag = (tag, count = 3) => {
 };
 ---
 
-<Layout title="TOP">
+{/* ▼ Layoutに、安全な記事リスト(mainSitePosts)を渡すように変更しました */}
+<Layout title="TOP" allPosts={mainSitePosts}>
   <div slot="top-full">
     {/* トップの大きな記事も、海外記事を弾いた箱から表示します */}
     <MainNewsLayout posts={mainSitePosts} />
