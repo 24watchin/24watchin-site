@@ -1,92 +1,31 @@
 ---
-import ReactionBar from '../../../../components/ReactionBar.astro';
-import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import Layout from '../../../../layouts/Layout.astro';
-import ShareButtons from '../../../../components/ShareButtons.astro';
-import RelatedNews from '../../../../components/RelatedNews.astro';
-import EditorPicks from '../../../../components/EditorPicks.astro';
-import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
-import { categoryLabelMap } from '../../../../lib/categoryLabels';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
-  // Cloudflareに登録した「日本語の合鍵」を使います
-  const BLOG_ID = import.meta.env.BLOG_ID_JA;
+  // 以前Cloudflareに登録した「英語の合鍵（BLOG_ID_EN）」を使って記事を取得します
+  const BLOG_ID = import.meta.env.BLOG_ID_EN;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
   const response = await fetch(url);
   const data = await response.json();
   const posts = data.items || [];
 
-  return posts.map((post) => ({ params: { id: post.id }, props: { post, allPosts: posts } }));
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
 }
 
-const { post, allPosts = [] } = Astro.props;
-
-// ▼ ここを .jp に戻しました（データ上の名前が jp なので）
-const currentCategory = categoryLabelMap.jp.allCategories.find(cat => {
-  if (!post.labels) return false;
-  return post.labels.some(label => cat.keywords.some(key => label.includes(key)));
-});
-
-const categoryLabel = currentCategory ? currentCategory.label : 'ニュース';
-const categorySlug = currentCategory ? currentCategory.slug : '';
-// ▼ リンクの住所を /ja/jp/ に修正しました
-const categoryHref = categorySlug ? `/ja/jp/category/${categorySlug}/` : '';
-
-function formatDateTimeJP(dateString) {
-  const date = new Date(dateString);
-  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-}
-
-const isForeignPost = (p) => {
-  if (!p || !p.labels) return false;
-  return p.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
-};
-
-const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
+const { post } = Astro.props;
 ---
 
-<Layout title={post.title} sidebarType="article">
-  <div class="article-breadcrumb-wrap">
-    {/* ▼ ここを /ja/jp/ に修正 */}
-    <Breadcrumb countryLabel="日本" countryHref="/ja/jp/" categoryLabel={categoryLabel} categoryHref={categoryHref} />
-  </div>
-
-  <article class="post-container">
-    <header class="post-header">
-      <h1 class="post-title">{post.title}</h1>
-      <div class="post-submeta">
-        <time class="post-date">{formatDateTimeJP(post.published)}</time>
-        {/* ▼ ここを /ja/jp/ に修正 */}
-        <ShareButtons articleUrl={`https://24watchin.com/ja/jp/news/${post.id}/`} articleTitle={post.title} />
-      </div>
+<Layout title={post.title}>
+  <article style="padding: 20px; max-width: 800px; margin: auto;">
+    <header style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+      <h1 style="font-size: 28px; line-height: 1.4;">{post.title}</h1>
+      <time style="color: #666; font-size: 14px;">{new Date(post.published).toLocaleDateString('en-US')}</time>
     </header>
-    <div class="post-content" set:html={post.content} />
-    <ReactionBar articleId={post.id} />
+    <div style="font-size: 16px; line-height: 1.8;" set:html={post.content} />
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+      <a href="/ja/en/" style="color: #007bff; text-decoration: none;">← Back to US News</a>
+    </footer>
   </article>
-
-  <div slot="bottom-wide">
-    <RelatedNews relatedPosts={safePosts.slice(0, 6)} />
-    <RecommendedLinks />
-    <EditorPicks recentPosts={safePosts} />
-  </div>
 </Layout>
-
-<style>
-  .article-breadcrumb-wrap { margin: -10px 0 6px; }
-  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
-  .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
-  .post-date { color: #666; font-size: 14px; }
-  .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
-  .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
-</style>
-
-<script define:vars={{ postId: post.id }}>
-  fetch('/api/pv', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ postId: postId })
-  }).catch(() => {});
-</script>
