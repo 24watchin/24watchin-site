@@ -70,7 +70,7 @@ const detectedLocale = pathParts.includes('en') ? 'en' : 'jp';
 const locale: SiteLanguageKey = detectedLocale as SiteLanguageKey;
 const labels = categoryLabelMap[locale] || categoryLabelMap.jp;
 
-// ▼ ここを /ja/ に書き換えることで、全てのリンクを新しい住所に統一します
+// ▼ ここを /ja/ に修正しました！
 const basePath = `/ja/${locale}`;
 
 const categoryItems = labels.headerCategories.map((item) => ({
