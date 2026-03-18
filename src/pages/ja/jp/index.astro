@@ -8,7 +8,7 @@ import RegionNewsBlock from '../../../components/RegionNewsBlock.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels';
 
 const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
+const BLOG_ID = import.meta.env.BLOG_ID_JA;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
