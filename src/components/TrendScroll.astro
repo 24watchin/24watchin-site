@@ -1,6 +1,6 @@
 ---
 const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
+const BLOG_ID = import.meta.env.BLOG_ID_JA;
 
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
 
@@ -8,13 +8,11 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// ▼ 【サイト全体のルール】「us-ja」などの海外タグが付いているかチェックする機能
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// ▼ 「us-ja」などの海外タグが付いている記事を「弾いて（!isForeignPost）」、最新10件を流します
 const posts = allPosts.filter(post => !isForeignPost(post)).slice(0, 10);
 
 const getImageUrl = (content) => {
@@ -35,7 +33,6 @@ const getImageUrl = (content) => {
 
     <div class="trend-scroll-container" id="trend-scroll">
       {posts.map((post) => (
-        {/* ▼ ここを /ja/jp/ に修正しました！ */}
         <a href={`/ja/jp/news/${post.id}/`} class="trend-item">
           <div class="trend-img-wrapper">
             <img src={getImageUrl(post.content)} alt={post.title} />
@@ -52,28 +49,17 @@ const getImageUrl = (content) => {
 </section>
 
 <style>
-  .bing-trend-section { padding: 10px 0 20px 0; margin-top: 0; background: #fff; }
-  .trend-header { margin-bottom: 20px; }
-  .trend-header h3 { font-size: 24px; font-weight: bold; margin: 0; color: #111; display: inline-block; border-bottom: 4px solid #8b0000; padding-bottom: 5px; }
+  .bing-trend-section { padding: 10px 0 20px 0; background: #fff; }
+  .trend-header h3 { font-size: 24px; font-weight: bold; border-bottom: 4px solid #8b0000; padding-bottom: 5px; }
   .trend-scroll-outer { position: relative; display: flex; align-items: center; }
-  .trend-scroll-container { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; scroll-behavior: smooth; scrollbar-width: none; width: 100%; }
-  .trend-scroll-container::-webkit-scrollbar { display: none; }
-  .trend-item { min-width: 180px; max-width: 180px; text-decoration: none; color: #333; flex-shrink: 0; }
-  .trend-img-wrapper { width: 100%; height: 120px; border-radius: 8px; overflow: hidden; margin-bottom: 10px; background: #f0f0f0; }
-  .trend-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-  .trend-item:hover img { transform: scale(1.05); }
-  .trend-title { font-size: 16px; font-weight: bold; line-height: 1.4; margin: 0; text-align: left; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .trend-item:hover .trend-title { text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: #333; text-underline-offset: 3px; }
-  .scroll-arrow { position: absolute; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 5; color: #333; font-size: 18px; transition: background 0.2s; }
-  .scroll-arrow:hover { background: #f0f0f0; }
+  .trend-scroll-container { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; }
+  .trend-item { min-width: 180px; text-decoration: none; color: #333; }
+  .trend-img-wrapper { width: 100%; height: 120px; border-radius: 8px; overflow: hidden; }
+  .trend-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+  .trend-title { font-size: 16px; font-weight: bold; margin-top: 10px; }
+  .scroll-arrow { position: absolute; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; }
   .prev-arrow { left: -15px; } 
   .next-arrow { right: -15px; } 
-  @media (max-width: 768px) {
-    .trend-item { min-width: 140px; max-width: 140px; }
-    .trend-img-wrapper { height: 90px; }
-    .prev-arrow { left: -5px; }
-    .next-arrow { right: -5px; }
-  }
 </style>
 
 <script>
@@ -82,12 +68,8 @@ const getImageUrl = (content) => {
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
     if (scrollContainer && btnPrev && btnNext) {
-      btnNext.addEventListener('click', () => {
-        scrollContainer.scrollBy({ left: 400, behavior: 'smooth' });
-      });
-      btnPrev.addEventListener('click', () => {
-        scrollContainer.scrollBy({ left: -400, behavior: 'smooth' });
-      });
+      btnNext.addEventListener('click', () => scrollContainer.scrollBy({ left: 400, behavior: 'smooth' }));
+      btnPrev.addEventListener('click', () => scrollContainer.scrollBy({ left: -400, behavior: 'smooth' }));
     }
   });
 </script>
