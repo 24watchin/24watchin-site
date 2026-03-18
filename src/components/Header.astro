@@ -72,7 +72,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
 const detectedLocale = pathParts[1] as SiteLanguageKey | undefined;
 const locale: SiteLanguageKey =
-  detectedLocale && detectedLocale in categoryLabelMap ? detectedLocale : 'jp';
+  detectedLocale && detectedLocale in categoryLabelMap ? detectedLocale : 'ja';
 
 const labels = categoryLabelMap[locale];
 const basePath = `/jp/${locale}`;

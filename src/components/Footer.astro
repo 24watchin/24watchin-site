@@ -2,8 +2,8 @@
 // URLから現在の言語（日本語か英語か）を自動で読み取ります
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
-const region = pathParts[0] || 'jp'; // 例: 'jp', 'us'
-const lang = pathParts[1] || 'jp';   // 例: 'jp', 'en'
+const region = pathParts[0] || 'ja'; // 例: 'ja', 'us'
+const lang = pathParts[1] || 'ja';   // 例: 'ja', 'en'
 
 // ▼ 日本語と英語のメニューを準備します（URLによって自動で切り替わります）
 const menus = {
@@ -27,7 +27,7 @@ const menus = {
 
 // 現在の言語に合わせたメニューを選びます
 const currentMenu = menus[lang] || menus.en;
-const infoTitle = lang === 'jp' ? 'インフォメーション' : 'Information';
+const infoTitle = lang === 'ja' ? 'インフォメーション' : 'Information';
 ---
 
 <footer class="site-footer">

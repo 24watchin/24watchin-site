@@ -4,8 +4,8 @@ import { getWeatherCondition } from '../../../lib/weatherConditions';
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
-const region = pathParts[0] || 'jp';
-const lang = pathParts[1] || 'jp';
+const region = pathParts[0] || 'ja';
+const lang = pathParts[1] || 'ja';
 const apiLangMap = { jp: 'ja', en: 'en', cn: 'zh', fr: 'fr', de: 'de', es: 'es', ru: 'ru' };
 const apiLang = apiLangMap[lang] || 'ja';
 const isImperial = lang === 'en';

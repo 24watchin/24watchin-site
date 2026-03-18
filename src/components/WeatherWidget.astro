@@ -3,8 +3,8 @@ import { getWeatherCondition } from '../lib/weatherConditions';
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
-const region = pathParts[0] || 'jp';
-const lang = pathParts[1] || 'jp';
+const region = pathParts[0] || 'ja';
+const lang = pathParts[1] || 'ja';
 
 const cityMap = {
   jp: { name: 'Tokyo', display: lang === 'en' ? 'Tokyo' : '東京' },

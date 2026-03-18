@@ -1,4 +1,4 @@
-export function getWeatherCondition(code: number, lang: string = 'jp') {
+export function getWeatherCondition(code: number, lang: string = 'ja') {
   // 約50種類のすべての天気コードを網羅した完全版辞書です
   const conditions: Record<number, { jp: string; en: string }> = {
     1000: { jp: '晴れ', en: 'Clear' },
