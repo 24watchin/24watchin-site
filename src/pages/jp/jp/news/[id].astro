@@ -69,8 +69,8 @@ const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
     {/* 2. あわせて読みたい（PR枠） */}
     <RecommendedLinks />
 
-    {/* 3. 編集部のおすすめ（部品が欲しがっている "recentPosts" という名前で渡します） */}
-    <EditorPicks recentPosts={safePosts.slice(0, 10)} />
+    {/* 3. 編集部のおすすめ（▼ 10件に絞らず、安全な記事すべてを渡すように変更しました） */}
+    <EditorPicks recentPosts={safePosts} />
   </div>
 </Layout>
 
