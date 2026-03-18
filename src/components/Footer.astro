@@ -1,83 +1,176 @@
 ---
-// フッター（サイトの一番下の部分）の部品です。
+// URLから現在の言語（日本語か英語か）を自動で読み取ります
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const region = pathParts[0] || 'jp'; // 例: 'jp', 'us'
+const lang = pathParts[1] || 'jp';   // 例: 'jp', 'en'
+
+// ▼ 日本語と英語のメニューを準備します（URLによって自動で切り替わります）
+const menus = {
+  jp: [
+    { label: 'About 24Watchin', href: `/${region}/${lang}/about/` },
+    { label: 'プライバシーポリシー', href: `/${region}/${lang}/privacy/` },
+    { label: '利用規約', href: `/${region}/${lang}/terms/` },
+    { label: 'お問い合わせ', href: `/${region}/${lang}/contact/` },
+    { label: '訂正・修正ポリシー', href: `/${region}/${lang}/corrections/` },
+    { label: '著作権・転載・引用について', href: `/${region}/${lang}/copyright/` }
+  ],
+  en: [
+    { label: 'About 24Watchin', href: `/${region}/${lang}/about/` },
+    { label: 'Privacy Policy', href: `/${region}/${lang}/privacy/` },
+    { label: 'Terms of Use', href: `/${region}/${lang}/terms/` },
+    { label: 'Contact', href: `/${region}/${lang}/contact/` },
+    { label: 'Corrections Policy', href: `/${region}/${lang}/corrections/` },
+    { label: 'Copyright / Reuse', href: `/${region}/${lang}/copyright/` }
+  ]
+};
+
+// 現在の言語に合わせたメニューを選びます
+const currentMenu = menus[lang] || menus.en;
+const infoTitle = lang === 'jp' ? 'インフォメーション' : 'Information';
 ---
 
 <footer class="site-footer">
   <div class="footer-content">
-    {/* 1列目：サイト情報とSNS */}
-    <div class="footer-column">
+    
+    {/* 1列目：ロゴとSNSアイコン */}
+    <div class="footer-column logo-column">
       <div class="footer-logo">
-        <span class="logo-icon">📰</span> NEWS
+        <span class="logo-icon">📰</span> 24Watchin
       </div>
-      <p class="footer-desc">
-        最新のニュースと情報をお届けする総合ニュースサイトです。
-      </p>
       <div class="footer-sns">
-        <span class="sns-label">公式SNS</span>
-        <a href="#" class="sns-icon">X</a>
-        <a href="#" class="sns-icon">f</a>
-        <a href="#" class="sns-icon" style="font-size: 10px;">LINE</a>
-        <a href="#" class="sns-icon">▶</a>
-        <a href="#" class="sns-icon">📷</a>
+        {/* SNSアイコン（デザインを整えるためにFontAwesomeを使っています） */}
+        <a href="#" class="sns-icon" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" class="sns-icon" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" class="sns-icon" aria-label="LINE"><i class="fa-brands fa-line"></i></a>
+        <a href="#" class="sns-icon" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#" class="sns-icon" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
       </div>
     </div>
 
-    {/* 2列目：カテゴリー */}
-    <div class="footer-column">
-      <h3 class="footer-heading">カテゴリー</h3>
+    {/* 2列目：規約などのリンク（自動で言語が切り替わります） */}
+    <div class="footer-column menu-column">
+      <h3 class="footer-heading">{infoTitle}</h3>
       <ul class="footer-links">
-        {/* ★ トップページへのリンクを日本版（/jp/jp/）に修正しました！ */}
-        <li><a href="/jp/jp/">トップ</a></li>
-        <li><a href="#">テクノロジー</a></li>
-        <li><a href="#">ビジネス</a></li>
-        <li><a href="#">スポーツ</a></li>
+        {currentMenu.map(item => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
       </ul>
     </div>
 
-    {/* 3列目：情報 */}
-    <div class="footer-column">
-      <h3 class="footer-heading">情報</h3>
+    {/* 3列目：各国のトップページ（入口）へのリンク枠 */}
+    <div class="footer-column global-column">
+      <h3 class="footer-heading">Global Sites</h3>
       <ul class="footer-links">
-        <li><a href="#">会社概要</a></li>
-        <li><a href="#">利用規約</a></li>
-        <li><a href="#">プライバシーポリシー</a></li>
-        <li><a href="#">お問い合わせ</a></li>
+        <li><a href="/jp/">Japan</a></li>
+        <li><a href="/us/">USA</a></li>
+        <li><a href="/tw/">Taiwan</a></li>
+        <li><a href="/de/">Germany</a></li>
       </ul>
     </div>
-
-    {/* 4列目：フォロー */}
-    <div class="footer-column">
-      <h3 class="footer-heading">フォロー</h3>
-      <ul class="footer-links">
-        <li><a href="#">Twitter</a></li>
-        <li><a href="#">Facebook</a></li>
-        <li><a href="#">Instagram</a></li>
-        <li><a href="#">YouTube</a></li>
-      </ul>
-    </div>
+    
   </div>
 
-  {/* 一番下のコピーライト部分 */}
+  {/* 一番下：ご指定の著作権表記 */}
   <div class="footer-bottom">
-    {/* ★ コピーライトを W-Studio Global Media Enterprises に更新しました！ */}
-    <p>&copy; 2026 W-Studio Global Media Enterprises. All rights reserved.</p>
+    <div class="copyright-text">
+      <p>24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。</p>
+      <p>著作権は The Dexent Media Enterprises または正当な権利者に帰属します。</p>
+      <p class="copyright-year">&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
+    </div>
   </div>
 </footer>
 
 <style>
-  /* フッター全体の背景色と文字色 */
-  .site-footer { background-color: #111827; color: #ffffff; font-family: sans-serif; padding-top: 40px; }
-  .footer-content { display: flex; justify-content: space-between; margin: 0 auto; padding: 0 20px 40px 20px; gap: 20px; }
+  /* フッター全体の背景色（ご指定のグレー）と文字色 */
+  .site-footer { 
+    background-color: #393737; 
+    color: #f3f4f6; 
+    font-family: sans-serif; 
+    padding-top: 50px; 
+    margin-top: 60px; 
+  }
+  
+  /* 3列を横に並べる設定 */
+  .footer-content { 
+    display: flex; 
+    justify-content: space-between; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 0 20px 40px 20px; 
+    gap: 40px; 
+  }
   .footer-column { flex: 1; }
-  .footer-logo { font-size: 20px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-  .logo-icon { color: #ef3332; }
-  .footer-desc { font-size: 13px; color: #9ca3af; line-height: 1.6; margin-bottom: 20px; }
-  .footer-sns { display: flex; align-items: center; gap: 10px; }
-  .sns-label { font-size: 12px; font-weight: bold; margin-right: 5px; }
-  .sns-icon { display: inline-flex; justify-content: center; align-items: center; width: 30px; height: 30px; border: 1px solid #ffffff; border-radius: 50%; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; }
-  .footer-heading { font-size: 16px; font-weight: bold; margin-bottom: 15px; }
-  .footer-links { list-style: none; padding: 0; margin: 0; }
-  .footer-links li { margin-bottom: 10px; }
-  .footer-links a { color: #9ca3af; text-decoration: none; font-size: 13px; }
-  .footer-bottom { text-align: center; border-top: 1px solid #1f2937; padding: 20px 0; font-size: 12px; color: #6b7280; }
+  .logo-column { flex: 1.5; }
+  .menu-column { flex: 1; }
+  .global-column { flex: 1; }
+  
+  /* 左側のロゴデザイン */
+  .footer-logo { 
+    font-size: 24px; 
+    font-weight: bold; 
+    margin-bottom: 20px; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    color: #ffffff; 
+  }
+  .logo-icon { color: #872732; }
+  
+  /* SNSアイコンのデザイン */
+  .footer-sns { display: flex; align-items: center; gap: 12px; }
+  .sns-icon { 
+    display: inline-flex; 
+    justify-content: center; 
+    align-items: center; 
+    width: 36px; 
+    height: 36px; 
+    background-color: rgba(255, 255, 255, 0.1); 
+    color: #ffffff; 
+    border-radius: 50%; 
+    text-decoration: none; 
+    font-size: 16px; 
+    transition: background-color 0.2s; 
+  }
+  .sns-icon:hover { background-color: #872732; }
+  
+  /* 各列のタイトルのデザイン */
+  .footer-heading { 
+    font-size: 16px; 
+    font-weight: bold; 
+    color: #ffffff; 
+    margin-bottom: 20px; 
+    border-bottom: 2px solid #872732; 
+    padding-bottom: 8px; 
+    display: inline-block; 
+  }
+  
+  /* リンク文字のデザイン */
+  .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  .footer-links a { color: #d1d5db; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+  .footer-links a:hover { color: #ffffff; text-decoration: underline; }
+
+  /* 一番下の著作権表記エリアのデザイン（少し暗い色で区切ります） */
+  .footer-bottom { 
+    background-color: #2b2a2a; 
+    padding: 24px 20px; 
+    text-align: center; 
+  }
+  .copyright-text p { 
+    margin: 0 0 6px 0; 
+    font-size: 12px; 
+    color: #9ca3af; 
+    line-height: 1.6; 
+  }
+  .copyright-year { 
+    margin-top: 12px !important; 
+    margin-bottom: 0 !important; 
+    font-size: 13px !important; 
+    color: #d1d5db !important; 
+  }
+
+  /* スマホで見た時は縦に並べ直す設定 */
+  @media (max-width: 768px) {
+    .footer-content { flex-direction: column; gap: 30px; }
+  }
 </style>
