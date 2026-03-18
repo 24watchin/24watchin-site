@@ -1,0 +1,31 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const API_KEY = import.meta.env.API_KEY;
+  // 以前Cloudflareに登録した「英語の合鍵（BLOG_ID_EN）」を使って記事を取得します
+  const BLOG_ID = import.meta.env.BLOG_ID_EN;
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+  const posts = data.items || [];
+
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+---
+
+<Layout title={post.title}>
+  <article style="padding: 20px; max-width: 800px; margin: auto;">
+    <header style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+      <h1 style="font-size: 28px; line-height: 1.4;">{post.title}</h1>
+      <time style="color: #666; font-size: 14px;">{new Date(post.published).toLocaleDateString('en-US')}</time>
+    </header>
+    <div style="font-size: 16px; line-height: 1.8;" set:html={post.content} />
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+      <a href="/ja/en/" style="color: #007bff; text-decoration: none;">← Back to US News</a>
+    </footer>
+  </article>
+</Layout>
