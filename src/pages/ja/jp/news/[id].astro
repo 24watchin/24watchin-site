@@ -10,7 +10,7 @@ import { categoryLabelMap } from '../../../../lib/categoryLabels';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
-  // ▼ ここを「BLOG_ID」から「BLOG_ID_JA」に変更しました
+  // Cloudflareに登録した「日本語の合鍵」を使います
   const BLOG_ID = import.meta.env.BLOG_ID_JA;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
@@ -23,15 +23,15 @@ export async function getStaticPaths() {
 
 const { post, allPosts = [] } = Astro.props;
 
-// ▼ categoryLabelMap.jp だった部分を .ja に変更しました
-const currentCategory = categoryLabelMap.ja.allCategories.find(cat => {
+// ▼ ここを .jp に戻しました（データ上の名前が jp なので）
+const currentCategory = categoryLabelMap.jp.allCategories.find(cat => {
   if (!post.labels) return false;
   return post.labels.some(label => cat.keywords.some(key => label.includes(key)));
 });
 
 const categoryLabel = currentCategory ? currentCategory.label : 'ニュース';
 const categorySlug = currentCategory ? currentCategory.slug : '';
-// ▼ URLの /jp/jp/ をすべて /ja/jp/ に変更しました
+// ▼ リンクの住所を /ja/jp/ に修正しました
 const categoryHref = categorySlug ? `/ja/jp/category/${categorySlug}/` : '';
 
 function formatDateTimeJP(dateString) {
@@ -49,7 +49,7 @@ const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
 
 <Layout title={post.title} sidebarType="article">
   <div class="article-breadcrumb-wrap">
-    {/* ▼ ここを /ja/jp/ に変更しました */}
+    {/* ▼ ここを /ja/jp/ に修正 */}
     <Breadcrumb countryLabel="日本" countryHref="/ja/jp/" categoryLabel={categoryLabel} categoryHref={categoryHref} />
   </div>
 
@@ -58,7 +58,7 @@ const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
       <h1 class="post-title">{post.title}</h1>
       <div class="post-submeta">
         <time class="post-date">{formatDateTimeJP(post.published)}</time>
-        {/* ▼ ここを /ja/jp/ に変更しました */}
+        {/* ▼ ここを /ja/jp/ に修正 */}
         <ShareButtons articleUrl={`https://24watchin.com/ja/jp/news/${post.id}/`} articleTitle={post.title} />
       </div>
     </header>
