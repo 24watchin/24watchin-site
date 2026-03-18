@@ -1,21 +1,29 @@
 ---
 // サイドバー用の「編集部のおすすめ」（縦並び）部品です
-// ▼ バケツリレーをやめ、この部品自身がBloggerから記事を直接取得するように改良しました！
-
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
 
 let allPosts = [];
-try {
-  const response = await fetch(url);
-  if (response.ok) {
-    const data = await response.json();
-    allPosts = data.items || [];
+
+// ▼ 【重要】APIの「取得しすぎ（429エラー）」を防ぐための記憶（キャッシュ）機能です！
+// 100ページ分ビルドしても、Bloggerにデータを取りに行くのは最初の1回だけにします。
+if (!globalThis.editorsPickCache) {
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const data = await response.json();
+      globalThis.editorsPickCache = data.items || [];
+    } else {
+      globalThis.editorsPickCache = [];
+    }
+  } catch (e) {
+    console.error("記事の取得に失敗しました", e);
+    globalThis.editorsPickCache = [];
   }
-} catch (e) {
-  console.error("記事の取得に失敗しました", e);
 }
+// 記憶しておいたデータを、すべてのページで使い回します
+allPosts = globalThis.editorsPickCache;
 
 // ▼ 海外記事（us-jaなど）を弾くバリア
 const isForeignPost = (post) => {
@@ -25,7 +33,6 @@ const isForeignPost = (post) => {
 
 // 安全な日本版の記事だけを抽出します
 const safePosts = allPosts.filter(p => !isForeignPost(p));
-
 
 // ▼ ここから「編集部①」などのタグを探して並べ替える仕組みです
 const topPostsMap = new Map();
