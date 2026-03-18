@@ -1,6 +1,7 @@
 ---
 const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID_JA;
+// ▼ ここを BLOG_ID に戻しました（これが最も安全です）
+const BLOG_ID = import.meta.env.BLOG_ID;
 
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
 
@@ -52,12 +53,13 @@ const getImageUrl = (content) => {
   .bing-trend-section { padding: 10px 0 20px 0; background: #fff; }
   .trend-header h3 { font-size: 24px; font-weight: bold; border-bottom: 4px solid #8b0000; padding-bottom: 5px; }
   .trend-scroll-outer { position: relative; display: flex; align-items: center; }
-  .trend-scroll-container { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; }
+  .trend-scroll-container { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
+  .trend-scroll-container::-webkit-scrollbar { display: none; }
   .trend-item { min-width: 180px; text-decoration: none; color: #333; }
   .trend-img-wrapper { width: 100%; height: 120px; border-radius: 8px; overflow: hidden; }
   .trend-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-  .trend-title { font-size: 16px; font-weight: bold; margin-top: 10px; }
-  .scroll-arrow { position: absolute; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; }
+  .trend-title { font-size: 16px; font-weight: bold; margin-top: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .scroll-arrow { position: absolute; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
   .prev-arrow { left: -15px; } 
   .next-arrow { right: -15px; } 
 </style>
