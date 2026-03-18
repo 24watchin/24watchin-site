@@ -1,38 +1,47 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+// ▼ 綺麗なデザインの部品「NewsList」を呼び出します
+import NewsList from '../../../components/NewsList.astro';
 
 const BLOG_ID = import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
-const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+// もっと見るボタンが動くように、多めに20件取得します
+const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=20`;
 
 const response = await fetch(url);
 const data = await response.json();
 const posts = data.items || [];
+
+// ▼ 記事本文から最初の画像を抜き出す専用の関数です
+const getImageUrl = (htmlContent) => {
+  if (!htmlContent) return '/images/logo-24watchin.png'; // 画像がない場合はロゴを出す
+  const match = htmlContent.match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : '/images/logo-24watchin.png';
+};
 ---
 
 <Layout title="日本ニュース - 24Watchin'">
-  <main class="news-container">
+  <main class="main-content">
     <h1 class="page-title">日本 ニュース</h1>
-    <div class="news-grid">
-      {posts.map((post) => (
-        <div class="news-card">
-          <a href={`/ja/jp/news/${post.id}/`} class="news-link">
-            <h2 class="news-title">{post.title}</h2>
-            <time class="news-date">{new Date(post.published).toLocaleDateString('ja-JP')}</time>
-          </a>
-        </div>
-      ))}
-    </div>
+    
+    {/* ▼ NewsListに、取得した記事と画像抜き出し機能を渡して表示させます */}
+    <NewsList posts={posts} getImageUrl={getImageUrl} />
+    
   </main>
 </Layout>
 
 <style>
-  .news-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
-  .page-title { font-size: 24px; border-bottom: 3px solid #872732; padding-bottom: 10px; margin-bottom: 30px; color: #1a1a1a; font-weight: bold; }
-  .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-  .news-card { background: #ffffff; border: 1px solid #eee; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s; }
-  .news-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-  .news-link { text-decoration: none; color: inherit; display: block; }
-  .news-title { font-size: 18px; color: #007bff; margin: 0 0 12px 0; font-weight: bold; line-height: 1.4; }
-  .news-date { font-size: 14px; color: #666; }
+  .main-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .page-title {
+    font-size: 24px;
+    border-bottom: 3px solid #872732;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    color: #1a1a1a;
+    font-weight: bold;
+  }
 </style>
