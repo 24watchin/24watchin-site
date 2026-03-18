@@ -1,8 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-import NewsCard from '../../../components/NewsCard.astro';
 
-// ▼ ここを BLOG_ID_JA にしました
+// 日本の合鍵（JA）を使うように指定
 const BLOG_ID = import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
@@ -13,18 +12,17 @@ const posts = data.items || [];
 ---
 
 <Layout title="日本ニュース - 24Watchin'">
-  <main>
+  <main style="padding: 20px;">
     <h1>日本 ニュース</h1>
-    <div class="news-grid">
+    <ul style="list-style: none; padding: 0;">
       {posts.map((post) => (
-        <NewsCard 
-          id={post.id} 
-          title={post.title} 
-          published={post.published}
-          {/* ▼ リンク先を /ja/jp/ に固定 */}
-          href={`/ja/jp/news/${post.id}/`}
-        />
+        <li style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+          <a href={`/ja/jp/news/${post.id}/`} style="text-decoration: none; color: #007bff; font-size: 18px; font-weight: bold;">
+            {post.title}
+          </a>
+          <p style="color: #666; font-size: 14px;">{new Date(post.published).toLocaleDateString('ja-JP')}</p>
+        </li>
       ))}
-    </div>
+    </ul>
   </main>
 </Layout>
