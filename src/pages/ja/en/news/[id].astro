@@ -3,7 +3,7 @@ import Layout from '../../../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
-  // 以前Cloudflareに登録した「英語の合鍵（BLOG_ID_EN）」を使って記事を取得します
+  // 英語の合鍵（BLOG_ID_EN）を使って記事を取得します
   const BLOG_ID = import.meta.env.BLOG_ID_EN;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
