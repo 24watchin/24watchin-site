@@ -10,7 +10,8 @@ import { categoryLabelMap } from '../../../../lib/categoryLabels';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
-  const BLOG_ID = import.meta.env.BLOG_ID_JA; // 日本の合鍵
+  // ▼ ここを BLOG_ID に合わせました
+  const BLOG_ID = import.meta.env.BLOG_ID;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
   const response = await fetch(url);
@@ -29,7 +30,6 @@ const currentCategory = categoryLabelMap.jp.allCategories.find(cat => {
 
 const categoryLabel = currentCategory ? currentCategory.label : 'ニュース';
 const categorySlug = currentCategory ? currentCategory.slug : '';
-// ▼ 住所を /ja/jp/ に変更しました
 const categoryHref = categorySlug ? `/ja/jp/category/${categorySlug}/` : '';
 
 function formatDateTimeJP(dateString) {
@@ -47,7 +47,6 @@ const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
 
 <Layout title={post.title} sidebarType="article">
   <div class="article-breadcrumb-wrap">
-    {/* ▼ 住所を /ja/jp/ に変更しました */}
     <Breadcrumb countryLabel="日本" countryHref="/ja/jp/" categoryLabel={categoryLabel} categoryHref={categoryHref} />
   </div>
 
@@ -56,7 +55,6 @@ const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
       <h1 class="post-title">{post.title}</h1>
       <div class="post-submeta">
         <time class="post-date">{formatDateTimeJP(post.published)}</time>
-        {/* ▼ URLを /ja/jp/ に変更しました */}
         <ShareButtons articleUrl={`https://24watchin.com/ja/jp/news/${post.id}/`} articleTitle={post.title} />
       </div>
     </header>
@@ -72,7 +70,6 @@ const safePosts = allPosts.filter(p => !isForeignPost(p) && p.id !== post.id);
 </Layout>
 
 <style>
-  /* スタイル（見た目）はそのままです */
   .article-breadcrumb-wrap { margin: -10px 0 6px; }
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
