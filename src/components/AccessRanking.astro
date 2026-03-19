@@ -11,11 +11,13 @@ if (kvData) {
     
     for (const key of listResult.keys) {
       const postId = key.name.replace('PV_', '');
+      
       const API_KEY = import.meta.env.API_KEY;
       const BLOG_ID = import.meta.env.BLOG_ID;
       const postUrl = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${postId}?key=${API_KEY}`;
       
       const pRes = await fetch(postUrl).catch(() => null);
+      
       if (pRes && pRes.ok) {
         const postData = await pRes.json();
         const publishedDate = new Date(postData.published);
@@ -54,12 +56,15 @@ const isForeignPost = (post) => {
 
 // 3. PV上位の記事データを取得
 let rankingList = [];
+
 if (sortedPostIds.length > 0) {
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
+  
   for (const id of sortedPostIds) {
     const postUrl = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${id}?key=${API_KEY}`;
     const res = await fetch(postUrl).catch(() => null);
+    
     if (res && res.ok) {
        const postData = await res.json();
        // ▼ 海外記事でなければランキングに入れる（バリア作動）
@@ -108,8 +113,9 @@ const getImageUrl = (content) => {
       <li class="ranking-item">
         <div class="rank-number">{index + 1}</div>
         <div class="post-info">
-          <a href={`/jp/jp/news/${post.id}/`} class="post-title">{post.title}</a>
+          <a href={`/ja/jp/news/${post.id}/`} class="post-title">{post.title}</a>
         </div>
+        
         <div class="post-thumbnail">
           <img src={getImageUrl(post.content)} alt="サムネイル" />
         </div>
@@ -144,12 +150,13 @@ const getImageUrl = (content) => {
     color: #1a1a1a;
   }
 
-  .ranking-list { list-style: none; padding: 0; margin: 0; }
+  .ranking-list { list-style: none; padding: 0; margin: 0;
+  }
   
   .ranking-item { 
     display: flex;
     align-items: center;
-    padding: 8px 0; 
+    padding: 8px 0;
     border-bottom: 1px dashed #ccc; 
     gap: 10px;
   }
@@ -163,13 +170,13 @@ const getImageUrl = (content) => {
     font-weight: bold; 
     font-style: italic; 
     width: 24px; 
-    text-align: center; 
+    text-align: center;
     color: #872732; 
   }
   .post-info { flex: 1; }
   
   .post-title { 
-    font-size: 13px; 
+    font-size: 13px;
     color: #000; 
     text-decoration: none;
     display: -webkit-box; 
