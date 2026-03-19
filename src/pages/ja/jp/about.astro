@@ -1,36 +1,50 @@
 ---
-const siteTitle = "24Watchin について";
+import Layout from '../../../layouts/Layout.astro';
+
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+
+const titles: Record<string, string> = {
+  ja: 'About 24Watchin',
+  en: 'About 24Watchin',
+  de: 'Über 24Watchin',
+  fr: 'À propos de 24Watchin',
+  es: 'Acerca de 24Watchin',
+  ru: 'О 24Watchin',
+  'zh-cn': '关于 24Watchin',
+  'zh-tw': '關於 24Watchin',
+};
+
+const pageTitle = titles[lang] ?? titles['en'];
 ---
 
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{siteTitle}</title>
-    <style>
-      body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
-      header { background: #1e3a8a; color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
-      header a { color: white; text-decoration: none; font-weight: bold; }
-      .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-      h2 { color: #1e3a8a; margin-top: 30px; }
-    </style>
-  </head>
-  <body>
-    <header>
-      {/* ★ トップページへ戻るリンクを、最新の /ja/jp/ に修正しました */}
-      <a href="/ja/jp/">← 24Watchin トップページに戻る</a>
-    </header>
+<Layout title={pageTitle} sidebarType="article">
+  <div class="info-container">
+    <h1 class="info-title">{pageTitle}</h1>
+    <div class="info-content">
+      <!-- ここに本文を入れてください -->
+    </div>
+  </div>
+</Layout>
 
-    <main class="container">
-      <h1>{siteTitle}</h1>
-      <p>24Watchinへようこそ！</p>
-      <p>当サイトは、AI技術を活用して世界中のニュースを収集し、日本語で分かりやすくお届けするメディアです。</p>
-
-      <h2>私たちのミッション</h2>
-      <p>情報の壁をなくし、世界の「今」をリアルタイムで共有することを目指しています。</p>
-
-      <h2>お問い合わせ</h2>
-      <p>ご意見・ご感想がございましたら、SNS等を通じてお知らせください。</p>
-    </main>
-  </body>
-</html>
+<style>
+  .info-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .info-title {
+    font-size: 26px;
+    color: #1a1a1a;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #872732;
+  }
+  .info-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #1a1a1a;
+  }
+</style>
