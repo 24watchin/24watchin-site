@@ -7,17 +7,14 @@ const getImageUrl = (content) => {
 };
 ---
 
-{/* ▼ HTML部分は鳴川さんの元のコードを100%完全に復元しています ▼ */}
 <section class="category-block">
   <div class="category-header">
     <h3>{title}</h3>
-    {/* ▼ ここを /ja/jp/ に修正しました！ */}
     <a href={`/ja/jp/category/${slug}/`} class="view-all">{title} ページへ <i class="fas fa-chevron-right"></i></a>
   </div>
 
   <div class="article-list">
     {posts.map((post) => (
-      {/* ▼ ここを /ja/jp/ に修正しました！ */}
       <a href={`/ja/jp/news/${post.id}/`} class="article-item">
         <div class="article-img">
           <img src={getImageUrl(post.content)} alt={post.title} />
@@ -26,7 +23,6 @@ const getImageUrl = (content) => {
           <h4>{post.title}</h4>
           <div class="article-meta">
             <span class="date">{new Date(post.published).toLocaleDateString('ja-JP')}</span>
-            {/* タグを削除しました */}
           </div>
         </div>
       </a>
@@ -34,55 +30,18 @@ const getImageUrl = (content) => {
   </div>
 </section>
 
-{/* ▼ CSS部分のみ、いただいた4つのご要望を追加しました ▼ */}
 <style>
-  /* ① カテゴリ間のスペースを狭くしました (30px → 15px) */
   .category-block { margin-bottom: 15px; }
-  
   .category-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 5px; margin-bottom: 15px; }
   .category-header h3 { font-size: 18px; margin: 0; font-weight: bold; }
-  
-  /* ③ 「〇〇ページへ」をグレーに変更し、ホバーで黒い細線を出す */
   .view-all { font-size: 12px; color: #666666; text-decoration: none; font-weight: bold; }
   .view-all:hover { text-decoration: underline; text-decoration-color: #000000; text-decoration-thickness: 1px; }
-
   .article-list { display: flex; flex-direction: column; gap: 15px; }
   .article-item { display: flex; gap: 12px; text-decoration: none; color: #333; }
   .article-img { width: 120px; height: 80px; flex-shrink: 0; border-radius: 4px; overflow: hidden; }
   .article-img img { width: 100%; height: 100%; object-fit: cover; }
-
-  /* ④ 日付を下に固定するための設定（画像の高さ80pxに合わせる） */
-  .article-info { 
-    display: flex; 
-    flex-direction: column; 
-    min-height: 80px; 
-    flex: 1; 
-    min-width: 0; 
-  }
-
-  /* ② 文字サイズ16px ＆ ④ タイトルを3行までに制限 */
-  .article-info h4 { 
-    font-size: 16px; 
-    margin: 0; 
-    line-height: 1.4; 
-    font-weight: bold; 
-    display: -webkit-box; 
-    -webkit-line-clamp: 3; 
-    -webkit-box-orient: vertical; 
-    overflow: hidden; 
-  }
-
-  /* ② マウスを当てた時に記事タイトルに黒い細線を出す */
-  .article-item:hover .article-info h4 {
-    text-decoration: underline;
-    text-decoration-color: #000000;
-    text-decoration-thickness: 1px;
-  }
-
-  /* ④ 日付を常に一番下の「4行目の位置」に押し付ける魔法のコード(margin-top: auto) */
-  .article-meta { 
-    font-size: 11px; 
-    color: #888; 
-    margin-top: auto; 
-  }
+  .article-info { display: flex; flex-direction: column; min-height: 80px; flex: 1; min-width: 0; }
+  .article-info h4 { font-size: 16px; margin: 0; line-height: 1.4; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .article-item:hover .article-info h4 { text-decoration: underline; text-decoration-color: #000000; text-decoration-thickness: 1px; }
+  .article-meta { font-size: 11px; color: #888; margin-top: auto; }
 </style>
