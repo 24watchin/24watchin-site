@@ -25,21 +25,22 @@ const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : 'ニュース';
 const keywords = catData ? catData.keywords : [slug];
 
-// ▼ 【追加】トップページと同じ「us-ja」などの海外タグを弾くバリア機能です
+// 海外タグを弾くフィルタ
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// ▼ 全記事から海外記事を弾いた、安全な箱（mainSitePosts）を作ります
+// 安全な記事（国内向け）のみを抽出
 const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
 
-// ▼ カテゴリに合う記事を探すとき、全記事からではなく「安全な箱」から探すように変更しました
+// カテゴリに合致する記事を抽出
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.some(label => keywords.some(key => label.includes(key)));
 });
 
+// 画像URLを取得する関数
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
