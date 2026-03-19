@@ -71,5 +71,12 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
     <script>
       document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
+
+    <!-- 遅延読み込み -->
+    <script>
+      document.querySelectorAll('img').forEach(img => {
+        img.setAttribute('loading', 'lazy');
+      });
+    </script>
   </body>
 </html>
