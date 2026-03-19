@@ -57,7 +57,6 @@ let alertFullText = "";
 
 if (WEATHER_API_KEY) {
   try {
-    // ▼ ここを「days=5」に変更し、余裕を持たせました
     const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${targetCity.name}&days=5&aqi=no&alerts=yes&lang=${apiLang}`;
     const wResponse = await fetch(weatherUrl);
     if (wResponse.ok) {
@@ -178,7 +177,7 @@ const getDayName = (dateStr) => {
         <h2 class="section-title">{labels.relatedTitle}</h2>
         <div class="news-list-one-column">
           {relatedNews.map((post) => (
-            <a href={`/jp/jp/news/${post.id}/`} class="news-item">
+            <a href={`/ja/jp/news/${post.id}/`} class="news-item">
               <div class="news-image">
                 <img src={getImageUrl(post.content)} alt={post.title} />
               </div>
@@ -207,22 +206,19 @@ const getDayName = (dateStr) => {
     const cityFullDate = `${nowInCity.find(p => p.type === 'year').value}-${nowInCity.find(p => p.type === 'month').value}-${nowInCity.find(p => p.type === 'day').value}`;
     const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
 
-    let visibleCount = 0; // 表示した日数を数えるカウンター
+    let visibleCount = 0;
 
     document.querySelectorAll('.day-group').forEach(group => {
       const groupDate = group.getAttribute('data-date');
 
       if (groupDate < cityFullDate) {
-        // 過去の日は非表示
         group.style.display = 'none';
       } else {
-        // 今日以降の日付の場合、3日分に達するまでは表示する
         if (visibleCount < 3) {
           group.style.display = 'block';
           visibleCount++;
           
           if (groupDate === cityFullDate) {
-            // 今日の場合は過去の時間を隠す
             group.querySelectorAll('.hourly-row').forEach(row => {
               if (parseInt(row.getAttribute('data-hour')) < cityHour) {
                 row.style.display = 'none';
@@ -230,12 +226,10 @@ const getDayName = (dateStr) => {
             });
           }
         } else {
-          // 4日目以降は非表示
           group.style.display = 'none';
         }
       }
     });
-
     document.querySelectorAll('.day-summary-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const targetId = e.currentTarget.getAttribute('data-target');
@@ -250,7 +244,6 @@ const getDayName = (dateStr) => {
 </script>
 
 <style>
-  /* 以前のスタイルをそのまま維持しています */
   :root { --weather-value-size: 1.15rem; }
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid #872732; padding-left: 12px; }
