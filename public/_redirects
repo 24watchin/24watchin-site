@@ -1,0 +1,2 @@
+/jp/jp/* /ja/jp/:splat 301
+/jp/* /ja/:splat 301
