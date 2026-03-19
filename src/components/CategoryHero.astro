@@ -1,8 +1,6 @@
 ---
-// ジャンルページの「顔」となる、ヒーローエリアの部品です
 const { posts, categoryName, getImageUrl } = Astro.props;
 
-// 最初の1記事を「メイン」、続く4記事を「サブ」に分けます
 const mainPost = posts[0];
 const subPosts = posts.slice(1, 5);
 ---
@@ -15,7 +13,7 @@ const subPosts = posts.slice(1, 5);
 <div class="hero-grid">
   {mainPost && (
     <article class="main-featured">
-      <a href={`/jp/jp/news/${mainPost.id}/`} class="hero-link">
+      <a href={`/ja/jp/news/${mainPost.id}/`} class="hero-link">
         <div class="main-image-wrapper">
           <img
             src={getImageUrl(mainPost.content)}
@@ -36,7 +34,7 @@ const subPosts = posts.slice(1, 5);
   <div class="sub-featured-list">
     {subPosts.map((post) => (
       <article class="sub-item">
-        <a href={`/jp/jp/news/${post.id}/`} class="hero-link sub-link">
+        <a href={`/ja/jp/news/${post.id}/`} class="hero-link sub-link">
           <div class="sub-image-wrapper">
             <img src={getImageUrl(post.content)} alt={post.title} class="hero-image" />
           </div>
@@ -53,128 +51,26 @@ const subPosts = posts.slice(1, 5);
 </div>
 
 <style>
-  .category-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 3px solid #1e3a8a;
-    margin-bottom: 2rem;
-    padding-bottom: 0.5rem;
-  }
-
-  .category-title {
-    font-size: 1.8rem;
-    margin: 0;
-    color: #1a1a1a;
-    font-weight: 800;
-  }
-
-  .article-count {
-    font-size: 0.9rem;
-    color: #666;
-  }
-
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 0;
-  }
-
-  .hero-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    transition: opacity 0.2s;
-  }
-
-  .hero-link:hover {
-    opacity: 0.8;
-  }
-
-  .hero-link:hover .main-title,
-  .hero-link:hover .sub-title,
-  .hero-link:focus-visible .main-title,
-  .hero-link:focus-visible .sub-title {
-    text-decoration: underline;
-    text-decoration-color: #000;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
-  }
-
-  .main-image-wrapper,
-  .sub-image-wrapper {
-    background: #eee;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .main-image-wrapper {
-    height: 350px;
-  }
-
-  .sub-image-wrapper {
-    width: 100px;
-    height: 70px;
-    flex-shrink: 0;
-  }
-
-  .hero-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .main-info {
-    padding: 1rem 0;
-  }
-
-  .main-title {
-    font-size: 1.5rem;
-    margin: 0 0 0.5rem 0;
-    line-height: 1.4;
-    font-weight: bold;
-    color: #1a1a1a;
-  }
-
-  .sub-featured-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .sub-link {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-
-  .sub-title {
-    font-size: 1rem;
-    margin: 0 0 0.3rem 0;
-    line-height: 1.4;
-    font-weight: bold;
-    color: #1a1a1a;
-  }
-
-  .hero-date {
-    font-size: 0.8rem;
-    color: #888;
-    display: block;
-  }
-
+  .category-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #1e3a8a; margin-bottom: 2rem; padding-bottom: 0.5rem; }
+  .category-title { font-size: 1.8rem; margin: 0; color: #1a1a1a; font-weight: 800; }
+  .article-count { font-size: 0.9rem; color: #666; }
+  .hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 0; }
+  .hero-link { text-decoration: none; color: inherit; display: block; transition: opacity 0.2s; }
+  .hero-link:hover { opacity: 0.8; }
+  .hero-link:hover .main-title, .hero-link:hover .sub-title, .hero-link:focus-visible .main-title, .hero-link:focus-visible .sub-title { text-decoration: underline; text-decoration-color: #000; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  .main-image-wrapper, .sub-image-wrapper { background: #eee; border-radius: 8px; overflow: hidden; position: relative; }
+  .main-image-wrapper { height: 350px; }
+  .sub-image-wrapper { width: 100px; height: 70px; flex-shrink: 0; }
+  .hero-image { width: 100%; height: 100%; object-fit: cover; }
+  .main-info { padding: 1rem 0; }
+  .main-title { font-size: 1.5rem; margin: 0 0 0.5rem 0; line-height: 1.4; font-weight: bold; color: #1a1a1a; }
+  .sub-featured-list { display: flex; flex-direction: column; gap: 1rem; }
+  .sub-link { display: flex; gap: 1rem; align-items: flex-start; }
+  .sub-title { font-size: 1rem; margin: 0 0 0.3rem 0; line-height: 1.4; font-weight: bold; color: #1a1a1a; }
+  .hero-date { font-size: 0.8rem; color: #888; display: block; }
   @media (max-width: 768px) {
-    .hero-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .main-image-wrapper {
-      height: 220px;
-    }
-
-    .main-title {
-      font-size: 1.2rem;
-    }
+    .hero-grid { grid-template-columns: 1fr; }
+    .main-image-wrapper { height: 220px; }
+    .main-title { font-size: 1.2rem; }
   }
 </style>
