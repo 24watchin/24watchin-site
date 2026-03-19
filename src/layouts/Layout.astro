@@ -1,9 +1,29 @@
 ---
 const {
   title,
-  description = '24Watchinは、世界の最新ニュースをわかりやすく届けるグローバルニュースメディアです。',
   sidebarType = 'top'
 } = Astro.props;
+
+// URLから言語を自動取得
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+
+// 言語別デフォルトdescription
+const defaultDescriptions: Record<string, string> = {
+  ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
+  en: 'News from around the world, in your language. 24Watchin delivers the latest local news and stories, clearly explained for international residents.',
+  de: 'Nachrichten aus aller Welt in Ihrer Sprache. 24Watchin liefert aktuelle lokale Nachrichten und Berichte, verständlich erklärt.',
+  fr: "L'actualité du monde entier dans votre langue. 24Watchin vous propose les dernières informations locales, expliquées clairement.",
+  es: 'Noticias de todo el mundo en tu idioma. 24Watchin ofrece las últimas noticias locales explicadas de forma clara y sencilla.',
+  ru: 'Новости со всего мира на вашем языке. 24Watchin доставляет актуальные местные новости, понятно объяснённые для иностранцев.',
+  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂的本地新闻与深度解说。',
+  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂的本地新聞與深度解說。',
+};
+
+// propsでdescriptionが渡された場合はそちらを優先、なければ言語別デフォルトを使用
+const { description } = Astro.props;
+const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
 
 import '../styles/global.css';
 import Header from '../components/Header.astro';
@@ -15,12 +35,12 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
 import WeatherSidebar from '../components/WeatherSidebar.astro';
 ---
 <!DOCTYPE html>
-<html lang="ja">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
       body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
