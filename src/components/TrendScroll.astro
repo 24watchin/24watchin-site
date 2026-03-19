@@ -1,6 +1,6 @@
 ---
 const API_KEY = import.meta.env.API_KEY;
-// ▼ ここを BLOG_ID に戻しました（これが最も安全です）
+// ▼ ここを成功しているファイルと同じ「BLOG_ID」に修正しました
 const BLOG_ID = import.meta.env.BLOG_ID;
 
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
@@ -34,6 +34,7 @@ const getImageUrl = (content) => {
 
     <div class="trend-scroll-container" id="trend-scroll">
       {posts.map((post) => (
+        /* ▼ ここを /ja/jp/ に修正しました */
         <a href={`/ja/jp/news/${post.id}/`} class="trend-item">
           <div class="trend-img-wrapper">
             <img src={getImageUrl(post.content)} alt={post.title} />
