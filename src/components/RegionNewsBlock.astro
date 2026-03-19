@@ -22,7 +22,6 @@ const formatPostTime = (dateString) => {
 
 const getDisplayCategory = (post) => {
   const labels = post?.labels || [];
-
   const visibleLabel = labels.find((label) => {
     if (!label) return false;
     if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false;
@@ -31,7 +30,6 @@ const getDisplayCategory = (post) => {
     if (/^(soc|pol|eco|biz|tech|env|cul|spo|int)-/i.test(label)) return false;
     return true;
   });
-
   return visibleLabel || 'ニュース';
 };
 ---
@@ -47,23 +45,19 @@ const getDisplayCategory = (post) => {
       <div class="city-block">
         <div class="article-3-grid">
           {city.posts.slice(0, 3).map((post) => (
-            /* ▼ ここを /ja/jp/ に修正しました！ */
             <a href={`/ja/jp/news/${post.id}/`} class="news-item">
               <div class="media-column">
                 <div class="thumbnail">
                   <img src={getImageUrl(post.content)} alt={post.title} />
                 </div>
-
                 <div class="image-date-row">
                   {post.published && (
                     <span class="post-time">{formatPostTime(post.published)}</span>
                   )}
                 </div>
               </div>
-
               <div class="info">
                 <h4 class="news-title">{post.title}</h4>
-
                 <div class="category-row">
                   <span class="category-badge">{getDisplayCategory(post)}</span>
                 </div>
@@ -77,7 +71,6 @@ const getDisplayCategory = (post) => {
 </section>
 
 <style>
-  /* 鳴川さんの元のデザインを100%継承しています */
   .region-section { width: 100%; margin-bottom: 56px; }
   .region-section + .region-section { margin-top: 10px; }
   .region-header { margin-bottom: 18px; }
