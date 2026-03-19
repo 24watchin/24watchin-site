@@ -1,0 +1,50 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+
+const titles: Record<string, string> = {
+  ja: '訂正・修正ポリシー',
+  en: 'Corrections Policy',
+  de: 'Korrekturen',
+  fr: 'Politique de corrections',
+  es: 'Política de correcciones',
+  ru: 'Политика исправлений',
+  'zh-cn': '更正政策',
+  'zh-tw': '更正政策',
+};
+
+const pageTitle = titles[lang] ?? titles['en'];
+---
+
+<Layout title={pageTitle} sidebarType="article">
+  <div class="info-container">
+    <h1 class="info-title">{pageTitle}</h1>
+    <div class="info-content">
+      <!-- ここに本文を入れてください -->
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .info-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .info-title {
+    font-size: 26px;
+    color: #1a1a1a;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #872732;
+  }
+  .info-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #1a1a1a;
+  }
+</style>
