@@ -66,5 +66,10 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
     </div>
 
     <Footer />
+
+    <!-- 右クリック禁止 -->
+    <script>
+      document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
   </body>
 </html>
