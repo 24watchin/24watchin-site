@@ -55,9 +55,8 @@ const displayPosts = finalPosts.slice(0, 10);
     </button>
 
     <div class="scroll-container" id="editor-picks-scroller">
-      {/* ▼ 並べ替えた displayPosts を使って画面に表示します */}
       {displayPosts.map((rp) => (
-        <a href={`/jp/jp/news/${rp.id}/`} class="scroll-item">
+        <a href={`/ja/jp/news/${rp.id}/`} class="scroll-item">
           <div class="scroll-img-wrapper">
             <img src={getImageUrl(rp.content)} alt={rp.title} />
           </div>
@@ -81,9 +80,11 @@ const displayPosts = finalPosts.slice(0, 10);
 
   if (scroller && prevBtn && nextBtn) {
     const scrollAmount = 320;
+
     nextBtn.addEventListener('click', () => {
       scroller.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
+
     prevBtn.addEventListener('click', () => {
       scroller.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     });
@@ -95,14 +96,14 @@ const displayPosts = finalPosts.slice(0, 10);
     background: #e5e7eb;
     padding: 15px 20px; 
     margin: 30px 0; 
-    border-radius: 12px; 
+    border-radius: 12px;
   }
   
   .section-title { 
     font-size: 19px;
     color: #333; 
     margin-bottom: 15px; 
-    border-bottom: 3px solid #872732; 
+    border-bottom: 3px solid #872732;
     padding-bottom: 5px; 
     display: inline-block;
   }
@@ -141,14 +142,14 @@ const displayPosts = finalPosts.slice(0, 10);
   
   .scroll-text { padding: 12px 15px; }
   .scroll-text h4 { 
-    font-size: 15px; 
+    font-size: 15px;
     line-height: 1.4; 
     margin: 0; 
     font-weight: bold; 
     display: -webkit-box;
     -webkit-line-clamp: 3; 
     -webkit-box-orient: vertical; 
-    overflow: hidden; 
+    overflow: hidden;
   }
 
   .nav-btn {
