@@ -5,7 +5,6 @@ const BLOG_ID = import.meta.env.BLOG_ID;
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
 
 let allPosts = [];
-
 // ▼ APIの「取得しすぎ（429エラー）」を防ぐための記憶（キャッシュ）機能
 if (!globalThis.editorsPickCache) {
   try {
@@ -78,7 +77,7 @@ const getImageUrl = (content) => {
     {displayPosts.map((post) => (
       <li class="ep-item">
         <div class="ep-info">
-          <a href={`/jp/jp/news/${post.id}/`} class="ep-post-title">{post.title}</a>
+          <a href={`/ja/jp/news/${post.id}/`} class="ep-post-title">{post.title}</a>
         </div>
         
         <div class="ep-thumbnail">
@@ -116,7 +115,8 @@ const getImageUrl = (content) => {
     color: #1a1a1a;
   }
 
-  .ep-list { list-style: none; padding: 0; margin: 0; }
+  .ep-list { list-style: none; padding: 0; margin: 0;
+  }
   
   .ep-item { 
     display: flex;
