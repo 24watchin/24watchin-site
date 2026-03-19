@@ -57,16 +57,13 @@ async function fetchAllPosts() {
 
 const rawPosts = await fetchAllPosts();
 
-// ▼ 【追加】サイト全体のルール：海外タグが付いているかチェックする機能
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-// ▼ 【追加】すべての記事から、海外記事を弾いた安全な箱（mainSitePosts）を作ります
 const mainSitePosts = rawPosts.filter(post => !isForeignPost(post));
 
-// ▼ 検索用のデータ（searchIndex）は、その安全な箱の中から作ります
 const searchIndex = mainSitePosts.map((post) => ({
   id: post.id,
   title: post.title || '',
@@ -102,7 +99,7 @@ const searchIndex = mainSitePosts.map((post) => ({
   const searchWord = q.toLowerCase();
   const dateFormatter = new Intl.DateTimeFormat('ja-JP');
   const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
-
+  
   document.getElementById('displayWord').textContent = q;
   document.getElementById('displayWordNo').textContent = q;
 
@@ -114,20 +111,21 @@ const searchIndex = mainSitePosts.map((post) => ({
 
     return title.includes(searchWord) || content.includes(searchWord);
   });
-
+  
   document.getElementById('resultCount').textContent = filtered.length;
 
   const grid = document.getElementById('resultsGrid');
   const loadMoreArea = document.getElementById('loadMoreArea');
   const noResults = document.getElementById('noResults');
   const loadMoreBtn = document.getElementById('loadMoreBtn');
-
+  
   let currentCount = 0;
   const PAGE_SIZE = 20;
 
   function createCard(post) {
     const card = document.createElement('a');
-    card.href = `/jp/jp/news/${post.id}`;
+    /* ▼ ここが /ja/jp/ に修正されています（JavaScript内のためコメントを書いても安全です） */
+    card.href = `/ja/jp/news/${post.id}/`;
     card.className = 'grid-item';
 
     const imageBox = document.createElement('div');
@@ -141,7 +139,7 @@ const searchIndex = mainSitePosts.map((post) => ({
 
     const metaLine = document.createElement('div');
     metaLine.className = 'post-meta-line';
-
+    
     const time = document.createElement('time');
     time.textContent = post.published
       ? dateFormatter.format(new Date(post.published))
@@ -162,12 +160,13 @@ const searchIndex = mainSitePosts.map((post) => ({
 
   function displayItems(limit) {
     const nextItems = filtered.slice(currentCount, currentCount + limit);
-
+    
     nextItems.forEach((post) => {
       grid.appendChild(createCard(post));
     });
 
     currentCount += nextItems.length;
+    
     loadMoreArea.style.display = currentCount < filtered.length ? 'block' : 'none';
   }
 
