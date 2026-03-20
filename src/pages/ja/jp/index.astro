@@ -13,16 +13,18 @@ const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${
 
 const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
-const allPosts = data.items || [];
+const allPosts = data.items || []; // フィルター前の全100記事データ
 
 const lang = 'ja';
-const country = 'jp'; // 自分の国を「jp」に設定 
+const country = 'jp'; // 自分の国を「jp」に設定 [cite: 76]
 
+// 自国以外の「ja-xx」タグを持つ記事（他国の日本語記事）を除外する判定
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^ja-[a-z]{2}$/.test(label) && label !== 'ja-jp');
 };
 
+// メイン部分に表示する「日本版」の純粋な記事リスト [cite: 77]
 const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
 
 const filterByCategory = (slug, count = 3) => {
@@ -34,7 +36,10 @@ const filterByCategory = (slug, count = 3) => {
 };
 ---
 
-<Layout title="日本のニュース" allPosts={mainSitePosts}>
+{/* Layoutに対して allPosts（全記事データ）を渡すことで、
+  フッターが「どの国に記事があるか」を自動判別できるようになります 
+*/}
+<Layout title="日本のニュース" allPosts={allPosts}>
   <div slot="top-full">
     <MainNewsLayout posts={mainSitePosts} />
     <TrendScroll />
@@ -60,7 +65,7 @@ const filterByCategory = (slug, count = 3) => {
   <GoogleAdBanner position="下部" />
 
   <div slot="bottom-wide">
-    {/* 日本(jp)を除外し、他国の「ja-〇〇」タグの記事がある時だけ表示します  */}
+    {/* 下部の地域ニュースブロック [cite: 82] */}
     <GlobalRegionNews lang={lang} country={country} allPosts={allPosts} />
   </div>
 </Layout>
