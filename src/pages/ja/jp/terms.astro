@@ -17,10 +17,22 @@ const titles: Record<string, string> = {
   'zh-tw': '使用條款',
 };
 
+const descriptions: Record<string, string> = {
+  ja: '24Watchinの利用規約です。本サービスの利用条件を定めています。',
+  en: 'Terms of Use for 24Watchin. This page defines the conditions for using our service.',
+  de: 'Nutzungsbedingungen von 24Watchin. Diese Seite legt die Bedingungen für die Nutzung unseres Dienstes fest.',
+  fr: "Conditions d'utilisation de 24Watchin. Cette page définit les conditions d'utilisation de notre service.",
+  es: 'Términos de uso de 24Watchin. Esta página define las condiciones de uso de nuestro servicio.',
+  ru: 'Условия использования 24Watchin. На этой странице определены условия использования нашего сервиса.',
+  'zh-cn': '24Watchin的使用条款。本页规定了使用本服务的条件。',
+  'zh-tw': '24Watchin的使用條款。本頁規定了使用本服務的條件。',
+};
+
 const pageTitle = titles[lang] ?? titles['en'];
+const pageDescription = descriptions[lang] ?? descriptions['en'];
 ---
 
-<Layout title={pageTitle} sidebarType="article">
+<Layout title={pageTitle} description={pageDescription} sidebarType="article">
   <div class="info-container">
     <h1 class="info-title">{pageTitle}</h1>
     <div class="info-content">
@@ -181,20 +193,10 @@ const pageTitle = titles[lang] ?? titles['en'];
 
       <section>
         <h2>第16条（お問い合わせ）</h2>
-        <p>本規約に関するお問い合わせは、以下よりお願いいたします。</p>
         <table class="info-table">
-          <tr>
-            <th>運営者</th>
-            <td>The Dexent Media Enterprises</td>
-          </tr>
-          <tr>
-            <th>サイト名</th>
-            <td>24Watchin</td>
-          </tr>
-          <tr>
-            <th>お問い合わせ</th>
-            <td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td>
-          </tr>
+          <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
+          <tr><th>サイト名</th><td>24Watchin</td></tr>
+          <tr><th>お問い合わせ</th><td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td></tr>
         </table>
       </section>
 
@@ -203,79 +205,17 @@ const pageTitle = titles[lang] ?? titles['en'];
 </Layout>
 
 <style>
-  .info-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .info-title {
-    font-size: 26px;
-    color: #1a1a1a;
-    margin: 0 0 8px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #872732;
-  }
-  .update-date {
-    font-size: 13px;
-    color: #888;
-    margin: 0 0 24px;
-  }
-  .info-content section {
-    margin-bottom: 32px;
-  }
-  .info-content h2 {
-    font-size: 18px;
-    color: #1a1a1a;
-    margin: 0 0 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #872732;
-  }
-  .info-content p {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    margin-bottom: 12px;
-  }
-  .info-content ol, .info-content ul {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    padding-left: 24px;
-    margin-bottom: 12px;
-  }
-  .info-content ol ol {
-    list-style-type: lower-latin;
-    margin-top: 8px;
-  }
-  .info-content a {
-    color: #872732;
-    text-decoration: underline;
-  }
-  .info-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    margin-top: 8px;
-  }
-  .info-table th {
-    width: 140px;
-    padding: 10px 16px;
-    background: #f8f4f4;
-    color: #555;
-    font-weight: bold;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .info-table td {
-    padding: 10px 16px;
-    border: 1px solid #e5e7eb;
-    color: #1a1a1a;
-  }
-
-  @media (max-width: 600px) {
-    .info-container { padding: 20px 16px; }
-    .info-table th { width: 100px; font-size: 13px; }
-  }
+  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 8px; padding-bottom: 12px; border-bottom: 3px solid #872732; }
+  .update-date { font-size: 13px; color: #888; margin: 0 0 24px; }
+  .info-content section { margin-bottom: 32px; }
+  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid #872732; }
+  .info-content p { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
+  .info-content ol, .info-content ul { font-size: 15px; line-height: 1.9; color: #333; padding-left: 24px; margin-bottom: 12px; }
+  .info-content ol ol { list-style-type: lower-latin; margin-top: 8px; }
+  .info-content a { color: #872732; text-decoration: underline; }
+  .info-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  .info-table th { width: 140px; padding: 10px 16px; background: #f8f4f4; color: #555; font-weight: bold; border: 1px solid #e5e7eb; text-align: left; white-space: nowrap; }
+  .info-table td { padding: 10px 16px; border: 1px solid #e5e7eb; color: #1a1a1a; }
+  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-table th { width: 100px; font-size: 13px; } }
 </style>
