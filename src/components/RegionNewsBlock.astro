@@ -1,5 +1,5 @@
 ---
-import { categoryLabelMap } from '../lib/categoryLabels';
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
 const { lang = 'ja', title, cityData = [] } = Astro.props;
 
@@ -17,23 +17,18 @@ const formatPostTime = (dateString) => {
   } catch { return ''; }
 };
 
-// 【修正箇所】正しくカテゴリを判定するロジック
 const getDisplayCategory = (post) => {
   const labels = post?.labels || [];
   
-  // URLの lang が 'ja' の場合、categoryLabels.ts に合わせて 'jp' に読み替えます
   const mapKey = lang === 'ja' ? 'jp' : lang;
   
-  // 指定された言語のカテゴリ設定を読み込みます
   const langConfig = categoryLabelMap[mapKey] || categoryLabelMap['en'];
   const validCategoryNames = langConfig.allCategories.map(cat => cat.label);
 
-  // 1. ラベルの中から、正式なカテゴリ名（社会、政治など）と一致するものを探します
   const categoryLabel = labels.find(label => validCategoryNames.includes(label));
   
   if (categoryLabel) return categoryLabel;
 
-  // 2. もし見つからなかった場合の予備ルール
   const fallbackLabel = labels.find(label => {
     if (!label) return false;
     if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false; 
@@ -97,7 +92,10 @@ const getDisplayCategory = (post) => {
   .image-date-row { margin-top: 2px; text-align: right; }
   .info { min-width: 0; flex: 1; }
   .news-title { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 700; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
-  .category-row { margin-top: 4px; text-align: right; }
+  
+  /* ▼ ここが変更部分です。 text-align: right; を text-align: left; に変更しました */
+  .category-row { margin-top: 4px; text-align: left; }
+  
   .category-badge { padding: 1px 6px; background: #4d4d4d; color: #ffffff; font-size: 13px; border-radius: 2px; }
   .post-time { font-size: 13px; color: #8a8a8a; }
 
