@@ -64,7 +64,11 @@ const getDisplayCategory = (post) => {
 </section>
 
 <style>
-  .region-section { width: 100%; margin-bottom: 56px; }
+  .region-section { 
+    width: 100%; 
+    /* 【修正ポイント】56px から 21px (56-35) に変更して間隔を狭くしました */
+    margin-bottom: 21px; 
+  }
   .region-header { margin-bottom: 18px; }
   .region-title { margin: 0 0 10px; font-size: 20px; font-weight: 700; color: #111111; }
   .region-line { width: 100%; height: 4px; background: #872732; }
