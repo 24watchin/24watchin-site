@@ -1,14 +1,14 @@
 ---
-// ▼ エラーの原因だった RelatedArticles を一旦削除しました
+// 1. GoogleAdBannerとAccessRankingだけを読み込みます
 import GoogleAdBanner from './GoogleAdBanner.astro';
 import AccessRanking from './AccessRanking.astro';
 ---
 
 <div class="sidebar-wrapper">
-  {/* 1. 上部に本物の広告を表示します */}
+  {/* 上部に本物の広告を表示します */}
   <GoogleAdBanner />
 
-  {/* 2. その下にランキングを表示します */}
+  {/* その下にランキングを表示します */}
   <AccessRanking />
 </div>
 
