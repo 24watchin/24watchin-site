@@ -17,10 +17,22 @@ const titles: Record<string, string> = {
   'zh-tw': '更正政策',
 };
 
+const descriptions: Record<string, string> = {
+  ja: '24Watchinの訂正・修正ポリシーです。記事の誤りや修正に関する対応方針を説明しています。',
+  en: 'Corrections Policy of 24Watchin. This page explains our approach to correcting errors in articles.',
+  de: 'Korrekturen-Richtlinie von 24Watchin. Diese Seite erklärt unseren Umgang mit Fehlerkorrekturen.',
+  fr: 'Politique de corrections de 24Watchin. Cette page explique notre approche pour corriger les erreurs.',
+  es: 'Política de correcciones de 24Watchin. Esta página explica nuestro enfoque para corregir errores.',
+  ru: 'Политика исправлений 24Watchin. На этой странице объясняется наш подход к исправлению ошибок.',
+  'zh-cn': '24Watchin的更正政策。本页说明我们处理文章错误的方针。',
+  'zh-tw': '24Watchin的更正政策。本頁說明我們處理文章錯誤的方針。',
+};
+
 const pageTitle = titles[lang] ?? titles['en'];
+const pageDescription = descriptions[lang] ?? descriptions['en'];
 ---
 
-<Layout title={pageTitle} sidebarType="article">
+<Layout title={pageTitle} description={pageDescription} sidebarType="article">
   <div class="info-container">
     <h1 class="info-title">{pageTitle}</h1>
     <div class="info-content">
@@ -36,110 +48,72 @@ const pageTitle = titles[lang] ?? titles['en'];
 
       <section>
         <h2>2. 訂正・修正の対象</h2>
-        <p>当サイトでは、主に次のような場合に訂正・修正を行うことがあります。</p>
         <ul>
           <li>事実関係に誤りがある場合</li>
           <li>人名、地名、団体名、役職名、日時、数値等に誤記がある場合</li>
           <li>引用、出典、リンク先、参照情報に誤りがある場合</li>
-          <li>翻訳記事において、原文の意味に影響する誤訳、不正確な表現、誤解を生じる表現がある場合</li>
+          <li>翻訳記事において、原文の意味に影響する誤訳、不正確な表現がある場合</li>
           <li>公開後の追加情報により、内容の補足または更新が必要と判断した場合</li>
           <li>権利侵害、法令違反、不適切表現その他の問題が判明した場合</li>
-          <li>当サイトが修正の必要があると判断した場合</li>
         </ul>
       </section>
 
       <section>
         <h2>3. 訂正・修正の方法</h2>
-        <p>当サイトは、誤りや問題の内容に応じて、次の方法のいずれか、または複数の方法により対応します。</p>
-
         <h3>（1）軽微な修正</h3>
         <p>誤字、脱字、表記ゆれ、リンク修正など、記事の趣旨や事実認識に大きな影響を与えない軽微な修正については、原則として個別の注記を付さずに修正する場合があります。</p>
-
         <h3>（2）内容に影響する修正</h3>
         <p>記事の意味、事実関係、読者の理解に一定の影響を与える修正については、必要に応じて記事内に修正または追記を明記します。</p>
-
         <h3>（3）重要な訂正</h3>
-        <p>記事の核心部分に関わる誤り、誤解を生じさせる重大な誤記、社会的影響が大きい誤り等については、記事内または当サイトが適切と判断する方法により、訂正の事実を明示します。</p>
-
+        <p>記事の核心部分に関わる誤り、誤解を生じさせる重大な誤記等については、記事内または当サイトが適切と判断する方法により、訂正の事実を明示します。</p>
         <h3>（4）更新</h3>
         <p>新たな情報や追加情報が判明した場合は、訂正ではなく「更新」または「追記」として反映する場合があります。</p>
-
         <h3>（5）削除または非公開</h3>
-        <p>法的問題、権利侵害、安全上の問題、重大な誤りその他の事情により、記事の公開継続が適切でないと判断した場合は、記事の全部または一部を削除、非公開または差し替えすることがあります。</p>
+        <p>法的問題、権利侵害、重大な誤りその他の事情により、記事の公開継続が適切でないと判断した場合は、記事の全部または一部を削除、非公開または差し替えすることがあります。</p>
       </section>
 
       <section>
-        <h2>4. 記事の公開後更新について</h2>
-        <p>ニュース記事は、その性質上、公開時点では未確定の情報や速報段階の情報を含む場合があります。当サイトは、公開後に新たな事実関係、追加情報、当局発表、原文更新、関係者コメント等を確認した場合、記事内容を更新することがあります。このような更新は、誤りの訂正ではなく、情報の追加または整理として行われる場合があります。</p>
-      </section>
-
-      <section>
-        <h2>5. 翻訳記事に関する取り扱い</h2>
+        <h2>4. 翻訳記事に関する取り扱い</h2>
         <p>当サイトでは、外国語情報をもとに記事を作成または翻訳掲載する場合があります。翻訳記事については、次のような事情により修正を行う場合があります。</p>
         <ul>
           <li>原文の更新や差し替えが行われた場合</li>
           <li>初出時の翻訳表現が不正確であった場合</li>
           <li>地域差、制度差、文化差等により補足説明が必要と判断した場合</li>
-          <li>原文の趣旨をより適切に反映する必要がある場合</li>
         </ul>
-        <p>翻訳記事の修正は、誤訳の訂正だけでなく、表現の明確化、誤解防止、補足説明の追加を目的として行うことがあります。</p>
       </section>
 
       <section>
-        <h2>6. 削除依頼・訂正依頼について</h2>
-        <p>当サイトでは、記事内容に関するご指摘、訂正のご連絡、権利侵害の申し出、削除依頼等を受け付けます。ご連絡の際は、できるだけ次の情報をご記載ください。</p>
+        <h2>5. 削除依頼・訂正依頼について</h2>
+        <p>記事内容に関するご指摘、訂正のご連絡、削除依頼等はお問い合わせフォームよりお送りください。ご連絡の際は、できるだけ次の情報をご記載ください。</p>
         <ul>
           <li>対象記事のURL</li>
           <li>記事タイトル</li>
-          <li>問題箇所</li>
-          <li>ご指摘内容</li>
+          <li>問題箇所とご指摘内容</li>
           <li>根拠となる情報または資料</li>
           <li>ご連絡先</li>
         </ul>
-        <p>これらの情報が不足している場合、確認や対応に時間を要することがあります。</p>
       </section>
 
       <section>
-        <h2>7. 対応の判断について</h2>
-        <p>当サイトは、寄せられたご指摘やご意見を参考に確認を行いますが、すべてのご連絡に対して個別に回答または修正を行うことを保証するものではありません。また、当サイトは、訂正、修正、追記、削除その他の対応の要否、方法、時期および掲載形式について、編集上および運営上の判断に基づき決定します。</p>
+        <h2>6. 対応の判断について</h2>
+        <p>当サイトは、寄せられたご指摘やご意見を参考に確認を行いますが、すべてのご連絡に対して個別に回答または修正を行うことを保証するものではありません。対応の要否、方法、時期については、編集上および運営上の判断に基づき決定します。</p>
       </section>
 
       <section>
-        <h2>8. 回答および対応に関する注意事項</h2>
-        <ul>
-          <li>ご連絡の内容、件数、確認状況その他の事情により、回答までお時間をいただく場合や、回答を差し上げられない場合があります。</li>
-          <li>土曜、日曜、祝日、年末年始、その他休業期間中にいただいたご連絡は、翌営業日以降の確認となる場合があります。</li>
-          <li>お寄せいただいた情報は、確認、調査、対応、記録その他これらに付随する目的で利用します。</li>
-        </ul>
+        <h2>7. 過去記事の取り扱い</h2>
+        <p>過去記事については、掲載後の事情変更により、現在の状況と一致しない場合があります。過去記事のすべてについて、常に最新情報へ更新することを保証するものではありません。</p>
       </section>
 
       <section>
-        <h2>9. 過去記事の取り扱い</h2>
-        <p>当サイトに掲載される記事は、公開時点の情報、状況、発表等に基づいて作成される場合があります。そのため、過去記事については、掲載後の事情変更により、現在の状況と一致しない場合があります。過去記事のすべてについて、常に最新情報へ更新することを保証するものではありません。</p>
-      </section>
-
-      <section>
-        <h2>10. 外部情報源について</h2>
-        <p>当サイトは、官公庁、企業、団体、通信社、報道機関、公開資料その他外部情報源に基づいて記事を作成する場合があります。外部情報源に誤り、更新、削除、訂正等が生じた場合、それに応じて当サイトの記事も修正または更新される場合があります。</p>
-      </section>
-
-      <section>
-        <h2>11. 本ポリシーの変更</h2>
+        <h2>8. 本ポリシーの変更</h2>
         <p>当サイトは、必要に応じて本ポリシーを改定することがあります。変更後の内容は、当サイト上に掲載した時点から適用されるものとします。</p>
       </section>
 
       <section>
-        <h2>12. お問い合わせ窓口</h2>
-        <p>記事の訂正・修正・削除に関するご連絡は、以下よりお願いいたします。</p>
+        <h2>9. お問い合わせ窓口</h2>
         <table class="info-table">
-          <tr>
-            <th>運営者</th>
-            <td>The Dexent Media Enterprises</td>
-          </tr>
-          <tr>
-            <th>お問い合わせ</th>
-            <td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td>
-          </tr>
+          <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
+          <tr><th>お問い合わせ</th><td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td></tr>
         </table>
       </section>
 
@@ -148,81 +122,17 @@ const pageTitle = titles[lang] ?? titles['en'];
 </Layout>
 
 <style>
-  .info-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .info-title {
-    font-size: 26px;
-    color: #1a1a1a;
-    margin: 0 0 8px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #872732;
-  }
-  .update-date {
-    font-size: 13px;
-    color: #888;
-    margin: 0 0 24px;
-  }
-  .info-content section {
-    margin-bottom: 32px;
-  }
-  .info-content h2 {
-    font-size: 18px;
-    color: #1a1a1a;
-    margin: 0 0 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #872732;
-  }
-  .info-content h3 {
-    font-size: 15px;
-    color: #333;
-    margin: 16px 0 8px;
-    font-weight: bold;
-  }
-  .info-content p {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    margin-bottom: 12px;
-  }
-  .info-content ul {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    padding-left: 24px;
-    margin-bottom: 12px;
-  }
-  .info-content a {
-    color: #872732;
-    text-decoration: underline;
-  }
-  .info-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    margin-top: 8px;
-  }
-  .info-table th {
-    width: 140px;
-    padding: 10px 16px;
-    background: #f8f4f4;
-    color: #555;
-    font-weight: bold;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .info-table td {
-    padding: 10px 16px;
-    border: 1px solid #e5e7eb;
-    color: #1a1a1a;
-  }
-
-  @media (max-width: 600px) {
-    .info-container { padding: 20px 16px; }
-    .info-table th { width: 100px; font-size: 13px; }
-  }
+  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 8px; padding-bottom: 12px; border-bottom: 3px solid #872732; }
+  .update-date { font-size: 13px; color: #888; margin: 0 0 24px; }
+  .info-content section { margin-bottom: 32px; }
+  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid #872732; }
+  .info-content h3 { font-size: 15px; color: #333; margin: 16px 0 8px; font-weight: bold; }
+  .info-content p { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
+  .info-content ul { font-size: 15px; line-height: 1.9; color: #333; padding-left: 24px; margin-bottom: 12px; }
+  .info-content a { color: #872732; text-decoration: underline; }
+  .info-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  .info-table th { width: 140px; padding: 10px 16px; background: #f8f4f4; color: #555; font-weight: bold; border: 1px solid #e5e7eb; text-align: left; white-space: nowrap; }
+  .info-table td { padding: 10px 16px; border: 1px solid #e5e7eb; color: #1a1a1a; }
+  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-table th { width: 100px; font-size: 13px; } }
 </style>
