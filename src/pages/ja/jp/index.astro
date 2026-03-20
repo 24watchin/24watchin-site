@@ -4,7 +4,7 @@ import CategoryNews from '../../../components/CategoryNews.astro';
 import MainNewsLayout from '../../../components/MainNewsLayout.astro';
 import TrendScroll from '../../../components/TrendScroll.astro';
 import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
-import GlobalRegionNews from '../../../components/GlobalRegionNews.astro'; // 新しい部品をインポート
+import GlobalRegionNews from '../../../components/GlobalRegionNews.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels';
 
 const API_KEY = import.meta.env.API_KEY;
@@ -15,29 +15,23 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
-// 現在の言語設定（このファイルは日本語版なので 'ja'）
 const lang = 'ja';
 
-// 海外タグが付いているかチェックする関数
+// 海外記事（ja-twなど）をメイングリッドに出さないための判定
+// タグが「ja-〇〇」かつ「ja-jp」ではない場合、海外記事とみなします
 const isForeignPost = (post) => {
   if (!post.labels) return false;
-  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+  return post.labels.some(label => /^ja-[a-z]{2}$/.test(label) && label !== 'ja-jp');
 };
 
-// 日本国内向けのクリーンな記事リスト
 const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
 
-// カテゴリー別に記事を抽出する関数
 const filterByCategory = (slug, count = 3) => {
   const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
-
-  return mainSitePosts.filter(post => {
-    if (!post.labels) return false;
-    return post.labels.some(label => 
-      keywords.some(key => label.includes(key))
-    );
-  }).slice(0, count);
+  return mainSitePosts.filter(post => 
+    post.labels?.some(label => keywords.some(key => label.includes(key)))
+  ).slice(0, count);
 };
 ---
 
@@ -67,20 +61,12 @@ const filterByCategory = (slug, count = 3) => {
   <GoogleAdBanner position="下部" />
 
   <div slot="bottom-wide">
-    {/* これ1行で、地域ニュースが全自動（言語・国フィルター付き）で表示されます */}
+    {/* ja-tw, ja-us などの記事がある時だけ自動でセクションを表示します */}
     <GlobalRegionNews lang={lang} allPosts={allPosts} />
   </div>
-
 </Layout>
 
 <style>
-  .genre-grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 30px; 
-    margin-top: 20px; 
-  }
-  @media (max-width: 900px) { 
-    .genre-grid { grid-template-columns: 1fr; } 
-  }
+  .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
+  @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
 </style>
