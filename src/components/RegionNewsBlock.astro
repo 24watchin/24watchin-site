@@ -1,11 +1,15 @@
 ---
+import { categoryLabelMap } from '../lib/categoryLabels';
+
 const { lang = 'ja', title, cityData = [] } = Astro.props;
 
+// 表示用画像の取得
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/124x83/eeeeee/999999?text=No+Image';
 };
 
+// 時刻のフォーマット
 const formatPostTime = (dateString) => {
   if (!dateString) return '';
   try {
@@ -15,14 +19,27 @@ const formatPostTime = (dateString) => {
   } catch { return ''; }
 };
 
+// 【修正：categoryLabels.ts に基づきカテゴリ名だけを表示するロジック】
 const getDisplayCategory = (post) => {
   const labels = post?.labels || [];
-  const visibleLabel = labels.find((label) => {
+  
+  // categoryLabels.ts から、現在の言語における正式なカテゴリ名リストを取得します
+  const langConfig = categoryLabelMap[lang] || categoryLabelMap['en'];
+  const validCategoryNames = langConfig.allCategories.map(cat => cat.label);
+
+  // 1. ラベルの中から、正式なカテゴリ名（政治、社会など）と完全一致するものを探します
+  const categoryLabel = labels.find(label => validCategoryNames.includes(label));
+  
+  if (categoryLabel) return categoryLabel;
+
+  // 2. 見つからない場合のフォールバック（国コードタグ ja-tw 等は除外して最初の文字を返す）
+  const fallbackLabel = labels.find(label => {
     if (!label) return false;
-    if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false;
+    if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false; 
     return true;
   });
-  return visibleLabel || (lang === 'ja' ? 'ニュース' : 'News');
+
+  return fallbackLabel || (lang === 'ja' ? 'ニュース' : 'News');
 };
 ---
 
@@ -64,23 +81,24 @@ const getDisplayCategory = (post) => {
 </section>
 
 <style>
-  .region-section { width: 100%; margin-bottom: 10px; } /* 地域間の間隔を狭く  */
+  /* 鳴川さんの指示によるタイトなレイアウト調整 */
+  .region-section { width: 100%; margin-bottom: 10px; }
   .region-header { margin-bottom: 12px; }
-  .region-title { margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #111; }
+  .region-title { margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #111111; }
   .region-line { width: 100%; height: 3px; background: #872732; }
-  .city-groups { display: flex; flex-direction: column; gap: 8px; } /* 国ごとの列の間隔  */
+  .city-groups { display: flex; flex-direction: column; gap: 8px; }
   .city-block { width: 100%; padding: 4px 0; }
-  .city-name { font-size: 15px; font-weight: bold; color: #333; margin: 0 0 8px 0; padding-left: 8px; border-left: 4px solid #d9d9d9; }
+  .city-name { font-size: 15px; font-weight: bold; color: #333333; margin: 0 0 8px 0; padding-left: 8px; border-left: 4px solid #d9d9d9; }
   .article-3-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
-  .news-item { display: flex; align-items: flex-start; gap: 12px; text-decoration: none; color: #111; }
+  .news-item { display: flex; align-items: flex-start; gap: 12px; text-decoration: none; color: #111111; }
   .media-column { width: 116px; flex-shrink: 0; }
-  .thumbnail { width: 116px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eee; }
+  .thumbnail { width: 116px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eeeeee; }
   .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
   .image-date-row { margin-top: 2px; text-align: right; }
   .info { min-width: 0; flex: 1; }
   .news-title { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 700; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
   .category-row { margin-top: 4px; text-align: right; }
-  .category-badge { padding: 1px 6px; background: #4d4d4d; color: #fff; font-size: 13px; border-radius: 2px; }
+  .category-badge { padding: 1px 6px; background: #4d4d4d; color: #ffffff; font-size: 13px; border-radius: 2px; }
   .post-time { font-size: 13px; color: #8a8a8a; }
 
   @media (max-width: 1024px) { .article-3-grid { grid-template-columns: 1fr 1fr; } }
