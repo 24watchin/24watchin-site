@@ -3,13 +3,11 @@ import RegionNewsBlock from './RegionNewsBlock.astro';
 
 const { lang = 'ja', country = '', allPosts = [] } = Astro.props;
 
-// 言語-国 の形式でフィルタリング（例: ja-tw）
 const filterByCountryTag = (countryCode, count = 3) => {
   const tag = `${lang}-${countryCode}`;
   return allPosts.filter(post => post.labels?.includes(tag)).slice(0, count);
 };
 
-// 【親タイトル：24Watchin Global News】（アポストロフィなし）
 const parentTitles = {
   ja: '24Watchin Global News',
   en: '24Watchin Global News',
@@ -21,7 +19,6 @@ const parentTitles = {
   'zh-cn': '24Watchin 全球新闻'
 };
 
-// 【各地域の「版」名称テーブル：マスター表を反映】
 const regionNameTable = {
   asia: { ja: 'アジア版', en: 'Asia Edition', fr: 'Édition Asie', de: 'Asien-Ausgabe', es: 'Edición Asia', ru: 'Азиатское издание', 'zh-tw': '亞洲版', 'zh-cn': '亚洲版' },
   europe: { ja: 'ヨーロッパ版', en: 'Europe Edition', fr: 'Édition Europe', de: 'Europa-Ausgabe', es: 'Edición Europa', ru: 'Европейское издание', 'zh-tw': '歐洲版', 'zh-cn': '欧洲版' },
@@ -65,17 +62,8 @@ const activeRegions = regionsTemplate.map(region => {
 )}
 
 <style>
-  .global-news-container { margin-top: 50px; width: 100%; }
+  /* ▼ ここの margin-top を 50px から 20px に減らしました */
+  .global-news-container { margin-top: 20px; width: 100%; }
   .parent-header { margin-bottom: 26px; border-bottom: 1px solid #ddd; padding-bottom: 12px; }
-  
-  /* 【修正】タイトルを20pxに、左側に太い赤線を追加 */
-  .parent-title { 
-    font-size: 20px; 
-    font-weight: 800; 
-    color: #111111; 
-    margin: 0; 
-    border-left: 6px solid #872732; 
-    padding-left: 14px; 
-    line-height: 1.1;
-  }
+  .parent-title { font-size: 20px; font-weight: 800; color: #111111; margin: 0; border-left: 6px solid #872732; padding-left: 14px; line-height: 1.1; }
 </style>
