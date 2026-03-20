@@ -4,25 +4,30 @@ import CategoryNews from '../../../components/CategoryNews.astro';
 import MainNewsLayout from '../../../components/MainNewsLayout.astro';
 import TrendScroll from '../../../components/TrendScroll.astro';
 import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
-import RegionNewsBlock from '../../../components/RegionNewsBlock.astro';
+import GlobalRegionNews from '../../../components/GlobalRegionNews.astro'; // 新しい部品をインポート
 import { categoryLabelMap } from '../../../lib/categoryLabels';
 
 const API_KEY = import.meta.env.API_KEY;
-// ▼ ここを成功している部品と同じ「BLOG_ID」に合わせました
 const BLOG_ID = import.meta.env.BLOG_ID;
-
 const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+
 const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
+// 現在の言語設定（このファイルは日本語版なので 'ja'）
+const lang = 'ja';
+
+// 海外タグが付いているかチェックする関数
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
+// 日本国内向けのクリーンな記事リスト
 const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
 
+// カテゴリー別に記事を抽出する関数
 const filterByCategory = (slug, count = 3) => {
   const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
@@ -32,13 +37,6 @@ const filterByCategory = (slug, count = 3) => {
     return post.labels.some(label => 
       keywords.some(key => label.includes(key))
     );
-  }).slice(0, count);
-};
-
-const filterByCountryTag = (tag, count = 3) => {
-  return allPosts.filter(post => {
-    if (!post.labels) return false;
-    return post.labels.includes(tag);
   }).slice(0, count);
 };
 ---
@@ -68,25 +66,21 @@ const filterByCountryTag = (tag, count = 3) => {
 
   <GoogleAdBanner position="下部" />
 
-  <div slot="bottom-wide" class="region-section-container">
-    <RegionNewsBlock 
-      title="アメリカ" 
-      cityData={[{ posts: filterByCountryTag("us-ja", 3) }]} 
-    />
-    <RegionNewsBlock 
-      title="台湾" 
-      cityData={[{ posts: filterByCountryTag("tw-ja", 3) }]} 
-    />
-    <RegionNewsBlock 
-      title="ドイツ" 
-      cityData={[{ posts: filterByCountryTag("de-ja", 3) }]} 
-    />
+  <div slot="bottom-wide">
+    {/* これ1行で、地域ニュースが全自動（言語・国フィルター付き）で表示されます */}
+    <GlobalRegionNews lang={lang} allPosts={allPosts} />
   </div>
 
 </Layout>
 
 <style>
-  .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
-  @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
-  .region-section-container { margin-top: 40px; width: 100%; }
+  .genre-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 30px; 
+    margin-top: 20px; 
+  }
+  @media (max-width: 900px) { 
+    .genre-grid { grid-template-columns: 1fr; } 
+  }
 </style>
