@@ -1,37 +1,26 @@
 ---
-// 関連記事を表示する部品を読み込みます
-import RelatedArticles from './RelatedArticles.astro';
-
-// ▼ 【修正】古い SidebarAd を消して、新しい GoogleAdBanner を読み込みます
+// ▼ エラーの原因だった RelatedArticles を一旦削除しました
 import GoogleAdBanner from './GoogleAdBanner.astro';
-
-// 人気記事ランキングを読み込みます
 import AccessRanking from './AccessRanking.astro';
 ---
 
 <div class="sidebar-wrapper">
-  {/* 1. 一番上に関連記事を表示します */}
-  <RelatedArticles />
-
-  {/* 2. その下に本物の広告を表示します */}
+  {/* 1. 上部に本物の広告を表示します */}
   <GoogleAdBanner />
 
-  {/* 3. 広告の下にランキングを表示します */}
+  {/* 2. その下にランキングを表示します */}
   <AccessRanking />
 </div>
 
 <style>
-  /* サイドバー全体を整列させるための設定です */
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 40px; /* パーツ間の隙間を40px空けます */
+    gap: 40px;
     width: 100%;
     margin: 0;
     padding: 0;
   }
-
-  /* 中に入るパーツを100%の幅に揃えます */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
