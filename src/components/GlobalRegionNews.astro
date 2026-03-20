@@ -1,7 +1,7 @@
 ---
 import RegionNewsBlock from './RegionNewsBlock.astro';
 
-const { lang = 'ja', allPosts = [] } = Astro.props;
+const { lang = 'ja', country = '', allPosts = [] } = Astro.props;
 
 // 言語-国 の形式でフィルタリング（例: ja-tw）
 const filterByCountryTag = (countryCode, count = 3) => {
@@ -32,12 +32,15 @@ const regionsTemplate = [
   }
 ];
 
-// 記事がある国だけ抽出し、国が1つもなくなった地域はタイトルごと消去する
+// 現在の国(jp)を除外し、かつ記事が存在する国・地域だけを抽出
 const activeRegions = regionsTemplate.map(region => {
-  const activeCities = region.cities.map(city => ({
-    ...city,
-    posts: filterByCountryTag(city.code)
-  })).filter(city => city.posts.length > 0);
+  const activeCities = region.cities
+    .filter(city => city.code !== country) // 現在の国を表示しない
+    .map(city => ({
+      ...city,
+      posts: filterByCountryTag(city.code)
+    }))
+    .filter(city => city.posts.length > 0);
 
   return { ...region, cities: activeCities };
 }).filter(region => region.cities.length > 0);
@@ -54,5 +57,5 @@ const activeRegions = regionsTemplate.map(region => {
 </div>
 
 <style>
-  .region-section-container { margin-top: 40px; width: 100%; }
+  .region-section-container { margin-top: 30px; width: 100%; }
 </style>
