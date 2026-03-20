@@ -4,6 +4,7 @@ import Layout from '../../../layouts/Layout.astro';
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || 'jp';
 
 const titles: Record<string, string> = {
   ja: 'お問い合わせ',
@@ -16,35 +17,501 @@ const titles: Record<string, string> = {
   'zh-tw': '聯絡我們',
 };
 
+const descriptions: Record<string, string> = {
+  ja: '24Watchinへのお問い合わせはこちらから。記事の訂正・転載・著作権などもお気軽にどうぞ。',
+  en: 'Contact 24Watchin here. Feel free to reach out about article corrections, reprints, copyright, and more.',
+  de: 'Kontaktieren Sie 24Watchin hier.',
+  fr: 'Contactez 24Watchin ici.',
+  es: 'Contacte a 24Watchin aquí.',
+  ru: 'Свяжитесь с 24Watchin здесь.',
+  'zh-cn': '在这里联系24Watchin。',
+  'zh-tw': '在這裡聯絡24Watchin。',
+};
+
+// 言語別テキスト
+const t: Record<string, Record<string, string>> = {
+  ja: {
+    intro1: '24Watchinをご利用いただきありがとうございます。当サイトに関するご意見、ご感想、お問い合わせは、下記フォームよりご連絡ください。',
+    intro2: '記事内容に関するご意見・ご指摘、訂正のご連絡、著作権・転載に関するお問い合わせ、広告掲載・提携に関するご相談などを受け付けています。',
+    beforeTitle: 'お問い合わせの前にご確認ください',
+    before1: 'お問い合わせの内容、件数、確認状況その他の事情により、回答までお時間をいただく場合や、回答を差し上げられない場合があります。',
+    before2: '土曜、日曜、祝日、年末年始にいただいたお問い合わせは、翌営業日以降の確認となる場合があります。',
+    before3: '当サイトからの回答内容について、無断で転載、引用、再配布することはご遠慮ください。',
+    before4: '営業・勧誘・宣伝のみを目的とした送信については、回答いたしかねる場合があります。',
+    privacyTitle: '個人情報の取り扱いについて',
+    privacyText: 'お問い合わせフォームにご入力いただいた情報は、お問い合わせへの対応、内容の確認、必要なご連絡その他これらに付随する目的のために利用します。詳細については',
+    privacyLink: 'プライバシーポリシー',
+    privacyEnd: 'をご確認ください。',
+    formTitle: 'お問い合わせフォーム',
+    typeLabel: 'お問い合わせの種類',
+    typePlaceholder: '選択してください',
+    typeOptions: ['一般のお問い合わせ', '記事内容に関するご意見・ご指摘', '訂正・修正のご連絡', '著作権・転載・引用に関するお問い合わせ', '画像・写真・掲載素材に関するお問い合わせ', '個人情報の取り扱いに関するお問い合わせ', '広告掲載・提携に関するお問い合わせ', 'その他'],
+    nameLabel: 'お名前',
+    namePlaceholder: '例：山田 太郎',
+    emailLabel: '連絡可能なメールアドレス',
+    emailPlaceholder: '例：example@email.com',
+    companyLabel: '会社名・団体名',
+    companyPlaceholder: '例：株式会社〇〇',
+    subjectLabel: '件名',
+    subjectPlaceholder: '例：記事について',
+    urlLabel: '対象ページURL',
+    urlPlaceholder: '例：https://24watchin.com/...',
+    urlNote: '記事やページについてのお問い合わせの場合は、該当URLをご記入ください。',
+    messageLabel: 'お問い合わせ内容',
+    messagePlaceholder: 'できるだけ具体的にご記入ください。',
+    agreementText: 'ご入力いただいた情報の取り扱いについて、プライバシーポリシーを確認し、同意します。',
+    submitBtn: '送信する',
+    sending: '送信中...',
+    required: '必須',
+    optional: '任意',
+    successTitle: 'お問い合わせを受け付けました。',
+    successText: '内容を確認のうえ、必要に応じてご連絡いたします。',
+    errorText: '送信に失敗しました。時間をおいて再度お試しください。',
+  },
+  en: {
+    intro1: 'Thank you for using 24Watchin. Please use the form below to send us your questions, opinions, or feedback.',
+    intro2: 'We accept inquiries about article content, corrections, copyright and reprints, advertising, and more.',
+    beforeTitle: 'Before You Contact Us',
+    before1: 'Depending on the nature and volume of inquiries, we may not be able to respond to every message.',
+    before2: 'Inquiries received on weekends or holidays will be addressed on the next business day.',
+    before3: 'Please do not reprint or redistribute our responses without permission.',
+    before4: 'We may not respond to messages sent solely for promotional or solicitation purposes.',
+    privacyTitle: 'Privacy',
+    privacyText: 'Information you submit will be used to respond to your inquiry. For details, please see our',
+    privacyLink: 'Privacy Policy',
+    privacyEnd: '.',
+    formTitle: 'Contact Form',
+    typeLabel: 'Type of Inquiry',
+    typePlaceholder: 'Please select',
+    typeOptions: ['General Inquiry', 'Opinion / Feedback on Article', 'Correction Request', 'Copyright / Reprint Inquiry', 'Image / Media Inquiry', 'Privacy Inquiry', 'Advertising / Partnership', 'Other'],
+    nameLabel: 'Your Name',
+    namePlaceholder: 'e.g. John Smith',
+    emailLabel: 'Email Address',
+    emailPlaceholder: 'e.g. example@email.com',
+    companyLabel: 'Company / Organization',
+    companyPlaceholder: 'e.g. Example Inc.',
+    subjectLabel: 'Subject',
+    subjectPlaceholder: 'e.g. About an article',
+    urlLabel: 'Relevant Page URL',
+    urlPlaceholder: 'e.g. https://24watchin.com/...',
+    urlNote: 'If your inquiry is about a specific page or article, please include the URL.',
+    messageLabel: 'Message',
+    messagePlaceholder: 'Please describe your inquiry in detail.',
+    agreementText: 'I have read and agree to the Privacy Policy regarding the handling of my information.',
+    submitBtn: 'Send',
+    sending: 'Sending...',
+    required: 'Required',
+    optional: 'Optional',
+    successTitle: 'Your message has been received.',
+    successText: 'We will review your inquiry and get back to you if needed.',
+    errorText: 'Failed to send. Please try again later.',
+  },
+  de: {
+    intro1: 'Vielen Dank für Ihre Nutzung von 24Watchin. Nutzen Sie das untenstehende Formular für Fragen, Meinungen oder Feedback.',
+    intro2: 'Wir nehmen Anfragen zu Artikelinhalten, Korrekturen, Urheberrecht, Werbung und mehr entgegen.',
+    beforeTitle: 'Hinweise vor der Kontaktaufnahme',
+    before1: 'Je nach Art und Umfang der Anfragen können wir möglicherweise nicht auf jede Nachricht antworten.',
+    before2: 'An Wochenenden oder Feiertagen eingegangene Anfragen werden am nächsten Werktag bearbeitet.',
+    before3: 'Bitte geben Sie unsere Antworten nicht ohne Genehmigung weiter.',
+    before4: 'Auf rein werbliche Nachrichten werden wir möglicherweise nicht antworten.',
+    privacyTitle: 'Datenschutz',
+    privacyText: 'Die von Ihnen übermittelten Informationen werden zur Bearbeitung Ihrer Anfrage verwendet. Weitere Informationen finden Sie in unserer',
+    privacyLink: 'Datenschutzrichtlinie',
+    privacyEnd: '.',
+    formTitle: 'Kontaktformular',
+    typeLabel: 'Art der Anfrage',
+    typePlaceholder: 'Bitte wählen',
+    typeOptions: ['Allgemeine Anfrage', 'Meinung / Feedback zum Artikel', 'Korrekturanfrage', 'Urheberrecht / Nachdruck', 'Bild / Medienanfrage', 'Datenschutzanfrage', 'Werbung / Partnerschaft', 'Sonstiges'],
+    nameLabel: 'Ihr Name',
+    namePlaceholder: 'z.B. Max Mustermann',
+    emailLabel: 'E-Mail-Adresse',
+    emailPlaceholder: 'z.B. beispiel@email.com',
+    companyLabel: 'Unternehmen / Organisation',
+    companyPlaceholder: 'z.B. Musterfirma GmbH',
+    subjectLabel: 'Betreff',
+    subjectPlaceholder: 'z.B. Über einen Artikel',
+    urlLabel: 'Relevante Seiten-URL',
+    urlPlaceholder: 'z.B. https://24watchin.com/...',
+    urlNote: 'Falls Ihre Anfrage eine bestimmte Seite betrifft, geben Sie bitte die URL an.',
+    messageLabel: 'Nachricht',
+    messagePlaceholder: 'Bitte beschreiben Sie Ihre Anfrage ausführlich.',
+    agreementText: 'Ich habe die Datenschutzrichtlinie gelesen und stimme der Verarbeitung meiner Daten zu.',
+    submitBtn: 'Senden',
+    sending: 'Wird gesendet...',
+    required: 'Pflichtfeld',
+    optional: 'Optional',
+    successTitle: 'Ihre Nachricht wurde empfangen.',
+    successText: 'Wir werden Ihre Anfrage prüfen und uns bei Bedarf melden.',
+    errorText: 'Senden fehlgeschlagen. Bitte versuchen Sie es später erneut.',
+  },
+  fr: {
+    intro1: 'Merci d\'utiliser 24Watchin. Veuillez utiliser le formulaire ci-dessous pour vos questions, opinions ou commentaires.',
+    intro2: 'Nous acceptons les demandes concernant les articles, les corrections, le droit d\'auteur, la publicité et plus encore.',
+    beforeTitle: 'Avant de nous contacter',
+    before1: 'Selon la nature des demandes, il est possible que nous ne puissions pas répondre à chaque message.',
+    before2: 'Les demandes reçues le week-end ou les jours fériés seront traitées le prochain jour ouvrable.',
+    before3: 'Veuillez ne pas reproduire nos réponses sans autorisation.',
+    before4: 'Nous ne répondrons pas aux messages à des fins purement publicitaires.',
+    privacyTitle: 'Confidentialité',
+    privacyText: 'Les informations soumises seront utilisées pour répondre à votre demande. Pour plus de détails, veuillez consulter notre',
+    privacyLink: 'Politique de confidentialité',
+    privacyEnd: '.',
+    formTitle: 'Formulaire de contact',
+    typeLabel: 'Type de demande',
+    typePlaceholder: 'Veuillez sélectionner',
+    typeOptions: ['Demande générale', 'Opinion / Commentaire sur article', 'Demande de correction', 'Droit d\'auteur / Reproduction', 'Demande image / médias', 'Demande confidentialité', 'Publicité / Partenariat', 'Autre'],
+    nameLabel: 'Votre nom',
+    namePlaceholder: 'ex. Jean Dupont',
+    emailLabel: 'Adresse e-mail',
+    emailPlaceholder: 'ex. exemple@email.com',
+    companyLabel: 'Entreprise / Organisation',
+    companyPlaceholder: 'ex. Société Exemple',
+    subjectLabel: 'Objet',
+    subjectPlaceholder: 'ex. À propos d\'un article',
+    urlLabel: 'URL de la page concernée',
+    urlPlaceholder: 'ex. https://24watchin.com/...',
+    urlNote: 'Si votre demande concerne une page spécifique, veuillez inclure l\'URL.',
+    messageLabel: 'Message',
+    messagePlaceholder: 'Veuillez décrire votre demande en détail.',
+    agreementText: 'J\'ai lu et j\'accepte la politique de confidentialité concernant le traitement de mes informations.',
+    submitBtn: 'Envoyer',
+    sending: 'Envoi en cours...',
+    required: 'Requis',
+    optional: 'Optionnel',
+    successTitle: 'Votre message a été reçu.',
+    successText: 'Nous examinerons votre demande et vous contacterons si nécessaire.',
+    errorText: 'Échec de l\'envoi. Veuillez réessayer plus tard.',
+  },
+  es: {
+    intro1: 'Gracias por usar 24Watchin. Use el formulario a continuación para enviar sus preguntas, opiniones o comentarios.',
+    intro2: 'Aceptamos consultas sobre contenido de artículos, correcciones, derechos de autor, publicidad y más.',
+    beforeTitle: 'Antes de contactarnos',
+    before1: 'Dependiendo de la naturaleza de las consultas, es posible que no podamos responder a cada mensaje.',
+    before2: 'Las consultas recibidas en fines de semana o días festivos se atenderán el siguiente día hábil.',
+    before3: 'Por favor, no reproduzca nuestras respuestas sin permiso.',
+    before4: 'Es posible que no respondamos mensajes enviados únicamente con fines promocionales.',
+    privacyTitle: 'Privacidad',
+    privacyText: 'La información enviada se utilizará para responder a su consulta. Para más detalles, consulte nuestra',
+    privacyLink: 'Política de privacidad',
+    privacyEnd: '.',
+    formTitle: 'Formulario de contacto',
+    typeLabel: 'Tipo de consulta',
+    typePlaceholder: 'Por favor seleccione',
+    typeOptions: ['Consulta general', 'Opinión / Comentario sobre artículo', 'Solicitud de corrección', 'Derechos de autor / Reproducción', 'Consulta de imagen / medios', 'Consulta de privacidad', 'Publicidad / Asociación', 'Otro'],
+    nameLabel: 'Su nombre',
+    namePlaceholder: 'ej. Juan García',
+    emailLabel: 'Correo electrónico',
+    emailPlaceholder: 'ej. ejemplo@email.com',
+    companyLabel: 'Empresa / Organización',
+    companyPlaceholder: 'ej. Empresa Ejemplo S.A.',
+    subjectLabel: 'Asunto',
+    subjectPlaceholder: 'ej. Sobre un artículo',
+    urlLabel: 'URL de la página relacionada',
+    urlPlaceholder: 'ej. https://24watchin.com/...',
+    urlNote: 'Si su consulta es sobre una página específica, incluya la URL.',
+    messageLabel: 'Mensaje',
+    messagePlaceholder: 'Por favor describa su consulta en detalle.',
+    agreementText: 'He leído y acepto la Política de privacidad sobre el manejo de mi información.',
+    submitBtn: 'Enviar',
+    sending: 'Enviando...',
+    required: 'Requerido',
+    optional: 'Opcional',
+    successTitle: 'Su mensaje ha sido recibido.',
+    successText: 'Revisaremos su consulta y nos pondremos en contacto si es necesario.',
+    errorText: 'Error al enviar. Por favor intente de nuevo más tarde.',
+  },
+  ru: {
+    intro1: 'Спасибо за использование 24Watchin. Пожалуйста, используйте форму ниже для вопросов, мнений или отзывов.',
+    intro2: 'Мы принимаем запросы о содержании статей, исправлениях, авторских правах, рекламе и многом другом.',
+    beforeTitle: 'Перед обращением',
+    before1: 'В зависимости от характера запросов мы можем не иметь возможности ответить на каждое сообщение.',
+    before2: 'Запросы, полученные в выходные или праздничные дни, будут рассмотрены в следующий рабочий день.',
+    before3: 'Пожалуйста, не воспроизводите наши ответы без разрешения.',
+    before4: 'Мы можем не отвечать на сообщения, отправленные исключительно в рекламных целях.',
+    privacyTitle: 'Конфиденциальность',
+    privacyText: 'Предоставленная информация будет использована для ответа на ваш запрос. Подробности см. в нашей',
+    privacyLink: 'Политике конфиденциальности',
+    privacyEnd: '.',
+    formTitle: 'Форма обратной связи',
+    typeLabel: 'Тип запроса',
+    typePlaceholder: 'Пожалуйста, выберите',
+    typeOptions: ['Общий запрос', 'Мнение / Отзыв о статье', 'Запрос на исправление', 'Авторские права / Перепечатка', 'Запрос по изображениям', 'Запрос о конфиденциальности', 'Реклама / Партнёрство', 'Другое'],
+    nameLabel: 'Ваше имя',
+    namePlaceholder: 'напр. Иван Иванов',
+    emailLabel: 'Адрес электронной почты',
+    emailPlaceholder: 'напр. primer@email.com',
+    companyLabel: 'Компания / Организация',
+    companyPlaceholder: 'напр. ООО Пример',
+    subjectLabel: 'Тема',
+    subjectPlaceholder: 'напр. О статье',
+    urlLabel: 'URL соответствующей страницы',
+    urlPlaceholder: 'напр. https://24watchin.com/...',
+    urlNote: 'Если ваш запрос касается конкретной страницы, пожалуйста, укажите URL.',
+    messageLabel: 'Сообщение',
+    messagePlaceholder: 'Пожалуйста, опишите ваш запрос подробно.',
+    agreementText: 'Я прочитал(а) и согласен(на) с Политикой конфиденциальности в отношении обработки моих данных.',
+    submitBtn: 'Отправить',
+    sending: 'Отправка...',
+    required: 'Обязательно',
+    optional: 'Необязательно',
+    successTitle: 'Ваше сообщение получено.',
+    successText: 'Мы рассмотрим ваш запрос и свяжемся с вами при необходимости.',
+    errorText: 'Ошибка отправки. Пожалуйста, попробуйте позже.',
+  },
+  'zh-cn': {
+    intro1: '感谢您使用24Watchin。请使用下方表单发送您的问题、意见或反馈。',
+    intro2: '我们接受有关文章内容、更正、版权、广告等方面的咨询。',
+    beforeTitle: '联系我们之前请注意',
+    before1: '根据咨询的性质和数量，我们可能无法回复每一条消息。',
+    before2: '周末或节假日收到的咨询将在下一个工作日处理。',
+    before3: '请勿未经许可转载或引用我们的回复。',
+    before4: '纯粹以促销或招揽为目的的消息，我们可能不予回复。',
+    privacyTitle: '隐私说明',
+    privacyText: '您提交的信息将用于回复您的咨询。详情请参阅我们的',
+    privacyLink: '隐私政策',
+    privacyEnd: '。',
+    formTitle: '联系表单',
+    typeLabel: '咨询类型',
+    typePlaceholder: '请选择',
+    typeOptions: ['一般咨询', '文章意见/反馈', '更正请求', '版权/转载咨询', '图片/媒体咨询', '隐私咨询', '广告/合作', '其他'],
+    nameLabel: '您的姓名',
+    namePlaceholder: '例：张三',
+    emailLabel: '电子邮件地址',
+    emailPlaceholder: '例：example@email.com',
+    companyLabel: '公司/组织',
+    companyPlaceholder: '例：示例公司',
+    subjectLabel: '主题',
+    subjectPlaceholder: '例：关于某篇文章',
+    urlLabel: '相关页面URL',
+    urlPlaceholder: '例：https://24watchin.com/...',
+    urlNote: '如果您的咨询涉及特定页面，请提供URL。',
+    messageLabel: '消息内容',
+    messagePlaceholder: '请详细描述您的咨询。',
+    agreementText: '我已阅读并同意隐私政策关于我的信息处理的相关内容。',
+    submitBtn: '发送',
+    sending: '发送中...',
+    required: '必填',
+    optional: '选填',
+    successTitle: '您的消息已收到。',
+    successText: '我们将审核您的咨询，必要时与您联系。',
+    errorText: '发送失败。请稍后再试。',
+  },
+  'zh-tw': {
+    intro1: '感謝您使用24Watchin。請使用下方表單發送您的問題、意見或反饋。',
+    intro2: '我們接受有關文章內容、更正、版權、廣告等方面的諮詢。',
+    beforeTitle: '聯絡我們之前請注意',
+    before1: '根據諮詢的性質和數量，我們可能無法回覆每一條訊息。',
+    before2: '週末或節假日收到的諮詢將在下一個工作日處理。',
+    before3: '請勿未經許可轉載或引用我們的回覆。',
+    before4: '純粹以促銷或招攬為目的的訊息，我們可能不予回覆。',
+    privacyTitle: '隱私說明',
+    privacyText: '您提交的資訊將用於回覆您的諮詢。詳情請參閱我們的',
+    privacyLink: '隱私政策',
+    privacyEnd: '。',
+    formTitle: '聯絡表單',
+    typeLabel: '諮詢類型',
+    typePlaceholder: '請選擇',
+    typeOptions: ['一般諮詢', '文章意見/反饋', '更正請求', '版權/轉載諮詢', '圖片/媒體諮詢', '隱私諮詢', '廣告/合作', '其他'],
+    nameLabel: '您的姓名',
+    namePlaceholder: '例：張三',
+    emailLabel: '電子郵件地址',
+    emailPlaceholder: '例：example@email.com',
+    companyLabel: '公司/組織',
+    companyPlaceholder: '例：示例公司',
+    subjectLabel: '主題',
+    subjectPlaceholder: '例：關於某篇文章',
+    urlLabel: '相關頁面URL',
+    urlPlaceholder: '例：https://24watchin.com/...',
+    urlNote: '如果您的諮詢涉及特定頁面，請提供URL。',
+    messageLabel: '訊息內容',
+    messagePlaceholder: '請詳細描述您的諮詢。',
+    agreementText: '我已閱讀並同意隱私政策關於我的資訊處理的相關內容。',
+    submitBtn: '發送',
+    sending: '發送中...',
+    required: '必填',
+    optional: '選填',
+    successTitle: '您的訊息已收到。',
+    successText: '我們將審核您的諮詢，必要時與您聯絡。',
+    errorText: '發送失敗。請稍後再試。',
+  },
+};
+
+const tx = t[lang] ?? t['en'];
 const pageTitle = titles[lang] ?? titles['en'];
+const pageDescription = descriptions[lang] ?? descriptions['en'];
 ---
 
-<Layout title={pageTitle} sidebarType="article">
+<Layout title={pageTitle} description={pageDescription} sidebarType="article">
   <div class="info-container">
     <h1 class="info-title">{pageTitle}</h1>
     <div class="info-content">
-      <!-- ここに本文を入れてください -->
+
+      <p>{tx.intro1}</p>
+      <p>{tx.intro2}</p>
+
+      <section>
+        <h2>{tx.beforeTitle}</h2>
+        <ul>
+          <li>{tx.before1}</li>
+          <li>{tx.before2}</li>
+          <li>{tx.before3}</li>
+          <li>{tx.before4}</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>{tx.privacyTitle}</h2>
+        <p>
+          {tx.privacyText}
+          <a href={`/${lang}/${country}/privacy/`}>{tx.privacyLink}</a>
+          {tx.privacyEnd}
+        </p>
+      </section>
+
+      <section>
+        <h2>{tx.formTitle}</h2>
+
+        <div id="form-success" class="form-success" style="display:none;">
+          <p>✅ {tx.successTitle}</p>
+          <p>{tx.successText}</p>
+        </div>
+
+        <div id="form-error" class="form-error" style="display:none;">
+          <p>⚠️ {tx.errorText}</p>
+        </div>
+
+        <form id="contact-form" class="contact-form">
+
+          <div class="form-group">
+            <label class="form-label">
+              {tx.typeLabel} <span class="required">{tx.required}</span>
+            </label>
+            <select name="type" required class="form-select">
+              <option value="">{tx.typePlaceholder}</option>
+              {tx.typeOptions.map((opt: string) => (
+                <option value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{tx.nameLabel} <span class="required">{tx.required}</span></label>
+            <input type="text" name="name" required placeholder={tx.namePlaceholder} class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{tx.emailLabel} <span class="required">{tx.required}</span></label>
+            <input type="email" name="email" required placeholder={tx.emailPlaceholder} class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{tx.companyLabel} <span class="optional">{tx.optional}</span></label>
+            <input type="text" name="company" placeholder={tx.companyPlaceholder} class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{tx.subjectLabel} <span class="required">{tx.required}</span></label>
+            <input type="text" name="subject" required placeholder={tx.subjectPlaceholder} class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{tx.urlLabel} <span class="optional">{tx.optional}</span></label>
+            <input type="url" name="pageUrl" placeholder={tx.urlPlaceholder} class="form-input" />
+            <p class="form-note">{tx.urlNote}</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{tx.messageLabel} <span class="required">{tx.required}</span></label>
+            <textarea name="message" required rows={6} placeholder={tx.messagePlaceholder} class="form-textarea"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-checkbox">
+              <input type="checkbox" name="agreement" required />
+              <span>{tx.agreementText}</span>
+            </label>
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="submit-btn" id="submit-btn" data-send={tx.submitBtn} data-sending={tx.sending}>
+              {tx.submitBtn}
+            </button>
+          </div>
+
+        </form>
+      </section>
+
     </div>
   </div>
 </Layout>
 
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const successMsg = document.getElementById('form-success') as HTMLDivElement;
+  const errorMsg = document.getElementById('form-error') as HTMLDivElement;
+  const sendLabel = submitBtn.dataset.send || 'Send';
+  const sendingLabel = submitBtn.dataset.sending || 'Sending...';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = sendingLabel;
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
+
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        form.reset();
+        successMsg.style.display = 'block';
+        successMsg.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    } catch {
+      errorMsg.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = sendLabel;
+    }
+  });
+</script>
+
 <style>
-  .info-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .info-title {
-    font-size: 26px;
-    color: #1a1a1a;
-    margin: 0 0 16px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #872732;
-  }
-  .info-content {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #1a1a1a;
-  }
+  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 24px; padding-bottom: 12px; border-bottom: 3px solid #872732; }
+  .info-content section { margin-bottom: 32px; }
+  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid #872732; }
+  .info-content p { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
+  .info-content ul { font-size: 15px; line-height: 1.9; color: #333; padding-left: 24px; margin-bottom: 12px; }
+  .info-content a { color: #872732; text-decoration: underline; }
+  .contact-form { display: flex; flex-direction: column; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 14px; font-weight: bold; color: #1a1a1a; }
+  .required { background: #872732; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; }
+  .optional { background: #9ca3af; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; }
+  .form-input, .form-select, .form-textarea { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; color: #1a1a1a; transition: border-color 0.2s; width: 100%; box-sizing: border-box; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #872732; }
+  .form-textarea { resize: vertical; }
+  .form-note { font-size: 12px; color: #6b7280; margin: 4px 0 0; }
+  .form-checkbox { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #333; cursor: pointer; }
+  .form-checkbox input { margin-top: 3px; accent-color: #872732; }
+  .form-submit { display: flex; justify-content: center; margin-top: 8px; }
+  .submit-btn { background: #872732; color: #fff; border: none; padding: 14px 48px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+  .submit-btn:hover { background: #6e1f27; }
+  .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+  .form-success { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; }
+  .form-success p { color: #166534; font-size: 15px; margin: 0 0 6px; }
+  .form-error { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; }
+  .form-error p { color: #991b1b; font-size: 15px; margin: 0; }
+  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .submit-btn { width: 100%; } }
 </style>
