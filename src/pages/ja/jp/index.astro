@@ -5,7 +5,7 @@ import MainNewsLayout from '../../../components/MainNewsLayout.astro';
 import TrendScroll from '../../../components/TrendScroll.astro';
 import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
 import GlobalRegionNews from '../../../components/GlobalRegionNews.astro';
-import { categoryLabelMap } from '../../../lib/categoryLabels';
+import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
@@ -16,17 +16,20 @@ const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
 const lang = 'ja';
-const country = 'jp';
+const country = 'jp'; 
 
-const isForeignPost = (post) => {
+// ▼ 【重要な修正】「他国を弾く」のではなく「自国のタグ（ja-jp等）を必須とする」厳格なルールに変更
+const targetTag = `${lang}-${country}`;
+const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => /^ja-[a-z]{2}$/.test(label) && label !== 'ja-jp');
-};
+  // その記事のラベルの中に、確実に「ja-jp」が含まれている場合のみOKとする
+  return post.labels.includes(targetTag);
+});
 
-const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
-
+// ▼ （修正）言語キーが 'ja' の場合は categoryLabels の 'jp' を見に行くように安全対策
+const langKey = lang === 'ja' ? 'jp' : lang;
 const filterByCategory = (slug, count = 3) => {
-  const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
+  const catData = categoryLabelMap[langKey]?.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
   return mainSitePosts.filter(post => 
     post.labels?.some(label => keywords.some(key => label.includes(key)))
@@ -36,7 +39,8 @@ const filterByCategory = (slug, count = 3) => {
 
 <Layout title="日本のニュース" allPosts={allPosts}>
   <div slot="top-full">
-    <MainNewsLayout posts={mainSitePosts} />
+    {/* ▼ lang と country も渡すことで、他の国でも使い回せるようにしました */}
+    <MainNewsLayout posts={mainSitePosts} lang={lang} country={country} />
     <TrendScroll />
   </div>
 
