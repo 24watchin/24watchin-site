@@ -56,16 +56,16 @@ const getDisplayCategory = (post) => {
                 <div class="thumbnail">
                   <img src={getImageUrl(post.content)} alt={post.title} />
                 </div>
-                <div class="image-date-row">
-                  {post.published && (
-                    <span class="post-time">{formatPostTime(post.published)}</span>
-                  )}
-                </div>
+                {/* ▼ ここにあった日付を削除しました */}
               </div>
               <div class="info">
                 <h4 class="news-title">{post.title}</h4>
-                <div class="category-row">
+                {/* ▼ ここに「カテゴリ」と「日付」を横並びに配置しました */}
+                <div class="meta-row">
                   <span class="category-badge">{getDisplayCategory(post)}</span>
+                  {post.published && (
+                    <span class="post-time">{formatPostTime(post.published)}</span>
+                  )}
                 </div>
               </div>
             </a>
@@ -89,16 +89,26 @@ const getDisplayCategory = (post) => {
   .media-column { width: 116px; flex-shrink: 0; }
   .thumbnail { width: 116px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eeeeee; }
   .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-  .image-date-row { margin-top: 2px; text-align: right; }
-  .info { min-width: 0; flex: 1; }
+  
+  /* .image-date-row を削除しました */
+  
+  .info { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+  
   .news-title { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 700; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
   
-  /* ▼ ここが変更部分です。 text-align: right; を text-align: left; に変更しました */
-  .category-row { margin-top: 4px; text-align: left; }
+  /* ▼ ここが新しい横並びルールです */
+  .meta-row { 
+    margin-top: 6px; 
+    display: flex; 
+    justify-content: space-between; /* 両端に引き離す */
+    align-items: center; /* 縦のズレを揃える */
+  }
   
   .category-badge { padding: 1px 6px; background: #4d4d4d; color: #ffffff; font-size: 13px; border-radius: 2px; }
-  .post-time { font-size: 13px; color: #8a8a8a; }
+  
+  /* ▼ 日付の文字サイズを少し調整し、色を揃えました */
+  .post-time { font-size: 12px; color: #8a8a8a; }
 
   @media (max-width: 1024px) { .article-3-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 700px) { .article-3-grid { grid-template-columns: 1fr; } .media-column, .thumbnail, .image-date-row { width: 112px; } }
+  @media (max-width: 700px) { .article-3-grid { grid-template-columns: 1fr; } .media-column, .thumbnail { width: 112px; } }
 </style>
