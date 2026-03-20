@@ -1,5 +1,23 @@
 ---
-const { title, cityData = [] } = Astro.props;
+// lang: 現在の言語（ja, enなど）
+// title: 地域の名前（アジア、ヨーロッパなど）
+// cityData: その地域に属する国のデータの配列
+const { lang = 'ja', title, cityData = [] } = Astro.props;
+
+// --- 【重要】国と言語の対応表（ここで表示・非表示を管理します） ---
+const countrySupport: Record<string, string[]> = {
+  'jp': ['ja', 'en', 'zh-cn', 'zh-tw'], // 日本はこれらの言語に対応
+  'tw': ['ja', 'zh-tw', 'fr'],         // 台湾はこれらに対応
+  'de': ['ja', 'de', 'en'],            // ドイツはこれらに対応
+  'us': ['ja', 'en', 'es', 'fr', 'zh-cn'], // アメリカはこれらに対応
+  // 今後、国が増えたらここに行を追加するだけで自動でフィルタリングされます
+};
+
+// 現在の言語に対応している国だけを抽出する（フィルター）
+const filteredCities = cityData.filter(city => {
+  const supportedLangs = countrySupport[city.code] || ['ja']; // 基本は日本語のみ
+  return supportedLangs.includes(lang);
+});
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
@@ -9,15 +27,14 @@ const getImageUrl = (content) => {
 const formatPostTime = (dateString) => {
   if (!dateString) return '';
   try {
-    return new Date(dateString).toLocaleString('ja-JP', {
+    // 日時表示も言語に合わせるとより親切です
+    return new Date(dateString).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US', {
       month: 'numeric',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
     });
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 };
 
 const getDisplayCategory = (post) => {
@@ -25,60 +42,70 @@ const getDisplayCategory = (post) => {
   const visibleLabel = labels.find((label) => {
     if (!label) return false;
     if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false;
-    if (/^world-/i.test(label)) return false;
-    if (/-idw\d+$/i.test(label)) return false;
-    if (/^(soc|pol|eco|biz|tech|env|cul|spo|int)-/i.test(label)) return false;
     return true;
   });
-  return visibleLabel || 'ニュース';
+  return visibleLabel || (lang === 'ja' ? 'ニュース' : 'News');
 };
 ---
 
-<section class="region-section">
-  <div class="region-header">
-    <h2 class="region-title">{title}</h2>
-    <div class="region-line"></div>
-  </div>
+{filteredCities.length > 0 && (
+  <section class="region-section">
+    <div class="region-header">
+      <h2 class="region-title">{title}</h2>
+      <div class="region-line"></div>
+    </div>
 
-  <div class="city-groups">
-    {cityData.map((city) => (
-      <div class="city-block">
-        <div class="article-3-grid">
-          {city.posts.slice(0, 3).map((post) => (
-            <a href={`/ja/jp/news/${post.id}/`} class="news-item">
-              <div class="media-column">
-                <div class="thumbnail">
-                  <img src={getImageUrl(post.content)} alt={post.title} />
+    <div class="city-groups">
+      {filteredCities.map((city) => (
+        <div class="city-block">
+          {/* 国名を表示する小さな見出しを追加 */}
+          <h3 class="city-name">{city.name}</h3>
+          
+          <div class="article-3-grid">
+            {city.posts.slice(0, 3).map((post) => (
+              /* リンク先を現在の言語と国に動的に合わせる */
+              <a href={`/${lang}/${city.code}/news/${post.id}/`} class="news-item">
+                <div class="media-column">
+                  <div class="thumbnail">
+                    <img src={getImageUrl(post.content)} alt={post.title} />
+                  </div>
+                  <div class="image-date-row">
+                    {post.published && (
+                      <span class="post-time">{formatPostTime(post.published)}</span>
+                    )}
+                  </div>
                 </div>
-                <div class="image-date-row">
-                  {post.published && (
-                    <span class="post-time">{formatPostTime(post.published)}</span>
-                  )}
+                <div class="info">
+                  <h4 class="news-title">{post.title}</h4>
+                  <div class="category-row">
+                    <span class="category-badge">{getDisplayCategory(post)}</span>
+                  </div>
                 </div>
-              </div>
-              <div class="info">
-                <h4 class="news-title">{post.title}</h4>
-                <div class="category-row">
-                  <span class="category-badge">{getDisplayCategory(post)}</span>
-                </div>
-              </div>
-            </a>
-          ))}
+              </a>
+            ))}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-</section>
+      ))}
+    </div>
+  </section>
+)}
 
 <style>
   .region-section { width: 100%; margin-bottom: 56px; }
-  .region-section + .region-section { margin-top: 10px; }
   .region-header { margin-bottom: 18px; }
   .region-title { margin: 0 0 10px; font-size: 20px; line-height: 1.2; font-weight: 700; color: #111111; }
   .region-line { width: 100%; height: 4px; background: #872732; }
-  .city-groups { display: flex; flex-direction: column; gap: 0; }
+  
+  .city-groups { display: flex; flex-direction: column; gap: 24px; }
   .city-block { width: 100%; padding: 10px 0; }
-  .city-block + .city-block { border-top: 1px solid #d9d9d9; }
+  
+  /* 国名の見出しスタイル */
+  .city-name {
+    font-size: 16px; font-weight: bold; color: #333;
+    margin: 0 0 12px 0; padding-left: 8px;
+    border-left: 4px solid #d9d9d9;
+  }
+
   .article-3-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; }
   .news-item { display: flex; align-items: flex-start; gap: 14px; text-decoration: none; color: #111111; min-width: 0; }
   .media-column { width: 124px; flex-shrink: 0; }
@@ -90,7 +117,8 @@ const getDisplayCategory = (post) => {
   .category-row { margin-top: 6px; text-align: right; min-height: 24px; }
   .category-badge { display: inline-block; padding: 2px 8px; border-radius: 2px; background: #4d4d4d; color: #ffffff; font-size: 14px; line-height: 1.2; font-weight: 400; }
   .post-time { font-size: 14px; line-height: 1.35; font-weight: 400; color: #8a8a8a; }
-  .news-item:hover .news-title { text-decoration-line: underline; text-decoration-color: #000000; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .news-item:hover .news-title { text-decoration: underline; }
+
   @media (max-width: 1024px) { .article-3-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 700px) { .article-3-grid { grid-template-columns: 1fr; } .media-column, .thumbnail, .image-date-row { width: 116px; } }
 </style>
