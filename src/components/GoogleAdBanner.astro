@@ -1,29 +1,63 @@
 ---
-// 場所の名前を受け取れるようにします（プログラミングで「引数」と呼びます）
-const { position = "上部" } = Astro.props;
+// 1. 各言語ごとの「広告」という文字の翻訳辞書です
+const adLabels = {
+  ja: '広告',
+  en: 'Advertisement',
+  fr: 'Publicité',
+  de: 'Anzeige',
+  es: 'Anuncio',
+  ru: 'Реклама',
+  'zh-cn': '广告',
+  'zh-tw': '廣告',
+};
+
+// 2. 今見ているページのURLから「何語のサイトか」を自動で読み取ります
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+
+// 3. 読み取った言語に合わせて、表示する文字を決定します
+const adText = adLabels[lang] || adLabels['en'];
 ---
 
-<div class="ad-banner-main">
-  広告スペース（{position}）
+<div class="ad-container">
+  {/* 広告の上に小さく「広告」というラベルを表示します（Googleの推奨ルールです） */}
+  <span class="ad-label">{adText}</span>
+  
+  <div class="ad-wrapper">
+    {/* ▼ ここが、なるさん専用のIDが入った本物のGoogle AdSenseコードです */}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2614349930540151" crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-2614349930540151"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script is:inline>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
 </div>
 
 <style>
-  .ad-banner-main {
-    background-color: #bbb;
-    height: 180px;
+  /* 広告枠のデザインとレイアウトのルールです */
+  .ad-container {
     width: 100%;
+    margin: 30px 0; /* 上下に30pxの余白を空けて、記事とくっつかないようにします */
+    text-align: center; /* 広告を真ん中に配置します */
+  }
+  .ad-label {
+    display: block;
+    font-size: 11px;
+    color: #999999;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .ad-wrapper {
+    width: 100%;
+    min-height: 100px; /* 広告が読み込まれる前に、サイトがガタガタ動かないように最低限の枠の大きさを確保します */
+    background-color: #f4f4f4; /* 広告が表示されない間（審査中など）は、薄いグレーの背景になります */
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #111;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    border-radius: 4px;
-    border: 2px dashed #888; /* 枠線を点線にして「ここが広告枠」と分かりやすくしました */
-  }
-
-  @media (max-width: 768px) {
-    .ad-banner-main { height: 120px; font-size: 18px; }
   }
 </style>
