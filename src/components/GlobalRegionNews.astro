@@ -1,18 +1,15 @@
 ---
 import RegionNewsBlock from './RegionNewsBlock.astro';
 
-// lang: 現在の言語（ja, enなど）を受け取ります
-// allPosts: Bloggerから取得した全記事データを受け取ります
 const { lang = 'ja', allPosts = [] } = Astro.props;
 
-// 国別の記事を抽出する補助関数
+// 言語-国 の形式でフィルタリング（例: ja-tw）
 const filterByCountryTag = (countryCode, count = 3) => {
-  const tag = `${countryCode}-${lang}`; // 例: "us-ja" や "de-ja" を自動生成
+  const tag = `${lang}-${countryCode}`;
   return allPosts.filter(post => post.labels?.includes(tag)).slice(0, count);
 };
 
-// 地域と国の定義（ここ一箇所を管理するだけで全サイトが変わります）
-const regions = [
+const regionsTemplate = [
   {
     title: lang === 'ja' ? 'アジア' : 'Asia',
     cities: [
@@ -34,25 +31,28 @@ const regions = [
     ]
   }
 ];
+
+// 記事がある国だけ抽出し、国が1つもなくなった地域はタイトルごと消去する
+const activeRegions = regionsTemplate.map(region => {
+  const activeCities = region.cities.map(city => ({
+    ...city,
+    posts: filterByCountryTag(city.code)
+  })).filter(city => city.posts.length > 0);
+
+  return { ...region, cities: activeCities };
+}).filter(region => region.cities.length > 0);
 ---
 
 <div class="region-section-container">
-  {regions.map(region => (
+  {activeRegions.map(region => (
     <RegionNewsBlock 
       lang={lang}
       title={region.title}
-      cityData={region.cities.map(city => ({
-        name: city.name,
-        code: city.code,
-        posts: filterByCountryTag(city.code)
-      }))}
+      cityData={region.cities}
     />
   ))}
 </div>
 
 <style>
-  .region-section-container { 
-    margin-top: 40px; 
-    width: 100%; 
-  }
+  .region-section-container { margin-top: 40px; width: 100%; }
 </style>
