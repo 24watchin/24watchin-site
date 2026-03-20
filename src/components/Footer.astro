@@ -135,14 +135,11 @@ const globalRegions = [
 ];
 
 const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
-const seeAllLabel = lang === 'ja' ? '全サイトを見る →' : 'See all sites →';
-const seeAllHref  = `/${lang}/`;
 ---
 
 <footer class="site-footer">
   <div class="footer-inner">
 
-    <!-- ロゴ＋SNS -->
     <div class="top-row">
       <a href={`/${lang}/${country}/`} class="footer-logo">
         <img src="/images/logo-24watchin-white.png" alt="24Watchin" height="36" />
@@ -162,7 +159,6 @@ const seeAllHref  = `/${lang}/`;
 
     <hr class="divider" />
 
-    <!-- Global Sites -->
     <p class="footer-heading">{globalTitle}</p>
     <div class="accordion-list">
       {globalRegions.map((region, i) => (
@@ -179,9 +175,7 @@ const seeAllHref  = `/${lang}/`;
         </div>
       ))}
     </div>
-    <a href={seeAllHref} class="see-all">{seeAllLabel}</a>
 
-    <!-- Information -->
     <div class="info-section">
       <p class="footer-heading">{infoTitle}</p>
       <div class="info-links">
@@ -193,7 +187,6 @@ const seeAllHref  = `/${lang}/`;
 
   </div>
 
-  <!-- コピーライト -->
   <div class="footer-bottom">
     <p>24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。</p>
     <p>著作権は The Dexent Media Enterprises または正当な権利者に帰属します。</p>
@@ -299,19 +292,12 @@ const seeAllHref  = `/${lang}/`;
   }
   .country-link:hover { background: #872732; color: #fff; }
 
-  .see-all {
-    display: inline-block; margin-top: 10px;
-    font-size: 11px; color: #9ca3af; text-decoration: none;
-    border-bottom: 1px dashed #9ca3af;
-    transition: color 0.2s;
-  }
-  .see-all:hover { color: #fff; }
-
   /* Information */
   .info-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
   .info-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
   .info-link {
-    font-size: 12px; color: #d1d5db; text-decoration: none;
+    font-size: 12px;
+    color: #d1d5db; text-decoration: none;
     white-space: nowrap; transition: color 0.2s;
   }
   .info-link:hover { color: #fff; text-decoration: underline; }
