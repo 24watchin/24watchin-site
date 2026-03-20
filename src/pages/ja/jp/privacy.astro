@@ -17,10 +17,22 @@ const titles: Record<string, string> = {
   'zh-tw': '隱私政策',
 };
 
+const descriptions: Record<string, string> = {
+  ja: '24Watchinのプライバシーポリシーです。個人情報の取り扱いについて説明しています。',
+  en: 'Privacy Policy of 24Watchin. This page explains how we handle your personal information.',
+  de: 'Datenschutzrichtlinie von 24Watchin. Diese Seite erklärt den Umgang mit Ihren persönlichen Daten.',
+  fr: 'Politique de confidentialité de 24Watchin. Cette page explique comment nous traitons vos données personnelles.',
+  es: 'Política de privacidad de 24Watchin. Esta página explica cómo manejamos su información personal.',
+  ru: 'Политика конфиденциальности 24Watchin. На этой странице объясняется порядок обработки персональных данных.',
+  'zh-cn': '24Watchin的隐私政策。本页说明我们如何处理您的个人信息。',
+  'zh-tw': '24Watchin的隱私政策。本頁說明我們如何處理您的個人資訊。',
+};
+
 const pageTitle = titles[lang] ?? titles['en'];
+const pageDescription = descriptions[lang] ?? descriptions['en'];
 ---
 
-<Layout title={pageTitle} sidebarType="article">
+<Layout title={pageTitle} description={pageDescription} sidebarType="article">
   <div class="info-container">
     <h1 class="info-title">{pageTitle}</h1>
     <div class="info-content">
@@ -38,14 +50,8 @@ const pageTitle = titles[lang] ?? titles['en'];
       <section>
         <h2>2. 事業者情報</h2>
         <table class="info-table">
-          <tr>
-            <th>運営者</th>
-            <td>The Dexent Media Enterprises</td>
-          </tr>
-          <tr>
-            <th>お問い合わせ</th>
-            <td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td>
-          </tr>
+          <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
+          <tr><th>お問い合わせ</th><td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td></tr>
         </table>
       </section>
 
@@ -187,16 +193,9 @@ const pageTitle = titles[lang] ?? titles['en'];
 
       <section>
         <h2>16. お問い合わせ窓口</h2>
-        <p>本ポリシーに関するお問い合わせ、権利行使請求、削除依頼その他の連絡は、以下よりお願いします。</p>
         <table class="info-table">
-          <tr>
-            <th>運営者</th>
-            <td>The Dexent Media Enterprises</td>
-          </tr>
-          <tr>
-            <th>お問い合わせ</th>
-            <td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td>
-          </tr>
+          <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
+          <tr><th>お問い合わせ</th><td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td></tr>
         </table>
       </section>
 
@@ -205,81 +204,17 @@ const pageTitle = titles[lang] ?? titles['en'];
 </Layout>
 
 <style>
-  .info-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .info-title {
-    font-size: 26px;
-    color: #1a1a1a;
-    margin: 0 0 8px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #872732;
-  }
-  .update-date {
-    font-size: 13px;
-    color: #888;
-    margin: 0 0 24px;
-  }
-  .info-content section {
-    margin-bottom: 32px;
-  }
-  .info-content h2 {
-    font-size: 18px;
-    color: #1a1a1a;
-    margin: 0 0 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #872732;
-  }
-  .info-content h3 {
-    font-size: 15px;
-    color: #333;
-    margin: 16px 0 8px;
-    font-weight: bold;
-  }
-  .info-content p {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    margin-bottom: 12px;
-  }
-  .info-content ul, .info-content ol {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    padding-left: 24px;
-    margin-bottom: 12px;
-  }
-  .info-content a {
-    color: #872732;
-    text-decoration: underline;
-  }
-  .info-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    margin-top: 8px;
-  }
-  .info-table th {
-    width: 140px;
-    padding: 10px 16px;
-    background: #f8f4f4;
-    color: #555;
-    font-weight: bold;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .info-table td {
-    padding: 10px 16px;
-    border: 1px solid #e5e7eb;
-    color: #1a1a1a;
-  }
-
-  @media (max-width: 600px) {
-    .info-container { padding: 20px 16px; }
-    .info-table th { width: 100px; font-size: 13px; }
-  }
+  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 8px; padding-bottom: 12px; border-bottom: 3px solid #872732; }
+  .update-date { font-size: 13px; color: #888; margin: 0 0 24px; }
+  .info-content section { margin-bottom: 32px; }
+  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid #872732; }
+  .info-content h3 { font-size: 15px; color: #333; margin: 16px 0 8px; font-weight: bold; }
+  .info-content p { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
+  .info-content ul, .info-content ol { font-size: 15px; line-height: 1.9; color: #333; padding-left: 24px; margin-bottom: 12px; }
+  .info-content a { color: #872732; text-decoration: underline; }
+  .info-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  .info-table th { width: 140px; padding: 10px 16px; background: #f8f4f4; color: #555; font-weight: bold; border: 1px solid #e5e7eb; text-align: left; white-space: nowrap; }
+  .info-table td { padding: 10px 16px; border: 1px solid #e5e7eb; color: #1a1a1a; }
+  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-table th { width: 100px; font-size: 13px; } }
 </style>
