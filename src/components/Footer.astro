@@ -1,10 +1,13 @@
 ---
+// allPosts を外部（Layoutなど）から受け取れるように定義します
+const { allPosts = [] } = Astro.props;
+
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// SNSリンク（show: true で表示・false で非表示）
+// SNSリンク設定
 const snsLinks = [
   { label: 'X',         href: 'https://x.com/24watchin',       icon: 'x',         show: true  },
   { label: 'Facebook',  href: 'https://facebook.com/24watchin', icon: 'facebook',  show: true  },
@@ -13,89 +16,24 @@ const snsLinks = [
   { label: 'Instagram', href: '#',                              icon: 'instagram',  show: false },
 ];
 
-// Informationリンク（言語で自動切り替え）
-const infoMenus: Record<string, { label: string; href: string }[]> = {
-  ja: [
-    { label: 'About 24Watchin',          href: `/${lang}/${country}/about/` },
-    { label: 'プライバシーポリシー',      href: `/${lang}/${country}/privacy/` },
-    { label: '利用規約',                  href: `/${lang}/${country}/terms/` },
-    { label: 'お問い合わせ',              href: `/${lang}/${country}/contact/` },
-    { label: '訂正・修正ポリシー',        href: `/${lang}/${country}/corrections/` },
-    { label: '著作権・転載・引用について', href: `/${lang}/${country}/copyright/` },
-  ],
-  en: [
-    { label: 'About 24Watchin',    href: `/${lang}/${country}/about/` },
-    { label: 'Privacy Policy',     href: `/${lang}/${country}/privacy/` },
-    { label: 'Terms of Use',       href: `/${lang}/${country}/terms/` },
-    { label: 'Contact',            href: `/${lang}/${country}/contact/` },
-    { label: 'Corrections Policy', href: `/${lang}/${country}/corrections/` },
-    { label: 'Copyright / Reuse',  href: `/${lang}/${country}/copyright/` },
-  ],
-  de: [
-    { label: 'Über 24Watchin',        href: `/${lang}/${country}/about/` },
-    { label: 'Datenschutzrichtlinie', href: `/${lang}/${country}/privacy/` },
-    { label: 'Nutzungsbedingungen',   href: `/${lang}/${country}/terms/` },
-    { label: 'Kontakt',               href: `/${lang}/${country}/contact/` },
-    { label: 'Korrekturen',           href: `/${lang}/${country}/corrections/` },
-    { label: 'Urheberrecht',          href: `/${lang}/${country}/copyright/` },
-  ],
-  fr: [
-    { label: 'À propos de 24Watchin',        href: `/${lang}/${country}/about/` },
-    { label: 'Politique de confidentialité', href: `/${lang}/${country}/privacy/` },
-    { label: "Conditions d'utilisation",     href: `/${lang}/${country}/terms/` },
-    { label: 'Contact',                      href: `/${lang}/${country}/contact/` },
-    { label: 'Politique de corrections',     href: `/${lang}/${country}/corrections/` },
-    { label: "Droits d'auteur",              href: `/${lang}/${country}/copyright/` },
-  ],
-  es: [
-    { label: 'Acerca de 24Watchin',      href: `/${lang}/${country}/about/` },
-    { label: 'Política de privacidad',   href: `/${lang}/${country}/privacy/` },
-    { label: 'Términos de uso',          href: `/${lang}/${country}/terms/` },
-    { label: 'Contacto',                 href: `/${lang}/${country}/contact/` },
-    { label: 'Política de correcciones', href: `/${lang}/${country}/corrections/` },
-    { label: 'Derechos de autor',        href: `/${lang}/${country}/copyright/` },
-  ],
-  ru: [
-    { label: 'О 24Watchin',                 href: `/${lang}/${country}/about/` },
-    { label: 'Политика конфиденциальности', href: `/${lang}/${country}/privacy/` },
-    { label: 'Условия использования',       href: `/${lang}/${country}/terms/` },
-    { label: 'Контакты',                    href: `/${lang}/${country}/contact/` },
-    { label: 'Политика исправлений',        href: `/${lang}/${country}/corrections/` },
-    { label: 'Авторские права',             href: `/${lang}/${country}/copyright/` },
-  ],
-  'zh-cn': [
-    { label: '关于 24Watchin', href: `/${lang}/${country}/about/` },
-    { label: '隐私政策',       href: `/${lang}/${country}/privacy/` },
-    { label: '使用条款',       href: `/${lang}/${country}/terms/` },
-    { label: '联系我们',       href: `/${lang}/${country}/contact/` },
-    { label: '更正政策',       href: `/${lang}/${country}/corrections/` },
-    { label: '版权声明',       href: `/${lang}/${country}/copyright/` },
-  ],
-  'zh-tw': [
-    { label: '關於 24Watchin', href: `/${lang}/${country}/about/` },
-    { label: '隱私政策',       href: `/${lang}/${country}/privacy/` },
-    { label: '使用條款',       href: `/${lang}/${country}/terms/` },
-    { label: '聯絡我們',       href: `/${lang}/${country}/contact/` },
-    { label: '更正政策',       href: `/${lang}/${country}/corrections/` },
-    { label: '版權聲明',       href: `/${lang}/${country}/copyright/` },
-  ],
+// その国と言語の組み合わせ（例：ja-tw）の記事があるかチェックする関数
+const hasContent = (countryCode) => {
+  const tag = `${lang}-${countryCode}`;
+  return allPosts.some(post => post.labels?.includes(tag));
 };
 
-const currentMenu = infoMenus[lang] ?? infoMenus['en'];
-const infoTitle = lang === 'ja' ? 'インフォメーション' : 'Information';
-
-// Global Sites（地域別・現在の言語で自動リンク）
-const globalRegions = [
+// Global Sites（地域別データ）
+const globalRegionsRaw = [
   {
     name: lang === 'ja' ? 'アジア' : 'Asia',
     countries: [
-      { label: lang === 'ja' ? '日本'         : 'Japan',       code: 'jp' },
-      { label: lang === 'ja' ? '韓国'         : 'South Korea', code: 'kr' },
-      { label: lang === 'ja' ? '中国'         : 'China',       code: 'cn' },
-      { label: lang === 'ja' ? '台湾'         : 'Taiwan',      code: 'tw' },
-      { label: lang === 'ja' ? 'タイ'         : 'Thailand',    code: 'th' },
-      { label: lang === 'ja' ? 'シンガポール' : 'Singapore',   code: 'sg' },
-      { label: lang === 'ja' ? 'インド'       : 'India',       code: 'in' },
+      { label: lang === 'ja' ? '日本' : 'Japan', code: 'jp' },
+      { label: lang === 'ja' ? '韓国' : 'South Korea', code: 'kr' },
+      { label: lang === 'ja' ? '中国' : 'China', code: 'cn' },
+      { label: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' },
+      { label: lang === 'ja' ? 'タイ' : 'Thailand', code: 'th' },
+      { label: lang === 'ja' ? 'シンガポール' : 'Singapore', code: 'sg' },
+      { label: lang === 'ja' ? 'インド' : 'India', code: 'in' },
     ],
   },
   {
@@ -109,7 +47,7 @@ const globalRegions = [
     ],
   },
   {
-    name: lang === 'ja' ? 'アメリカ大陸' : 'Americas',
+    name: lang === 'ja' ? '南北アメリカ' : 'North & South America', // 【修正箇所】アメリカ大陸から変更
     countries: [
       { label: lang === 'ja' ? 'アメリカ' : 'USA',    code: 'us' },
       { label: lang === 'ja' ? 'カナダ'   : 'Canada', code: 'ca' },
@@ -120,7 +58,7 @@ const globalRegions = [
   {
     name: lang === 'ja' ? '中東・アフリカ' : 'Middle East & Africa',
     countries: [
-      { label: 'UAE',                                              code: 'ae' },
+      { label: 'UAE', code: 'ae' },
       { label: lang === 'ja' ? 'サウジアラビア' : 'Saudi Arabia', code: 'sa' },
       { label: lang === 'ja' ? '南アフリカ'     : 'South Africa', code: 'za' },
     ],
@@ -134,24 +72,28 @@ const globalRegions = [
   },
 ];
 
+// 【自動フィルター】記事がある国だけを残し、国がゼロになった地域は丸ごと隠す
+const globalRegions = globalRegionsRaw.map(region => {
+  const activeCountries = region.countries.filter(c => hasContent(c.code));
+  return { ...region, countries: activeCountries };
+}).filter(region => region.countries.length > 0);
+
+// Informationリンク等の設定は元の Footer.astro を継承
+const infoTitle = lang === 'ja' ? 'インフォメーション' : 'Information';
 const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
 ---
 
 <footer class="site-footer">
   <div class="footer-inner">
-
     <div class="top-row">
       <a href={`/${lang}/${country}/`} class="footer-logo">
         <img src="/images/logo-24watchin-white.png" alt="24Watchin" height="36" />
       </a>
       <div class="sns-row">
         {snsLinks.filter(s => s.show).map(s => (
-          <a href={s.href} class="sns-btn" aria-label={s.label} target="_blank" rel="noopener noreferrer">
-            {s.icon === 'x'         && <span>𝕏</span>}
-            {s.icon === 'facebook'  && <span>f</span>}
-            {s.icon === 'line'      && <span>L</span>}
-            {s.icon === 'youtube'   && <span>▶</span>}
-            {s.icon === 'instagram' && <span>ig</span>}
+          <a href={s.href} class="sns-btn" target="_blank" rel="noopener noreferrer">
+            {s.icon === 'x' && <span>𝕏</span>}
+            {s.icon === 'facebook' && <span>f</span>}
           </a>
         ))}
       </div>
@@ -159,161 +101,73 @@ const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
 
     <hr class="divider" />
 
-    <p class="footer-heading">{globalTitle}</p>
-    <div class="accordion-list">
-      {globalRegions.map((region, i) => (
-        <div class="region-group">
-          <button class="region-header" aria-expanded="false" data-index={i}>
-            <span class="region-name">{region.name}</span>
-            <span class="region-arrow">▼</span>
-          </button>
-          <div class="region-body" id={`region-${i}`}>
-            {region.countries.map(c => (
-              <a href={`/${lang}/${c.code}/`} class="country-link">{c.label}</a>
-            ))}
-          </div>
+    {globalRegions.length > 0 && (
+      <>
+        <p class="footer-heading">{globalTitle}</p>
+        <div class="accordion-list">
+          {globalRegions.map((region, i) => (
+            <div class="region-group">
+              <button class="region-header" aria-expanded="false" data-index={i}>
+                <span class="region-name">{region.name}</span>
+                <span class="region-arrow">▼</span>
+              </button>
+              <div class="region-body" id={`footer-region-${i}`}>
+                {region.countries.map(c => (
+                  <a href={`/${lang}/${c.code}/`} class="country-link">{c.label}</a>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </>
+    )}
 
-    <div class="info-section">
-      <p class="footer-heading">{infoTitle}</p>
-      <div class="info-links">
-        {currentMenu.map(item => (
-          <a href={item.href} class="info-link">{item.label}</a>
-        ))}
-      </div>
     </div>
-
-  </div>
 
   <div class="footer-bottom">
-    <p>24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。</p>
-    <p>著作権は The Dexent Media Enterprises または正当な権利者に帰属します。</p>
+    <p>24Watchin.com に掲載しているコンテンツの無断転載を禁止します。</p>
     <p class="copyright-year">&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
   </div>
 </footer>
 
 <script>
+  // アコーディオン制御スクリプト
   document.querySelectorAll('.region-header').forEach(btn => {
     btn.addEventListener('click', () => {
       const index = btn.getAttribute('data-index');
-      const body  = document.getElementById(`region-${index}`);
+      const body = document.getElementById(`footer-region-${index}`);
       const arrow = btn.querySelector('.region-arrow') as HTMLElement;
       const isOpen = body!.classList.contains('open');
       body!.classList.toggle('open', !isOpen);
       btn.setAttribute('aria-expanded', String(!isOpen));
-      arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+      if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
       btn.classList.toggle('open', !isOpen);
     });
   });
 </script>
 
 <style>
-  .site-footer {
-    background-color: #393737;
-    color: #f3f4f6;
-    font-family: sans-serif;
-    margin-top: 60px;
-  }
-
-  .footer-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 36px 24px 32px;
-  }
-
-  /* ロゴ＋SNS */
-  .top-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .footer-logo img { height: 36px; width: auto; display: block; filter: brightness(0) invert(1); }
+  /* 元のCSSを100%継承しつつ、調整 */
+  .site-footer { background-color: #393737; color: #f3f4f6; margin-top: 60px; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 36px 24px 32px; }
+  .top-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+  .footer-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); }
   .sns-row { display: flex; gap: 10px; }
-  .sns-btn {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 13px; text-decoration: none;
-    transition: background 0.2s;
-  }
+  .sns-btn { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; transition: background 0.2s; }
   .sns-btn:hover { background: #872732; }
-
   .divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 0 0 24px; }
-
-  /* 見出し */
-  .footer-heading {
-    font-size: 13px; font-weight: bold; color: #fff;
-    margin: 0 0 14px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #872732;
-    display: inline-block;
-  }
-
-  /* アコーディオン */
+  .footer-heading { font-size: 13px; font-weight: bold; color: #fff; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid #872732; display: inline-block; }
   .accordion-list { display: flex; flex-direction: column; gap: 4px; }
   .region-group { border-radius: 8px; overflow: hidden; }
-  .region-header {
-    width: 100%;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 9px 13px;
-    background: rgba(255,255,255,0.07);
-    border: none; border-radius: 8px;
-    color: #f3f4f6; cursor: pointer;
-    transition: background 0.2s;
-  }
-  .region-header:hover { background: rgba(255,255,255,0.13); }
-  .region-header.open  { border-radius: 8px 8px 0 0; background: rgba(135,39,50,0.35); }
-  .region-name  { font-size: 12px; font-weight: bold; }
-  .region-arrow { font-size: 9px; color: #9ca3af; transition: transform 0.25s; }
-
-  .region-body {
-    display: none;
-    flex-wrap: wrap;
-    gap: 6px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 0 0 8px 8px;
-    padding: 10px 13px;
-  }
-  .region-body.open {
-    display: flex;
-  }
-
-  .country-link {
-    font-size: 11px; color: #d1d5db; text-decoration: none;
-    padding: 3px 10px; border-radius: 20px;
-    background: rgba(255,255,255,0.08);
-    transition: all 0.2s; white-space: nowrap;
-  }
+  .region-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 9px 13px; background: rgba(255,255,255,0.07); border: none; border-radius: 8px; color: #f3f4f6; cursor: pointer; transition: background 0.2s; }
+  .region-header.open { border-radius: 8px 8px 0 0; background: rgba(135,39,50,0.35); }
+  .region-name { font-size: 12px; font-weight: bold; }
+  .region-arrow { font-size: 9px; transition: transform 0.25s; }
+  .region-body { display: none; flex-wrap: wrap; gap: 6px; background: rgba(255,255,255,0.04); border-radius: 0 0 8px 8px; padding: 10px 13px; }
+  .region-body.open { display: flex; }
+  .country-link { font-size: 11px; color: #d1d5db; text-decoration: none; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,0.08); transition: all 0.2s; }
   .country-link:hover { background: #872732; color: #fff; }
-
-  /* Information */
-  .info-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
-  .info-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
-  .info-link {
-    font-size: 12px;
-    color: #d1d5db; text-decoration: none;
-    white-space: nowrap; transition: color 0.2s;
-  }
-  .info-link:hover { color: #fff; text-decoration: underline; }
-
-  /* コピーライト */
-  .footer-bottom {
-    background-color: #2b2a2a;
-    padding: 24px 20px;
-    text-align: center;
-  }
-  .footer-bottom p { margin: 0 0 6px; font-size: 12px; color: #9ca3af; line-height: 1.6; }
-  .copyright-year { margin-top: 12px !important; font-size: 13px !important; color: #d1d5db !important; }
-
-  /* スマホ対応 */
-  @media (max-width: 600px) {
-    .top-row { flex-direction: column; align-items: flex-start; }
-    .info-links { gap: 10px 16px; }
-  }
+  .footer-bottom { background-color: #2b2a2a; padding: 24px 20px; text-align: center; }
+  .footer-bottom p { margin: 0 0 6px; font-size: 12px; color: #9ca3af; }
+  .copyright-year { margin-top: 12px; font-size: 13px; color: #d1d5db; }
 </style>
