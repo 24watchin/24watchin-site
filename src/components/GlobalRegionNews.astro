@@ -2,15 +2,16 @@
 import RegionNewsBlock from './RegionNewsBlock.astro';
 
 // lang: 現在の言語（ja, enなど）を受け取ります
+// allPosts: Bloggerから取得した全記事データを受け取ります
 const { lang = 'ja', allPosts = [] } = Astro.props;
 
-// 国ごとの記事を抽出する補助関数
+// 国別の記事を抽出する補助関数
 const filterByCountryTag = (countryCode, count = 3) => {
-  const tag = `${countryCode}-${lang}`; // 例: "us-ja" や "us-en" を自動生成
+  const tag = `${countryCode}-${lang}`; // 例: "us-ja" や "de-ja" を自動生成
   return allPosts.filter(post => post.labels?.includes(tag)).slice(0, count);
 };
 
-// 地域と国の定義（ここ一箇所を直せば全サイトが変わります！）
+// 地域と国の定義（ここ一箇所を管理するだけで全サイトが変わります）
 const regions = [
   {
     title: lang === 'ja' ? 'アジア' : 'Asia',
@@ -50,5 +51,8 @@ const regions = [
 </div>
 
 <style>
-  .region-section-container { margin-top: 40px; width: 100%; }
+  .region-section-container { 
+    margin-top: 40px; 
+    width: 100%; 
+  }
 </style>
