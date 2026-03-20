@@ -16,9 +16,8 @@ const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
 const lang = 'ja';
-const country = 'jp'; // このページが日本版であることを定義
+const country = 'jp'; // 自分の国を「jp」に設定 
 
-// メイングリッドには「他国の記事（ja-twなど）」を表示させない判定
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^ja-[a-z]{2}$/.test(label) && label !== 'ja-jp');
@@ -61,7 +60,7 @@ const filterByCategory = (slug, count = 3) => {
   <GoogleAdBanner position="下部" />
 
   <div slot="bottom-wide">
-    {/* country={country} を渡すことで、自国(日本)を除外した他国ニュースを表示します */}
+    {/* 日本(jp)を除外し、他国の「ja-〇〇」タグの記事がある時だけ表示します  */}
     <GlobalRegionNews lang={lang} country={country} allPosts={allPosts} />
   </div>
 </Layout>
