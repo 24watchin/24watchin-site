@@ -34,7 +34,6 @@ const filterByCategory = (slug, count = 3) => {
 };
 ---
 
-{/* allPosts を Layout に渡すことで、フッターに情報が伝わります */}
 <Layout title="日本のニュース" allPosts={allPosts}>
   <div slot="top-full">
     <MainNewsLayout posts={mainSitePosts} />
