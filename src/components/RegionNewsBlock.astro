@@ -9,7 +9,7 @@ const getImageUrl = (content) => {
 const formatPostTime = (dateString) => {
   if (!dateString) return '';
   try {
-    return new Date(dateString).toLocaleString('ja-JP', {
+    return new Date(dateString).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US', {
       month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
     });
   } catch { return ''; }
@@ -19,10 +19,10 @@ const getDisplayCategory = (post) => {
   const labels = post?.labels || [];
   const visibleLabel = labels.find((label) => {
     if (!label) return false;
-    if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false; // タグを非表示
+    if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false;
     return true;
   });
-  return visibleLabel || 'ニュース';
+  return visibleLabel || (lang === 'ja' ? 'ニュース' : 'News');
 };
 ---
 
@@ -64,34 +64,17 @@ const getDisplayCategory = (post) => {
 </section>
 
 <style>
-  .region-section { 
-    width: 100%; 
-    margin-bottom: 5px; /* 地域セクション同士の間隔を最小限に */
-  }
+  .region-section { width: 100%; margin-bottom: 10px; } /* 地域間の間隔を狭く  */
   .region-header { margin-bottom: 12px; }
-  .region-title { margin: 0 0 6px; font-size: 19px; font-weight: 700; color: #111111; }
+  .region-title { margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #111; }
   .region-line { width: 100%; height: 3px; background: #872732; }
-  
-  .city-groups { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 10px; /* 日本・台湾などの行の間隔 */
-  }
-  .city-block { 
-    width: 100%; 
-    padding: 4px 0; /* 各国の上下の余白を最小限に */
-  }
-  
-  .city-name { 
-    font-size: 15px; font-weight: bold; color: #333; 
-    margin: 0 0 8px 0; padding-left: 8px; 
-    border-left: 4px solid #d9d9d9; 
-  }
-
+  .city-groups { display: flex; flex-direction: column; gap: 8px; } /* 国ごとの列の間隔  */
+  .city-block { width: 100%; padding: 4px 0; }
+  .city-name { font-size: 15px; font-weight: bold; color: #333; margin: 0 0 8px 0; padding-left: 8px; border-left: 4px solid #d9d9d9; }
   .article-3-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
-  .news-item { display: flex; align-items: flex-start; gap: 12px; text-decoration: none; color: #111111; }
+  .news-item { display: flex; align-items: flex-start; gap: 12px; text-decoration: none; color: #111; }
   .media-column { width: 116px; flex-shrink: 0; }
-  .thumbnail { width: 116px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eeeeee; }
+  .thumbnail { width: 116px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eee; }
   .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
   .image-date-row { margin-top: 2px; text-align: right; }
   .info { min-width: 0; flex: 1; }
