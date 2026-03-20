@@ -1,33 +1,42 @@
 ---
-// 1. 広告部品を読み込みます
-import SidebarAd from './SidebarAd.astro';
-// 2. 「編集部のおすすめ」部品を読み込みます（ファイル名を修正しました）
-import EditorsPick from './EditorsPick.astro';
+// 関連記事を表示する部品を読み込みます
+import RelatedArticles from './RelatedArticles.astro';
+
+// ▼ 【修正】古い SidebarAd を消して、新しい GoogleAdBanner を読み込みます
+import GoogleAdBanner from './GoogleAdBanner.astro';
+
+// 人気記事ランキングを読み込みます
+import AccessRanking from './AccessRanking.astro';
 ---
 
 <div class="sidebar-wrapper">
-  {/* 1. 広告を上に配置します */}
-  <SidebarAd />
+  {/* 1. 一番上に関連記事を表示します */}
+  <RelatedArticles />
 
-  {/* 2. 「編集部のおすすめ」を配置します（アクセスランキングは完全に削除しました） */}
-  <EditorsPick />
+  {/* 2. その下に本物の広告を表示します */}
+  <GoogleAdBanner />
+
+  {/* 3. 広告の下にランキングを表示します */}
+  <AccessRanking />
 </div>
 
 <style>
-  /* サイドバー全体の見た目を整える設定です */
+  /* サイドバー全体を整列させるための設定です */
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 40px; /* パーツの間の隙間を40pxに設定 */
+    gap: 40px; /* パーツ間の隙間を40px空けます */
     width: 100%;
     margin: 0;
     padding: 0;
   }
 
-  /* 中に入るパーツの横幅を100%に揃える設定 */
+  /* 中に入るパーツを100%の幅に揃えます */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     box-sizing: border-box !important;
   }
 </style>
