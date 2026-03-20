@@ -1,21 +1,25 @@
 ---
-// サイドバー用の広告部品を読み込みます
-import SidebarAd from './SidebarAd.astro';
 // 天気パーツを読み込みます
 import WeatherWidget from './WeatherWidget.astro';
+
+// ▼ 【修正】古い SidebarAd を消して、新しい GoogleAdBanner を読み込みます
+import GoogleAdBanner from './GoogleAdBanner.astro';
+
+// 必要に応じて、ここで他の部品（ランキングなど）も読み込めます
 ---
 
 <div class="sidebar-wrapper">
   {/* 1. 一番上に天気パーツを配置 */}
   <WeatherWidget />
 
-  {/* 2. その下に広告を配置 */}
-  <SidebarAd />
+  {/* 2. その下に本物の広告を配置 */}
+  <GoogleAdBanner />
 
   {/* 必要に応じて、ここにさらに「防災情報」などのパーツを追加できます */}
 </div>
 
 <style>
+  /* サイドバー全体を整列させる設定です */
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
@@ -25,6 +29,7 @@ import WeatherWidget from './WeatherWidget.astro';
     padding: 0;
   }
 
+  /* 中に入るパーツの幅を100%に揃えます */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
