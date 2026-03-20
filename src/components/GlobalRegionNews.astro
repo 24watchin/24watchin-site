@@ -9,9 +9,9 @@ const filterByCountryTag = (countryCode, count = 3) => {
   return allPosts.filter(post => post.labels?.includes(tag)).slice(0, count);
 };
 
-// 【親タイトル：24Watchin Global News】（言語別）
+// 【親タイトル：24Watchin Global News】（アポストロフィなし）
 const parentTitles = {
-  ja: '24Watchin グローバル・ニュース',
+  ja: '24Watchin Global News',
   en: '24Watchin Global News',
   fr: '24Watchin Actualités Mondiales',
   de: '24Watchin Global News',
@@ -21,12 +21,12 @@ const parentTitles = {
   'zh-cn': '24Watchin 全球新闻'
 };
 
-// 【各地域の「版」名称テーブル】
+// 【各地域の「版」名称テーブル：マスター表を反映】
 const regionNameTable = {
   asia: { ja: 'アジア版', en: 'Asia Edition', fr: 'Édition Asie', de: 'Asien-Ausgabe', es: 'Edición Asia', ru: 'Азиатское издание', 'zh-tw': '亞洲版', 'zh-cn': '亚洲版' },
-  europe: { ja: 'ヨーロッパ版', en: 'Europe Edition', fr: 'Édition Europe', de: 'Europa-Ausgabe', es: 'Edición Europa', ru: 'Европейское издание', 'zh-tw': '歐洲版', 'zh-cn': 'ヨーロッパ版' },
+  europe: { ja: 'ヨーロッパ版', en: 'Europe Edition', fr: 'Édition Europe', de: 'Europa-Ausgabe', es: 'Edición Europa', ru: 'Европейское издание', 'zh-tw': '歐洲版', 'zh-cn': '欧洲版' },
   americas: { ja: '南北アメリカ版', en: 'Americas Edition', fr: 'Édition Amériques', de: 'Amerika-Ausgabe', es: 'Edición Américas', ru: 'Американское издание', 'zh-tw': '美洲版', 'zh-cn': '美洲版' },
-  middleEastAfrica: { ja: '中東・アフリカ版', en: 'Middle East & Africa Edition', fr: 'Édition Moyen-Orient et Afrique', de: 'Nahost- und Afrika-Ausgabe', es: 'Edición Oriente Medio y África', ru: 'Ближневосточно-африканское издание', 'zh-tw': '中東與非洲版', 'zh-cn': '中东与非洲版' },
+  middleEastAfrica: { ja: '中東・アフリカ版', en: 'Middle East & Africa Edition', fr: 'Édition Moyen-Orient et Afrique', de: 'Nahost- und Afrika-Ausgabe', es: 'Edición Oriente Medio y África', ru: 'Ближневосточно-африканское издание', 'zh-tw': '中東・非洲版', 'zh-cn': '中东与非洲版' },
   oceania: { ja: 'オセアニア版', en: 'Oceania Edition', fr: 'Édition Océanie', de: 'Ozeanien-Ausgabe', es: 'Edición Oceanía', ru: 'Океанийское издание', 'zh-tw': '大洋洲版', 'zh-cn': '大洋洲版' }
 };
 
@@ -40,7 +40,7 @@ const regionsTemplate = [
 
 const activeRegions = regionsTemplate.map(region => {
   const activeCities = region.cities
-    .filter(city => city.code !== country) // 現在のページと同じ国は非表示 
+    .filter(city => city.code !== country)
     .map(city => ({ ...city, posts: filterByCountryTag(city.code) }))
     .filter(city => city.posts.length > 0);
 
@@ -66,6 +66,16 @@ const activeRegions = regionsTemplate.map(region => {
 
 <style>
   .global-news-container { margin-top: 50px; width: 100%; }
-  .parent-header { margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-  .parent-title { font-size: 28px; font-weight: 800; color: #111; margin: 0; }
+  .parent-header { margin-bottom: 26px; border-bottom: 1px solid #ddd; padding-bottom: 12px; }
+  
+  /* 【修正】タイトルを20pxに、左側に太い赤線を追加 */
+  .parent-title { 
+    font-size: 20px; 
+    font-weight: 800; 
+    color: #111111; 
+    margin: 0; 
+    border-left: 6px solid #872732; 
+    padding-left: 14px; 
+    line-height: 1.1;
+  }
 </style>
