@@ -3,13 +3,11 @@ import { categoryLabelMap } from '../lib/categoryLabels';
 
 const { lang = 'ja', title, cityData = [] } = Astro.props;
 
-// 表示用画像の取得
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/124x83/eeeeee/999999?text=No+Image';
 };
 
-// 時刻のフォーマット
 const formatPostTime = (dateString) => {
   if (!dateString) return '';
   try {
@@ -19,20 +17,23 @@ const formatPostTime = (dateString) => {
   } catch { return ''; }
 };
 
-// 【修正：categoryLabels.ts に基づきカテゴリ名だけを表示するロジック】
+// 【修正箇所】正しくカテゴリを判定するロジック
 const getDisplayCategory = (post) => {
   const labels = post?.labels || [];
   
-  // categoryLabels.ts から、現在の言語における正式なカテゴリ名リストを取得します
-  const langConfig = categoryLabelMap[lang] || categoryLabelMap['en'];
+  // URLの lang が 'ja' の場合、categoryLabels.ts に合わせて 'jp' に読み替えます
+  const mapKey = lang === 'ja' ? 'jp' : lang;
+  
+  // 指定された言語のカテゴリ設定を読み込みます
+  const langConfig = categoryLabelMap[mapKey] || categoryLabelMap['en'];
   const validCategoryNames = langConfig.allCategories.map(cat => cat.label);
 
-  // 1. ラベルの中から、正式なカテゴリ名（政治、社会など）と完全一致するものを探します
+  // 1. ラベルの中から、正式なカテゴリ名（社会、政治など）と一致するものを探します
   const categoryLabel = labels.find(label => validCategoryNames.includes(label));
   
   if (categoryLabel) return categoryLabel;
 
-  // 2. 見つからない場合のフォールバック（国コードタグ ja-tw 等は除外して最初の文字を返す）
+  // 2. もし見つからなかった場合の予備ルール
   const fallbackLabel = labels.find(label => {
     if (!label) return false;
     if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false; 
@@ -81,7 +82,6 @@ const getDisplayCategory = (post) => {
 </section>
 
 <style>
-  /* 鳴川さんの指示によるタイトなレイアウト調整 */
   .region-section { width: 100%; margin-bottom: 10px; }
   .region-header { margin-bottom: 12px; }
   .region-title { margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #111111; }
