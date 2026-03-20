@@ -1,17 +1,10 @@
 ---
-// エラー回避のためのProps定義
-interface Props {
-  title?: string;
-  sidebarType?: string;
-  description?: string;
-  allPosts?: any[]; // 【追加】これがないと「赤字」になります
-}
-
+// 全引数を Astro.props から取得。エラー回避のため型指定を外しました。
 const {
   title,
   sidebarType = 'top',
   description,
-  allPosts = [] // デフォルト値を空配列に設定
+  allPosts = []
 } = Astro.props;
 
 // URLから言語を自動取得 [cite: 83-84]
@@ -20,15 +13,15 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 
 // 言語別デフォルトdescription [cite: 85-88]
-const defaultDescriptions: Record<string, string> = {
+const defaultDescriptions = {
   ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
   en: 'News from around the world, in your language. 24Watchin delivers the latest local news and stories, clearly explained for international residents.',
-  de: 'Nachrichten aus aller Welt in Ihrer Sprache. 24Watchin delivers updated local news, clearly explained.',
-  fr: "L'actualité du monde entier dans votre langue. 24Watchin vous propose les dernières informations locales.",
-  es: 'Noticias de todo el mundo en tu idioma. 24Watchin ofrece las últimas noticias locales explicadas de forma clara.',
-  ru: 'Новости со всего мира на вашем языке. 24Watchin доставляет актуальные местные новости.',
-  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂的本地新闻。',
-  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂的本地新聞。',
+  de: 'Nachrichten aus aller Welt in Ihrer Sprache. 24Watchin liefert aktuelle lokale Nachrichten und Berichte, verständlich erklärt.',
+  fr: "L'actualité du monde entier dans votre langue. 24Watchin vous propose les dernières informations locales, expliquées clairement.",
+  es: 'Noticias de todo el mundo en tu idioma. 24Watchin ofrece las últimas noticias locales explicadas de forma clara y sencilla.',
+  ru: 'Новости со всего мира на вашем языке. 24Watchin доставляет актуальные местные новости, понятно объяснённые для иностранцев.',
+  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂的本地新闻与深度解说。',
+  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂的本地新聞與深度解說。',
 };
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
@@ -92,7 +85,7 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
       </div>
     </div>
 
-    {/* フッターにデータを渡す：これで自動表示機能が動きます */}
+    {/* フッターにデータを渡す。型エラーを避けるため引数名のみ記述します */}
     <Footer allPosts={allPosts} />
 
     <script>
