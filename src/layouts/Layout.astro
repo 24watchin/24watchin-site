@@ -1,12 +1,20 @@
 ---
+// エラー回避のためのProps定義
+interface Props {
+  title?: string;
+  sidebarType?: string;
+  description?: string;
+  allPosts?: any[]; // 【追加】これがないと「赤字」になります
+}
+
 const {
   title,
   sidebarType = 'top',
   description,
-  allPosts = [] // 【追加】ページから渡される全記事データを受け取れるようにしました [cite: 80]
+  allPosts = [] // デフォルト値を空配列に設定
 } = Astro.props;
 
-// URLから言語を自動取得 [cite: 84]
+// URLから言語を自動取得 [cite: 83-84]
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
@@ -15,12 +23,12 @@ const lang = pathParts[0] || 'ja';
 const defaultDescriptions: Record<string, string> = {
   ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
   en: 'News from around the world, in your language. 24Watchin delivers the latest local news and stories, clearly explained for international residents.',
-  de: 'Nachrichten aus aller Welt in Ihrer Sprache. 24Watchin liefert aktuelle lokale Nachrichten und Berichte, verständlich erklärt.',
-  fr: "L'actualité du monde entier dans votre langue. 24Watchin vous propose les dernières informations locales, expliquées clairement.",
-  es: 'Noticias de todo el mundo en tu idioma. 24Watchin ofrece las últimas noticias locales explicadas de forma clara y sencilla.',
-  ru: 'Новости со всего мира на вашем языке. 24Watchin доставляет актуальные местные новости, понятно объяснённые для иностранцев.',
-  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂的本地新闻与深度解说。',
-  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂的本地新聞與深度解說。',
+  de: 'Nachrichten aus aller Welt in Ihrer Sprache. 24Watchin delivers updated local news, clearly explained.',
+  fr: "L'actualité du monde entier dans votre langue. 24Watchin vous propose les dernières informations locales.",
+  es: 'Noticias de todo el mundo en tu idioma. 24Watchin ofrece las últimas noticias locales explicadas de forma clara.',
+  ru: 'Новости со всего мира на вашем языке. 24Watchin доставляет актуальные местные новости.',
+  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂的本地新闻。',
+  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂的本地新聞。',
 };
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
@@ -31,22 +39,22 @@ import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 import CategorySidebar from '../components/CategorySidebar.astro';
 import ArticleSidebar from '../components/ArticleSidebar.astro';
-import WeatherSidebar from '../components/WeatherSidebar.astro'; [cite: 91]
+import WeatherSidebar from '../components/WeatherSidebar.astro';
 ---
 <!DOCTYPE html>
 <html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title> [cite: 92]
+    <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
     <meta name="description" content={metaDescription} />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-      body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; } [cite: 93]
-      .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; } [cite: 94]
+      body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+      .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
       .page-shell { margin-top: 30px; }
-      .main-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: start; } [cite: 96]
-      .content-area, .sidebar-area { display: block; width: 100%; min-width: 0; margin: 0; padding: 0; align-self: start; } [cite: 97]
+      .main-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: start; }
+      .content-area, .sidebar-area { display: block; width: 100%; min-width: 0; margin: 0; padding: 0; align-self: start; }
       .bottom-wide { margin-top: 50px; width: 100%; }
 
       @media (max-width: 900px) {
@@ -84,17 +92,17 @@ import WeatherSidebar from '../components/WeatherSidebar.astro'; [cite: 91]
       </div>
     </div>
 
-    {/* 【重要】Footerへ全記事データを引き継ぎます */}
+    {/* フッターにデータを渡す：これで自動表示機能が動きます */}
     <Footer allPosts={allPosts} />
 
     <script>
       document.addEventListener('contextmenu', e => e.preventDefault());
-    </script> [cite: 105]
+    </script>
 
     <script>
       document.querySelectorAll('img').forEach(img => {
         img.setAttribute('loading', 'lazy');
       });
-    </script> [cite: 106]
+    </script>
   </body>
 </html>
