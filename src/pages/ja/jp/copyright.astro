@@ -17,10 +17,22 @@ const titles: Record<string, string> = {
   'zh-tw': '版權聲明',
 };
 
+const descriptions: Record<string, string> = {
+  ja: '24Watchinの著作権・転載・引用に関するポリシーです。コンテンツの利用ルールをご確認ください。',
+  en: 'Copyright and reuse policy of 24Watchin. Please review the rules for using our content.',
+  de: 'Urheberrechts- und Nutzungsrichtlinie von 24Watchin. Bitte lesen Sie die Regeln zur Inhaltsnutzung.',
+  fr: "Politique de droits d'auteur de 24Watchin. Veuillez consulter les règles d'utilisation du contenu.",
+  es: 'Política de derechos de autor de 24Watchin. Por favor, revise las reglas para el uso del contenido.',
+  ru: 'Политика авторских прав 24Watchin. Пожалуйста, ознакомьтесь с правилами использования контента.',
+  'zh-cn': '24Watchin的版权和转载政策。请查阅内容使用规则。',
+  'zh-tw': '24Watchin的版權和轉載政策。請查閱內容使用規則。',
+};
+
 const pageTitle = titles[lang] ?? titles['en'];
+const pageDescription = descriptions[lang] ?? descriptions['en'];
 ---
 
-<Layout title={pageTitle} sidebarType="article">
+<Layout title={pageTitle} description={pageDescription} sidebarType="article">
   <div class="info-container">
     <h1 class="info-title">{pageTitle}</h1>
     <div class="info-content">
@@ -41,7 +53,6 @@ const pageTitle = titles[lang] ?? titles['en'];
           <li>見出しのみを変更した転載や再掲載</li>
           <li>データベース化、アーカイブ化</li>
           <li>商用利用</li>
-          <li>その他、著作権法その他法令に反する利用</li>
         </ul>
       </section>
 
@@ -53,21 +64,12 @@ const pageTitle = titles[lang] ?? titles['en'];
           <li>引用の必要性があること</li>
           <li>引用部分とそれ以外が明確に区別されていること</li>
           <li>出所を明示すること</li>
-          <li>引用の範囲を超えないこと</li>
-        </ul>
-        <p>次のような利用は、引用として認められない場合があります。</p>
-        <ul>
-          <li>記事の大部分を転載する行為</li>
-          <li>見出しと本文の主要部分をそのまま掲載する行為</li>
-          <li>写真や図表を単独で掲載する行為</li>
-          <li>引用の体裁を取りながら、実質的に転載となる行為</li>
         </ul>
       </section>
 
       <section>
         <h2>3. 写真・画像・図表・動画等の利用について</h2>
-        <p>当サイトに掲載される写真、画像、図表、動画、音声その他の素材は、記事本文以上に権利処理が厳格な場合があります。これらの素材については、引用の可否が本文以上に限定される場合があるため、<strong>無断利用はしないでください。</strong></p>
-        <p>特に、通信社配信素材、提携先提供素材、外部ライセンス素材等については、当サイト運営者自身が再許諾権を持たない場合があります。</p>
+        <p>当サイトに掲載される写真、画像、図表、動画、音声その他の素材は、記事本文以上に権利処理が厳格な場合があります。これらの素材については、<strong>無断利用はしないでください。</strong></p>
       </section>
 
       <section>
@@ -79,7 +81,6 @@ const pageTitle = titles[lang] ?? titles['en'];
           <li>テキスト・データマイニング</li>
           <li>スクレイピング、クローリング、ロボット等による自動取得</li>
           <li>データセット化、学習用コーパス化</li>
-          <li>自動翻訳サービスや要約サービスへの再投入で、第三者提供や再配布を伴う利用</li>
         </ul>
       </section>
 
@@ -89,12 +90,9 @@ const pageTitle = titles[lang] ?? titles['en'];
         <ul>
           <li>違法または公序良俗に反する内容を含むサイトからのリンク</li>
           <li>当サイトまたは第三者の信用を害するおそれのあるリンク</li>
-          <li>当サイトとの提携、後援、推奨等の関係があるとの誤認を生じさせるリンク</li>
           <li>フレーム内表示その他、当サイトのコンテンツであることが不明確となる方法によるリンク</li>
-          <li>画像、動画、ファイル等への直リンクで、当サイト運営に支障を及ぼすもの</li>
-          <li>営利目的その他、当サイト運営者が不適切と判断するリンク</li>
+          <li>当サイトとの提携等の関係があるとの誤認を生じさせるリンク</li>
         </ul>
-        <p>当サイト運営者は、必要と判断した場合、リンク削除を求めることができるものとします。</p>
       </section>
 
       <section>
@@ -102,73 +100,28 @@ const pageTitle = titles[lang] ?? titles['en'];
         <p>次のような場合は、事前に当サイト運営者へご相談ください。</p>
         <ul>
           <li>記事、写真、図表、動画等を転載したい場合</li>
-          <li>印刷物、書籍、雑誌、会報、教材等に利用したい場合</li>
-          <li>ウェブサイト、アプリ、動画、SNS広告等に掲載したい場合</li>
+          <li>印刷物、書籍、雑誌、教材等に利用したい場合</li>
+          <li>ウェブサイト、アプリ、SNS広告等に掲載したい場合</li>
           <li>商用利用をしたい場合</li>
-          <li>翻訳掲載、再編集掲載、まとめ掲載をしたい場合</li>
-          <li>画像や写真のみ利用したい場合</li>
-          <li>ニュースアーカイブ、DB、システム等へ組み込みたい場合</li>
+          <li>翻訳掲載、再編集掲載をしたい場合</li>
         </ul>
       </section>
 
       <section>
-        <h2>7. 利用申請時にご連絡いただきたい事項</h2>
-        <p>利用申請を行う場合は、次の内容をできるだけ具体的にご記載ください。</p>
-        <ul>
-          <li>利用を希望する記事または素材のURL</li>
-          <li>記事タイトルまたは対象コンテンツ名</li>
-          <li>利用したい範囲</li>
-          <li>利用目的</li>
-          <li>利用媒体</li>
-          <li>利用期間</li>
-          <li>掲載予定箇所または公開予定URL</li>
-          <li>法人名・団体名・担当者名</li>
-          <li>ご連絡先メールアドレス</li>
-        </ul>
-        <p>内容によっては、利用をお断りする場合があります。</p>
+        <h2>7. 権利侵害のご連絡について</h2>
+        <p>当サイトコンテンツが無断利用されているとお考えの場合は、お問い合わせフォームよりご連絡ください。内容を確認のうえ、必要に応じて削除、修正その他の措置を行います。</p>
       </section>
 
       <section>
-        <h2>8. 権利侵害のご連絡について</h2>
-        <p>当サイトコンテンツが第三者の権利を侵害している、または当サイトコンテンツが無断利用されているとお考えの場合は、お問い合わせフォームよりご連絡ください。</p>
-        <p>ご連絡の際は、できるだけ次の情報をご記載ください。</p>
-        <ul>
-          <li>対象ページのURL</li>
-          <li>問題となる箇所</li>
-          <li>権利侵害の内容</li>
-          <li>権利者本人または代理人であることを示す情報</li>
-          <li>ご連絡先</li>
-        </ul>
-        <p>当サイト運営者は、内容を確認のうえ、必要に応じて削除、修正、公開停止その他の措置を行います。</p>
-      </section>
-
-      <section>
-        <h2>9. 回答および対応について</h2>
-        <p>ご連絡の内容、件数、確認状況その他の事情により、回答までお時間をいただく場合や、回答を差し上げられない場合があります。当サイト運営者は、対応の要否および内容について、法令、契約、編集方針、権利関係その他の事情を踏まえて判断します。</p>
-      </section>
-
-      <section>
-        <h2>10. 免責</h2>
-        <p>当サイトコンテンツの利用にあたっては、利用者ご自身の責任で法令および権利関係をご確認ください。当サイト運営者は、当サイトコンテンツの利用により生じた損害または紛争について、当サイト運営者に故意または重過失がある場合を除き、責任を負いません。</p>
-      </section>
-
-      <section>
-        <h2>11. 本ページの変更</h2>
+        <h2>8. 本ページの変更</h2>
         <p>当サイト運営者は、必要に応じて本ページの内容を改定することがあります。変更後の内容は、当サイト上に掲載した時点から適用されるものとします。</p>
       </section>
 
       <section>
-        <h2>12. お問い合わせ窓口</h2>
-        <p>著作権、転載、引用、利用申請、権利侵害に関するご連絡は、以下よりお願いいたします。</p>
+        <h2>9. お問い合わせ窓口</h2>
         <table class="info-table">
-          <tr>
-            <th>運営者</th>
-            <td>The Dexent Media Enterprises</td>
-          </tr>
-          <tr>
-            <th>お問い合わせ</th>
-            <td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td>
-          </tr>
+          <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
+          <tr><th>お問い合わせ</th><td><a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a></td></tr>
         </table>
       </section>
 
@@ -177,75 +130,16 @@ const pageTitle = titles[lang] ?? titles['en'];
 </Layout>
 
 <style>
-  .info-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .info-title {
-    font-size: 26px;
-    color: #1a1a1a;
-    margin: 0 0 8px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #872732;
-  }
-  .update-date {
-    font-size: 13px;
-    color: #888;
-    margin: 0 0 24px;
-  }
-  .info-content section {
-    margin-bottom: 32px;
-  }
-  .info-content h2 {
-    font-size: 18px;
-    color: #1a1a1a;
-    margin: 0 0 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #872732;
-  }
-  .info-content p {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    margin-bottom: 12px;
-  }
-  .info-content ul {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    padding-left: 24px;
-    margin-bottom: 12px;
-  }
-  .info-content a {
-    color: #872732;
-    text-decoration: underline;
-  }
-  .info-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    margin-top: 8px;
-  }
-  .info-table th {
-    width: 140px;
-    padding: 10px 16px;
-    background: #f8f4f4;
-    color: #555;
-    font-weight: bold;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .info-table td {
-    padding: 10px 16px;
-    border: 1px solid #e5e7eb;
-    color: #1a1a1a;
-  }
-
-  @media (max-width: 600px) {
-    .info-container { padding: 20px 16px; }
-    .info-table th { width: 100px; font-size: 13px; }
-  }
+  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 8px; padding-bottom: 12px; border-bottom: 3px solid #872732; }
+  .update-date { font-size: 13px; color: #888; margin: 0 0 24px; }
+  .info-content section { margin-bottom: 32px; }
+  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid #872732; }
+  .info-content p { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
+  .info-content ul { font-size: 15px; line-height: 1.9; color: #333; padding-left: 24px; margin-bottom: 12px; }
+  .info-content a { color: #872732; text-decoration: underline; }
+  .info-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  .info-table th { width: 140px; padding: 10px 16px; background: #f8f4f4; color: #555; font-weight: bold; border: 1px solid #e5e7eb; text-align: left; white-space: nowrap; }
+  .info-table td { padding: 10px 16px; border: 1px solid #e5e7eb; color: #1a1a1a; }
+  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-table th { width: 100px; font-size: 13px; } }
 </style>
