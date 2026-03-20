@@ -9,53 +9,63 @@ const filterByCountryTag = (countryCode, count = 3) => {
   return allPosts.filter(post => post.labels?.includes(tag)).slice(0, count);
 };
 
+// 【親タイトル：24Watchin Global News】（言語別）
+const parentTitles = {
+  ja: '24Watchin グローバル・ニュース',
+  en: '24Watchin Global News',
+  fr: '24Watchin Actualités Mondiales',
+  de: '24Watchin Global News',
+  es: '24Watchin Noticias Globales',
+  ru: '24Watchin Мировые новости',
+  'zh-tw': '24Watchin 全球新聞',
+  'zh-cn': '24Watchin 全球新闻'
+};
+
+// 【各地域の「版」名称テーブル】
+const regionNameTable = {
+  asia: { ja: 'アジア版', en: 'Asia Edition', fr: 'Édition Asie', de: 'Asien-Ausgabe', es: 'Edición Asia', ru: 'Азиатское издание', 'zh-tw': '亞洲版', 'zh-cn': '亚洲版' },
+  europe: { ja: 'ヨーロッパ版', en: 'Europe Edition', fr: 'Édition Europe', de: 'Europa-Ausgabe', es: 'Edición Europa', ru: 'Европейское издание', 'zh-tw': '歐洲版', 'zh-cn': 'ヨーロッパ版' },
+  americas: { ja: '南北アメリカ版', en: 'Americas Edition', fr: 'Édition Amériques', de: 'Amerika-Ausgabe', es: 'Edición Américas', ru: 'Американское издание', 'zh-tw': '美洲版', 'zh-cn': '美洲版' },
+  middleEastAfrica: { ja: '中東・アフリカ版', en: 'Middle East & Africa Edition', fr: 'Édition Moyen-Orient et Afrique', de: 'Nahost- und Afrika-Ausgabe', es: 'Edición Oriente Medio y África', ru: 'Ближневосточно-африканское издание', 'zh-tw': '中東與非洲版', 'zh-cn': '中东与非洲版' },
+  oceania: { ja: 'オセアニア版', en: 'Oceania Edition', fr: 'Édition Océanie', de: 'Ozeanien-Ausgabe', es: 'Edición Oceanía', ru: 'Океанийское издание', 'zh-tw': '大洋洲版', 'zh-cn': '大洋洲版' }
+};
+
 const regionsTemplate = [
-  {
-    title: lang === 'ja' ? 'アジア' : 'Asia',
-    cities: [
-      { name: lang === 'ja' ? '日本' : 'Japan', code: 'jp' },
-      { name: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' },
-    ]
-  },
-  {
-    title: lang === 'ja' ? 'ヨーロッパ' : 'Europe',
-    cities: [
-      { name: lang === 'ja' ? 'ドイツ' : 'Germany', code: 'de' },
-      { name: lang === 'ja' ? 'フランス' : 'France', code: 'fr' },
-    ]
-  },
-  {
-    title: lang === 'ja' ? 'アメリカ大陸' : 'Americas',
-    cities: [
-      { name: lang === 'ja' ? 'アメリカ' : 'USA', code: 'us' },
-    ]
-  }
+  { key: 'asia', cities: [{ name: lang === 'ja' ? '日本' : 'Japan', code: 'jp' }, { name: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' }, { name: lang === 'ja' ? '韓国' : 'South Korea', code: 'kr' }, { name: lang === 'ja' ? 'シンガポール' : 'Singapore', code: 'sg' }] },
+  { key: 'europe', cities: [{ name: lang === 'ja' ? 'ドイツ' : 'Germany', code: 'de' }, { name: lang === 'ja' ? 'フランス' : 'France', code: 'fr' }] },
+  { key: 'americas', cities: [{ name: lang === 'ja' ? 'アメリカ' : 'USA', code: 'us' }] },
+  { key: 'middleEastAfrica', cities: [{ name: lang === 'ja' ? 'アラブ首長国連邦' : 'UAE', code: 'ae' }] },
+  { key: 'oceania', cities: [{ name: lang === 'ja' ? 'オーストラリア' : 'Australia', code: 'au' }] }
 ];
 
-// 現在の国(jp)を除外し、かつ記事が存在する国・地域だけを抽出
 const activeRegions = regionsTemplate.map(region => {
   const activeCities = region.cities
-    .filter(city => city.code !== country) // 現在の国を表示しない
-    .map(city => ({
-      ...city,
-      posts: filterByCountryTag(city.code)
-    }))
+    .filter(city => city.code !== country) // 現在のページと同じ国は非表示 
+    .map(city => ({ ...city, posts: filterByCountryTag(city.code) }))
     .filter(city => city.posts.length > 0);
 
-  return { ...region, cities: activeCities };
+  return { title: regionNameTable[region.key][lang] || regionNameTable[region.key]['en'], cities: activeCities };
 }).filter(region => region.cities.length > 0);
 ---
 
-<div class="region-section-container">
-  {activeRegions.map(region => (
-    <RegionNewsBlock 
-      lang={lang}
-      title={region.title}
-      cityData={region.cities}
-    />
-  ))}
-</div>
+{activeRegions.length > 0 && (
+  <div class="global-news-container">
+    <div class="parent-header">
+      <h1 class="parent-title">{parentTitles[lang] || parentTitles['en']}</h1>
+    </div>
+    
+    {activeRegions.map(region => (
+      <RegionNewsBlock 
+        lang={lang}
+        title={region.title}
+        cityData={region.cities}
+      />
+    ))}
+  </div>
+)}
 
 <style>
-  .region-section-container { margin-top: 30px; width: 100%; }
+  .global-news-container { margin-top: 50px; width: 100%; }
+  .parent-header { margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+  .parent-title { font-size: 28px; font-weight: 800; color: #111; margin: 0; }
 </style>
