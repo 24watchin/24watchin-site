@@ -1,5 +1,4 @@
 ---
-// 全引数を Astro.props から取得。エラー回避のため型指定を外しました。
 const {
   title,
   sidebarType = 'top',
@@ -7,12 +6,10 @@ const {
   allPosts = []
 } = Astro.props;
 
-// URLから言語を自動取得 [cite: 83-84]
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 
-// 言語別デフォルトdescription [cite: 85-88]
 const defaultDescriptions = {
   ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
   en: 'News from around the world, in your language. 24Watchin delivers the latest local news and stories, clearly explained for international residents.',
@@ -48,7 +45,9 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
       .page-shell { margin-top: 30px; }
       .main-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: start; }
       .content-area, .sidebar-area { display: block; width: 100%; min-width: 0; margin: 0; padding: 0; align-self: start; }
-      .bottom-wide { margin-top: 50px; width: 100%; }
+      
+      /* ▼ ここの margin-top を 50px から 20px に減らしました */
+      .bottom-wide { margin-top: 20px; width: 100%; }
 
       @media (max-width: 900px) {
         .main-layout { grid-template-columns: minmax(0, 1fr); }
@@ -85,7 +84,6 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
       </div>
     </div>
 
-    {/* フッターにデータを渡す。型エラーを避けるため引数名のみ記述します */}
     <Footer allPosts={allPosts} />
 
     <script>
