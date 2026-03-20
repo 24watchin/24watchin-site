@@ -1,14 +1,16 @@
 ---
 // ランキング部品を読み込みます
 import AccessRanking from './AccessRanking.astro';
-// サイドバー用の広告部品を読み込みます
-import SidebarAd from './SidebarAd.astro';
+
+// ▼ 【ここを修正】古いダミー広告部品を消して、新しい「GoogleAdBanner」を読み込みます
+import GoogleAdBanner from './GoogleAdBanner.astro';
+
 // 「編集部のおすすめ」部品を読み込みます
 import EditorsPick from './EditorsPick.astro';
-// ★今回新しく作った「天気パーツ」を読み込みます
+// 天気パーツを読み込みます
 import WeatherWidget from './WeatherWidget.astro';
 
-// ▼ 追加：Layoutから記事リストを受け取ります
+// Layoutから記事リストを受け取ります
 const { allPosts = [] } = Astro.props;
 ---
 
@@ -19,25 +21,25 @@ const { allPosts = [] } = Astro.props;
   {/* 2. 天気の下にランキング部品を配置します */}
   <AccessRanking />
 
-  {/* 3. ランキングの下に上部広告を配置します */}
-  <SidebarAd />
+  {/* 3. 【ここを修正】本物の広告部品を表示します */}
+  <GoogleAdBanner />
 
-  {/* 4. 上部広告の下に「編集部のおすすめ」を配置します（記事リストを渡します） */}
+  {/* 4. 広告の下に「編集部のおすすめ」を配置します */}
   <EditorsPick allPosts={allPosts} />
 </div>
 
 <style>
-  /* サイドバー全体をピシッと整列させるための設定です */
+  /* サイドバー全体を整列させるための設定です */
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 40px; /* パーツとパーツの間の隙間を均等に「40px」空けて、窮屈さをなくしました */
-    width: 100%; /* サイドバーの枠（300px）いっぱいに広げます */
+    gap: 40px; /* パーツ間の隙間を40px空けます */
+    width: 100%;
     margin: 0;
     padding: 0;
   }
 
-  /* 中に入るパーツに対して、「自分勝手な幅やズレをなくして、強制的に100%に揃えなさい」と指示します */
+  /* 中に入るパーツを100%の幅に揃えます */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
