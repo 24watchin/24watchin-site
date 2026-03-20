@@ -17,10 +17,22 @@ const titles: Record<string, string> = {
   'zh-tw': '關於 24Watchin',
 };
 
+const descriptions: Record<string, string> = {
+  ja: '24Watchinの運営者情報・サイト概要です。海外在住者向けの多言語グローバルニュースメディアです。',
+  en: 'About 24Watchin. A multilingual global news media for international residents around the world.',
+  de: 'Über 24Watchin. Ein mehrsprachiges globales Nachrichtenmedium für im Ausland lebende Menschen.',
+  fr: 'À propos de 24Watchin. Un média d\'information mondial multilingue pour les résidents étrangers.',
+  es: 'Acerca de 24Watchin. Un medio de comunicación global multilingüe para residentes en el extranjero.',
+  ru: 'О 24Watchin. Многоязычное глобальное новостное издание для иностранных резидентов.',
+  'zh-cn': '关于24Watchin。面向海外居民的多语言全球新闻媒体。',
+  'zh-tw': '關於24Watchin。面向海外居民的多語言全球新聞媒體。',
+};
+
 const pageTitle = titles[lang] ?? titles['en'];
+const pageDescription = descriptions[lang] ?? descriptions['en'];
 ---
 
-<Layout title={pageTitle} sidebarType="article">
+<Layout title={pageTitle} description={pageDescription} sidebarType="article">
   <div class="info-container">
     <h1 class="info-title">{pageTitle}</h1>
     <div class="info-content">
@@ -116,9 +128,7 @@ const pageTitle = titles[lang] ?? titles['en'];
     border-radius: 4px;
     margin-bottom: 32px;
   }
-  .info-content section {
-    margin-bottom: 32px;
-  }
+  .info-content section { margin-bottom: 32px; }
   .info-content h2 {
     font-size: 18px;
     color: #1a1a1a;
@@ -132,10 +142,7 @@ const pageTitle = titles[lang] ?? titles['en'];
     color: #333;
     margin-bottom: 12px;
   }
-  .info-content a {
-    color: #872732;
-    text-decoration: underline;
-  }
+  .info-content a { color: #872732; text-decoration: underline; }
   .info-table {
     width: 100%;
     border-collapse: collapse;
@@ -156,7 +163,6 @@ const pageTitle = titles[lang] ?? titles['en'];
     border: 1px solid #e5e7eb;
     color: #1a1a1a;
   }
-
   @media (max-width: 600px) {
     .info-container { padding: 20px 16px; }
     .info-table th { width: 100px; font-size: 13px; }
