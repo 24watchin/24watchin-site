@@ -3,7 +3,7 @@ import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import Layout from '../../../../layouts/Layout.astro';
 import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
-import { categoryLabelMap } from '../../../../lib/categoryLabels';
+import { categoryLabelMap } from '../../../../lib/categoryLabels.ts';
 
 export async function getStaticPaths() {
   const slugs = categoryLabelMap.jp.allCategories.map(cat => cat.slug);
@@ -21,20 +21,21 @@ const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const allPosts = data.items || [];
 
+const lang = 'ja';
+const country = 'jp';
+
 const catData = categoryLabelMap.jp.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : 'ニュース';
 const keywords = catData ? catData.keywords : [slug];
 
-// ▼ 【修正】タグの順番を正しく「ja-us」「ja-jp」の形式に直しました
-const isForeignPost = (post) => {
+// ▼ 【重要な修正】自国のタグ（ja-jp等）を必須とする厳格なルールに変更
+const targetTag = `${lang}-${country}`;
+const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => /^ja-[a-z]{2}$/.test(label) && label !== 'ja-jp');
-};
+  return post.labels.includes(targetTag);
+});
 
-// ▼ 全記事から海外記事を弾いた、安全な箱（mainSitePosts）を作ります
-const mainSitePosts = allPosts.filter(post => !isForeignPost(post));
-
-// ▼ カテゴリに合う記事を探すとき、全記事からではなく「安全な箱」から探すように変更しました
+// ▼ 厳格に絞り込まれた記事の中から、さらにカテゴリに合うものを探します
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.some(label => keywords.some(key => label.includes(key)));
@@ -46,13 +47,12 @@ const getImageUrl = (content) => {
 };
 ---
 
-{/* ▼ 【修正】Layout に allPosts={allPosts} を追加し、フッターが正常に動くようにしました */}
 <Layout title={categoryName} sidebarType="category" allPosts={allPosts}>
   <Breadcrumb
     countryLabel="日本"
-    countryHref="/ja/jp/"
+    countryHref={`/${lang}/${country}/`}
     categoryLabel={categoryName}
-    categoryHref={`/ja/jp/category/${slug}/`}
+    categoryHref={`/${lang}/${country}/category/${slug}/`}
   />
 
   {categoryPosts.length > 0 ? (
