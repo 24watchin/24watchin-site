@@ -1,10 +1,15 @@
 ---
 // ジャンルページ専用サイドバー：ランキングと広告を統合
+import GoogleAdBanner from './GoogleAdBanner.astro';
+
+// ▼ 【追加】親から言語と国を受け取るようにします
+const { lang = 'ja', country = 'jp' } = Astro.props;
+
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 
 // 1. ランキング用のデータを取得（最新10件）
-const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+const url = `https://www.googleapis.com/googleapis/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
 const response = await fetch(url).catch(() => null);
 const data = response ? await response.json() : { items: [] };
 const fetchedPosts = data.items || [];
@@ -39,8 +44,8 @@ for (let i = 0; i < 10; i++) {
           <li class="ranking-item">
             <div class="rank-number">{index + 1}</div>
             <div class="post-info">
-              {/* ★ ここを日本版の住所（/ja/jp/）に修正しました！ */}
-              <a href={post.dummy ? "#" : `/ja/jp/news/${post.id}/`} class="post-title">{post.title}</a>
+              {/* ▼ 【修正】/ja/jp/ を自動化しました */}
+              <a href={post.dummy ? "#" : `/${lang}/${country}/news/${post.id}/`} class="post-title">{post.title}</a>
             </div>
             <div class="post-thumbnail">
               <img src="https://placehold.co/80x60?text=No+Image" alt="サムネイル" />
@@ -56,22 +61,14 @@ for (let i = 0; i < 10; i++) {
   </section>
 
   {/* 2. 広告エリア ブロック */}
-  <section class="sidebar-widget ad-section">
-    <div class="ad-container">
-      <p class="ad-label">ADVERTISEMENT</p>
-      <div class="ad-box">
-        {/* ここに将来的にGoogle AdSenseなどのコードを貼り付けます */}
-        <p>広告エリア</p>
-      </div>
-    </div>
-  </section>
+  {/* ▼ 【修正】古い ad-section を消して、本物の広告部品に差し替えました */}
+  <GoogleAdBanner />
 
 </aside>
 
 <style>
   .category-sidebar { display: flex; flex-direction: column; gap: 2.5rem; }
 
-  /* ランキングのデザイン（ご提供いただいたものを調整） */
   .ranking-container { background-color: #fff; font-family: sans-serif; }
   .ranking-header h2 { font-size: 16px; font-weight: bold; margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px; }
   .ranking-label { font-size: 10px; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 0; }
@@ -87,9 +84,4 @@ for (let i = 0; i < 10; i++) {
   .post-thumbnail img { width: 70px; height: 50px; object-fit: cover; border-radius: 4px; }
   .ranking-footer { text-align: right; margin-top: 15px; font-size: 12px; }
   .ranking-footer a { color: #666; text-decoration: none; }
-
-  /* 広告エリアのデザイン */
-  .ad-container { text-align: center; }
-  .ad-label { font-size: 10px; color: #999; margin-bottom: 5px; }
-  .ad-box { background: #f4f4f4; height: 250px; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; color: #bbb; font-weight: bold; }
 </style>
