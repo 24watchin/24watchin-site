@@ -156,7 +156,10 @@ const getDayName = (dateStr) => {
                     {day.hour.map((h) => (
                       <tr class="hourly-row" data-hour={parseInt(h.time.split(' ')[1].split(':')[0])}>
                         <td class="h-time value-text">{h.time.split(' ')[1]}</td>
-                        <td class="h-icon"><img src={`https:${h.condition.icon}`} alt="" /></td>
+                        <td class="h-icon">
+                          <img src={`https:${h.condition.icon}`} alt="" />
+                          <div class="h-condition-text">{getWeatherCondition(h.condition.code, lang)}</div>
+                        </td>
                         <td class="h-temp value-text">{isImperial ? Math.round(h.temp_f) : Math.round(h.temp_c)}°</td>
                         <td class="h-humidity value-text">{h.humidity}%</td>
                         <td class="h-wind value-text">{isImperial ? Math.round(h.wind_mph) : Math.round(h.wind_kph)}</td>
@@ -246,13 +249,14 @@ const getDayName = (dateStr) => {
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid #872732; padding-left: 12px; }
 
-  /* --- ① アイコンの縦揃えの修正 --- */
+  /* --- ① アイコンと文字を中央に縦一列に並べる --- */
   .weather-page .weather-info {
     display: flex;
     flex-direction: column; 
-    align-items: center;    /* 中央に寄せる */
+    align-items: center;    
     justify-content: center;
     text-align: center;
+    gap: 4px;
   }
 
   .weather-page .summary-icon {
@@ -262,21 +266,21 @@ const getDayName = (dateStr) => {
     margin: 0 auto; 
   }
 
-  /* --- ③ 夜の月の色とサイズを修正 --- */
-  /* 夜用アイコン(nightを含むURL)にオレンジフィルターを適用 */
+  /* --- ② 夜の月の色（シルバー・白）とサイズの調整 --- */
   .weather-page img[src*="night"] {
-    filter: sepia(100%) saturate(1000%) hue-rotate(-50deg) brightness(1.2);
-    width: 85px;  /* 月だけのアイコンを大きく */
-    height: 85px;
+    /* 青を「白銀色」に変え、明るさをアップする設定 */
+    filter: brightness(1.6) grayscale(1); 
+    width: 95px;  /* 月だけのアイコンを大きく */
+    height: 95px;
   }
 
-  /* --- ② 気温の横並び修正 --- */
+  /* --- ② 気温の横並び --- */
   .weather-page .temp-info {
     display: flex;
-    flex-direction: row;    /* 横に並べる */
+    flex-direction: row;    
     align-items: center;    
     justify-content: center;
-    gap: 8px;              
+    gap: 12px;              
     white-space: nowrap;    
   }
 
@@ -289,7 +293,7 @@ const getDayName = (dateStr) => {
   .weather-page .day-summary-btn {
     width: 100%;
     display: grid;
-    grid-template-columns: 0.8fr 1.2fr 1.8fr 0.6fr 0.8fr; /* 配置を整理 */
+    grid-template-columns: 0.8fr 1.6fr 1.8fr 0.6fr 0.8fr;
     align-items: center;
     padding: 10px 16px;
     background: none;
@@ -297,16 +301,41 @@ const getDayName = (dateStr) => {
     cursor: pointer;
   }
 
-  /* 以下、共通スタイル */
+  /* ③ 1時間ごとの表のデザイン調整 */
+  .weather-page .h-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .weather-page .h-icon img {
+    width: 48px;
+    height: 48px;
+  }
+  /* 夜の1時間ごとアイコンも少し大きくする */
+  .weather-page .h-icon img[src*="night"] {
+    width: 58px;
+    height: 58px;
+  }
+  .weather-page .h-condition-text {
+    font-size: 0.75rem;
+    color: #444;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+
+  /* 共通スタイル */
   .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
   .weather-page .day-summary-btn:hover { background: #f9fafb; }
   .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; }
   .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; }
+  .weather-page .condition-text { font-size: 0.9rem; color: #333; font-weight: bold; margin-top: -5px; }
   .weather-page .hourly-badge { background-color: #4141e0; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-  .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 4px 16px; border-top: 1px solid #eee; }
+  .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 12px 16px; border-top: 1px solid #eee; overflow-x: auto; }
   .weather-page .hourly-table { width: 100%; min-width: 550px; border-collapse: collapse; }
-  .weather-page .hourly-table th { padding: 8px 4px; font-size: 0.8rem; color: #888; border-bottom: 1px solid #ddd; text-align: center; }
-  .weather-page .hourly-table td { padding: 4px 4px; text-align: center; border-bottom: 1px solid #eee; }
+  .weather-page .hourly-table th { padding: 12px 4px; font-size: 0.8rem; color: #888; border-bottom: 1px solid #ddd; text-align: center; }
+  .weather-page .hourly-table td { padding: 10px 4px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; }
+
   .alert-ticker-container { background: #f0f7ff; border: 1.5px solid #1fa7db; border-radius: 8px; padding: 6px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; overflow: hidden; }
   .alert-ticker-label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #0068b7; font-weight: bold; font-size: 0.95rem; }
   .alert-ticker-window { flex-grow: 1; background: #fff; border: 1px solid #1fa7db; border-radius: 4px; height: 32px; display: flex; align-items: center; overflow: hidden; position: relative; }
