@@ -12,10 +12,23 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// SNSリンク設定：URLを @24_watchin に修正しました
+// 言語別SNSリンク設定
+const snsConfig: Record<string, { x: string; fb: string; showX: boolean; showFb: boolean }> = {
+  ja:    { x: 'https://x.com/24watchin_ja', fb: 'https://facebook.com/24watchin.ja', showX: true,  showFb: true  },
+  en:    { x: 'https://x.com/24watchin_en', fb: 'https://facebook.com/24watchin.en', showX: true,  showFb: true  },
+  'zh-tw': { x: 'https://x.com/24watchin_tw', fb: 'https://facebook.com/24watchin.tw', showX: true,  showFb: true  },
+  es:    { x: 'https://x.com/24watchin_es', fb: 'https://facebook.com/24watchin.es', showX: true,  showFb: true  },
+  fr:    { x: 'https://x.com/24watchin_fr', fb: 'https://facebook.com/24watchin.fr', showX: true,  showFb: true  },
+  de:    { x: 'https://x.com/24watchin_de', fb: 'https://facebook.com/24watchin.de', showX: true,  showFb: true  },
+  zh:    { x: '', fb: '', showX: false, showFb: false }, // 簡体字：Weibo設定後に追加予定
+  ru:    { x: '', fb: '', showX: false, showFb: false }, // ロシア語：VK設定後に追加予定
+};
+
+const currentSns = snsConfig[lang] ?? snsConfig['en'];
+
 const snsLinks = [
-  { label: 'X',         href: 'https://x.com/24_watchin',       icon: 'x',         show: true  },
-  { label: 'Facebook',  href: 'https://facebook.com/24watchin', icon: 'facebook',  show: true  },
+  { label: 'X',        href: currentSns.x,  icon: 'x',        show: currentSns.showX  },
+  { label: 'Facebook', href: currentSns.fb, icon: 'facebook', show: currentSns.showFb },
 ];
 
 // Informationメニュー
