@@ -1,83 +1,151 @@
 ---
-// 共有メモ対応・軽量検索ページ（24Watchin安定版）
+// 【24Watchin】以前のデザインを完全再現し、安定性を強化した検索ページ
 import Layout from '../../../layouts/Layout.astro';
 
-// index.astro が取得した「共有メモ」を再利用します
-const posts = globalThis.bloggerPostsCache || [];
+// 補助関数：画像抽出とHTMLタグ削除（バックアップから継承）
+function extractImageSrc(html = '') {
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match ? match[1] : '';
+}
+function stripHtml(html = '') {
+  return html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
+}
 
-// 海外記事を弾くバリア
+// 【重要】index.astro が取得済みの「共有メモ」を再利用（電話はしません）
+const rawPosts = globalThis.bloggerPostsCache || [];
+
 const isForeignPost = (post) => {
   if (!post.labels) return false;
   return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
 };
 
-const safePosts = posts.filter(p => !isForeignPost(p));
+const mainSitePosts = rawPosts.filter(post => !isForeignPost(post));
+
+// 検索用データの作成（バックアップの構造を維持）
+const searchIndex = mainSitePosts.map((post) => ({
+  id: post.id,
+  title: post.title || '',
+  published: post.published || '',
+  imageUrl: extractImageSrc(post.content || ''),
+  plainText: stripHtml(post.content || ''),
+}));
 ---
 
-<Layout title="検索 - 24Watchin">
-  <div class="search-container">
-    <h1 class="page-title">サイト内検索</h1>
-    
-    {safePosts.length > 0 ? (
-      <div id="search-root" data-posts={JSON.stringify(safePosts)}>
-        <p class="search-info">最新の {safePosts.length} 件の記事から検索します</p>
-        <input type="text" id="search-input" placeholder="キーワードを入力してください..." autofocus />
-        <div id="results"></div>
-      </div>
-    ) : (
-      <div class="no-data">
-        <p>検索データを準備中です。数分後にページを更新してください。</p>
-        <a href="/ja/jp/" class="back-link">トップページへ戻る</a>
-      </div>
-    )}
+<Layout title="検索結果">
+  <div class="search-main-wrapper">
+    <div class="search-header-area">
+      <h1 class="search-title">
+        「<span id="displayWord"></span>」の検索結果：<span id="resultCount">0</span>件
+      </h1>
+    </div>
+
+    <div class="results-grid" id="resultsGrid"></div>
+
+    <div id="noResults" class="no-results" style="display: none;">
+      「<span id="displayWordNo"></span>」に一致する記事は見つかりませんでした。
+    </div>
+
+    <div id="loadMoreArea" class="load-more-area" style="display: none;">
+      <button id="loadMoreBtn" class="load-more-btn">さらに表示</button>
+    </div>
   </div>
 </Layout>
 
-<script>
-  // ブラウザ上で動く検索プログラム
-  const root = document.getElementById('search-root');
-  if (root) {
-    const input = document.getElementById('search-input');
-    const results = document.getElementById('results');
-    const posts = JSON.parse(root.dataset.posts);
+<script is:inline define:vars={{ searchIndex }}>
+  // ヘッダーからの検索ワード（q=...）を受け取る仕組み
+  const params = new URLSearchParams(window.location.search);
+  const q = (params.get('q') || '').trim();
+  const searchWord = q.toLowerCase();
+  const dateFormatter = new Intl.DateTimeFormat('ja-JP');
+  const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 
-    input.addEventListener('input', (e) => {
-      const query = e.target.value.trim().toLowerCase();
-      if (!query) {
-        results.innerHTML = '';
-        return;
-      }
+  document.getElementById('displayWord').textContent = q;
+  document.getElementById('displayWordNo').textContent = q;
 
-      const filtered = posts.filter(p => 
-        (p.title && p.title.toLowerCase().includes(query)) || 
-        (p.content && p.content.toLowerCase().includes(query))
-      );
+  // 共有メモから検索
+  const filtered = searchIndex.filter((post) => {
+    if (!searchWord) return false;
+    return post.title.toLowerCase().includes(searchWord) || post.plainText.toLowerCase().includes(searchWord);
+  });
 
-      if (filtered.length > 0) {
-        results.innerHTML = filtered.map(p => `
-          <div class="result-item">
-            <a href="/ja/jp/news/${p.id}/">
-              <span class="result-title">${p.title}</span>
-            </a>
-          </div>
-        `).join('');
-      } else {
-        results.innerHTML = '<p class="no-results">一致する記事が見つかりませんでした。</p>';
-      }
-    });
+  document.getElementById('resultCount').textContent = filtered.length;
+
+  const grid = document.getElementById('resultsGrid');
+  const loadMoreArea = document.getElementById('loadMoreArea');
+  const noResults = document.getElementById('noResults');
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  
+  let currentCount = 0;
+  const PAGE_SIZE = 20;
+
+  // カード作成（バックアップのデザインを100%再現）
+  function createCard(post) {
+    const card = document.createElement('a');
+    card.href = `/ja/jp/news/${post.id}/`;
+    card.className = 'grid-item';
+
+    const imageBox = document.createElement('div');
+    imageBox.className = 'post-image-box';
+
+    const img = document.createElement('img');
+    img.src = post.imageUrl || PLACEHOLDER_IMAGE;
+    img.alt = post.title || '';
+
+    imageBox.appendChild(img);
+    const metaLine = document.createElement('div');
+    metaLine.className = 'post-meta-line';
+    
+    const time = document.createElement('time');
+    time.textContent = post.published ? dateFormatter.format(new Date(post.published)) : '';
+    metaLine.appendChild(time);
+
+    const title = document.createElement('h2');
+    title.className = 'post-title-text';
+    title.textContent = post.title || '';
+
+    card.appendChild(imageBox);
+    card.appendChild(metaLine);
+    card.appendChild(title);
+
+    return card;
   }
+
+  function displayItems(limit) {
+    const nextItems = filtered.slice(currentCount, currentCount + limit);
+    nextItems.forEach((post) => {
+      grid.appendChild(createCard(post));
+    });
+    currentCount += nextItems.length;
+    loadMoreArea.style.display = currentCount < filtered.length ? 'block' : 'none';
+  }
+
+  if (filtered.length > 0) {
+    displayItems(PAGE_SIZE);
+  } else {
+    noResults.style.display = 'block';
+  }
+
+  loadMoreBtn?.addEventListener('click', () => {
+    displayItems(PAGE_SIZE);
+  });
 </script>
 
-<style>
-  .search-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; min-height: 70vh; font-family: sans-serif; }
-  .page-title { border-bottom: 4px solid #872732; padding-bottom: 10px; margin-bottom: 20px; font-size: 24px; color: #1a1a1a; }
-  .search-info { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
-  #search-input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; outline: none; transition: border-color 0.2s; }
-  #search-input:focus { border-color: #872732; }
-  #results { margin-top: 20px; }
-  .result-item { padding: 15px 0; border-bottom: 1px solid #eee; }
-  .result-title { color: #872732; text-decoration: none; font-weight: bold; font-size: 16px; }
-  .result-item a:hover .result-title { text-decoration: underline; }
-  .no-results, .no-data { padding: 30px; text-align: center; color: #666; }
-  .back-link { display: inline-block; margin-top: 15px; color: #872732; text-decoration: none; font-weight: bold; }
+<style is:global>
+  /* バックアップのCSSをそのまま適用 */
+  .search-main-wrapper { width: 100%; min-width: 0; margin: 0; padding: 20px; box-sizing: border-box; }
+  .search-header-area { margin: 0 0 25px 0; padding: 0 0 10px 0; border-bottom: 1px solid #ddd; }
+  .search-title { font-size: 1.25rem; font-weight: bold; color: #333; }
+  .results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; width: 100%; }
+  .grid-item { display: block; text-decoration: none !important; color: inherit !important; }
+  .post-image-box { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #f0f0f0; border-radius: 4px; }
+  .post-image-box img { width: 100%; height: 100%; object-fit: cover; }
+  .post-meta-line { margin: 10px 0 5px 0; font-size: 13px; color: #999; }
+  .post-title-text { font-size: 16px; font-weight: bold; line-height: 1.4; color: #333; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .no-results { margin-top: 40px; text-align: center; color: #666; }
+  .load-more-area { text-align: center; margin: 40px 0; }
+  .load-more-btn { background: #fff; border: 1px solid #ccc; padding: 12px 40px; border-radius: 4px; cursor: pointer; }
+  
+  @media (max-width: 1024px) { .results-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .results-grid { grid-template-columns: 1fr; } }
 </style>
