@@ -1,0 +1,309 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getWeatherCondition } from '../../../lib/weatherConditions';
+
+// 【重要】Astroに「どのページを作るか」を教える命令を追加しました
+export async function getStaticPaths() {
+  const paths = [
+    { params: { lang: 'ja', country: 'jp' } }, // 日本語 - 日本
+    { params: { lang: 'en', country: 'us' } }, // 英語 - アメリカ
+    { params: { lang: 'de', country: 'de' } }, // ドイツ語 - ドイツ
+    { params: { lang: 'fr', country: 'fr' } }, // フランス語 - フランス
+    // 必要に応じて、ここに行を追加するだけで新しい国を増やせます
+  ];
+  return paths;
+}
+
+// URLから「言語」と「国」を自動的に受け取ります
+const { lang, country } = Astro.params;
+
+const apiLangMap = { jp: 'ja', en: 'en', cn: 'zh', fr: 'fr', de: 'de', es: 'es', ru: 'ru' };
+const apiLang = apiLangMap[lang] || 'ja';
+const isImperial = lang === 'en';
+
+// --- Bloggerから関連記事を取得 ---
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = import.meta.env.BLOG_ID;
+const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
+
+let relatedNews = [];
+if (API_KEY && BLOG_ID) {
+  try {
+    const bloggerUrl = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+    const bResponse = await fetch(bloggerUrl);
+    if (bResponse.ok) {
+      const bData = await bResponse.json();
+      const allPosts = bData.items || [];
+      const isForeignPost = (post) => {
+        if (!post.labels) return false;
+        // その国のタグ（例: ja-jp）がついているかチェック
+        const targetTag = `${lang}-${country}`;
+        return post.labels.includes(targetTag);
+      };
+
+      relatedNews = allPosts.filter(post => 
+        post.labels && 
+        post.labels.includes(`${lang}-${country}`) &&
+        post.labels.some(label => ['天気', '気象', '災害', 'weather'].includes(label))
+      ).slice(0, 5);
+    }
+  } catch (e) {}
+}
+
+const getImageUrl = (content) => {
+  const match = content?.match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
+};
+
+// --- 天気データの取得 ---
+const cityMap = {
+  jp: { name: 'Tokyo', tz: 'Asia/Tokyo', display: { ja: '東京', en: 'Tokyo' } },
+  us: { name: 'New_York', tz: 'America/New_York', display: { ja: 'ニューヨーク', en: 'New York' } },
+  de: { name: 'Berlin', tz: 'Europe/Berlin', display: { ja: 'ベルリン', en: 'Berlin' } },
+  fr: { name: 'Paris', tz: 'Europe/Paris', display: { ja: 'パリ', en: 'Paris' } },
+};
+
+const targetCity = cityMap[country] || cityMap.jp;
+const cityDisplayName = targetCity.display[lang] || targetCity.display.ja || targetCity.display.en;
+
+let forecastDays = [];
+let alertFullText = "";
+
+if (WEATHER_API_KEY) {
+  try {
+    const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${targetCity.name}&days=5&aqi=no&alerts=yes&lang=${apiLang}`;
+    const wResponse = await fetch(weatherUrl);
+    if (wResponse.ok) {
+      const wData = await wResponse.json();
+      forecastDays = wData.forecast.forecastday;
+      const alerts = wData.alerts.alert || [];
+      alertFullText = alerts.map(a => a.headline).join(' / ');
+    }
+  } catch (e) {}
+}
+
+const allLabels = {
+  ja: { title: '3日間の天気予報', alertTitle: '気象・災害情報', relatedTitle: '関連記事', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
+  en: { title: '3-Day Forecast', alertTitle: 'Weather/Disaster Info', relatedTitle: 'Related News', hourly: 'Hourly', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' }
+};
+const labels = allLabels[lang] || allLabels.en;
+const tempUnit = isImperial ? '℉' : '℃';
+const windUnit = isImperial ? 'mph' : 'km/h';
+
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+};
+const getDayName = (dateStr) => {
+  const dayIndex = new Date(dateStr).getDay();
+  const dayNames = { ja: ['日', '月', '火', '水', '木', '金', '土'], en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
+  return (dayNames[lang] || dayNames.en)[dayIndex];
+};
+---
+
+<Layout title={`${cityDisplayName} | ${labels.title}`} sidebarType="weather">
+  <main class="weather-page" data-timezone={targetCity.tz}>
+    <div class="alert-ticker-container">
+      <div class="alert-ticker-label">
+        <span class="alert-ticker-icon">ℹ️</span>
+        <span class="alert-ticker-name">{labels.alertTitle} ({cityDisplayName})：</span>
+      </div>
+      <div class="alert-ticker-window">
+        {alertFullText ? (
+          <div class="alert-ticker-text">
+            <span>{alertFullText}　　　{alertFullText}</span>
+          </div>
+        ) : (
+          <div class="alert-ticker-empty"></div>
+        )}
+      </div>
+    </div>
+
+    <section class="forecast-section">
+      <h2 class="section-title">{cityDisplayName} {labels.title}</h2>
+      
+      <div class="forecast-container">
+        {forecastDays.map((day, index) => (
+          <div class="day-group" data-date={day.date}>
+            <button class="day-summary-btn" aria-expanded="false" data-target={`hourly-${index}`}>
+              <div class="date-info">
+                <span class="date-text">{formatDate(day.date)}({getDayName(day.date)})</span>
+              </div>
+              <div class="weather-info">
+                <img 
+                  src={`https:${day.day.condition.icon}`} 
+                  alt="" 
+                  class={`summary-icon ${day.day.condition.icon.includes('113.png') ? 'moon-only' : 'moon-cloud'}`} 
+                />
+                <span class="condition-text">{getWeatherCondition(day.day.condition.code, lang)}</span>
+              </div>
+              <div class="temp-info">
+                <div class="temp-item">
+                  <span class="temp-label">{labels.max}</span>
+                  <span class="value-text temp-max">{isImperial ? Math.round(day.day.maxtemp_f) : Math.round(day.day.maxtemp_c)}°</span>
+                </div>
+                <span class="temp-sep">/</span>
+                <div class="temp-item">
+                  <span class="temp-label">{labels.min}</span>
+                  <span class="value-text temp-min">{isImperial ? Math.round(day.day.mintemp_f) : Math.round(day.day.mintemp_c)}°</span>
+                </div>
+              </div>
+              <div class="rain-info">
+                <span class="value-text rain-val">{day.day.daily_chance_of_rain}%</span>
+              </div>
+              <div class="badge-wrapper">
+                <span class="hourly-badge">{labels.hourly}</span>
+              </div>
+            </button>
+
+            <div id={`hourly-${index}`} class="hourly-details" hidden>
+              <div class="hourly-scroll-wrapper">
+                <table class="hourly-table">
+                  <thead>
+                    <tr>
+                      <th>{labels.time}</th>
+                      <th>{labels.weather}</th>
+                      <th>{labels.temp}({tempUnit})</th>
+                      <th>{labels.humidity}</th>
+                      <th>{labels.wind}({windUnit})</th>
+                      <th>{labels.rain}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {day.hour.map((h) => (
+                      <tr class="hourly-row" data-hour={parseInt(h.time.split(' ')[1].split(':')[0])}>
+                        <td class="h-time value-text">{h.time.split(' ')[1]}</td>
+                        <td class="h-icon">
+                          <img 
+                            src={`https:${h.condition.icon}`} 
+                            alt="" 
+                            class={h.condition.icon.includes('113.png') ? 'moon-only' : 'moon-cloud'}
+                          />
+                          <div class="h-condition-text">{getWeatherCondition(h.condition.code, lang)}</div>
+                        </td>
+                        <td class="h-temp value-text">{isImperial ? Math.round(h.temp_f) : Math.round(h.temp_c)}°</td>
+                        <td class="h-humidity value-text">{h.humidity}%</td>
+                        <td class="h-wind value-text">{isImperial ? Math.round(h.wind_mph) : Math.round(h.wind_kph)}</td>
+                        <td class="h-rain value-text">{h.chance_of_rain}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {relatedNews.length > 0 && (
+      <section class="related-news-section">
+        <h2 class="section-title">{labels.relatedTitle}</h2>
+        <div class="news-list-one-column">
+          {relatedNews.map((post) => (
+            <a href={`/${lang}/${country}/news/${post.id}/`} class="news-item">
+              <div class="news-image">
+                <img src={getImageUrl(post.content)} alt={post.title} />
+              </div>
+              <div class="news-content">
+                <h3 class="news-title">{post.title}</h3>
+                <time class="news-date">{new Date(post.published).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US')}</time>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </main>
+</Layout>
+
+<script>
+  function updateWeatherDisplay() {
+    const page = document.querySelector('.weather-page');
+    if (!page) return;
+
+    const timezone = page.getAttribute('data-timezone') || 'Asia/Tokyo';
+    const nowInCity = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', hourCycle: 'h23'
+    }).formatToParts(new Date());
+    const cityFullDate = `${nowInCity.find(p => p.type === 'year').value}-${nowInCity.find(p => p.type === 'month').value}-${nowInCity.find(p => p.type === 'day').value}`;
+    const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
+
+    let visibleCount = 0;
+    document.querySelectorAll('.day-group').forEach(group => {
+      const groupDate = group.getAttribute('data-date');
+      if (groupDate < cityFullDate) {
+        group.style.display = 'none';
+      } else {
+        if (visibleCount < 3) {
+          group.style.display = 'block';
+          visibleCount++;
+          if (groupDate === cityFullDate) {
+            group.querySelectorAll('.hourly-row').forEach(row => {
+              if (parseInt(row.getAttribute('data-hour')) < cityHour) {
+                row.style.display = 'none';
+              }
+            });
+          }
+        } else {
+          group.style.display = 'none';
+        }
+      }
+    });
+
+    document.querySelectorAll('.day-summary-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const targetId = e.currentTarget.getAttribute('data-target');
+        const targetEl = document.getElementById(targetId);
+        const isExpanded = e.currentTarget.getAttribute('aria-expanded') === 'true';
+        e.currentTarget.setAttribute('aria-expanded', String(!isExpanded));
+        targetEl.hidden = isExpanded;
+      });
+    });
+  }
+  updateWeatherDisplay();
+</script>
+
+<style>
+  :root { --weather-value-size: 1.15rem; }
+  .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
+  .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid #872732; padding-left: 12px; }
+
+  /* アイコンの中央整列 */
+  .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px; min-width: 130px; }
+  .weather-page .summary-icon { width: 72px; height: 72px; display: block; margin: 0 auto; }
+
+  /* 月の色とデザイン調整 */
+  .weather-page img.moon-only[src*="night"] {
+    filter: sepia(100%) saturate(400%) hue-rotate(15deg) brightness(1.0);
+    width: 90px; height: 90px;
+  }
+  .weather-page img.moon-cloud[src*="night"] {
+    filter: grayscale(1) brightness(1.1) contrast(0.9);
+    width: 85px; height: 85px;
+  }
+
+  /* 気温の横並び */
+  .weather-page .temp-info { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 12px; white-space: nowrap; }
+  .weather-page .temp-item { display: flex; align-items: baseline; gap: 4px; }
+  .weather-page .day-summary-btn { width: 100%; display: grid; grid-template-columns: 0.8fr 1.8fr 1.8fr 0.6fr 0.8fr; align-items: center; padding: 12px 16px; background: none; border: none; cursor: pointer; }
+
+  /* 1時間ごとの表 */
+  .weather-page .h-icon { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .weather-page .h-icon img { width: 48px; height: 48px; }
+  .weather-page .h-icon img.moon-only { width: 55px; height: 55px; }
+  .weather-page .h-condition-text { font-size: 0.8rem; color: #1a1a1a; font-weight: bold; white-space: nowrap; }
+
+  /* 共通スタイル */
+  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
+  .weather-page .day-summary-btn:hover { background: #f9fafb; }
+  .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; }
+  .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; }
+  .weather-page .condition-text { font-size: 0.95rem; color: #1a1a1a; font-weight: bold; margin-top: -5px; }
+  .weather-page .hourly-badge { background-color: #4141e0; color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
+  .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 16px 16px; border-top: 1px solid #eee; overflow-x: auto; }
+  .weather-page .hourly-table { width: 100%; min-width: 600px; border-collapse: collapse; }
+  .weather-page .hourly-table th { padding: 12px 6px; font-size: 0.85rem; color: #666; border-bottom: 1px solid #ccc; text-align: center; }
+  .weather-page .hourly-table td { padding: 12px 6px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; }
+</style>
