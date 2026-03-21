@@ -1,13 +1,16 @@
 ---
-// サイドバー用の「編集部のおすすめ」共有メモ版
-const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
+// サイドバー用「編集部のおすすめ」共有メモ＆厳格フィルター版
+// ページの言語と国情報を受け取ります
+const { lang = 'ja', country = 'jp' } = Astro.props;
+const targetTag = `${lang}-${country}`;
 
-// 【重要】index.astro が取ってきた「共有メモ」をのぞく
+// 1. 他のパーツ（index.astroなど）が用意した「共有メモ」をのぞく
 let allPosts = globalThis.bloggerPostsCache || [];
 
-// もしメモが空なら、予備で1回だけ取得（保険）
+// 2. 【保険】もしメモが空なら、代表して1回だけGoogleに電話する
 if (allPosts.length === 0) {
+  const API_KEY = import.meta.env.API_KEY;
+  const BLOG_ID = import.meta.env.BLOG_ID;
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
   const response = await fetch(url).catch(() => null);
   if (response && response.ok) {
@@ -17,14 +20,12 @@ if (allPosts.length === 0) {
   }
 }
 
-// 海外記事を弾くバリア
-const isForeignPost = (post) => {
-  if (!post.labels) return false;
-  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
-};
-const safePosts = allPosts.filter(p => !isForeignPost(p));
+// 3. 【重要】このページと同じタグ（ja-jp など）を持つ記事だけを厳選（消去法ではなく、指定方式！）
+const safePosts = allPosts.filter(post => 
+  post.labels && post.labels.includes(targetTag)
+);
 
-// 「編集部①」などのタグを探して並べ替える仕組み（ここは元のロジックを維持）
+// 4. 「編集部①」などのタグを探して並べ替える仕組み（ここは元のロジックを維持）
 const topPostsMap = new Map();
 const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩12345678910])$/;
 const numConverter = { 
@@ -54,26 +55,37 @@ const getImageUrl = (content) => {
   return match ? match[1] : 'https://placehold.co/64x48/eeeeee/999999?text=No+Image';
 };
 ---
+
 <div class="ep-container">
-  <div class="ep-header"><h3 class="ep-title">編集部のおすすめ</h3></div>
+  <div class="ep-header">
+    <h3 class="ep-title">編集部のおすすめ</h3>
+  </div>
+
   <ul class="ep-list">
     {displayPosts.map((post) => (
       <li class="ep-item">
-        <div class="ep-info"><a href={`/ja/jp/news/${post.id}/`} class="ep-post-title">{post.title}</a></div>
-        <div class="ep-thumbnail"><img src={getImageUrl(post.content)} alt="サムネイル" /></div>
+        <div class="ep-info">
+          {/* リンクを自動化：どの言語ページでも正しく飛びます */}
+          <a href={`/${lang}/${country}/news/${post.id}/`} class="ep-post-title">{post.title}</a>
+        </div>
+        <div class="ep-thumbnail">
+          <img src={getImageUrl(post.content)} alt="サムネイル" />
+        </div>
       </li>
     ))}
   </ul>
 </div>
+
 <style>
-  /* スタイル部分は以前と同じものを維持 */
+  /* スタイルは以前の綺麗なデザインをそのまま維持 */
   .ep-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px 16px 16px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); font-family: sans-serif; }
   .ep-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid #872732; padding-bottom: 6px; margin-bottom: 12px; }
   .ep-title { font-size: 1.1rem; font-weight: bold; margin: 0; color: #1a1a1a; }
   .ep-list { list-style: none; padding: 0; margin: 0; }
   .ep-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px dashed #ccc; gap: 10px; }
   .ep-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .ep-info { flex: 1; }
+  .ep-info { flex: 1; min-width: 0; }
   .ep-post-title { font-size: 13px; color: #000; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
-  .ep-thumbnail img { width: 64px; height: 48px; object-fit: cover; border-radius: 4px; }
+  .ep-post-title:hover { text-decoration: underline; }
+  .ep-thumbnail img { width: 64px; height: 48px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
 </style>
