@@ -30,7 +30,20 @@ const sortedPostIds = Array.from(pvMap.entries())
 // 2. 共有メモからデータを読み込む
 let allPosts = globalThis.bloggerPostsCache || [];
 
-// 3. 【重要】このページと同じ「言語-国」タグを持つ記事だけを抽出
+// 【修正：保険の追加】もし共有メモが空なら、自分で1回だけ取得します
+if (allPosts.length === 0) {
+  const API_KEY = import.meta.env.API_KEY;
+  const BLOG_ID = import.meta.env.BLOG_ID;
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+  const response = await fetch(url).catch(() => null);
+  if (response && response.ok) {
+    const data = await response.json();
+    allPosts = data.items || [];
+    globalThis.bloggerPostsCache = allPosts;
+  }
+}
+
+// 3. 厳格なフィルター：このページと同じ「言語-国」タグを持つ記事だけを抽出
 const sitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.includes(targetTag);
@@ -71,7 +84,6 @@ const getImageUrl = (content) => {
           <li class="ranking-item">
             <div class="rank-number">{index + 1}</div>
             <div class="post-info">
-              {/* リンクを言語・国に合わせて自動調整 */}
               <a href={`/${lang}/${country}/news/${post.id}/`} class="post-title">
                 {post.title}
               </a>
@@ -82,6 +94,9 @@ const getImageUrl = (content) => {
           </li>
         ))}
       </ul>
+      {rankingList.length === 0 && (
+        <p style="font-size: 12px; color: #666; padding: 10px; text-align: center;">記事を読み込み中です...</p>
+      )}
     </div>
   </section>
 
@@ -89,7 +104,6 @@ const getImageUrl = (content) => {
 </aside>
 
 <style>
-  /* 最新の AccessRanking.astro と同じデザインに統一 */
   .category-sidebar { display: flex; flex-direction: column; gap: 24px; }
   .ranking-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px 16px 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); font-family: sans-serif; }
   .widget-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid #872732; padding-bottom: 6px; margin-bottom: 12px; }
