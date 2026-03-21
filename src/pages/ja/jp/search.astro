@@ -1,0 +1,83 @@
+---
+// 共有メモ対応・軽量検索ページ（24Watchin安定版）
+import Layout from '../../../layouts/Layout.astro';
+
+// index.astro が取得した「共有メモ」を再利用します
+const posts = globalThis.bloggerPostsCache || [];
+
+// 海外記事を弾くバリア
+const isForeignPost = (post) => {
+  if (!post.labels) return false;
+  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
+};
+
+const safePosts = posts.filter(p => !isForeignPost(p));
+---
+
+<Layout title="検索 - 24Watchin">
+  <div class="search-container">
+    <h1 class="page-title">サイト内検索</h1>
+    
+    {safePosts.length > 0 ? (
+      <div id="search-root" data-posts={JSON.stringify(safePosts)}>
+        <p class="search-info">最新の {safePosts.length} 件の記事から検索します</p>
+        <input type="text" id="search-input" placeholder="キーワードを入力してください..." autofocus />
+        <div id="results"></div>
+      </div>
+    ) : (
+      <div class="no-data">
+        <p>検索データを準備中です。数分後にページを更新してください。</p>
+        <a href="/ja/jp/" class="back-link">トップページへ戻る</a>
+      </div>
+    )}
+  </div>
+</Layout>
+
+<script>
+  // ブラウザ上で動く検索プログラム
+  const root = document.getElementById('search-root');
+  if (root) {
+    const input = document.getElementById('search-input');
+    const results = document.getElementById('results');
+    const posts = JSON.parse(root.dataset.posts);
+
+    input.addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+      if (!query) {
+        results.innerHTML = '';
+        return;
+      }
+
+      const filtered = posts.filter(p => 
+        (p.title && p.title.toLowerCase().includes(query)) || 
+        (p.content && p.content.toLowerCase().includes(query))
+      );
+
+      if (filtered.length > 0) {
+        results.innerHTML = filtered.map(p => `
+          <div class="result-item">
+            <a href="/ja/jp/news/${p.id}/">
+              <span class="result-title">${p.title}</span>
+            </a>
+          </div>
+        `).join('');
+      } else {
+        results.innerHTML = '<p class="no-results">一致する記事が見つかりませんでした。</p>';
+      }
+    });
+  }
+</script>
+
+<style>
+  .search-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; min-height: 70vh; font-family: sans-serif; }
+  .page-title { border-bottom: 4px solid #872732; padding-bottom: 10px; margin-bottom: 20px; font-size: 24px; color: #1a1a1a; }
+  .search-info { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
+  #search-input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; outline: none; transition: border-color 0.2s; }
+  #search-input:focus { border-color: #872732; }
+  #results { margin-top: 20px; }
+  .result-item { padding: 15px 0; border-bottom: 1px solid #eee; }
+  .result-title { color: #872732; text-decoration: none; font-weight: bold; font-size: 16px; }
+  .result-item a:hover .result-title { text-decoration: underline; }
+  .no-results, .no-data { padding: 30px; text-align: center; color: #666; }
+  .back-link { display: inline-block; margin-top: 15px; color: #872732; text-decoration: none; font-weight: bold; }
+</style>
