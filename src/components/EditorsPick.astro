@@ -1,12 +1,14 @@
 ---
-// サイドバー用の「編集部のおすすめ」（縦並び）部品
+// サイドバー用の「編集部のおすすめ」超安定版
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
-const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+
+// 取得件数を少し増やして（100件）、確実に記事が見つかるようにします
+const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
 
 let allPosts = [];
 
-// ▼ より確実にデータを取得・保持する仕組みに変更
+// キャッシュが空の場合のみ取得を試みる
 if (!globalThis.editorsPickCache || globalThis.editorsPickCache.length === 0) {
   try {
     const response = await fetch(url).catch(() => null);
@@ -15,7 +17,7 @@ if (!globalThis.editorsPickCache || globalThis.editorsPickCache.length === 0) {
       globalThis.editorsPickCache = data.items || [];
     }
   } catch (e) {
-    console.error("編集部おすすめの取得に失敗しました", e);
+    console.error("記事取得エラー:", e);
   }
 }
 
@@ -29,17 +31,20 @@ const isForeignPost = (post) => {
 
 const safePosts = allPosts.filter(p => !isForeignPost(p));
 
-// 「編集部①」などのタグを探して並べ替える仕組み
+// 「編集部①」や「編集部1」など、どちらの形式でも探せるように強化
 const topPostsMap = new Map();
-const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩])$/;
-const numMap = { '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10 };
+const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩12345678910])$/;
+const numConverter = { 
+  '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10,
+  '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10 
+};
 
 safePosts.forEach(post => {
   if (!post.labels) return;
   post.labels.forEach(label => {
     const match = label.match(topLabelRegex);
     if (match) {
-      const num = numMap[match[1]];
+      const num = numConverter[match[1]];
       if (!topPostsMap.has(num)) {
         topPostsMap.set(num, post);
       }
@@ -47,10 +52,12 @@ safePosts.forEach(post => {
   });
 });
 
+// 指定された記事を順番に並べる
 let finalPosts = Array.from(topPostsMap.entries())
   .sort((a, b) => a[0] - b[0])
   .map(entry => entry[1]);
 
+// 5件に満たない場合は、最新の記事で必ず埋める（これで真っ白を防ぎます）
 const usedIds = new Set(finalPosts.map(p => p.id));
 const normalPosts = safePosts.filter(p => !usedIds.has(p.id));
 
@@ -72,21 +79,24 @@ const getImageUrl = (content) => {
   </div>
 
   <ul class="ep-list">
-    {displayPosts.map((post) => (
-      <li class="ep-item">
-        <div class="ep-info">
-          <a href={`/ja/jp/news/${post.id}/`} class="ep-post-title">{post.title}</a>
-        </div>
-        <div class="ep-thumbnail">
-          <img src={getImageUrl(post.content)} alt="サムネイル" />
-        </div>
-      </li>
-    ))}
+    {displayPosts.length > 0 ? (
+      displayPosts.map((post) => (
+        <li class="ep-item">
+          <div class="ep-info">
+            <a href={`/ja/jp/news/${post.id}/`} class="ep-post-title">{post.title}</a>
+          </div>
+          <div class="ep-thumbnail">
+            <img src={getImageUrl(post.content)} alt="サムネイル" />
+          </div>
+        </li>
+      ))
+    ) : (
+      <p style="font-size: 12px; color: #666; padding: 10px;">記事を読み込み中です...</p>
+    )}
   </ul>
 </div>
 
 <style>
-  /* 元のデザインを完全に維持しています */
   .ep-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px 16px 16px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); font-family: sans-serif; }
   .ep-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid #872732; padding-bottom: 6px; margin-bottom: 12px; }
   .ep-title { font-size: 1.1rem; font-weight: bold; margin: 0; color: #1a1a1a; }
