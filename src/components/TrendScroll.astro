@@ -1,20 +1,30 @@
 ---
+// トレンドWatchin！ 共有メモ＆厳格フィルター版
+// 親ファイルから言語と国の情報を受け取れるようにします（初期値は日本）
+const { lang = 'ja', country = 'jp' } = Astro.props;
+const targetTag = `${lang}-${country}`;
+
 const API_KEY = import.meta.env.API_KEY;
-// ▼ ここを成功しているファイルと同じ「BLOG_ID」に修正しました
 const BLOG_ID = import.meta.env.BLOG_ID;
 
-const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+// 1. 共有メモからデータを読み込む
+let allPosts = globalThis.bloggerPostsCache || [];
 
-const response = await fetch(url).catch(() => null);
-const data = response ? await response.json() : { items: [] };
-const allPosts = data.items || [];
+// 2. 【保険】もし共有メモが空なら、自分で1回だけ取得します
+if (allPosts.length === 0) {
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
+  const response = await fetch(url).catch(() => null);
+  if (response && response.ok) {
+    const data = await response.json();
+    allPosts = data.items || [];
+    globalThis.bloggerPostsCache = allPosts;
+  }
+}
 
-const isForeignPost = (post) => {
-  if (!post.labels) return false;
-  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
-};
-
-const posts = allPosts.filter(post => !isForeignPost(post)).slice(0, 10);
+// 3. 【重要】このページと同じタグ（ja-jp など）を持つ記事だけを厳選
+const posts = allPosts
+  .filter(post => post.labels && post.labels.includes(targetTag))
+  .slice(0, 10);
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
@@ -33,15 +43,18 @@ const getImageUrl = (content) => {
     </div>
 
     <div class="trend-scroll-container" id="trend-scroll">
-      {posts.map((post) => (
-        /* ▼ ここを /ja/jp/ に修正しました */
-        <a href={`/ja/jp/news/${post.id}/`} class="trend-item">
-          <div class="trend-img-wrapper">
-            <img src={getImageUrl(post.content)} alt={post.title} />
-          </div>
-          <h4 class="trend-title">{post.title}</h4>
-        </a>
-      ))}
+      {posts.length > 0 ? (
+        posts.map((post) => (
+          <a href={`/${lang}/${country}/news/${post.id}/`} class="trend-item">
+            <div class="trend-img-wrapper">
+              <img src={getImageUrl(post.content)} alt={post.title} />
+            </div>
+            <h4 class="trend-title">{post.title}</h4>
+          </a>
+        ))
+      ) : (
+        <p style="padding: 20px; color: #666;">トレンド記事を読み込み中です...</p>
+      )}
     </div>
 
     <div class="scroll-arrow next-arrow" id="btn-next">
@@ -51,16 +64,18 @@ const getImageUrl = (content) => {
 </section>
 
 <style>
+  /* スタイルは元のデザインを完全に維持しています */
   .bing-trend-section { padding: 10px 0 20px 0; background: #fff; }
-  .trend-header h3 { font-size: 24px; font-weight: bold; border-bottom: 4px solid #8b0000; padding-bottom: 5px; }
+  .trend-header h3 { font-size: 24px; font-weight: bold; border-bottom: 4px solid #8b0000; padding-bottom: 5px; margin-bottom: 15px; }
   .trend-scroll-outer { position: relative; display: flex; align-items: center; }
-  .trend-scroll-container { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
+  .trend-scroll-container { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding-bottom: 10px; }
   .trend-scroll-container::-webkit-scrollbar { display: none; }
-  .trend-item { min-width: 180px; text-decoration: none; color: #333; }
-  .trend-img-wrapper { width: 100%; height: 120px; border-radius: 8px; overflow: hidden; }
-  .trend-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-  .trend-title { font-size: 16px; font-weight: bold; margin-top: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .scroll-arrow { position: absolute; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
+  .trend-item { min-width: 180px; text-decoration: none; color: #333; transition: opacity 0.2s; }
+  .trend-item:hover { opacity: 0.8; }
+  .trend-img-wrapper { width: 100%; height: 120px; border-radius: 8px; overflow: hidden; background: #eee; }
+  .trend-img-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .trend-title { font-size: 15px; font-weight: bold; margin-top: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+  .scroll-arrow { position: absolute; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; border: none; }
   .prev-arrow { left: -15px; } 
   .next-arrow { right: -15px; } 
 </style>
