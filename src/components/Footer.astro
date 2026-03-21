@@ -2,30 +2,30 @@
 // Layoutから渡されるデータ、または共有メモからデータを取得します
 let { allPosts = [] } = Astro.props;
 
-// 共有メモをチェックして、全ページでグローバルサイトが表示されるようにします [cite: 77, 91]
+// 共有メモをチェックして、全ページでグローバルサイトが表示されるようにします [cite: 1]
 if (allPosts.length === 0 && globalThis.bloggerPostsCache) {
   allPosts = globalThis.bloggerPostsCache;
-}
+} [cite: 2]
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// SNSリンク設定
+// SNSリンク設定：URLをご指定の @24_watchin に修正しました [cite: 3]
 const snsLinks = [
-  { label: 'X',         href: 'https://x.com/24watchin',       icon: 'x',         show: true  },
+  { label: 'X',         href: 'https://x.com/24_watchin',       icon: 'x',         show: true  },
   { label: 'Facebook',  href: 'https://facebook.com/24watchin', icon: 'facebook',  show: true  },
 ];
 
-// Informationメニュー（全言語対応を維持） [cite: 81-90]
+// Informationメニュー（全言語対応を維持） [cite: 4]
 const infoMenus = {
   ja: [
     { label: 'About 24Watchin',          href: `/${lang}/${country}/about/` },
     { label: 'プライバシーポリシー',      href: `/${lang}/${country}/privacy/` },
     { label: '利用規約',                  href: `/${lang}/${country}/terms/` },
     { label: 'お問い合わせ',              href: `/${lang}/${country}/contact/` },
-    { label: '訂正・修正ポリシー',        href: `/${lang}/${country}/corrections/` },
+    { label: '訂正・修正ポリシー',        href: `/${lang}/${country}/corrections/` }, [cite: 5]
     { label: '著作権・転載・引用について', href: `/${lang}/${country}/copyright/` },
   ],
   en: [
@@ -34,53 +34,53 @@ const infoMenus = {
     { label: 'Terms of Use',       href: `/${lang}/${country}/terms/` },
     { label: 'Contact',            href: `/${lang}/${country}/contact/` },
     { label: 'Corrections Policy', href: `/${lang}/${country}/corrections/` },
-    { label: 'Copyright / Reuse',  href: `/${lang}/${country}/copyright/` },
+    { label: 'Copyright / Reuse',  href: `/${lang}/${country}/copyright/` }, [cite: 6]
   ],
 };
 const currentMenu = infoMenus[lang] || infoMenus['en'];
-const infoTitle = lang === 'ja' ? 'インフォメーション' : 'Information';
+const infoTitle = lang === 'ja' ? 'インフォメーション' : 'Information'; [cite: 7]
 
-// 記事がある国だけを表示するための判定ロジック [cite: 91]
+// 記事がある国だけを表示するための判定ロジック [cite: 8]
 const hasContent = (countryCode) => {
   const tag = `${lang}-${countryCode}`;
   return allPosts.some(post => post.labels?.includes(tag));
 };
 
-// 【修正箇所】全ての地域（中東・アフリカ、オセアニア等）を網羅したリスト 
+// 全ての地域を網羅したリスト [cite: 9]
 const globalRegionsRaw = [
-  { name: lang === 'ja' ? 'アジア' : 'Asia', countries: [
-      { label: lang === 'ja' ? '日本' : 'Japan', code: 'jp' },
-      { label: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' },
-      { label: lang === 'ja' ? '韓国' : 'South Korea', code: 'kr' },
-      { label: lang === 'ja' ? '中国' : 'China', code: 'cn' },
-      { label: lang === 'ja' ? 'タイ' : 'Thailand', code: 'th' },
-      { label: lang === 'ja' ? 'シンガポール' : 'Singapore', code: 'sg' },
-      { label: lang === 'ja' ? 'インド' : 'India', code: 'in' },
+  { name: lang === 'ja' ? 'アジア' : 'Asia', countries: [ [cite: 10]
+      { label: lang === 'ja' ? '日本' : 'Japan', code: 'jp' }, [cite: 11]
+      { label: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' }, [cite: 12]
+      { label: lang === 'ja' ? '韓国' : 'South Korea', code: 'kr' }, [cite: 13]
+      { label: lang === 'ja' ? '中国' : 'China', code: 'cn' }, [cite: 14]
+      { label: lang === 'ja' ? 'タイ' : 'Thailand', code: 'th' }, [cite: 15]
+      { label: lang === 'ja' ? 'シンガポール' : 'Singapore', code: 'sg' }, [cite: 16]
+      { label: lang === 'ja' ? 'インド' : 'India', code: 'in' }, [cite: 17]
     ]
   },
-  { name: lang === 'ja' ? 'ヨーロッパ' : 'Europe', countries: [
-      { label: lang === 'ja' ? 'ドイツ' : 'Germany', code: 'de' },
-      { label: lang === 'ja' ? 'フランス' : 'France', code: 'fr' },
-      { label: lang === 'ja' ? 'イギリス' : 'UK', code: 'gb' },
-      { label: lang === 'ja' ? 'イタリア' : 'Italy', code: 'it' },
-      { label: lang === 'ja' ? 'スペイン' : 'Spain', code: 'es' },
+  { name: lang === 'ja' ? 'ヨーロッパ' : 'Europe', countries: [ [cite: 18]
+      { label: lang === 'ja' ? 'ドイツ' : 'Germany', code: 'de' }, [cite: 19]
+      { label: lang === 'ja' ? 'フランス' : 'France', code: 'fr' }, [cite: 20]
+      { label: lang === 'ja' ? 'イギリス' : 'UK', code: 'gb' }, [cite: 21]
+      { label: lang === 'ja' ? 'イタリア' : 'Italy', code: 'it' }, [cite: 22]
+      { label: lang === 'ja' ? 'スペイン' : 'Spain', code: 'es' }, [cite: 23]
     ]
   },
-  { name: lang === 'ja' ? '南北アメリカ' : 'North & South America', countries: [
-      { label: lang === 'ja' ? 'アメリカ' : 'USA', code: 'us' },
-      { label: lang === 'ja' ? 'カナダ' : 'Canada', code: 'ca' },
-      { label: lang === 'ja' ? 'ブラジル' : 'Brazil', code: 'br' },
+  { name: lang === 'ja' ? '南北アメリカ' : 'North & South America', countries: [ [cite: 24]
+      { label: lang === 'ja' ? 'アメリカ' : 'USA', code: 'us' }, [cite: 25]
+      { label: lang === 'ja' ? 'カナダ' : 'Canada', code: 'ca' }, [cite: 26]
+      { label: lang === 'ja' ? 'ブラジル' : 'Brazil', code: 'br' }, [cite: 27]
     ]
   },
-  { name: lang === 'ja' ? '中東・アフリカ' : 'Middle East & Africa', countries: [
+  { name: lang === 'ja' ? '中東・アフリカ' : 'Middle East & Africa', countries: [ [cite: 28]
       { label: 'UAE', code: 'ae' },
-      { label: lang === 'ja' ? 'サウジアラビア' : 'Saudi Arabia', code: 'sa' },
-      { label: lang === 'ja' ? '南アフリカ' : 'South Africa', code: 'za' },
+      { label: lang === 'ja' ? 'サウジアラビア' : 'Saudi Arabia', code: 'sa' }, [cite: 29]
+      { label: lang === 'ja' ? '南アフリカ' : 'South Africa', code: 'za' }, [cite: 30]
     ]
   },
-  { name: lang === 'ja' ? 'オセアニア' : 'Oceania', countries: [
-      { label: lang === 'ja' ? 'オーストラリア' : 'Australia', code: 'au' },
-      { label: lang === 'ja' ? 'ニュージーランド' : 'New Zealand', code: 'nz' },
+  { name: lang === 'ja' ? 'オセアニア' : 'Oceania', countries: [ [cite: 31]
+      { label: lang === 'ja' ? 'オーストラリア' : 'Australia', code: 'au' }, [cite: 32]
+      { label: lang === 'ja' ? 'ニュージーランド' : 'New Zealand', code: 'nz' }, [cite: 33]
     ]
   },
 ];
@@ -88,9 +88,8 @@ const globalRegionsRaw = [
 const globalRegions = globalRegionsRaw.map(region => {
   const activeCountries = region.countries.filter(c => hasContent(c.code));
   return { ...region, countries: activeCountries };
-}).filter(region => region.countries.length > 0);
-
-const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
+}).filter(region => region.countries.length > 0); [cite: 34]
+const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites'; [cite: 35]
 ---
 
 <footer class="site-footer">
@@ -98,40 +97,37 @@ const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
 
     <div class="top-row">
       <a href={`/${lang}/${country}/`} class="footer-logo">
-        {/* ③ 24Watchinのロゴを大きく(48px)設定 [cite: 120, 130] */}
         <img src="/images/logo-24watchin-white.png" alt="24Watchin" />
       </a>
       <div class="sns-row">
         {snsLinks.filter(s => s.show).map(s => (
-          /* ② SNSの丸枠(42px)と中のロゴ(22px)を大きく設定  */
           <a href={s.href} class="sns-btn" aria-label={s.label} target="_blank" rel="noopener noreferrer">
-            {s.icon === 'x' && <span class="sns-icon">𝕏</span>}
+            {s.icon === 'x' && <span class="sns-icon">𝕏</span>} [cite: 37]
             {s.icon === 'facebook' && <span class="sns-icon">f</span>}
           </a>
         ))}
       </div>
-    </div>
+    </div> [cite: 36]
 
     <hr class="divider" />
 
-    {/* ① グローバルサイトの表示 [cite: 118, 122] */}
     {globalRegions.length > 0 && (
       <>
         <p class="footer-heading">{globalTitle}</p>
-        <div class="accordion-list">
+        <div class="accordion-list"> [cite: 38]
           {globalRegions.map((region, i) => (
             <div class="region-group">
               <button class="region-header" aria-expanded="false" data-index={i}>
                 <span class="region-name">{region.name}</span>
                 <span class="region-arrow">▼</span>
               </button>
-              <div class="region-body" id={`footer-region-${i}`}>
+              <div class="region-body" id={`footer-region-${i}`}> [cite: 39]
                 {region.countries.map(c => (
                   <a href={`/${lang}/${c.code}/`} class="country-link">{c.label}</a>
                 ))}
               </div>
             </div>
-          ))}
+          ))} [cite: 40]
         </div>
       </>
     )}
@@ -149,8 +145,8 @@ const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
 
   <div class="footer-bottom">
     <p>24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。</p>
-    <p>著作権は The Dexent Media Enterprises または正当な権利者に帰属します。</p>
-    <p class="copyright-year">&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
+    <p>著作権は The Dexent Media Enterprises または正当な権利者に帰属します。</p> [cite: 41]
+    <p class="copyright-year">&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p> [cite: 42]
   </div>
 </footer>
 
@@ -167,60 +163,44 @@ const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
       btn.classList.toggle('open', !isOpen);
     });
   });
-</script>
+</script> [cite: 43]
 
 <style>
   .site-footer { background-color: #393737; color: #f3f4f6; font-family: sans-serif; margin-top: 60px; }
-  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 36px 24px 32px; }
-  
-  .top-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
-  
-  /* ③ ロゴの拡大設定  */
-  .footer-logo img { height: 48px; width: auto; display: block; filter: brightness(0) invert(1); }
-  
-  .sns-row { display: flex; gap: 14px; }
-  
-  /* ② SNSアイコンとロゴの拡大設定  */
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 36px 24px 32px; } [cite: 44]
+  .top-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; } [cite: 45]
+  .footer-logo img { height: 48px; width: auto; display: block; filter: brightness(0) invert(1); } [cite: 46]
+  .sns-row { display: flex; gap: 14px; } [cite: 47]
   .sns-btn { 
-    width: 42px; height: 42px; 
+    width: 42px; height: 42px; [cite: 48]
     border-radius: 50%; background: rgba(255,255,255,0.12);
     display: flex; align-items: center; justify-content: center; 
     text-decoration: none; transition: background 0.2s;
-  }
-  .sns-icon {
-    font-size: 22px; 
-    color: #fff;
-    font-weight: bold;
-    line-height: 1;
-  }
+  } [cite: 49]
+  .sns-icon { font-size: 22px; color: #fff; font-weight: bold; line-height: 1; } [cite: 50]
   .sns-btn:hover { background: #872732; }
-
-  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 0 0 24px; }
-  .footer-heading { font-size: 13px; font-weight: bold; color: #fff; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid #872732; display: inline-block; }
-  
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 0 0 24px; } [cite: 51]
+  .footer-heading { font-size: 13px; font-weight: bold; color: #fff; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid #872732; display: inline-block; } [cite: 52]
   .accordion-list { display: flex; flex-direction: column; gap: 6px; }
-  .region-group { border-radius: 8px; overflow: hidden; }
-  .region-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.07); border: none; border-radius: 8px; color: #f3f4f6; cursor: pointer; transition: background 0.2s; }
-  .region-header:hover { background: rgba(255,255,255,0.13); }
+  .region-group { border-radius: 8px; overflow: hidden; } [cite: 53]
+  .region-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.07); [cite: 54] border: none; border-radius: 8px; color: #f3f4f6; cursor: pointer; transition: background 0.2s; }
+  .region-header:hover { background: rgba(255,255,255,0.13); } [cite: 55]
   .region-header.open { border-radius: 8px 8px 0 0; background: rgba(135,39,50,0.4); }
-  .region-name { font-size: 12px; font-weight: bold; }
+  .region-name { font-size: 12px; font-weight: bold; } [cite: 56]
   .region-arrow { font-size: 9px; color: #9ca3af; transition: transform 0.25s; }
-  .region-body { display: none; flex-wrap: wrap; gap: 8px; background: rgba(255,255,255,0.05); border-radius: 0 0 8px 8px; padding: 14px; }
-  .region-body.open { display: flex; }
-  .country-link { font-size: 11px; color: #d1d5db; text-decoration: none; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); transition: all 0.2s; white-space: nowrap; }
+  .region-body { display: none; flex-wrap: wrap; gap: 8px; background: rgba(255,255,255,0.05); border-radius: 0 0 8px 8px; padding: 14px; } [cite: 57]
+  .region-body.open { display: flex; } [cite: 58]
+  .country-link { font-size: 11px; color: #d1d5db; text-decoration: none; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); transition: all 0.2s; white-space: nowrap; } [cite: 59]
   .country-link:hover { background: #872732; color: #fff; }
-
-  .info-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12); }
-  .info-links { display: flex; flex-wrap: wrap; gap: 12px 28px; }
-  .info-link { font-size: 12px; color: #d1d5db; text-decoration: none; white-space: nowrap; transition: color 0.2s; }
+  .info-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12); } [cite: 60]
+  .info-links { display: flex; flex-wrap: wrap; gap: 12px 28px; } [cite: 61]
+  .info-link { font-size: 12px; color: #d1d5db; text-decoration: none; white-space: nowrap; transition: color 0.2s; } [cite: 62]
   .info-link:hover { color: #fff; text-decoration: underline; }
-
-  .footer-bottom { background-color: #2b2a2a; padding: 32px 20px; text-align: center; }
-  .footer-bottom p { margin: 0 0 8px; font-size: 12px; color: #9ca3af; line-height: 1.6; }
-  .copyright-year { margin-top: 16px !important; font-size: 13px !important; color: #d1d5db !important; }
-
+  .footer-bottom { background-color: #2b2a2a; padding: 32px 20px; text-align: center; } [cite: 63]
+  .footer-bottom p { margin: 0 0 8px; font-size: 12px; color: #9ca3af; line-height: 1.6; } [cite: 64]
+  .copyright-year { margin-top: 16px !important; font-size: 13px !important; color: #d1d5db !important; } [cite: 65]
   @media (max-width: 600px) {
-    .top-row { flex-direction: column; align-items: flex-start; }
+    .top-row { flex-direction: column; align-items: flex-start; } [cite: 66]
     .footer-logo img { height: 40px; }
   }
 </style>
