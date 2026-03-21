@@ -207,17 +207,14 @@ const getDayName = (dateStr) => {
     const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
 
     let visibleCount = 0;
-
     document.querySelectorAll('.day-group').forEach(group => {
       const groupDate = group.getAttribute('data-date');
-
       if (groupDate < cityFullDate) {
         group.style.display = 'none';
       } else {
         if (visibleCount < 3) {
           group.style.display = 'block';
           visibleCount++;
-          
           if (groupDate === cityFullDate) {
             group.querySelectorAll('.hourly-row').forEach(row => {
               if (parseInt(row.getAttribute('data-hour')) < cityHour) {
@@ -230,6 +227,7 @@ const getDayName = (dateStr) => {
         }
       }
     });
+
     document.querySelectorAll('.day-summary-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const targetId = e.currentTarget.getAttribute('data-target');
@@ -248,26 +246,72 @@ const getDayName = (dateStr) => {
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid #872732; padding-left: 12px; }
 
+  /* --- ① アイコンの縦揃えの修正 --- */
+  .weather-page .weather-info {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    /* 中央に寄せる */
+    justify-content: center;
+    text-align: center;
+  }
+
+  .weather-page .summary-icon {
+    width: 72px;
+    height: 72px;
+    display: block;
+    margin: 0 auto; 
+  }
+
+  /* --- ③ 夜の月の色とサイズを修正 --- */
+  /* 夜用アイコン(nightを含むURL)にオレンジフィルターを適用 */
+  .weather-page img[src*="night"] {
+    filter: sepia(100%) saturate(1000%) hue-rotate(-50deg) brightness(1.2);
+    width: 85px;  /* 月だけのアイコンを大きく */
+    height: 85px;
+  }
+
+  /* --- ② 気温の横並び修正 --- */
+  .weather-page .temp-info {
+    display: flex;
+    flex-direction: row;    /* 横に並べる */
+    align-items: center;    
+    justify-content: center;
+    gap: 8px;              
+    white-space: nowrap;    
+  }
+
+  .weather-page .temp-item {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .weather-page .day-summary-btn {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr 1.8fr 0.6fr 0.8fr; /* 配置を整理 */
+    align-items: center;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* 以下、共通スタイル */
+  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
+  .weather-page .day-summary-btn:hover { background: #f9fafb; }
+  .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; }
+  .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; }
+  .weather-page .hourly-badge { background-color: #4141e0; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+  .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 4px 16px; border-top: 1px solid #eee; }
+  .weather-page .hourly-table { width: 100%; min-width: 550px; border-collapse: collapse; }
+  .weather-page .hourly-table th { padding: 8px 4px; font-size: 0.8rem; color: #888; border-bottom: 1px solid #ddd; text-align: center; }
+  .weather-page .hourly-table td { padding: 4px 4px; text-align: center; border-bottom: 1px solid #eee; }
   .alert-ticker-container { background: #f0f7ff; border: 1.5px solid #1fa7db; border-radius: 8px; padding: 6px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; overflow: hidden; }
   .alert-ticker-label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #0068b7; font-weight: bold; font-size: 0.95rem; }
   .alert-ticker-window { flex-grow: 1; background: #fff; border: 1px solid #1fa7db; border-radius: 4px; height: 32px; display: flex; align-items: center; overflow: hidden; position: relative; }
   .alert-ticker-text { white-space: nowrap; position: absolute; padding-left: 100%; animation: ticker 30s linear infinite; font-size: 0.9rem; color: #c53030; font-weight: bold; }
   @keyframes ticker { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-
-  .weather-page .forecast-container { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
-  .weather-page .day-summary-btn { width: 100%; display: grid; grid-template-columns: 0.9fr 1.6fr 1.6fr 0.6fr 0.9fr; align-items: center; padding: 6px 16px; background: none; border: none; cursor: pointer; }
-  .weather-page .day-summary-btn:hover { background: #f9fafb; }
-  .weather-page .summary-icon { width: 72px; height: 72px; } 
-  .weather-page .temp-max { color: #d32f2f !important; }
-  .weather-page .temp-min { color: #1976d2 !important; }
-  .weather-page .hourly-badge { background-color: #4141e0; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-
-  .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 4px 16px; border-top: 1px solid #eee; }
-  .weather-page .hourly-table { width: 100%; min-width: 550px; border-collapse: collapse; }
-  .weather-page .hourly-table th { padding: 8px 4px; font-size: 0.8rem; color: #888; border-bottom: 1px solid #ddd; text-align: center; }
-  .weather-page .hourly-table td { padding: 4px 4px; text-align: center; border-bottom: 1px solid #eee; }
-
   .news-list-one-column { display: flex; flex-direction: column; gap: 15px; }
   .news-item { display: flex; gap: 20px; text-decoration: none; color: inherit; padding: 12px; border: 1px solid #eee; border-radius: 12px; transition: background 0.2s; }
   .news-item:hover { background: #f8f9fa; }
@@ -276,7 +320,6 @@ const getDayName = (dateStr) => {
   .news-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
   .news-title { font-size: 1.1rem; font-weight: bold; margin: 0 0 10px 0; }
   .news-date { font-size: 0.85rem; color: #999; }
-
   @media (max-width: 600px) {
     .news-item { flex-direction: column; }
     .news-image { width: 100%; }
