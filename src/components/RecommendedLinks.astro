@@ -1,6 +1,5 @@
 ---
-// 「あわせて読みたい」のブロックですが、将来の広告（PR）枠として使います。
-// 今は記事を読み込まず、ダミーの枠だけを用意しています。
+// 「あわせて読みたい」枠（Google AdSense マルチプレックス広告）
 ---
 
 <div class="bottom-section">
@@ -9,12 +8,18 @@
     <span class="sponsor-credit">PR</span>
   </div>
   
-  <div class="sponsored-grid">
-    {/* 将来ここに広告が入るまでのダミー枠を4つ並べます */}
-    <div class="dummy-ad-box">広告スペース<br>(300x250等)</div>
-    <div class="dummy-ad-box">広告スペース<br>(300x250等)</div>
-    <div class="dummy-ad-box">広告スペース<br>(300x250等)</div>
-    <div class="dummy-ad-box">広告スペース<br>(300x250等)</div>
+  <div class="adsense-container">
+    {/* ▼ なるさん専用のGoogle AdSenseコード ▼ */}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2614349930540151" crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-format="autorelaxed"
+         data-ad-client="ca-pub-2614349930540151"
+         data-ad-slot="6685789540"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    {/* ▲ ここまで ▲ */}
   </div>
 </div>
 
@@ -22,26 +27,13 @@
   .bottom-section { margin-bottom: 50px; }
   
   .sponsored-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-  .section-title { font-size: 22px; color: #333; margin-bottom: 5px; padding-bottom: 0; display: inline-block; border-bottom: none; }
-  .sponsor-credit { font-size: 12px; color: #007bff; font-weight: bold; margin-bottom: 5px; }
+  .section-title { font-size: 22px; color: #1a1a1a; margin-bottom: 5px; padding-bottom: 0; display: inline-block; border-bottom: none; font-weight: bold; }
   
-  .sponsored-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  /* PRの文字を産経新聞のように少し控えめなグレーにして自然に馴染ませます */
+  .sponsor-credit { font-size: 13px; color: #888888; font-weight: bold; margin-bottom: 5px; }
   
-  /* ダミー広告枠のデザイン */
-  .dummy-ad-box {
-    background-color: #f1f1f1;
-    border: 1px dashed #ccc;
-    height: 250px; /* 一般的な広告の高さに合わせています */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #999;
-    font-size: 14px;
-    border-radius: 4px;
-  }
-  
-  @media (max-width: 768px) {
-    .sponsored-grid { grid-template-columns: 1fr; }
+  .adsense-container {
+    width: 100%;
+    overflow: hidden; /* 広告が枠からはみ出ないようにするための安全対策です */
   }
 </style>
