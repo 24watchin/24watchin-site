@@ -3,7 +3,6 @@ import RegionNewsBlockSidebar from './RegionNewsBlockSidebar.astro';
 
 const { lang = 'ja', country = '', allPosts = [] } = Astro.props;
 
-// ★ ここが違う！1国につき1記事だけ取得
 const filterByCountryTag = (countryCode, count = 1) => {
   const tag = `${lang}-${countryCode}`;
   return allPosts.filter(post => post.labels?.includes(tag)).slice(0, count);
@@ -47,9 +46,9 @@ const activeRegions = regionsTemplate.map(region => {
 ---
 
 {activeRegions.length > 0 && (
-  <div class="sidebar-global-news">
-    <div class="sidebar-header">
-      <h2 class="sidebar-title">{parentTitles[lang] || parentTitles['en']}</h2>
+  <div class="gnews-wrapper">
+    <div class="widget-header">
+      <h3 class="widget-title">{parentTitles[lang] || parentTitles['en']}</h3>
     </div>
 
     {activeRegions.map(region => (
@@ -63,7 +62,27 @@ const activeRegions = regionsTemplate.map(region => {
 )}
 
 <style>
-  .sidebar-global-news { width: 100%; margin-top: 16px; }
-  .sidebar-header { margin-bottom: 14px; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
-  .sidebar-title { font-size: 15px; font-weight: 800; color: #111; margin: 0; border-left: 5px solid #872732; padding-left: 10px; line-height: 1.2; }
+  .gnews-wrapper {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px 16px 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    font-family: sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .widget-header {
+    border-bottom: 4px solid #872732;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+  }
+
+  .widget-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0;
+    color: #1a1a1a;
+  }
 </style>
