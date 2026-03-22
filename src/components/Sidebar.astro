@@ -1,45 +1,40 @@
 ---
-// ランキング部品を読み込みます
 import AccessRanking from './AccessRanking.astro';
-
-// ▼ 【ここを修正】古いダミー広告部品を消して、新しい「GoogleAdBanner」を読み込みます
 import GoogleAdBanner from './GoogleAdBanner.astro';
-
-// 「編集部のおすすめ」部品を読み込みます
 import EditorsPick from './EditorsPick.astro';
-// 天気パーツを読み込みます
 import WeatherWidget from './WeatherWidget.astro';
+import GlobalRegionNewsSidebar from './GlobalRegionNewsSidebar.astro';
 
-// Layoutから記事リストを受け取ります
 const { allPosts = [] } = Astro.props;
+
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || 'jp';
 ---
 
 <div class="sidebar-wrapper">
-  {/* 1. 一番上に天気パーツを配置します */}
   <WeatherWidget />
-
-  {/* 2. 天気の下にランキング部品を配置します */}
   <AccessRanking />
-
-  {/* 3. 【ここを修正】本物の広告部品を表示します */}
   <GoogleAdBanner />
-
-  {/* 4. 広告の下に「編集部のおすすめ」を配置します */}
   <EditorsPick allPosts={allPosts} />
+
+  <GlobalRegionNewsSidebar
+    lang={lang}
+    country={country}
+    allPosts={allPosts}
+  />
 </div>
 
 <style>
-  /* サイドバー全体を整列させるための設定です */
   .sidebar-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 40px; /* パーツ間の隙間を40px空けます */
+    gap: 40px;
     width: 100%;
     margin: 0;
     padding: 0;
   }
-
-  /* 中に入るパーツを100%の幅に揃えます */
   .sidebar-wrapper > :global(*) {
     width: 100% !important;
     max-width: 100% !important;
