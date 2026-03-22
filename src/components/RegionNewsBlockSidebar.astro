@@ -1,20 +1,11 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
-const { lang = 'ja', title, cityData = [] } = Astro.props;
+const { lang = 'ja', title = '', cityData = [] } = Astro.props;
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
-  return match ? match[1] : 'https://placehold.co/72x48/eeeeee/999999?text=No+Image';
-};
-
-const formatPostTime = (dateString) => {
-  if (!dateString) return '';
-  try {
-    return new Date(dateString).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
-    });
-  } catch { return ''; }
+  return match ? match[1] : 'https://placehold.co/60x40/eeeeee/999999?text=No+Image';
 };
 
 const getDisplayCategory = (post) => {
@@ -33,10 +24,110 @@ const getDisplayCategory = (post) => {
 };
 ---
 
-<section class="sb-region-section">
-  <div class="sb-region-header">
-    <span class="sb-region-title">{title}</span>
-  </div>
+<div class="sb-region-block">
+  <p class="sb-region-title">{title}</p>
 
-  <div class="sb-city-groups">
-    {cityData.map((city) =>
+  {cityData.map((city) => (
+    <div class="sb-city-block">
+      <p class="sb-city-name">{city.name}</p>
+      {city.posts.slice(0, 1).map((post) => (
+        <a href={`/${lang}/${city.code}/news/${post.id}/`} class="sb-news-item">
+          <div class="sb-thumbnail">
+            <img src={getImageUrl(post.content)} alt={post.title} />
+          </div>
+          <div class="sb-info">
+            <p class="sb-news-title">{post.title}</p>
+            <span class="sb-category-badge">{getDisplayCategory(post)}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  ))}
+</div>
+
+<style>
+  .sb-region-block {
+    margin-bottom: 16px;
+  }
+
+  .sb-region-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 8px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .sb-city-block {
+    margin-bottom: 12px;
+  }
+
+  .sb-city-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #872732;
+    margin: 0 0 5px 0;
+    padding-left: 6px;
+    border-left: 3px solid #872732;
+  }
+
+  .sb-news-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    text-decoration: none;
+    color: #111;
+  }
+
+  .sb-news-item:hover .sb-news-title {
+    color: #872732;
+    text-decoration: underline;
+  }
+
+  .sb-thumbnail {
+    width: 60px;
+    flex-shrink: 0;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #eee;
+  }
+
+  .sb-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sb-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sb-news-title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sb-category-badge {
+    display: inline-block;
+    padding: 1px 5px;
+    background: #4d4d4d;
+    color: #fff;
+    font-size: 10px;
+    border-radius: 2px;
+    align-self: flex-start;
+  }
+</style>
