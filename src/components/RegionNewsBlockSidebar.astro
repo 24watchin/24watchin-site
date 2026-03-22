@@ -1,6 +1,4 @@
 ---
-import { categoryLabelMap } from '../lib/categoryLabels.ts';
-
 const { lang = 'ja', title = '', cityData = [] } = Astro.props;
 
 const getImageUrl = (content) => {
@@ -9,49 +7,24 @@ const getImageUrl = (content) => {
 };
 ---
 
-<div class="gnews-container">
-  <div class="widget-header">
-    <h3 class="widget-title">{title}</h3>
-  </div>
-
-  {cityData.map((city) => (
-    <div class="gnews-city-block">
-      <p class="gnews-city-name">{city.name}</p>
-      {city.posts.slice(0, 1).map((post) => (
-        <a href={`/${lang}/${city.code}/news/${post.id}/`} class="gnews-item">
-          <div class="gnews-thumbnail">
-            <img src={getImageUrl(post.content)} alt={post.title} />
-          </div>
+{cityData.map((city) => (
+  <div class="gnews-city-block">
+    <p class="gnews-region-name">{title}</p>
+    {city.posts.slice(0, 1).map((post) => (
+      <a href={`/${lang}/${city.code}/news/${post.id}/`} class="gnews-item">
+        <div class="gnews-thumbnail">
+          <img src={getImageUrl(post.content)} alt={post.title} />
+        </div>
+        <div class="gnews-info">
           <p class="gnews-title">{post.title}</p>
-        </a>
-      ))}
-    </div>
-  ))}
-</div>
+          <span class="gnews-country-badge">{city.name}</span>
+        </div>
+      </a>
+    ))}
+  </div>
+))}
 
 <style>
-  .gnews-container {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 12px 16px 16px 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    font-family: sans-serif;
-  }
-
-  .widget-header {
-    border-bottom: 4px solid #872732;
-    padding-bottom: 6px;
-    margin-bottom: 12px;
-  }
-
-  .widget-title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin: 0;
-    color: #1a1a1a;
-  }
-
   .gnews-city-block {
     padding: 8px 0;
     border-bottom: 1px dashed #ccc;
@@ -62,7 +35,7 @@ const getImageUrl = (content) => {
     padding-bottom: 0;
   }
 
-  .gnews-city-name {
+  .gnews-region-name {
     font-size: 13px;
     font-weight: 700;
     color: #872732;
@@ -99,6 +72,14 @@ const getImageUrl = (content) => {
     object-fit: cover;
   }
 
+  .gnews-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
   .gnews-title {
     margin: 0;
     font-size: 13px;
@@ -109,5 +90,16 @@ const getImageUrl = (content) => {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .gnews-country-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    background: #e5e5e5;
+    color: #444;
+    font-size: 11px;
+    border-radius: 3px;
+    font-weight: 600;
+    align-self: flex-start;
   }
 </style>
