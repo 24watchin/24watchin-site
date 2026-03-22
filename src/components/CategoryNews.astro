@@ -1,28 +1,58 @@
 ---
-const { title, slug, posts = [] } = Astro.props;
+const { title, slug, posts = [], lang = 'ja', country = 'jp' } = Astro.props;
 
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/120x80/eeeeee/999999?text=No+Image';
 };
+
+// 「〇〇 ページへ」の多言語対応
+const pageToTexts = {
+  ja: 'ページへ',
+  en: 'View All',
+  'zh-cn': '查看更多',
+  'zh-tw': '查看更多',
+  es: 'Ver más',
+  fr: 'Voir plus',
+  de: 'Mehr',
+  ru: 'Все статьи',
+};
+const pageToText = pageToTexts[lang] || pageToTexts['ja'];
+
+// 日付フォーマットも言語対応
+const dateLocaleMap = {
+  ja: 'ja-JP',
+  en: 'en-US',
+  'zh-cn': 'zh-CN',
+  'zh-tw': 'zh-TW',
+  es: 'es-ES',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  ru: 'ru-RU',
+};
+const dateLocale = dateLocaleMap[lang] || 'ja-JP';
+
+const categoryPath = '/' + lang + '/' + country + '/category/' + slug + '/';
 ---
 
 <section class="category-block">
   <div class="category-header">
     <h3>{title}</h3>
-    <a href={`/ja/jp/category/${slug}/`} class="view-all">{title} ページへ <i class="fas fa-chevron-right"></i></a>
+    <a href={categoryPath} class="view-all">
+      {title} {pageToText} <i class="fas fa-chevron-right"></i>
+    </a>
   </div>
 
   <div class="article-list">
     {posts.map((post) => (
-      <a href={`/ja/jp/news/${post.id}/`} class="article-item">
+      <a href={'/' + lang + '/' + country + '/news/' + post.id + '/'} class="article-item">
         <div class="article-img">
           <img src={getImageUrl(post.content)} alt={post.title} />
         </div>
         <div class="article-info">
           <h4>{post.title}</h4>
           <div class="article-meta">
-            <span class="date">{new Date(post.published).toLocaleDateString('ja-JP')}</span>
+            <span class="date">{new Date(post.published).toLocaleDateString(dateLocale)}</span>
           </div>
         </div>
       </a>
