@@ -82,18 +82,54 @@ const categoryItems = labels.headerCategories.map((item) => {
   const href = basePath + '/category/' + item.slug + '/';
   const hrefClean = basePath + '/category/' + item.slug;
   const isActive = cleanCurrentPath === hrefClean;
-  return { href, label: item.label, isActive };
+  return { href, label: item.label, isActive, slug: item.slug };
 });
 
 const homeHref = basePath + '/';
 const searchAction = basePath + '/search';
 const navClass = 'category-bar locale-' + localeKey;
 
-const countryName = labels.countryName;
 const languageName = labels.languageName;
 const searchPlaceholder = labels.searchPlaceholder;
 const searchAriaLabel = labels.searchAriaLabel;
 const categoryBarAriaLabel = labels.categoryBarAriaLabel;
+
+// ▼ JAPAN表示を各言語に翻訳（jaはそのまま）
+const countryNameMap: Record<string, string> = {
+  jp: 'JAPAN',
+  en: 'JAPAN',
+  'zh-cn': '日本',
+  'zh-tw': '日本',
+  es: 'JAPÓN',
+  fr: 'JAPON',
+  de: 'JAPAN',
+  ru: 'ЯПОНИЯ',
+};
+const displayCountryName = countryNameMap[localeKey] || 'JAPAN';
+
+// ▼ Moreボタンが必要な言語
+const needsMore = ['en', 'es', 'fr', 'de', 'ru'].includes(localeKey);
+
+// ▼ More内に入れるカテゴリ
+const moreSlugs = ['environment-energy', 'sports', 'health-life'];
+
+// ▼ メインに表示するカテゴリとMoreの中に入れるカテゴリを分ける
+const mainItems = needsMore
+  ? categoryItems.filter(item => !moreSlugs.includes(item.slug))
+  : categoryItems;
+const moreItems = needsMore
+  ? categoryItems.filter(item => moreSlugs.includes(item.slug))
+  : [];
+
+// ▼ Moreボタンのテキスト（各言語）
+const moreTextMap: Record<string, string> = {
+  en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё',
+};
+const moreText = moreTextMap[localeKey] || 'More';
+
+// ▼ Moreの中にアクティブなカテゴリがあるか
+const moreHasActive = moreItems.some(item => item.isActive);
+const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
 ---
 
 <header class="site-header">
@@ -102,7 +138,7 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
       <a href={homeHref} class="logo-link" aria-label="24Watchin">
         <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
       </a>
-      <div class="country-name">{countryName}</div>
+      <div class="country-name">{displayCountryName}</div>
     </div>
     <div class="right-area">
       <div class="language-name">{languageName}</div>
@@ -120,14 +156,31 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
 
   <nav class={navClass} aria-label={categoryBarAriaLabel}>
     <div class="category-inner">
-      {categoryItems.map((item, index) => (
-        <>
-          {index > 0 && <span class="category-separator" aria-hidden="true">|</span>}
-          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-            <span class="category-link-text">{item.label}</span>
-          </a>
-        </>
+
+      {needsMore && (
+        <div class="more-wrapper">
+          <button class={moreBtnClass} id="more-btn">
+            {moreText}
+            <svg class="more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="more-dropdown" id="more-dropdown">
+            {moreItems.map((item) => (
+              <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>
+                {item.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {mainItems.map((item) => (
+        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+          <span class="category-link-text">{item.label}</span>
+        </a>
       ))}
+
     </div>
   </nav>
 
@@ -161,11 +214,10 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
   .search-input { width: 190px; height: 36px; padding: 0 12px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 16px; outline: none; }
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
+
   .category-bar { width: 100%; background: #393737; }
   .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; overflow-x: auto; white-space: nowrap; }
-
-  /* ▼ 文字サイズ14px・間隔を狭く */
-  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 10px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; }
+  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; }
   .category-link.active { background: var(--theme-color); }
   .category-link:hover .category-link-text {
     text-decoration: underline;
@@ -174,12 +226,55 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
     text-underline-offset: 4px;
   }
 
-  /* ▼ カテゴリ間の薄いグレーの「|」 */
-  .category-separator {
-    color: #6b6b6b;
-    font-size: 12px;
-    user-select: none;
+  /* ▼ Moreボタン */
+  .more-wrapper { position: relative; display: inline-flex; align-items: center; }
+  .more-btn {
+    height: 54px;
+    padding: 0 18px;
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
+  .more-btn:hover { background: rgba(255,255,255,0.1); }
+  .more-btn.active { background: var(--theme-color); }
+  .more-chevron {
+    width: 14px;
+    height: 14px;
+    stroke: #ffffff;
+    transition: transform 0.2s;
+  }
+  .more-btn.open .more-chevron { transform: rotate(180deg); }
+
+  /* ▼ Moreドロップダウン */
+  .more-dropdown {
+    display: none;
+    position: absolute;
+    top: 54px;
+    left: 0;
+    background: #393737;
+    min-width: 220px;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .more-dropdown.open { display: block; }
+  .more-link {
+    display: block;
+    padding: 13px 18px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .more-link:last-child { border-bottom: none; }
+  .more-link:hover { background: rgba(255,255,255,0.1); }
+  .more-link.active { background: var(--theme-color); }
 
   .header-word-bar { width: 100%; background: #ffffff; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 11px 32px 13px; display: flex; align-items: center; overflow-x: auto; }
@@ -187,3 +282,21 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
   .header-word-separator { margin: 0 1em; color: #b9b9b9; }
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 </style>
+
+<script>
+  const btn = document.getElementById('more-btn');
+  const dropdown = document.getElementById('more-dropdown');
+
+  if (btn && dropdown) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      btn.classList.toggle('open');
+      dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', () => {
+      btn.classList.remove('open');
+      dropdown.classList.remove('open');
+    });
+  }
+</script>
