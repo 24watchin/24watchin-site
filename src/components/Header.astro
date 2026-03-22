@@ -81,25 +81,27 @@ const localeKeyMap: Record<string, string> = {
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
-const basePath = `/${lang}/${country}`;
+const basePath = '/' + lang + '/' + country;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
-// ▼ isActive（アクティブかどうか）を---の中で先に計算する！
 const categoryItems = labels.headerCategories.map((item) => {
-  const href = `${basePath}/category/${item.slug}/`;
-  const hrefClean = `${basePath}/category/${item.slug}`;
+  const href = basePath + '/category/' + item.slug + '/';
+  const hrefClean = basePath + '/category/' + item.slug;
   const isActive = cleanCurrentPath === hrefClean;
   return { href, label: item.label, isActive };
 });
 
-const homeHref = `${basePath}/`;
-const searchAction = `${basePath}/search`;
+const homeHref = basePath + '/';
+const searchAction = basePath + '/search';
+
+// ▼ class属性に使う文字列を全部ここで組み立てる！
+const navClass = 'category-bar locale-' + localeKey;
 ---
 
 <header class="site-header">
   <div class="header-top">
     <div class="brand-area">
-      <a href={homeHref} class="logo-link" aria-label={`24Watchin ${labels.countryName}`}>
+      <a href={homeHref} class="logo-link" aria-label="24Watchin">
         <img
           src="/images/logo-24watchin.png"
           alt="24Watchin"
@@ -130,7 +132,7 @@ const searchAction = `${basePath}/search`;
     </div>
   </div>
 
-  <nav class={`category-bar locale-${localeKey}`} aria-label={labels.categoryBarAriaLabel}>
+  <nav class={navClass} aria-label={labels.categoryBarAriaLabel}>
     <div class="category-inner">
       {categoryItems.map((item) => (
         
