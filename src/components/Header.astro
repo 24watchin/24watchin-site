@@ -95,14 +95,9 @@ const searchAriaLabel = labels.searchAriaLabel;
 const categoryBarAriaLabel = labels.categoryBarAriaLabel;
 
 const countryNameMap: Record<string, string> = {
-  jp: 'JAPAN',
-  en: 'JAPAN',
-  'zh-cn': '日本',
-  'zh-tw': '日本',
-  es: 'JAPÓN',
-  fr: 'JAPON',
-  de: 'JAPAN',
-  ru: 'ЯПОНИЯ',
+  jp: 'JAPAN', en: 'JAPAN', 'zh-cn': '日本',
+  'zh-tw': '日本', es: 'JAPÓN', fr: 'JAPON',
+  de: 'JAPAN', ru: 'ЯПОНИЯ',
 };
 const displayCountryName = countryNameMap[localeKey] || 'JAPAN';
 
@@ -148,34 +143,28 @@ const moreHasActive = moreItems.some(item => item.isActive);
   <nav class={navClass} aria-label={categoryBarAriaLabel}>
     <div class="category-inner">
 
-      {/* ▼ メインカテゴリを先に表示 */}
       {mainItems.map((item) => (
         <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
           <span class="category-link-text">{item.label}</span>
         </a>
       ))}
 
-      {/* ▼ Moreボタンは一番右 */}
       {needsMore && (
-        <div class="more-wrapper">
-          <button
-            class={moreHasActive ? 'more-btn active' : 'more-btn'}
-            id="more-btn"
-            type="button"
-          >
+        <details class="more-wrapper">
+          <summary class={moreHasActive ? 'more-btn active' : 'more-btn'}>
             {moreText}
             <svg class="more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
-          </button>
-          <div class="more-dropdown" id="more-dropdown">
+          </summary>
+          <div class="more-dropdown">
             {moreItems.map((item) => (
               <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>
                 {item.label}
               </a>
             ))}
           </div>
-        </div>
+        </details>
       )}
 
     </div>
@@ -211,6 +200,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .search-input { width: 190px; height: 36px; padding: 0 12px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 16px; outline: none; }
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
+
   .category-bar { width: 100%; background: #393737; }
   .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; overflow-x: auto; white-space: nowrap; }
   .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; }
@@ -222,8 +212,10 @@ const moreHasActive = moreItems.some(item => item.isActive);
     text-underline-offset: 4px;
   }
 
-  /* ▼ Moreボタン */
+  /* ▼ Moreボタン（details/summary） */
   .more-wrapper { position: relative; display: inline-flex; align-items: center; }
+  summary.more-btn { list-style: none; }
+  summary.more-btn::-webkit-details-marker { display: none; }
   .more-btn {
     height: 54px;
     padding: 0 18px;
@@ -245,9 +237,9 @@ const moreHasActive = moreItems.some(item => item.isActive);
     stroke: #ffffff;
     transition: transform 0.2s ease;
   }
-  .more-btn.open .more-chevron { transform: rotate(180deg); }
+  details[open] .more-chevron { transform: rotate(180deg); }
 
-  /* ▼ ドロップダウン：右端に合わせる */
+  /* ▼ ドロップダウン */
   .more-dropdown {
     display: none;
     position: absolute;
@@ -258,7 +250,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
     z-index: 999;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
-  .more-dropdown.open { display: block; }
+  details[open] .more-dropdown { display: block; }
   .more-link {
     display: block;
     padding: 14px 18px;
@@ -278,32 +270,3 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .header-word-separator { margin: 0 1em; color: #b9b9b9; }
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 </style>
-
-<script is:inline>
-  // ▼ DOMContentLoadedを使わずに直接実行！
-  const moreBtn = document.getElementById('more-btn');
-  const moreDropdown = document.getElementById('more-dropdown');
-
-  if (moreBtn && moreDropdown) {
-    moreBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const isOpen = moreDropdown.classList.contains('open');
-      if (isOpen) {
-        moreDropdown.classList.remove('open');
-        moreBtn.classList.remove('open');
-      } else {
-        moreDropdown.classList.add('open');
-        moreBtn.classList.add('open');
-      }
-    });
-
-    document.addEventListener('click', function() {
-      moreDropdown.classList.remove('open');
-      moreBtn.classList.remove('open');
-    });
-
-    moreDropdown.addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-  }
-</script>
