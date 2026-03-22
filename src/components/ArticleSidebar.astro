@@ -1,16 +1,25 @@
 ---
-// 1. GoogleAdBannerとAccessRankingだけを読み込みます
-// (エラーの原因だった RelatedArticles は削除しました)
 import GoogleAdBanner from './GoogleAdBanner.astro';
 import AccessRanking from './AccessRanking.astro';
+import GlobalRegionNewsSidebar from './GlobalRegionNewsSidebar.astro';
+
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || 'jp';
+
+const allPosts = globalThis.bloggerPostsCache || [];
 ---
 
 <div class="sidebar-wrapper">
-  {/* 上部に本物の広告を表示します */}
   <GoogleAdBanner />
-
-  {/* その下にランキングを表示します */}
   <AccessRanking />
+
+  <GlobalRegionNewsSidebar
+    lang={lang}
+    country={country}
+    allPosts={allPosts}
+  />
 </div>
 
 <style>
