@@ -139,11 +139,9 @@ const moreHasActive = moreItems.some(item => item.isActive);
     </div>
   </div>
 
-  <!-- ▼ navをposition:relativeにして、Moreドロップダウンの基準点にする -->
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
 
-      <!-- ▼ カテゴリリンク（スクロール対象） -->
       <div class="category-scroll">
         {mainItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
@@ -152,15 +150,15 @@ const moreHasActive = moreItems.some(item => item.isActive);
         ))}
       </div>
 
-      <!-- ▼ Moreボタン：category-scrollの外！ -->
+      {/* ▼ Moreボタン：hoverで開閉！ */}
       {needsMore && (
-        <details class="more-wrapper">
-          <summary class={moreHasActive ? 'more-btn active' : 'more-btn'}>
+        <div class="more-wrapper">
+          <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
             {moreText}
             <svg class="more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
-          </summary>
+          </div>
           <div class="more-dropdown">
             {moreItems.map((item) => (
               <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>
@@ -168,7 +166,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
               </a>
             ))}
           </div>
-        </details>
+        </div>
       )}
 
     </div>
@@ -205,10 +203,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
 
-  /* ▼ カテゴリバー全体 */
-  .category-bar { width: 100%; background: #393737; position: relative; }
-
-  /* ▼ カテゴリバーの内側：スクロールエリアとMoreボタンを横並びに */
+  .category-bar { width: 100%; background: #393737; }
   .category-nav-inner {
     max-width: 1280px;
     margin: 0 auto;
@@ -217,7 +212,6 @@ const moreHasActive = moreItems.some(item => item.isActive);
     align-items: center;
   }
 
-  /* ▼ スクロール対象のカテゴリリンク群 */
   .category-scroll {
     display: flex;
     align-items: center;
@@ -237,15 +231,14 @@ const moreHasActive = moreItems.some(item => item.isActive);
     text-underline-offset: 4px;
   }
 
-  /* ▼ Moreボタン */
-  .more-wrapper { position: relative; flex-shrink: 0; }
-  summary.more-btn { list-style: none; }
-  summary.more-btn::-webkit-details-marker { display: none; }
+  /* ▼ Moreボタン：hoverで開閉！ */
+  .more-wrapper {
+    position: relative;
+    flex-shrink: 0;
+  }
   .more-btn {
     height: 54px;
     padding: 0 18px;
-    background: none;
-    border: none;
     color: #ffffff;
     font-size: 16px;
     font-weight: 700;
@@ -253,18 +246,22 @@ const moreHasActive = moreItems.some(item => item.isActive);
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    user-select: none;
   }
   .more-btn:hover { background: rgba(255,255,255,0.1); }
   .more-btn.active { background: var(--theme-color); }
+
   .more-chevron {
     width: 14px;
     height: 14px;
     stroke: #ffffff;
     transition: transform 0.2s ease;
   }
-  details[open] .more-chevron { transform: rotate(180deg); }
 
-  /* ▼ ドロップダウン：overflowの外に出た！ */
+  /* ▼ hoverで矢印が回転 */
+  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
+
+  /* ▼ ドロップダウン：hoverで表示！マウスが離れたら消える！ */
   .more-dropdown {
     display: none;
     position: absolute;
@@ -275,7 +272,10 @@ const moreHasActive = moreItems.some(item => item.isActive);
     z-index: 999;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
-  details[open] .more-dropdown { display: block; }
+
+  /* ▼ more-wrapperにhoverしている間だけ表示！ */
+  .more-wrapper:hover .more-dropdown { display: block; }
+
   .more-link {
     display: block;
     padding: 14px 18px;
