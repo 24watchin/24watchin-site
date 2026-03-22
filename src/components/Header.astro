@@ -238,10 +238,10 @@ const languageOptions = [
 <style>
   .site-header { width: 100%; background: #ffffff; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-
-  /* ▼ 変更①：align-items を flex-end に → JAPANがロゴ右端に揃う */
   .brand-area { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
   .logo-link { display: inline-block; text-decoration: none; }
+
+  /* ▼ PC用ロゴサイズ */
   .logo-image { display: block; width: 200px; max-width: 100%; height: auto; }
   .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
@@ -311,11 +311,12 @@ const languageOptions = [
   .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 
-  /* ▼ 変更②：logo-imageの縮小を削除・ロゴサイズはそのまま */
-  @media (max-width: 400px) {
+  /* ▼ スマホ版（768px以下）：ロゴを小さくして右側が収まるように */
+  @media (max-width: 768px) {
     .header-top { padding: 8px 10px 6px; gap: 8px; }
-    .country-name { font-size: 13px; margin-top: 2px; }
-    .search-input { width: 120px; height: 30px; font-size: 13px; }
+    .logo-image { width: 140px; }
+    .country-name { font-size: 12px; margin-top: 2px; }
+    .search-input { width: 110px; height: 30px; font-size: 13px; }
     .search-button { width: 30px; height: 30px; }
     .search-icon { width: 14px; height: 14px; }
     .lang-current { font-size: 12px; }
