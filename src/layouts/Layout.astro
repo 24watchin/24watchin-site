@@ -1,4 +1,6 @@
 ---
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+
 const {
   title,
   sidebarType = 'top',
@@ -9,6 +11,14 @@ const {
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
+
+// ▼ テーマカラーをlangから取得
+const localeKeyMap = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
+  'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
+};
+const localeKey = localeKeyMap[lang] || 'jp';
+const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
 
 const defaultDescriptions = {
   ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
@@ -39,16 +49,15 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
     <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
     <meta name="description" content={metaDescription} />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
+    <style define:vars={{ themeColor }}>
+      /* ▼ テーマカラーをCSS変数として全体に配布！ */
+      :root { --theme-color: var(--themeColor); }
       body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
       .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
       .page-shell { margin-top: 30px; }
       .main-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: start; }
       .content-area, .sidebar-area { display: block; width: 100%; min-width: 0; margin: 0; padding: 0; align-self: start; }
-      
-      /* ▼ ここの margin-top を 50px から 20px に減らしました */
       .bottom-wide { margin-top: 20px; width: 100%; }
-
       @media (max-width: 900px) {
         .main-layout { grid-template-columns: minmax(0, 1fr); }
         .sidebar-area { display: none; }
@@ -89,7 +98,6 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
     <script>
       document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
-
     <script>
       document.querySelectorAll('img').forEach(img => {
         img.setAttribute('loading', 'lazy');
