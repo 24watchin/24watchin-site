@@ -87,7 +87,6 @@ const categoryItems = labels.headerCategories.map((item) => {
 
 const homeHref = basePath + '/';
 const searchAction = basePath + '/search';
-const navClass = 'category-bar locale-' + localeKey;
 
 const languageName = labels.languageName;
 const searchPlaceholder = labels.searchPlaceholder;
@@ -140,15 +139,20 @@ const moreHasActive = moreItems.some(item => item.isActive);
     </div>
   </div>
 
-  <nav class={navClass} aria-label={categoryBarAriaLabel}>
-    <div class="category-inner">
+  <!-- ▼ navをposition:relativeにして、Moreドロップダウンの基準点にする -->
+  <nav class="category-bar" aria-label={categoryBarAriaLabel}>
+    <div class="category-nav-inner">
 
-      {mainItems.map((item) => (
-        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-          <span class="category-link-text">{item.label}</span>
-        </a>
-      ))}
+      <!-- ▼ カテゴリリンク（スクロール対象） -->
+      <div class="category-scroll">
+        {mainItems.map((item) => (
+          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+            <span class="category-link-text">{item.label}</span>
+          </a>
+        ))}
+      </div>
 
+      <!-- ▼ Moreボタン：category-scrollの外！ -->
       {needsMore && (
         <details class="more-wrapper">
           <summary class={moreHasActive ? 'more-btn active' : 'more-btn'}>
@@ -201,9 +205,30 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
 
-  .category-bar { width: 100%; background: #393737; }
-  .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; overflow-x: auto; white-space: nowrap; }
-  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; }
+  /* ▼ カテゴリバー全体 */
+  .category-bar { width: 100%; background: #393737; position: relative; }
+
+  /* ▼ カテゴリバーの内側：スクロールエリアとMoreボタンを横並びに */
+  .category-nav-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ▼ スクロール対象のカテゴリリンク群 */
+  .category-scroll {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+  .category-scroll::-webkit-scrollbar { display: none; }
+
+  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
   .category-link:hover .category-link-text {
     text-decoration: underline;
@@ -212,8 +237,8 @@ const moreHasActive = moreItems.some(item => item.isActive);
     text-underline-offset: 4px;
   }
 
-  /* ▼ Moreボタン（details/summary） */
-  .more-wrapper { position: relative; display: inline-flex; align-items: center; }
+  /* ▼ Moreボタン */
+  .more-wrapper { position: relative; flex-shrink: 0; }
   summary.more-btn { list-style: none; }
   summary.more-btn::-webkit-details-marker { display: none; }
   .more-btn {
@@ -239,7 +264,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
   }
   details[open] .more-chevron { transform: rotate(180deg); }
 
-  /* ▼ ドロップダウン */
+  /* ▼ ドロップダウン：overflowの外に出た！ */
   .more-dropdown {
     display: none;
     position: absolute;
