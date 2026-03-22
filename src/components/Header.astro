@@ -82,17 +82,18 @@ const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
 const basePath = `/${lang}/${country}`;
+const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
-// ▼ hrefClean（末尾スラッシュなし）も一緒に作っておく
-const categoryItems = labels.headerCategories.map((item) => ({
-  href: `${basePath}/category/${item.slug}/`,
-  hrefClean: `${basePath}/category/${item.slug}`,
-  label: item.label,
-}));
+// ▼ isActive（アクティブかどうか）を---の中で先に計算する！
+const categoryItems = labels.headerCategories.map((item) => {
+  const href = `${basePath}/category/${item.slug}/`;
+  const hrefClean = `${basePath}/category/${item.slug}`;
+  const isActive = cleanCurrentPath === hrefClean;
+  return { href, label: item.label, isActive };
+});
 
 const homeHref = `${basePath}/`;
 const searchAction = `${basePath}/search`;
-const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 ---
 
 <header class="site-header">
@@ -129,12 +130,12 @@ const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : 
     </div>
   </div>
 
-  <nav class:list={['category-bar', `locale-${localeKey}`]} aria-label={labels.categoryBarAriaLabel}>
+  <nav class={`category-bar locale-${localeKey}`} aria-label={labels.categoryBarAriaLabel}>
     <div class="category-inner">
       {categoryItems.map((item) => (
         
           href={item.href}
-          class:list={['category-link', cleanCurrentPath === item.hrefClean && 'active']}
+          class={item.isActive ? 'category-link active' : 'category-link'}
         >
           <span class="category-link-text">{item.label}</span>
         </a>
