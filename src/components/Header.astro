@@ -93,36 +93,28 @@ const categoryItems = labels.headerCategories.map((item) => {
 
 const homeHref = basePath + '/';
 const searchAction = basePath + '/search';
-
-// ▼ class属性に使う文字列を全部ここで組み立てる！
 const navClass = 'category-bar locale-' + localeKey;
+
+const countryName = labels.countryName;
+const languageName = labels.languageName;
+const searchPlaceholder = labels.searchPlaceholder;
+const searchAriaLabel = labels.searchAriaLabel;
+const categoryBarAriaLabel = labels.categoryBarAriaLabel;
 ---
 
 <header class="site-header">
   <div class="header-top">
     <div class="brand-area">
       <a href={homeHref} class="logo-link" aria-label="24Watchin">
-        <img
-          src="/images/logo-24watchin.png"
-          alt="24Watchin"
-          class="logo-image"
-        />
+        <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
       </a>
-      <div class="country-name">{labels.countryName}</div>
+      <div class="country-name">{countryName}</div>
     </div>
-
     <div class="right-area">
-      <div class="language-name">{labels.languageName}</div>
-
+      <div class="language-name">{languageName}</div>
       <form action={searchAction} method="get" class="search-form">
-        <input
-          type="text"
-          name="q"
-          class="search-input"
-          placeholder={labels.searchPlaceholder}
-          aria-label={labels.searchAriaLabel}
-        />
-        <button type="submit" class="search-button" aria-label={labels.searchAriaLabel}>
+        <input type="text" name="q" class="search-input" placeholder={searchPlaceholder} aria-label={searchAriaLabel} />
+        <button type="submit" class="search-button" aria-label={searchAriaLabel}>
           <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <circle cx="11" cy="11" r="6.5"></circle>
             <line x1="16" y1="16" x2="21" y2="21"></line>
@@ -132,13 +124,10 @@ const navClass = 'category-bar locale-' + localeKey;
     </div>
   </div>
 
-  <nav class={navClass} aria-label={labels.categoryBarAriaLabel}>
+  <nav class={navClass} aria-label={categoryBarAriaLabel}>
     <div class="category-inner">
       {categoryItems.map((item) => (
-        
-          href={item.href}
-          class={item.isActive ? 'category-link active' : 'category-link'}
-        >
+        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
           <span class="category-link-text">{item.label}</span>
         </a>
       ))}
