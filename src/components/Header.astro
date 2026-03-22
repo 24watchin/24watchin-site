@@ -329,22 +329,18 @@ const languageOptions = [
         return;
       }
 
-      var hasOverflow = scroll.scrollWidth > scroll.clientWidth + 1;
-      var isNarrow = window.innerWidth < 1100;
+      // ▼ PC幅なら右矢印は常に表示
+      btnRight.classList.add('visible');
 
-      if (hasOverflow || isNarrow) {
-        if (scroll.scrollLeft > 0) {
-          btnLeft.classList.add('visible');
-        } else {
-          btnLeft.classList.remove('visible');
-        }
-        if (scroll.scrollLeft >= scroll.scrollWidth - scroll.clientWidth - 1) {
-          btnRight.classList.remove('visible');
-        } else {
-          btnRight.classList.add('visible');
-        }
+      // ▼ 左にスクロール済みなら左矢印を表示
+      if (scroll.scrollLeft > 2) {
+        btnLeft.classList.add('visible');
       } else {
         btnLeft.classList.remove('visible');
+      }
+
+      // ▼ 右端まで来たら右矢印を消す
+      if (scroll.scrollLeft >= scroll.scrollWidth - scroll.clientWidth - 2) {
         btnRight.classList.remove('visible');
       }
     }
