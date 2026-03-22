@@ -7,7 +7,23 @@ import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
 import GlobalRegionNews from '../../../components/GlobalRegionNews.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
 
-// ▼ URLから lang と country を自動取得！
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'ja', country: 'jp' } },
+    { params: { lang: 'en', country: 'jp' } },
+    { params: { lang: 'en', country: 'us' } },
+    { params: { lang: 'zh-cn', country: 'jp' } },
+    { params: { lang: 'zh-tw', country: 'jp' } },
+    { params: { lang: 'es', country: 'jp' } },
+    { params: { lang: 'fr', country: 'jp' } },
+    { params: { lang: 'de', country: 'jp' } },
+    { params: { lang: 'ru', country: 'jp' } },
+    { params: { lang: 'de', country: 'de' } },
+    { params: { lang: 'fr', country: 'fr' } },
+    { params: { lang: 'en', country: 'ae' } },
+  ];
+}
+
 const { lang, country } = Astro.params;
 
 const API_KEY = import.meta.env.API_KEY;
@@ -28,14 +44,12 @@ if (!globalThis.bloggerPostsCache || globalThis.bloggerPostsCache.length === 0) 
 
 const allPosts = globalThis.bloggerPostsCache || [];
 
-// ▼ このページの言語・国に合うタグの記事だけ抽出！
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.includes(targetTag);
 });
 
-// ▼ 言語キーの変換（jaはjpにマッピング）
 const langKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
   'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
@@ -66,7 +80,6 @@ const categoryItems = displayCategories.map(slug => {
   };
 });
 
-// ▼ ページタイトルも多言語対応
 const pageTitles = {
   jp: '日本のニュース', en: 'Japan News', 'zh-cn': '日本新闻',
   'zh-tw': '日本新聞', es: 'Noticias de Japón',
@@ -98,7 +111,7 @@ const pageTitle = pageTitles[langKey] || 'News';
       </>
     ) : (
       <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
-        {categoryData.searchPlaceholder === '検索' ? '現在ニュースを読み込み中です。数分後にページを更新してください。' : 'Loading news. Please refresh in a few minutes.'}
+        Loading news. Please refresh in a few minutes.
       </p>
     )}
   </div>
@@ -114,3 +127,14 @@ const pageTitle = pageTitles[langKey] || 'News';
   .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
   @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
 </style>
+```
+
+---
+
+## ⚠️ 重要なお願い！
+
+`getStaticPaths()` の中の組み合わせリストを**実際に使っている言語・国の組み合わせ**に合わせる必要があります！
+
+`weather.astro` の中の `getStaticPaths()` を見せてもらえますか？そこに正しい組み合わせが入っているはずです！📂
+```
+src/pages/[lang]/[country]/weather.astro
