@@ -336,9 +336,9 @@ for (const city of cities) {
   .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
   .weather-page .summary-icon { width: 72px; height: 72px; display: block; margin: 0 auto; }
 
-  /* ▼ 月アイコンだけ拡大・自然な色 */
-  .weather-page .summary-icon.moon-only { transform: scale(1.5); transform-origin: center; }
-  .weather-page .h-icon img.moon-only { transform: scale(1.5); transform-origin: center; }
+  /* ▼ 月アイコンだけ拡大＋黄色フィルター！ */
+  .weather-page .summary-icon.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
+  .weather-page .h-icon img.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
 
   .weather-page .temp-info { display: flex; gap: 12px; white-space: nowrap; }
   .weather-page .temp-item { display: flex; align-items: baseline; gap: 4px; }
