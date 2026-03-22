@@ -120,10 +120,13 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
 
   <nav class={navClass} aria-label={categoryBarAriaLabel}>
     <div class="category-inner">
-      {categoryItems.map((item) => (
-        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-          <span class="category-link-text">{item.label}</span>
-        </a>
+      {categoryItems.map((item, index) => (
+        <>
+          {index > 0 && <span class="category-separator" aria-hidden="true">|</span>}
+          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+            <span class="category-link-text">{item.label}</span>
+          </a>
+        </>
       ))}
     </div>
   </nav>
@@ -159,10 +162,10 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
   .category-bar { width: 100%; background: #393737; }
-  .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; overflow-x: auto; white-space: nowrap; }
-  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; }
+  .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; overflow-x: auto; white-space: nowrap; }
 
-  /* ▼ アクティブとホバーにテーマカラーを使用！ */
+  /* ▼ 文字サイズ14px・間隔を狭く */
+  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 10px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; }
   .category-link.active { background: var(--theme-color); }
   .category-link:hover .category-link-text {
     text-decoration: underline;
@@ -171,11 +174,16 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
     text-underline-offset: 4px;
   }
 
+  /* ▼ カテゴリ間の薄いグレーの「|」 */
+  .category-separator {
+    color: #6b6b6b;
+    font-size: 12px;
+    user-select: none;
+  }
+
   .header-word-bar { width: 100%; background: #ffffff; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 11px 32px 13px; display: flex; align-items: center; overflow-x: auto; }
   .header-word-link { color: #111111; text-decoration: underline; font-size: 16px; }
   .header-word-separator { margin: 0 1em; color: #b9b9b9; }
-
-  /* ▼ ヘッダー下の太線にテーマカラーを使用！ */
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 </style>
