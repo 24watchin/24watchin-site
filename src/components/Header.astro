@@ -83,15 +83,15 @@ const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
 const basePath = `/${lang}/${country}`;
 
+// ▼ hrefClean（末尾スラッシュなし）も一緒に作っておく
 const categoryItems = labels.headerCategories.map((item) => ({
   href: `${basePath}/category/${item.slug}/`,
+  hrefClean: `${basePath}/category/${item.slug}`,
   label: item.label,
 }));
 
 const homeHref = `${basePath}/`;
 const searchAction = `${basePath}/search`;
-
-// ▼ スラッシュなしのパスで比較するための変数
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 ---
 
@@ -134,7 +134,7 @@ const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : 
       {categoryItems.map((item) => (
         
           href={item.href}
-          class:list={['category-link', cleanCurrentPath === item.href.slice(0, -1) && 'active']}
+          class:list={['category-link', cleanCurrentPath === item.hrefClean && 'active']}
         >
           <span class="category-link-text">{item.label}</span>
         </a>
