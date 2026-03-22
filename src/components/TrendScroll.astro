@@ -27,26 +27,26 @@ const getImageUrl = (content) => {
 };
 
 const trendTitles = {
-  ja: 'トレンドWatchin！',
-  en: 'Watchin Trends!',
-  'zh-cn': 'Watchin 热点！',
+  ja:      'トレンドWatchin！',
+  en:      'Watchin Trends!',
+  'zh-cn': 'Watchin 趋势！',
   'zh-tw': 'Watchin 熱點！',
-  es: 'Tendencias Watchin!',
-  fr: 'Tendances Watchin!',
-  de: 'Watchin Trends!',
-  ru: 'Тренды Watchin!',
+  es:      'Tendencias Watchin!',
+  fr:      'Tendances Watchin!',
+  de:      'Watchin Trends!',
+  ru:      'Тренды Watchin!',
 };
 const trendTitle = trendTitles[lang] || trendTitles['ja'];
 
 const loadingMessages = {
-  ja: 'トレンド記事を読み込み中です...',
-  en: 'Loading trending articles...',
+  ja:      'トレンド記事を読み込み中です...',
+  en:      'Loading trending articles...',
   'zh-cn': '正在加载热点文章...',
   'zh-tw': '正在載入熱點文章...',
-  es: 'Cargando artículos de tendencia...',
-  fr: 'Chargement des articles tendance...',
-  de: 'Beiträge werden geladen...',
-  ru: 'Загрузка популярных статей...',
+  es:      'Cargando artículos de tendencia...',
+  fr:      'Chargement des articles tendance...',
+  de:      'Beiträge werden geladen...',
+  ru:      'Загрузка популярных статей...',
 };
 const loadingMessage = loadingMessages[lang] || loadingMessages['ja'];
 ---
@@ -84,7 +84,8 @@ const loadingMessage = loadingMessages[lang] || loadingMessages['ja'];
 
 <style>
   .bing-trend-section { padding: 10px 0 20px 0; background: #fff; }
-  .trend-header h3 { font-size: 24px; font-weight: bold; border-bottom: 4px solid #8b0000; padding-bottom: 5px; margin-bottom: 15px; }
+  /* ▼ テーマカラーを使用！ */
+  .trend-header h3 { font-size: 24px; font-weight: bold; border-bottom: 4px solid var(--theme-color, #872732); padding-bottom: 5px; margin-bottom: 15px; }
   .trend-scroll-outer { position: relative; display: flex; align-items: center; }
   .trend-scroll-container { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding-bottom: 10px; }
   .trend-scroll-container::-webkit-scrollbar { display: none; }
