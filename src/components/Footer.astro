@@ -1,8 +1,8 @@
 ---
-// Layoutから渡されるデータ、または共有メモからデータを取得します
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+
 let { allPosts = [] } = Astro.props;
 
-// 共有メモをチェックして、全ページでグローバルサイトが表示されるようにします
 if (allPosts.length === 0 && globalThis.bloggerPostsCache) {
   allPosts = globalThis.bloggerPostsCache;
 }
@@ -12,103 +12,226 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// 言語別SNSリンク設定
-const snsConfig: Record<string, { x: string; fb: string; showX: boolean; showFb: boolean }> = {
-  ja:    { x: 'https://x.com/24watchin_ja', fb: 'https://facebook.com/24watchin.ja', showX: true,  showFb: true  },
-  en:    { x: 'https://x.com/24watchin_en', fb: 'https://facebook.com/24watchin.en', showX: true,  showFb: true  },
-  'zh-tw': { x: 'https://x.com/24watchin_tw', fb: 'https://facebook.com/24watchin.tw', showX: true,  showFb: true  },
-  es:    { x: 'https://x.com/24watchin_es', fb: 'https://facebook.com/24watchin.es', showX: true,  showFb: true  },
-  fr:    { x: 'https://x.com/24watchin_fr', fb: 'https://facebook.com/24watchin.fr', showX: true,  showFb: true  },
-  de:    { x: 'https://x.com/24watchin_de', fb: 'https://facebook.com/24watchin.de', showX: true,  showFb: true  },
-  zh:    { x: '', fb: '', showX: false, showFb: false }, // 簡体字：Weibo設定後に追加予定
-  ru:    { x: '', fb: '', showX: false, showFb: false }, // ロシア語：VK設定後に追加予定
+// ▼ テーマカラーをlangから取得
+const localeKeyMap: Record<string, string> = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
+  'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru',
 };
+const localeKey = localeKeyMap[lang] || 'jp';
+const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
+const footerStyle = '--theme-color:' + themeColor + ';';
 
+// ▼ SNS設定
+const snsConfig: Record<string, { x: string; fb: string; showX: boolean; showFb: boolean }> = {
+  ja:      { x: 'https://x.com/24watchin_ja', fb: 'https://facebook.com/24watchin.ja', showX: true,  showFb: true  },
+  en:      { x: 'https://x.com/24watchin_en', fb: 'https://facebook.com/24watchin.en', showX: true,  showFb: true  },
+  'zh-tw': { x: 'https://x.com/24watchin_tw', fb: 'https://facebook.com/24watchin.tw', showX: true,  showFb: true  },
+  es:      { x: 'https://x.com/24watchin_es', fb: 'https://facebook.com/24watchin.es', showX: true,  showFb: true  },
+  fr:      { x: 'https://x.com/24watchin_fr', fb: 'https://facebook.com/24watchin.fr', showX: true,  showFb: true  },
+  de:      { x: 'https://x.com/24watchin_de', fb: 'https://facebook.com/24watchin.de', showX: true,  showFb: true  },
+  'zh-cn': { x: '', fb: '', showX: false, showFb: false },
+  ru:      { x: '', fb: '', showX: false, showFb: false },
+};
 const currentSns = snsConfig[lang] ?? snsConfig['en'];
-
 const snsLinks = [
   { label: 'X',        href: currentSns.x,  icon: 'x',        show: currentSns.showX  },
   { label: 'Facebook', href: currentSns.fb, icon: 'facebook', show: currentSns.showFb },
 ];
 
-// Informationメニュー
-const infoMenus = {
+// ▼ Informationメニュー（8言語対応）
+const infoMenus: Record<string, { label: string; href: string }[]> = {
   ja: [
-    { label: 'About 24Watchin',          href: `/${lang}/${country}/about/` },
-    { label: 'プライバシーポリシー',      href: `/${lang}/${country}/privacy/` },
-    { label: '利用規約',                  href: `/${lang}/${country}/terms/` },
-    { label: 'お問い合わせ',              href: `/${lang}/${country}/contact/` },
-    { label: '訂正・修正ポリシー',        href: `/${lang}/${country}/corrections/` },
-    { label: '著作権・転載・引用について', href: `/${lang}/${country}/copyright/` },
+    { label: 'About 24Watchin',           href: '/' + lang + '/' + country + '/about/' },
+    { label: 'プライバシーポリシー',       href: '/' + lang + '/' + country + '/privacy/' },
+    { label: '利用規約',                   href: '/' + lang + '/' + country + '/terms/' },
+    { label: 'お問い合わせ',               href: '/' + lang + '/' + country + '/contact/' },
+    { label: '訂正・修正ポリシー',         href: '/' + lang + '/' + country + '/corrections/' },
+    { label: '著作権・転載・引用について', href: '/' + lang + '/' + country + '/copyright/' },
   ],
   en: [
-    { label: 'About 24Watchin',    href: `/${lang}/${country}/about/` },
-    { label: 'Privacy Policy',     href: `/${lang}/${country}/privacy/` },
-    { label: 'Terms of Use',       href: `/${lang}/${country}/terms/` },
-    { label: 'Contact',            href: `/${lang}/${country}/contact/` },
-    { label: 'Corrections Policy', href: `/${lang}/${country}/corrections/` },
-    { label: 'Copyright / Reuse',  href: `/${lang}/${country}/copyright/` },
+    { label: 'About 24Watchin',    href: '/' + lang + '/' + country + '/about/' },
+    { label: 'Privacy Policy',     href: '/' + lang + '/' + country + '/privacy/' },
+    { label: 'Terms of Use',       href: '/' + lang + '/' + country + '/terms/' },
+    { label: 'Contact',            href: '/' + lang + '/' + country + '/contact/' },
+    { label: 'Corrections Policy', href: '/' + lang + '/' + country + '/corrections/' },
+    { label: 'Copyright / Reuse',  href: '/' + lang + '/' + country + '/copyright/' },
+  ],
+  'zh-cn': [
+    { label: '关于 24Watchin',  href: '/' + lang + '/' + country + '/about/' },
+    { label: '隐私政策',        href: '/' + lang + '/' + country + '/privacy/' },
+    { label: '使用条款',        href: '/' + lang + '/' + country + '/terms/' },
+    { label: '联系我们',        href: '/' + lang + '/' + country + '/contact/' },
+    { label: '更正政策',        href: '/' + lang + '/' + country + '/corrections/' },
+    { label: '版权声明',        href: '/' + lang + '/' + country + '/copyright/' },
+  ],
+  'zh-tw': [
+    { label: '關於 24Watchin',  href: '/' + lang + '/' + country + '/about/' },
+    { label: '隱私政策',        href: '/' + lang + '/' + country + '/privacy/' },
+    { label: '使用條款',        href: '/' + lang + '/' + country + '/terms/' },
+    { label: '聯絡我們',        href: '/' + lang + '/' + country + '/contact/' },
+    { label: '更正政策',        href: '/' + lang + '/' + country + '/corrections/' },
+    { label: '版權聲明',        href: '/' + lang + '/' + country + '/copyright/' },
+  ],
+  es: [
+    { label: 'Acerca de 24Watchin', href: '/' + lang + '/' + country + '/about/' },
+    { label: 'Política de privacidad', href: '/' + lang + '/' + country + '/privacy/' },
+    { label: 'Términos de uso',     href: '/' + lang + '/' + country + '/terms/' },
+    { label: 'Contacto',            href: '/' + lang + '/' + country + '/contact/' },
+    { label: 'Política de correcciones', href: '/' + lang + '/' + country + '/corrections/' },
+    { label: 'Derechos de autor',   href: '/' + lang + '/' + country + '/copyright/' },
+  ],
+  fr: [
+    { label: 'À propos de 24Watchin', href: '/' + lang + '/' + country + '/about/' },
+    { label: 'Politique de confidentialité', href: '/' + lang + '/' + country + '/privacy/' },
+    { label: "Conditions d'utilisation", href: '/' + lang + '/' + country + '/terms/' },
+    { label: 'Contact',              href: '/' + lang + '/' + country + '/contact/' },
+    { label: 'Politique de corrections', href: '/' + lang + '/' + country + '/corrections/' },
+    { label: 'Droits d\'auteur',     href: '/' + lang + '/' + country + '/copyright/' },
+  ],
+  de: [
+    { label: 'Über 24Watchin',      href: '/' + lang + '/' + country + '/about/' },
+    { label: 'Datenschutzrichtlinie', href: '/' + lang + '/' + country + '/privacy/' },
+    { label: 'Nutzungsbedingungen', href: '/' + lang + '/' + country + '/terms/' },
+    { label: 'Kontakt',             href: '/' + lang + '/' + country + '/contact/' },
+    { label: 'Korrektурrichtlinie', href: '/' + lang + '/' + country + '/corrections/' },
+    { label: 'Urheberrecht',        href: '/' + lang + '/' + country + '/copyright/' },
+  ],
+  ru: [
+    { label: 'О 24Watchin',         href: '/' + lang + '/' + country + '/about/' },
+    { label: 'Политика конфиденциальности', href: '/' + lang + '/' + country + '/privacy/' },
+    { label: 'Условия использования', href: '/' + lang + '/' + country + '/terms/' },
+    { label: 'Контакты',            href: '/' + lang + '/' + country + '/contact/' },
+    { label: 'Политика исправлений', href: '/' + lang + '/' + country + '/corrections/' },
+    { label: 'Авторские права',     href: '/' + lang + '/' + country + '/copyright/' },
   ],
 };
 const currentMenu = infoMenus[lang] || infoMenus['en'];
-const infoTitle = lang === 'ja' ? 'インフォメーション' : 'Information';
 
-// 記事がある国だけを表示するための判定ロジック
-const hasContent = (countryCode) => {
-  const tag = `${lang}-${countryCode}`;
-  return allPosts.some(post => post.labels && post.labels.includes(tag));
+// ▼ タイトル多言語化
+const infoTitleMap: Record<string, string> = {
+  ja: 'インフォメーション', en: 'Information', 'zh-cn': '信息',
+  'zh-tw': '資訊', es: 'Información', fr: 'Informations',
+  de: 'Informationen', ru: 'Информация',
+};
+const infoTitle = infoTitleMap[lang] || infoTitleMap['en'];
+
+const globalTitleMap: Record<string, string> = {
+  ja: 'グローバルサイト', en: 'Global Sites', 'zh-cn': '全球站点',
+  'zh-tw': '全球站點', es: 'Sitios Globales', fr: 'Sites Mondiaux',
+  de: 'Globale Seiten', ru: 'Глобальные сайты',
+};
+const globalTitle = globalTitleMap[lang] || globalTitleMap['en'];
+
+// ▼ 国名の多言語対応
+const countryNames: Record<string, Record<string, string>> = {
+  jp:  { ja: '日本',     en: 'Japan',        'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón',         fr: 'Japon',        de: 'Japan',        ru: 'Япония'       },
+  tw:  { ja: '台湾',     en: 'Taiwan',       'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán',        fr: 'Taïwan',       de: 'Taiwan',       ru: 'Тайвань'      },
+  kr:  { ja: '韓国',     en: 'South Korea',  'zh-cn': '韩国', 'zh-tw': '韓國', es: 'Corea del Sur', fr: 'Corée du Sud', de: 'Südkorea',     ru: 'Южная Корея'  },
+  cn:  { ja: '中国',     en: 'China',        'zh-cn': '中国', 'zh-tw': '中國', es: 'China',         fr: 'Chine',        de: 'China',        ru: 'Китай'        },
+  th:  { ja: 'タイ',     en: 'Thailand',     'zh-cn': '泰国', 'zh-tw': '泰國', es: 'Tailandia',     fr: 'Thaïlande',    de: 'Thailand',     ru: 'Таиланд'      },
+  sg:  { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour',    de: 'Singapur',     ru: 'Сингапур'     },
+  in:  { ja: 'インド',   en: 'India',        'zh-cn': '印度', 'zh-tw': '印度', es: 'India',         fr: 'Inde',         de: 'Indien',       ru: 'Индия'        },
+  de:  { ja: 'ドイツ',   en: 'Germany',      'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania',      fr: 'Allemagne',    de: 'Deutschland',  ru: 'Германия'     },
+  fr:  { ja: 'フランス', en: 'France',       'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia',       fr: 'France',       de: 'Frankreich',   ru: 'Франция'      },
+  gb:  { ja: 'イギリス', en: 'UK',           'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido',   fr: 'Royaume-Uni',  de: 'Großbritannien', ru: 'Великобритания' },
+  it:  { ja: 'イタリア', en: 'Italy',        'zh-cn': '意大利', 'zh-tw': '義大利', es: 'Italia',     fr: 'Italie',       de: 'Italien',      ru: 'Италия'       },
+  es:  { ja: 'スペイン', en: 'Spain',        'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'España',     fr: 'Espagne',      de: 'Spanien',      ru: 'Испания'      },
+  us:  { ja: 'アメリカ', en: 'USA',          'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.',        fr: 'États-Unis',   de: 'USA',          ru: 'США'          },
+  ca:  { ja: 'カナダ',   en: 'Canada',       'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá',     fr: 'Canada',       de: 'Kanada',       ru: 'Канада'       },
+  br:  { ja: 'ブラジル', en: 'Brazil',       'zh-cn': '巴西', 'zh-tw': '巴西', es: 'Brasil',        fr: 'Brésil',       de: 'Brasilien',    ru: 'Бразилия'     },
+  ae:  { ja: 'アラブ首長国連邦', en: 'UAE',  'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU',       fr: 'EAU',          de: 'VAE',          ru: 'ОАЭ'          },
+  sa:  { ja: 'サウジアラビア', en: 'Saudi Arabia', 'zh-cn': '沙特阿拉伯', 'zh-tw': '沙烏地阿拉伯', es: 'Arabia Saudita', fr: 'Arabie saoudite', de: 'Saudi-Arabien', ru: 'Саудовская Аравия' },
+  za:  { ja: '南アフリカ', en: 'South Africa', 'zh-cn': '南非', 'zh-tw': '南非', es: 'Sudáfrica',   fr: 'Afrique du Sud', de: 'Südafrika',  ru: 'ЮАР'          },
+  au:  { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie',   de: 'Australien',   ru: 'Австралия'    },
+  nz:  { ja: 'ニュージーランド', en: 'New Zealand', 'zh-cn': '新西兰', 'zh-tw': '紐西蘭', es: 'Nueva Zelanda', fr: 'Nouvelle-Zélande', de: 'Neuseeland', ru: 'Новая Зеландия' },
 };
 
-// 地域リスト
+const getCountryLabel = (code: string) => {
+  return countryNames[code]?.[lang] || countryNames[code]?.['en'] || code.toUpperCase();
+};
+
+// ▼ 地域名の多言語化
+const regionNames: Record<string, Record<string, string>> = {
+  asia:     { ja: 'アジア', en: 'Asia', 'zh-cn': '亚洲', 'zh-tw': '亞洲', es: 'Asia', fr: 'Asie', de: 'Asien', ru: 'Азия' },
+  europe:   { ja: 'ヨーロッパ', en: 'Europe', 'zh-cn': '欧洲', 'zh-tw': '歐洲', es: 'Europa', fr: 'Europe', de: 'Europa', ru: 'Европа' },
+  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Америка' },
+  mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中东与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
+  oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'Океания' },
+};
+
+const hasContent = (countryCode: string) => {
+  const tag = lang + '-' + countryCode;
+  return allPosts.some((post: any) => post.labels && post.labels.includes(tag));
+};
+
 const globalRegionsRaw = [
-  { name: lang === 'ja' ? 'アジア' : 'Asia', countries: [
-      { label: lang === 'ja' ? '日本' : 'Japan', code: 'jp' },
-      { label: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' },
-      { label: lang === 'ja' ? '韓国' : 'South Korea', code: 'kr' },
-      { label: lang === 'ja' ? '中国' : 'China', code: 'cn' },
-      { label: lang === 'ja' ? 'タイ' : 'Thailand', code: 'th' },
-      { label: lang === 'ja' ? 'シンガポール' : 'Singapore', code: 'sg' },
-      { label: lang === 'ja' ? 'インド' : 'India', code: 'in' },
-    ]
-  },
-  { name: lang === 'ja' ? 'ヨーロッパ' : 'Europe', countries: [
-      { label: lang === 'ja' ? 'ドイツ' : 'Germany', code: 'de' },
-      { label: lang === 'ja' ? 'フランス' : 'France', code: 'fr' },
-      { label: lang === 'ja' ? 'イギリス' : 'UK', code: 'gb' },
-      { label: lang === 'ja' ? 'イタリア' : 'Italy', code: 'it' },
-      { label: lang === 'ja' ? 'スペイン' : 'Spain', code: 'es' },
-    ]
-  },
-  { name: lang === 'ja' ? '南北アメリカ' : 'North & South America', countries: [
-      { label: lang === 'ja' ? 'アメリカ' : 'USA', code: 'us' },
-      { label: lang === 'ja' ? 'カナダ' : 'Canada', code: 'ca' },
-      { label: lang === 'ja' ? 'ブラジル' : 'Brazil', code: 'br' },
-    ]
-  },
-  { name: lang === 'ja' ? '中東・アフリカ' : 'Middle East & Africa', countries: [
-      { label: 'UAE', code: 'ae' },
-      { label: lang === 'ja' ? 'サウジアラビア' : 'Saudi Arabia', code: 'sa' },
-      { label: lang === 'ja' ? '南アフリカ' : 'South Africa', code: 'za' },
-    ]
-  },
-  { name: lang === 'ja' ? 'オセアニア' : 'Oceania', countries: [
-      { label: lang === 'ja' ? 'オーストラリア' : 'Australia', code: 'au' },
-      { label: lang === 'ja' ? 'ニュージーランド' : 'New Zealand', code: 'nz' },
-    ]
-  },
+  { key: 'asia',     countries: ['jp','tw','kr','cn','th','sg','in'] },
+  { key: 'europe',   countries: ['de','fr','gb','it','es'] },
+  { key: 'americas', countries: ['us','ca','br'] },
+  { key: 'mideast',  countries: ['ae','sa','za'] },
+  { key: 'oceania',  countries: ['au','nz'] },
 ];
 
 const globalRegions = globalRegionsRaw.map(region => {
-  const activeCountries = region.countries.filter(c => hasContent(c.code));
-  return { ...region, countries: activeCountries };
+  const activeCountries = region.countries
+    .filter(code => hasContent(code))
+    .map(code => ({ code, label: getCountryLabel(code) }));
+  return {
+    name: regionNames[region.key]?.[lang] || regionNames[region.key]?.['en'] || region.key,
+    countries: activeCountries,
+  };
 }).filter(region => region.countries.length > 0);
-const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
+
+// ▼ フッター下部テキストの多言語化
+const footerTextMap: Record<string, { notice1: string; notice2: string; copyright: string }> = {
+  ja: {
+    notice1: '24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。',
+    notice2: '著作権は The Dexent Media Enterprises または正当な権利者に帰属します。',
+    copyright: '© 2026 The Dexent Media Enterprises. All Rights Reserved.',
+  },
+  en: {
+    notice1: 'Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.',
+    notice2: 'Copyright belongs to The Dexent Media Enterprises or respective rights holders.',
+    copyright: '© 2026 The Dexent Media Enterprises. All Rights Reserved.',
+  },
+  'zh-cn': {
+    notice1: '未经授权，禁止转载或使用24Watchin.com上的任何文章、照片、图像、图表或其他内容。',
+    notice2: '版权归The Dexent Media Enterprises或相关权利持有人所有。',
+    copyright: '© 2026 The Dexent Media Enterprises. 保留所有权利。',
+  },
+  'zh-tw': {
+    notice1: '未經授權，禁止轉載或使用24Watchin.com上的任何文章、照片、圖像、圖表或其他內容。',
+    notice2: '版權歸The Dexent Media Enterprises或相關權利持有人所有。',
+    copyright: '© 2026 The Dexent Media Enterprises. 保留所有權利。',
+  },
+  es: {
+    notice1: 'Queda prohibida la reproducción o el uso no autorizado de artículos, fotos, imágenes, gráficos u otros contenidos de 24Watchin.com.',
+    notice2: 'Los derechos de autor pertenecen a The Dexent Media Enterprises o a los respectivos titulares de derechos.',
+    copyright: '© 2026 The Dexent Media Enterprises. Todos los derechos reservados.',
+  },
+  fr: {
+    notice1: 'Toute reproduction ou utilisation non autorisée des articles, photos, images, graphiques ou autres contenus de 24Watchin.com est interdite.',
+    notice2: 'Les droits d\'auteur appartiennent à The Dexent Media Enterprises ou aux détenteurs de droits respectifs.',
+    copyright: '© 2026 The Dexent Media Enterprises. Tous droits réservés.',
+  },
+  de: {
+    notice1: 'Die unerlaubte Vervielfältigung oder Nutzung von Artikeln, Fotos, Bildern, Grafiken oder anderen Inhalten auf 24Watchin.com ist untersagt.',
+    notice2: 'Das Urheberrecht liegt bei The Dexent Media Enterprises oder den jeweiligen Rechteinhabern.',
+    copyright: '© 2026 The Dexent Media Enterprises. Alle Rechte vorbehalten.',
+  },
+  ru: {
+    notice1: 'Несанкционированное воспроизведение или использование статей, фотографий, изображений, графиков или другого контента на 24Watchin.com запрещено.',
+    notice2: 'Авторские права принадлежат The Dexent Media Enterprises или соответствующим правообладателям.',
+    copyright: '© 2026 The Dexent Media Enterprises. Все права защищены.',
+  },
+};
+const footerText = footerTextMap[lang] || footerTextMap['en'];
 ---
 
-<footer class="site-footer">
+<footer class="site-footer" style={footerStyle}>
   <div class="footer-inner">
     <div class="top-row">
-      <a href={`/${lang}/${country}/`} class="footer-logo">
+      <a href={'/' + lang + '/' + country + '/'} class="footer-logo">
         <img src="/images/logo-24watchin-white.png" alt="24Watchin" />
       </a>
       <div class="sns-row">
@@ -133,9 +256,9 @@ const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
                 <span class="region-name">{region.name}</span>
                 <span class="region-arrow">▼</span>
               </button>
-              <div class="region-body" id={`footer-region-${i}`}>
+              <div class="region-body" id={'footer-region-' + i}>
                 {region.countries.map(c => (
-                  <a href={`/${lang}/${c.code}/`} class="country-link">{c.label}</a>
+                  <a href={'/' + lang + '/' + c.code + '/'} class="country-link">{c.label}</a>
                 ))}
               </div>
             </div>
@@ -155,20 +278,20 @@ const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
   </div>
 
   <div class="footer-bottom">
-    <p>24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。</p>
-    <p>著作権は The Dexent Media Enterprises または正当な権利者に帰属します。</p>
-    <p class="copyright-year">&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
+    <p>{footerText.notice1}</p>
+    <p>{footerText.notice2}</p>
+    <p class="copyright-year">{footerText.copyright}</p>
   </div>
 </footer>
 
-<script>
-  document.querySelectorAll('.region-header').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const index = btn.getAttribute('data-index');
-      const body = document.getElementById('footer-region-' + index);
-      const arrow = btn.querySelector('.region-arrow');
+<script is:inline>
+  document.querySelectorAll('.region-header').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var index = btn.getAttribute('data-index');
+      var body = document.getElementById('footer-region-' + index);
+      var arrow = btn.querySelector('.region-arrow');
       if (body) {
-        const isOpen = body.classList.contains('open');
+        var isOpen = body.classList.contains('open');
         body.classList.toggle('open', !isOpen);
         btn.setAttribute('aria-expanded', String(!isOpen));
         if (arrow instanceof HTMLElement) {
@@ -186,27 +309,22 @@ const globalTitle = lang === 'ja' ? 'グローバルサイト' : 'Global Sites';
   .top-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
   .footer-logo img { height: 48px; width: auto; display: block; filter: brightness(0) invert(1); }
   .sns-row { display: flex; gap: 14px; }
-  .sns-btn { 
-    width: 42px; height: 42px;
-    border-radius: 50%; background: rgba(255,255,255,0.12);
-    display: flex; align-items: center; justify-content: center; 
-    text-decoration: none; transition: background 0.2s;
-  }
+  .sns-btn { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background 0.2s; }
   .sns-icon { font-size: 22px; color: #fff; font-weight: bold; line-height: 1; }
-  .sns-btn:hover { background: #872732; }
+  .sns-btn:hover { background: var(--theme-color); }
   .divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 0 0 24px; }
-  .footer-heading { font-size: 13px; font-weight: bold; color: #fff; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid #872732; display: inline-block; }
+  .footer-heading { font-size: 13px; font-weight: bold; color: #fff; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid var(--theme-color); display: inline-block; }
   .accordion-list { display: flex; flex-direction: column; gap: 6px; }
   .region-group { border-radius: 8px; overflow: hidden; }
   .region-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.07); border: none; border-radius: 8px; color: #f3f4f6; cursor: pointer; transition: background 0.2s; }
   .region-header:hover { background: rgba(255,255,255,0.13); }
-  .region-header.open { border-radius: 8px 8px 0 0; background: rgba(135,39,50,0.4); }
+  .region-header.open { border-radius: 8px 8px 0 0; background: rgba(255,255,255,0.15); }
   .region-name { font-size: 12px; font-weight: bold; }
   .region-arrow { font-size: 9px; color: #9ca3af; transition: transform 0.25s; }
   .region-body { display: none; flex-wrap: wrap; gap: 8px; background: rgba(255,255,255,0.05); border-radius: 0 0 8px 8px; padding: 14px; }
   .region-body.open { display: flex; }
   .country-link { font-size: 11px; color: #d1d5db; text-decoration: none; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); transition: all 0.2s; white-space: nowrap; }
-  .country-link:hover { background: #872732; color: #fff; }
+  .country-link:hover { background: var(--theme-color); color: #fff; }
   .info-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12); }
   .info-links { display: flex; flex-wrap: wrap; gap: 12px 28px; }
   .info-link { font-size: 12px; color: #d1d5db; text-decoration: none; white-space: nowrap; transition: color 0.2s; }
