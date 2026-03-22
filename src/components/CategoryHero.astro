@@ -7,7 +7,6 @@ const subPosts = posts.slice(1, 5);
 
 <header class="category-header">
   <h1 class="category-title">{categoryName}ニュース</h1>
-  <span class="article-count">最新記事: {posts.length}件</span>
 </header>
 
 <div class="hero-grid">
@@ -53,7 +52,6 @@ const subPosts = posts.slice(1, 5);
 <style>
   .category-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #1e3a8a; margin-bottom: 2rem; padding-bottom: 0.5rem; }
   .category-title { font-size: 1.8rem; margin: 0; color: #1a1a1a; font-weight: 800; }
-  .article-count { font-size: 0.9rem; color: #666; }
   .hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 0; }
   .hero-link { text-decoration: none; color: inherit; display: block; transition: opacity 0.2s; }
   .hero-link:hover { opacity: 0.8; }
