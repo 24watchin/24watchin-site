@@ -1,7 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import RelatedNews from '../../../components/RelatedNews.astro';
-import { getWeatherCondition } from '../../../lib/weatherConditions';
+import { getWeatherCondition, getUnitSystem, convertTemp, convertWind } from '../../../lib/weatherConditions';
 import { countryCityMap } from '../../../lib/cityConfig';
 
 export async function getStaticPaths() {
@@ -56,6 +56,9 @@ const apiLangMap: Record<string, string> = {
 };
 const apiLang = apiLangMap[lang] || 'en';
 
+// ▼ 単位設定
+const { isImperial, tempUnit, windUnit } = getUnitSystem(lang);
+
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
@@ -97,6 +100,7 @@ const tzMap: Record<string, string> = {
   bd: 'Asia/Dhaka',          np: 'Asia/Kathmandu',
 };
 
+// ▼ 全都市の予報データを一括取得（単位変換・翻訳済み）
 const allForecastData: Record<string, any> = {};
 for (const city of cities) {
   if (!WEATHER_API_KEY) break;
@@ -106,9 +110,27 @@ for (const city of cities) {
     if (wResponse.ok) {
       const wData = await wResponse.json();
       allForecastData[city.key] = {
-        forecastDays: wData.forecast.forecastday,
         alertText: (wData.alerts?.alert || []).map((a: any) => a.headline).join(' / '),
         timezone: tzMap[country] || 'Asia/Tokyo',
+        forecastDays: wData.forecast.forecastday.map((day: any) => ({
+          date: day.date,
+          conditionCode: day.day.condition.code,
+          conditionText: getWeatherCondition(day.day.condition.code, lang),
+          conditionIcon: day.day.condition.icon,
+          maxtemp: convertTemp(day.day.maxtemp_c, isImperial),
+          mintemp: convertTemp(day.day.mintemp_c, isImperial),
+          rainChance: day.day.daily_chance_of_rain,
+          hour: day.hour.map((h: any) => ({
+            time: h.time.split(' ')[1],
+            conditionCode: h.condition.code,
+            conditionText: getWeatherCondition(h.condition.code, lang),
+            conditionIcon: h.condition.icon,
+            temp: convertTemp(h.temp_c, isImperial),
+            humidity: h.humidity,
+            wind: convertWind(h.wind_kph, isImperial),
+            rainChance: h.chance_of_rain,
+          })),
+        })),
       };
     }
   } catch (e) {}
@@ -119,10 +141,10 @@ const defaultCityName = defaultCity.display[lang] || defaultCity.display['en'] |
 const storageKey = 'watchin_weather_city_' + country;
 
 const allLabels: Record<string, Record<string, string>> = {
-  ja:      { title: '3日間の天気予報', alertTitle: '気象・災害情報', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
+  ja:      { title: '3日間の天気予報', alertTitle: '気象・災害情報', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水確率', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
   en:      { title: '3-Day Forecast', alertTitle: 'Weather/Disaster Info', hourly: 'Hourly', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
-  'zh-cn': { title: '3天天气预报', alertTitle: '气象·灾害信息', hourly: '每小时', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
-  'zh-tw': { title: '3天天氣預報', alertTitle: '氣象・災害資訊', hourly: '每小時', time: '時間', weather: '天氣', rain: '降水', humidity: '濕度', wind: '風速', max: '最高', min: '最低', temp: '氣溫' },
+  'zh-cn': { title: '3天天气预报', alertTitle: '气象·灾害信息', hourly: '每小时', time: '时间', weather: '天气', rain: '降水概率', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
+  'zh-tw': { title: '3天天氣預報', alertTitle: '氣象・災害資訊', hourly: '每小時', time: '時間', weather: '天氣', rain: '降水概率', humidity: '濕度', wind: '風速', max: '最高', min: '最低', temp: '氣溫' },
   es:      { title: 'Pronóstico de 3 días', alertTitle: 'Info Meteorológica', hourly: 'Por hora', time: 'Hora', weather: 'Tiempo', rain: 'Lluvia', humidity: 'Humedad', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
   fr:      { title: 'Prévisions sur 3 jours', alertTitle: 'Infos Météo', hourly: 'Par heure', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humidité', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
   de:      { title: '3-Tage-Vorhersage', alertTitle: 'Wetter-/Katastropheninfo', hourly: 'Stündlich', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Feuchte', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
@@ -143,6 +165,8 @@ for (const city of cities) {
     data-city-names={JSON.stringify(cityNameMap)}
     data-labels={JSON.stringify(labels)}
     data-default-city={defaultCity.key}
+    data-temp-unit={tempUnit}
+    data-wind-unit={windUnit}
   >
 
     <div class="alert-ticker-container">
@@ -178,6 +202,8 @@ for (const city of cities) {
   var cityNames       = JSON.parse(page.getAttribute('data-city-names') || '{}');
   var labels          = JSON.parse(page.getAttribute('data-labels') || '{}');
   var defaultCity     = page.getAttribute('data-default-city') || '';
+  var tempUnit        = page.getAttribute('data-temp-unit') || '°C';
+  var windUnit        = page.getAttribute('data-wind-unit') || 'km/h';
 
   var alertCityName     = document.getElementById('alert-city-name');
   var alertContent      = document.getElementById('alert-ticker-content');
@@ -207,40 +233,43 @@ for (const city of cities) {
     if (!forecastDays || forecastDays.length === 0) return '<p style="padding:20px;color:#666">--</p>';
     var html = '';
     forecastDays.forEach(function(day, index) {
-      var isMoonOnly = day.day.condition.icon.includes('113.png');
+      var isMoonOnly = day.conditionIcon.includes('113.png');
       var iconClass = 'summary-icon' + (isMoonOnly ? ' moon-only' : '');
       html += '<div class="day-group" data-date="' + day.date + '">';
       html += '<button class="day-summary-btn" aria-expanded="false" data-target="hourly-' + index + '">';
       html += '<div class="date-info"><span class="date-text">' + formatDate(day.date) + '(' + getDayName(day.date) + ')</span></div>';
       html += '<div class="weather-info">';
-      html += '<img src="https:' + day.day.condition.icon + '" alt="" class="' + iconClass + '" />';
-      html += '<span class="condition-text">' + (day.day.condition.text || '') + '</span>';
+      html += '<img src="https:' + day.conditionIcon + '" alt="" class="' + iconClass + '" />';
+      html += '<span class="condition-text">' + day.conditionText + '</span>';
       html += '</div>';
       html += '<div class="temp-info">';
-      html += '<div class="temp-item"><span class="temp-label">' + (labels.max||'Max') + '</span><span class="value-text temp-max">' + Math.round(day.day.maxtemp_c) + '°</span></div>';
+      html += '<div class="temp-item"><span class="temp-label">' + (labels.max||'Max') + '</span><span class="value-text temp-max">' + day.maxtemp + tempUnit + '</span></div>';
       html += '<span class="temp-sep">/</span>';
-      html += '<div class="temp-item"><span class="temp-label">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + Math.round(day.day.mintemp_c) + '°</span></div>';
+      html += '<div class="temp-item"><span class="temp-label">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + day.mintemp + tempUnit + '</span></div>';
       html += '</div>';
-      html += '<div class="rain-info"><span class="value-text rain-val">' + day.day.daily_chance_of_rain + '%</span></div>';
+      html += '<div class="rain-info"><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
       html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '</span></div>';
       html += '</button>';
       html += '<div id="hourly-' + index + '" class="hourly-details" hidden>';
       html += '<div class="hourly-scroll-wrapper"><table class="hourly-table"><thead><tr>';
-      html += '<th>' + (labels.time||'Time') + '</th><th>' + (labels.weather||'Weather') + '</th>';
-      html += '<th>' + (labels.temp||'Temp') + '</th><th>' + (labels.humidity||'Humid') + '</th>';
-      html += '<th>' + (labels.wind||'Wind') + '</th><th>' + (labels.rain||'Rain') + '</th>';
+      html += '<th>' + (labels.time||'Time') + '</th>';
+      html += '<th>' + (labels.weather||'Weather') + '</th>';
+      html += '<th>' + (labels.temp||'Temp') + '(' + tempUnit + ')</th>';
+      html += '<th>' + (labels.humidity||'Humid') + '(%)</th>';
+      html += '<th>' + (labels.wind||'Wind') + '(' + windUnit + ')</th>';
+      html += '<th>' + (labels.rain||'Rain') + '(%)</th>';
       html += '</tr></thead><tbody>';
       day.hour.forEach(function(h) {
-        var hHour = parseInt(h.time.split(' ')[1].split(':')[0]);
-        var hMoon = h.condition.icon.includes('113.png');
+        var hHour = parseInt(h.time.split(':')[0]);
+        var hMoon = h.conditionIcon.includes('113.png');
         html += '<tr class="hourly-row" data-hour="' + hHour + '">';
-        html += '<td class="h-time value-text">' + h.time.split(' ')[1] + '</td>';
-        html += '<td class="h-icon"><img src="https:' + h.condition.icon + '" alt="" class="' + (hMoon ? 'moon-only' : '') + '" />';
-        html += '<div class="h-condition-text">' + (h.condition.text || '') + '</div></td>';
-        html += '<td class="h-temp value-text">' + Math.round(h.temp_c) + '°</td>';
-        html += '<td class="h-humidity value-text">' + h.humidity + '%</td>';
-        html += '<td class="h-wind value-text">' + Math.round(h.wind_kph) + '</td>';
-        html += '<td class="h-rain value-text">' + h.chance_of_rain + '%</td>';
+        html += '<td class="h-time value-text">' + h.time + '</td>';
+        html += '<td class="h-icon"><img src="https:' + h.conditionIcon + '" alt="" class="' + (hMoon ? 'moon-only' : '') + '" />';
+        html += '<div class="h-condition-text">' + h.conditionText + '</div></td>';
+        html += '<td class="h-temp value-text">' + h.temp + '</td>';
+        html += '<td class="h-humidity value-text">' + h.humidity + '</td>';
+        html += '<td class="h-wind value-text">' + h.wind + '</td>';
+        html += '<td class="h-rain value-text">' + h.rainChance + '</td>';
         html += '</tr>';
       });
       html += '</tbody></table></div></div></div>';
@@ -335,11 +364,8 @@ for (const city of cities) {
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 12px; font-weight: bold; }
   .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
   .weather-page .summary-icon { width: 72px; height: 72px; display: block; margin: 0 auto; }
-
-  /* ▼ 月アイコンだけ拡大＋黄色フィルター！ */
   .weather-page .summary-icon.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
   .weather-page .h-icon img.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
-
   .weather-page .temp-info { display: flex; gap: 12px; white-space: nowrap; }
   .weather-page .temp-item { display: flex; align-items: baseline; gap: 4px; }
   .weather-page .day-summary-btn { width: 100%; display: grid; grid-template-columns: 0.8fr 1.8fr 1.8fr 0.6fr 0.8fr; align-items: center; padding: 12px 16px; background: none; border: none; cursor: pointer; }
