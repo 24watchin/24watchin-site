@@ -12,7 +12,6 @@ const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 
-// ▼ テーマカラーをlangから取得
 const localeKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
   'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
@@ -33,6 +32,9 @@ const defaultDescriptions = {
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
 
+// ▼ インラインスタイル文字列として組み立てる
+const bodyStyle = '--theme-color: ' + themeColor + ';';
+
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -49,9 +51,7 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
     <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
     <meta name="description" content={metaDescription} />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style define:vars={{ themeColor }}>
-      /* ▼ テーマカラーをCSS変数として全体に配布！ */
-      :root { --theme-color: var(--themeColor); }
+    <style>
       body { font-family: sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
       .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
       .page-shell { margin-top: 30px; }
@@ -66,7 +66,8 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
     </style>
   </head>
 
-  <body>
+  <!-- ▼ bodyにインラインスタイルでCSS変数を設定！全パーツに届く！ -->
+  <body style={bodyStyle}>
     <Header />
 
     <div class="container page-shell">
