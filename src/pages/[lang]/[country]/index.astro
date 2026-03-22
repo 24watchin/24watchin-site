@@ -9,40 +9,53 @@ import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
 
 export async function getStaticPaths() {
   return [
-    { params: { lang: 'ja', country: 'jp' } },
-    { params: { lang: 'en', country: 'jp' } },
-    { params: { lang: 'en', country: 'us' } },
+    { params: { lang: 'ja',    country: 'jp' } },
+    { params: { lang: 'en',    country: 'jp' } },
+    { params: { lang: 'en',    country: 'us' } },
+    { params: { lang: 'en',    country: 'ae' } },
     { params: { lang: 'zh-cn', country: 'jp' } },
     { params: { lang: 'zh-tw', country: 'jp' } },
-    { params: { lang: 'es', country: 'jp' } },
-    { params: { lang: 'fr', country: 'jp' } },
-    { params: { lang: 'de', country: 'jp' } },
-    { params: { lang: 'ru', country: 'jp' } },
-    { params: { lang: 'de', country: 'de' } },
-    { params: { lang: 'fr', country: 'fr' } },
-    { params: { lang: 'en', country: 'ae' } },
+    { params: { lang: 'es',    country: 'jp' } },
+    { params: { lang: 'fr',    country: 'jp' } },
+    { params: { lang: 'de',    country: 'jp' } },
+    { params: { lang: 'ru',    country: 'jp' } },
+    { params: { lang: 'de',    country: 'de' } },
+    { params: { lang: 'fr',    country: 'fr' } },
   ];
 }
 
 const { lang, country } = Astro.params;
 
+// ▼ 言語別BLOG_ID
+const blogIdMap: Record<string, string> = {
+  ja:      import.meta.env.BLOG_ID_JA,
+  en:      import.meta.env.BLOG_ID_EN,
+  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
+  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
+  es:      import.meta.env.BLOG_ID_ES,
+  fr:      import.meta.env.BLOG_ID_FR,
+  de:      import.meta.env.BLOG_ID_DE,
+  ru:      import.meta.env.BLOG_ID_RU,
+};
+const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
-const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
 
-if (!globalThis.bloggerPostsCache || globalThis.bloggerPostsCache.length === 0) {
+// ▼ 言語別キャッシュ
+const cacheKey = 'bloggerPostsCache_' + lang;
+if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
   try {
+    const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
     const response = await fetch(url).catch(() => null);
     if (response && response.ok) {
       const data = await response.json();
-      globalThis.bloggerPostsCache = data.items || [];
+      globalThis[cacheKey] = data.items || [];
     }
   } catch (e) {
     console.error("記事の取得に失敗しました", e);
   }
 }
 
-const allPosts = globalThis.bloggerPostsCache || [];
+const allPosts = globalThis[cacheKey] || [];
 
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
@@ -80,12 +93,15 @@ const categoryItems = displayCategories.map(slug => {
   };
 });
 
-const pageTitles = {
-  jp: '日本のニュース', en: 'Japan News', 'zh-cn': '日本新闻',
-  'zh-tw': '日本新聞', es: 'Noticias de Japón',
-  fr: 'Actualités du Japon', de: 'Japan Nachrichten', ru: 'Новости Японии'
+// ▼ 国別ページタイトル
+const pageTitleMap: Record<string, Record<string, string>> = {
+  jp: { ja: '日本のニュース', en: 'Japan News', 'zh-cn': '日本新闻', 'zh-tw': '日本新聞', es: 'Noticias de Japón', fr: 'Actualités du Japon', de: 'Japan Nachrichten', ru: 'Новости Японии' },
+  us: { ja: 'アメリカのニュース', en: 'USA News', 'zh-cn': '美国新闻', 'zh-tw': '美國新聞', es: 'Noticias de EE.UU.', fr: 'Actualités des États-Unis', de: 'USA Nachrichten', ru: 'Новости США' },
+  ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿聯酋新聞', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
+  de: { ja: 'ドイツのニュース', en: 'Germany News', 'zh-cn': '德国新闻', 'zh-tw': '德國新聞', es: 'Noticias de Alemania', fr: 'Actualités d\'Allemagne', de: 'Deutschland Nachrichten', ru: 'Новости Германии' },
+  fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': '法国新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости Франции' },
 };
-const pageTitle = pageTitles[langKey] || 'News';
+const pageTitle = pageTitleMap[country]?.[lang] || 'News';
 ---
 
 <Layout title={pageTitle} allPosts={allPosts}>
