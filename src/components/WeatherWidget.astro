@@ -1,5 +1,5 @@
 ---
-import { getWeatherCondition } from '../lib/weatherConditions';
+import { getWeatherCondition, getUnitSystem, convertTemp } from '../lib/weatherConditions';
 import { countryCityMap } from '../lib/cityConfig';
 
 const currentPath = Astro.url.pathname;
@@ -8,6 +8,7 @@ const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
 const cities = countryCityMap[country] || countryCityMap['jp'];
+const { isImperial, tempUnit } = getUnitSystem(lang);
 
 const API_KEY = import.meta.env.WEATHER_API_KEY;
 if (!globalThis.weatherCache) globalThis.weatherCache = {};
@@ -40,11 +41,11 @@ const cityDataForJs = cities.map(city => {
   return {
     key: city.key,
     displayName: city.display[lang] || city.display['en'] || city.key,
-    temp: current ? Math.round(current.temp_c) : null,
-    feelsLike: current ? Math.round(current.feelslike_c) : null,
+    temp: current ? convertTemp(current.temp_c, isImperial) : null,
+    feelsLike: current ? convertTemp(current.feelslike_c, isImperial) : null,
     humidity: current?.humidity ?? null,
     iconUrl,
-    isMoon: iconUrl.includes('113.png'),  // ▼ 追加！
+    isMoon: iconUrl.includes('113.png'),
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
@@ -89,9 +90,7 @@ const storageKey = 'watchin_weather_city_' + country;
   data-city-data={JSON.stringify(cityDataForJs)}
   data-weather-base-link={weatherBaseLink}
   data-storage-key={storageKey}
-  data-feels-label={feelsLikeLabel}
-  data-humidity-label={humidityLabel}
-  data-error-text={errorText}
+  data-temp-unit={tempUnit}
 >
   <div class="widget-header">
     <h3 class="widget-title">{titleText}</h3>
@@ -104,7 +103,6 @@ const storageKey = 'watchin_weather_city_' + country;
     <a href={weatherBaseLink} class="widget-body-link" id="weather-body-link">
       <div class="widget-content">
         <div class="widget-left">
-          <!-- ▼ 月アイコンに moon-only クラスを付与 -->
           <img
             src={defaultData.iconUrl}
             alt={defaultData.conditionText}
@@ -114,11 +112,11 @@ const storageKey = 'watchin_weather_city_' + country;
           <span class="widget-desc" id="weather-desc">{defaultData.conditionText}</span>
         </div>
         <div class="widget-right">
-          <span class="widget-temp" id="weather-temp">{defaultData.temp}℃</span>
+          <span class="widget-temp" id="weather-temp">{defaultData.temp}{tempUnit}</span>
           <div class="widget-details">
             <div class="detail-line">
               <span class="detail-label">{feelsLikeLabel}</span>
-              <span class="detail-value" id="weather-feels">{defaultData.feelsLike}℃</span>
+              <span class="detail-value" id="weather-feels">{defaultData.feelsLike}{tempUnit}</span>
             </div>
             <div class="detail-line">
               <span class="detail-label">{humidityLabel}</span>
@@ -156,6 +154,7 @@ const storageKey = 'watchin_weather_city_' + country;
   var cityData   = JSON.parse(widget.getAttribute('data-city-data') || '[]');
   var baseLink   = widget.getAttribute('data-weather-base-link') || '';
   var storageKey = widget.getAttribute('data-storage-key') || '';
+  var tempUnit   = widget.getAttribute('data-temp-unit') || '°C';
 
   var cityLink = document.getElementById('weather-city-link');
   var bodyLink = document.getElementById('weather-body-link');
@@ -176,15 +175,14 @@ const storageKey = 'watchin_weather_city_' + country;
     if (cityLink) { cityLink.textContent = city.displayName; cityLink.href = link; }
     if (bodyLink) bodyLink.href = link;
 
-    // ▼ 月アイコンはクラスで拡大・自然な色
     if (icon) {
       icon.src = city.iconUrl;
       icon.alt = city.conditionText;
       icon.className = 'widget-icon' + (city.isMoon ? ' moon-only' : '');
     }
     if (desc)     desc.textContent = city.conditionText;
-    if (temp)     temp.textContent = city.temp !== null ? city.temp + '℃' : '--';
-    if (feels)    feels.textContent = city.feelsLike !== null ? city.feelsLike + '℃' : '--';
+    if (temp)     temp.textContent = city.temp !== null ? city.temp + tempUnit : '--';
+    if (feels)    feels.textContent = city.feelsLike !== null ? city.feelsLike + tempUnit : '--';
     if (humidity) humidity.textContent = city.humidity !== null ? city.humidity + '%' : '--';
 
     buttons.forEach(function(btn) {
@@ -231,12 +229,8 @@ const storageKey = 'watchin_weather_city_' + country;
   .widget-body-link:hover { background: #f9f9f9; }
   .widget-content { display: flex; justify-content: center; align-items: center; gap: 28px; }
   .widget-left { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-
-  /* ▼ 通常アイコン */
   .widget-icon { width: 72px; height: 72px; object-fit: contain; }
-  /* ▼ 月アイコンだけ拡大・自然な色！ */
-  .widget-icon.moon-only { transform: scale(1.5); transform-origin: center; }
-
+  .widget-icon.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
   .widget-desc { font-size: 1rem; font-weight: bold; color: #1a1a1a; margin-top: 6px; }
   .widget-right { display: flex; flex-direction: column; align-items: flex-start; }
   .widget-temp { font-size: 2.2rem; font-weight: bold; line-height: 1; color: #1a1a1a; margin-bottom: 10px; }
