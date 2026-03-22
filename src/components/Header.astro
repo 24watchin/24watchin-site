@@ -261,23 +261,24 @@ const languageOptions = [
   .category-bar { width: 100%; background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 4px; display: flex; align-items: center; }
 
+  /* ▼ 矢印：デフォルト非表示・activeクラスで表示 */
   .scroll-arrow {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.18);
     border: none;
-    color: rgba(255,255,255,0.35);
+    color: #ffffff;
     font-size: 22px;
     width: 28px;
     height: 54px;
     cursor: pointer;
     flex-shrink: 0;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     line-height: 1;
     padding: 0;
-    transition: all 0.2s;
+    transition: background 0.2s;
   }
-  .scroll-arrow.active { background: rgba(255,255,255,0.18); color: #ffffff; }
+  .scroll-arrow.active { display: flex; }
   .scroll-arrow.active:hover { background: rgba(255,255,255,0.30); }
 
   .pc-category-group { display: flex; align-items: center; min-width: 0; flex: 1; }
@@ -318,7 +319,7 @@ const languageOptions = [
     .search-icon { width: 14px; height: 14px; }
     .lang-current { font-size: 12px; }
     .pc-category-group { display: none; }
-    .scroll-arrow { display: none; }
+    .scroll-arrow { display: none !important; }
     .sp-scroll { display: flex; flex: 1; min-width: 0; }
     .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
@@ -337,21 +338,18 @@ const languageOptions = [
       var atLeft = scroll.scrollLeft <= 2;
       var atRight = scroll.scrollLeft >= scroll.scrollWidth - scroll.clientWidth - 2;
 
-      // ▼ 1000px以上の広い画面では両方非表示
       if (isWide) {
         btnLeft.classList.remove('active');
         btnRight.classList.remove('active');
         return;
       }
 
-      // ▼ 1000px以下：左端以外で左矢印アクティブ
       if (!atLeft) {
         btnLeft.classList.add('active');
       } else {
         btnLeft.classList.remove('active');
       }
 
-      // ▼ 1000px以下：右端以外で右矢印アクティブ
       if (!atRight) {
         btnRight.classList.add('active');
       } else {
