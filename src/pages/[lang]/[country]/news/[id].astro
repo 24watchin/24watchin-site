@@ -1,12 +1,12 @@
 ---
-import ReactionBar from '../../../components/ReactionBar.astro';
-import Breadcrumb from '../../../components/Breadcrumb.astro';
-import Layout from '../../../layouts/Layout.astro';
-import ShareButtons from '../../../components/ShareButtons.astro';
-import RelatedNews from '../../../components/RelatedNews.astro';
-import EditorPicks from '../../../components/EditorPicks.astro';
-import RecommendedLinks from '../../../components/RecommendedLinks.astro';
-import { categoryLabelMap, type SiteLanguageKey } from '../../../lib/categoryLabels';
+import ReactionBar from '../../../../components/ReactionBar.astro';
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
+import Layout from '../../../../layouts/Layout.astro';
+import ShareButtons from '../../../../components/ShareButtons.astro';
+import RelatedNews from '../../../../components/RelatedNews.astro';
+import EditorPicks from '../../../../components/EditorPicks.astro';
+import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
+import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
