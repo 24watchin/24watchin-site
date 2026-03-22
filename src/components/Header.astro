@@ -123,7 +123,6 @@ const moreTextMap: Record<string, string> = {
 const moreText = moreTextMap[localeKey] || 'More';
 const moreHasActive = moreItems.some(item => item.isActive);
 
-// ▼ styleを---の中で全部組み立てる！テンプレート内では+を使わない！
 const languageOptions = [
   { code: 'ja', key: 'jp',    label: '日本語',   barStyle: 'background:#872732' },
   { code: 'en', key: 'en',    label: 'English',  barStyle: 'background:#001580' },
@@ -177,7 +176,9 @@ const languageOptions = [
 
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
-      <div class="category-scroll">
+
+      <!-- ▼ PC版：メインカテゴリのみ表示 -->
+      <div class="category-scroll pc-scroll">
         {mainItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
             <span class="category-link-text">{item.label}</span>
@@ -185,8 +186,18 @@ const languageOptions = [
         ))}
       </div>
 
+      <!-- ▼ スマホ版：全カテゴリを横スクロールで表示 -->
+      <div class="category-scroll sp-scroll">
+        {categoryItems.map((item) => (
+          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+            <span class="category-link-text">{item.label}</span>
+          </a>
+        ))}
+      </div>
+
+      <!-- ▼ Moreボタン：PC版のみ表示 -->
       {needsMore && (
-        <div class="more-wrapper">
+        <div class="more-wrapper pc-more">
           <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
             {moreText}
             <svg class="more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -202,6 +213,7 @@ const languageOptions = [
           </div>
         </div>
       )}
+
     </div>
   </nav>
 
@@ -248,8 +260,14 @@ const languageOptions = [
 
   .category-bar { width: 100%; background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; }
+
   .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
   .category-scroll::-webkit-scrollbar { display: none; }
+
+  /* ▼ PC版：pc-scrollを表示・sp-scrollを非表示 */
+  .pc-scroll { display: flex; }
+  .sp-scroll { display: none; }
+
   .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
   .category-link:hover .category-link-text { text-decoration: underline; text-decoration-color: #cccccc; text-decoration-thickness: 2px; text-underline-offset: 4px; }
@@ -266,6 +284,13 @@ const languageOptions = [
   .more-link:last-child { border-bottom: none; }
   .more-link:hover { background: rgba(255,255,255,0.12); }
   .more-link.active { background: var(--theme-color); }
+
+  /* ▼ スマホ版：sp-scrollを表示・pc-scrollとMoreボタンを非表示 */
+  @media (max-width: 768px) {
+    .pc-scroll { display: none; }
+    .sp-scroll { display: flex; flex: 1; }
+    .pc-more { display: none; }
+  }
 
   .header-word-bar { width: 100%; background: #ffffff; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 11px 32px 13px; display: flex; align-items: center; overflow-x: auto; }
