@@ -9,9 +9,8 @@ import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
-const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
+const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
 
-// ▼ 【重要】全員で使い回す「共有メモ」からデータを読み込む仕組み
 if (!globalThis.bloggerPostsCache || globalThis.bloggerPostsCache.length === 0) {
   try {
     const response = await fetch(url).catch(() => null);
@@ -27,23 +26,42 @@ if (!globalThis.bloggerPostsCache || globalThis.bloggerPostsCache.length === 0) 
 const allPosts = globalThis.bloggerPostsCache || [];
 
 const lang = 'ja';
-const country = 'jp'; 
-const targetTag = `${lang}-${country}`;
+const country = 'jp';
+const targetTag = lang + '-' + country;
 
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.includes(targetTag);
 });
 
+// ▼ langからcategoryLabelMapのキーに変換
 const langKey = lang === 'ja' ? 'jp' : lang;
+const categoryData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
+
+// ▼ カテゴリ一覧をlabelMapから自動取得！タイトルも自動で言語切替！
+const displayCategories = [
+  'politics', 'society', 'international', 'economy',
+  'environment-energy', 'business', 'technology-ai',
+  'entertainment', 'sports', 'health-life', 'weather', 'traffic'
+];
 
 const filterByCategory = (slug, count = 3) => {
-  const catData = categoryLabelMap[langKey]?.allCategories.find(c => c.slug === slug);
+  const catData = categoryData.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
-  return mainSitePosts.filter(post => 
+  return mainSitePosts.filter(post =>
     post.labels?.some(label => keywords.some(key => label.includes(key)))
   ).slice(0, count);
 };
+
+// ▼ slug → label の変換テーブルを作成
+const categoryItems = displayCategories.map(slug => {
+  const catData = categoryData.allCategories.find(c => c.slug === slug);
+  return {
+    slug,
+    title: catData ? catData.label : slug,
+    posts: filterByCategory(slug, 3),
+  };
+});
 ---
 
 <Layout title="日本のニュース" allPosts={allPosts}>
@@ -54,22 +72,16 @@ const filterByCategory = (slug, count = 3) => {
 
   <GoogleAdBanner position="上部" />
 
-  {/* メインエリアの表示（データがない場合はメッセージを出すように強化） */}
   <div class="genre-grid">
     {allPosts.length > 0 ? (
       <>
-        <CategoryNews title="政治" slug="politics" posts={filterByCategory("politics", 3)} />
-        <CategoryNews title="社会" slug="society" posts={filterByCategory("society", 3)} />
-        <CategoryNews title="国際" slug="international" posts={filterByCategory("international", 3)} />
-        <CategoryNews title="経済" slug="economy" posts={filterByCategory("economy", 3)} />
-        <CategoryNews title="環境・エネルギー" slug="environment-energy" posts={filterByCategory("environment-energy", 3)} />
-        <CategoryNews title="ビジネス" slug="business" posts={filterByCategory("business", 3)} />
-        <CategoryNews title="テクノロジー・AI" slug="technology-ai" posts={filterByCategory("technology-ai", 3)} />
-        <CategoryNews title="文化・エンタメ" slug="entertainment" posts={filterByCategory("entertainment", 3)} />
-        <CategoryNews title="スポーツ" slug="sports" posts={filterByCategory("sports", 3)} />
-        <CategoryNews title="健康・ライフ" slug="health-life" posts={filterByCategory("health-life", 3)} />
-        <CategoryNews title="天気" slug="weather" posts={filterByCategory("weather", 3)} />
-        <CategoryNews title="交通" slug="traffic" posts={filterByCategory("traffic", 3)} />
+        {categoryItems.map((cat) => (
+          <CategoryNews
+            title={cat.title}
+            slug={cat.slug}
+            posts={cat.posts}
+          />
+        ))}
       </>
     ) : (
       <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
