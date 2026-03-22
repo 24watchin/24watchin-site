@@ -168,6 +168,12 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
   .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; overflow-x: auto; white-space: nowrap; }
   .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; }
   .category-link.active { background: #e8383d; }
+  .category-link:hover .category-link-text {
+    text-decoration: underline;
+    text-decoration-color: #cccccc;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
   .header-word-bar { width: 100%; background: #ffffff; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 11px 32px 13px; display: flex; align-items: center; overflow-x: auto; }
   .header-word-link { color: #111111; text-decoration: underline; font-size: 16px; }
