@@ -7,9 +7,7 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// ▼ cityConfig.ts から都市リストを取得！
 const cities = countryCityMap[country] || countryCityMap['jp'];
-const defaultCity = cities[0];
 
 const API_KEY = import.meta.env.WEATHER_API_KEY;
 if (!globalThis.weatherCache) globalThis.weatherCache = {};
@@ -41,7 +39,6 @@ const cityDataForJs = cities.map(city => {
   return {
     key: city.key,
     displayName: city.display[lang] || city.display['en'] || city.key,
-    weatherLink: '/' + lang + '/' + country + '/weather/',
     temp: current ? Math.round(current.temp_c) : null,
     feelsLike: current ? Math.round(current.feelslike_c) : null,
     humidity: current?.humidity ?? null,
@@ -49,6 +46,8 @@ const cityDataForJs = cities.map(city => {
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
+
+const weatherBaseLink = '/' + lang + '/' + country + '/weather/';
 
 const titleTextMap: Record<string, string> = {
   ja: '現在の天気', en: 'Current Weather', 'zh-cn': '当前天气',
@@ -81,18 +80,26 @@ const humidityLabel = humidityMap[lang] || humidityMap['en'];
 const errorText = errorTextMap[lang] || errorTextMap['en'];
 const defaultData = cityDataForJs[0];
 const showCityButtons = cities.length > 1;
+const storageKey = 'watchin_weather_city_' + country;
 ---
 
-<div class="weather-widget" id="weather-widget">
+<div class="weather-widget" id="weather-widget"
+  data-city-data={JSON.stringify(cityDataForJs)}
+  data-weather-base-link={weatherBaseLink}
+  data-storage-key={storageKey}
+  data-feels-label={feelsLikeLabel}
+  data-humidity-label={humidityLabel}
+  data-error-text={errorText}
+>
   <div class="widget-header">
     <h3 class="widget-title">{titleText}</h3>
-    <a href={defaultData.weatherLink} class="city-link" id="weather-city-link">
+    <a href={weatherBaseLink} class="city-link" id="weather-city-link">
       {defaultData.displayName}
     </a>
   </div>
 
   {defaultData.temp !== null ? (
-    <a href={defaultData.weatherLink} class="widget-body-link" id="weather-body-link">
+    <a href={weatherBaseLink} class="widget-body-link" id="weather-body-link">
       <div class="widget-content">
         <div class="widget-left">
           <img src={defaultData.iconUrl} alt={defaultData.conditionText} class="widget-icon" id="weather-icon" />
@@ -114,7 +121,7 @@ const showCityButtons = cities.length > 1;
       </div>
     </a>
   ) : (
-    <p class="widget-error">{errorText}</p>
+    <p class="widget-error" id="weather-error">{errorText}</p>
   )}
 
   {showCityButtons && (
@@ -122,12 +129,9 @@ const showCityButtons = cities.length > 1;
       <div class="city-section-header">
         <span class="city-section-title">{cityWeatherTitle}</span>
       </div>
-      <div class="city-buttons">
+      <div class="city-buttons" id="city-buttons">
         {cityDataForJs.map((city, i) => (
-          <button
-            class={i === 0 ? 'city-btn active' : 'city-btn'}
-            data-city={JSON.stringify(city)}
-          >
+          <button class={i === 0 ? 'city-btn active' : 'city-btn'} data-key={city.key}>
             {city.displayName}
           </button>
         ))}
@@ -137,31 +141,90 @@ const showCityButtons = cities.length > 1;
 </div>
 
 <script is:inline>
-  (function() {
-    var buttons = document.querySelectorAll('.city-btn');
-    if (!buttons.length) return;
+(function() {
+  var widget = document.getElementById('weather-widget');
+  if (!widget) return;
+
+  var cityData     = JSON.parse(widget.getAttribute('data-city-data') || '[]');
+  var baseLink     = widget.getAttribute('data-weather-base-link') || '';
+  var storageKey   = widget.getAttribute('data-storage-key') || '';
+  var feelsLabel   = widget.getAttribute('data-feels-label') || '';
+  var humLabel     = widget.getAttribute('data-humidity-label') || '';
+  var errorText    = widget.getAttribute('data-error-text') || '';
+
+  var cityLink     = document.getElementById('weather-city-link');
+  var bodyLink     = document.getElementById('weather-body-link');
+  var icon         = document.getElementById('weather-icon');
+  var desc         = document.getElementById('weather-desc');
+  var temp         = document.getElementById('weather-temp');
+  var feels        = document.getElementById('weather-feels');
+  var humidity     = document.getElementById('weather-humidity');
+  var buttons      = document.querySelectorAll('.city-btn');
+
+  // ▼ ウィジェット表示を更新する関数
+  function applyCity(city, saveStorage) {
+    if (!city) return;
+    if (saveStorage && storageKey) {
+      try { localStorage.setItem(storageKey, city.key); } catch(e) {}
+    }
+
+    // ヘッダーのリンク
+    var link = baseLink + '?city=' + city.key;
+    if (cityLink) { cityLink.textContent = city.displayName; cityLink.href = link; }
+    if (bodyLink) bodyLink.href = link;
+
+    // 天気表示
+    if (icon)     { icon.src = city.iconUrl; icon.alt = city.conditionText; }
+    if (desc)     desc.textContent = city.conditionText;
+    if (temp)     temp.textContent = city.temp !== null ? city.temp + '℃' : '--';
+    if (feels)    feels.textContent = city.feelsLike !== null ? city.feelsLike + '℃' : '--';
+    if (humidity) humidity.textContent = city.humidity !== null ? city.humidity + '%' : '--';
+
+    // アクティブボタン
     buttons.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var city = JSON.parse(btn.getAttribute('data-city'));
-        buttons.forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        var cityLink = document.getElementById('weather-city-link');
-        var bodyLink = document.getElementById('weather-body-link');
-        var icon = document.getElementById('weather-icon');
-        var desc = document.getElementById('weather-desc');
-        var temp = document.getElementById('weather-temp');
-        var feels = document.getElementById('weather-feels');
-        var humidity = document.getElementById('weather-humidity');
-        if (cityLink) { cityLink.textContent = city.displayName; cityLink.href = city.weatherLink; }
-        if (bodyLink) bodyLink.href = city.weatherLink;
-        if (icon) { icon.src = city.iconUrl; icon.alt = city.conditionText; }
-        if (desc) desc.textContent = city.conditionText;
-        if (temp) temp.textContent = city.temp !== null ? city.temp + '℃' : '--';
-        if (feels) feels.textContent = city.feelsLike !== null ? city.feelsLike + '℃' : '--';
-        if (humidity) humidity.textContent = city.humidity !== null ? city.humidity + '%' : '--';
-      });
+      btn.classList.toggle('active', btn.getAttribute('data-key') === city.key);
     });
-  })();
+
+    // ▼ 天気予報ページのメインコンテンツにも通知
+    if (typeof window.updateWeatherMain === 'function') {
+      window.updateWeatherMain(city.key);
+    }
+  }
+
+  // ▼ ボタンクリック
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var key = btn.getAttribute('data-key');
+      var city = cityData.find(function(c) { return c.key === key; });
+      if (city) applyCity(city, true);
+    });
+  });
+
+  // ▼ ページ読み込み時：localStorage または URLパラメーターから復元
+  function initCity() {
+    // URLパラメーター優先
+    var urlParams = new URLSearchParams(window.location.search);
+    var urlCity = urlParams.get('city');
+    var savedKey = urlCity;
+
+    // なければlocalStorage
+    if (!savedKey && storageKey) {
+      try { savedKey = localStorage.getItem(storageKey); } catch(e) {}
+    }
+
+    if (savedKey) {
+      var city = cityData.find(function(c) { return c.key === savedKey; });
+      if (city) {
+        applyCity(city, false);
+        return;
+      }
+    }
+    // デフォルト（最初の都市）
+    if (cityData.length > 0) applyCity(cityData[0], false);
+  }
+
+  initCity();
+})();
 </script>
 
 <style>
@@ -185,7 +248,7 @@ const showCityButtons = cities.length > 1;
   .widget-error { font-size: 0.9rem; color: #666; margin: 0; text-align: center; }
   .city-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid #eee; }
   .city-section-header { margin-bottom: 10px; }
-  .city-section-title { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+  .city-section-title { font-size: 12px; font-weight: 700; color: #888; letter-spacing: 0.05em; }
   .city-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
   .city-btn { padding: 5px 12px; font-size: 12px; font-weight: 600; border: 1px solid #ddd; border-radius: 20px; background: #f5f5f5; color: #444; cursor: pointer; transition: all 0.15s; }
   .city-btn:hover { background: #e8e8e8; border-color: #bbb; }
