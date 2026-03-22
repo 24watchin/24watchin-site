@@ -5,7 +5,7 @@ export const categoryLabelMap = {
     headerCategories: [
       { slug: 'politics', label: '政治' }, { slug: 'society', label: '社会' }, { slug: 'international', label: '国際' }, { slug: 'economy', label: '経済' }, { slug: 'environment-energy', label: '環境・エネルギー' },
       { slug: 'business', label: 'ビジネス' }, { slug: 'technology-ai', label: 'テクノロジー・AI' }, { slug: 'entertainment', label: '文化・エンタメ' }, { slug: 'sports', label: 'スポーツ' }, { slug: 'health-life', label: '健康・ライフ' },
-      { slug: 'weather', label: '天気' }, { slug: 'traffic', label: '交通' }
+      { slug: 'weather', label: '天気・災害' }, { slug: 'traffic', label: '交通' }
     ],
     allCategories: [
       { slug: 'politics', label: '政治', keywords: ['政治'] }, { slug: 'society', label: '社会', keywords: ['社会'] }, { slug: 'international', label: '国際', keywords: ['国際'] }, { slug: 'economy', label: '経済', keywords: ['経済', '財経'] },
