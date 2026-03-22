@@ -53,13 +53,33 @@ const localeKeyMap: Record<string, string> = {
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
+// ▼ 言語別BLOG_ID
+const blogIdMap: Record<string, string> = {
+  ja:      import.meta.env.BLOG_ID_JA,
+  en:      import.meta.env.BLOG_ID_EN,
+  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
+  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
+  es:      import.meta.env.BLOG_ID_ES,
+  fr:      import.meta.env.BLOG_ID_FR,
+  de:      import.meta.env.BLOG_ID_DE,
+  ru:      import.meta.env.BLOG_ID_RU,
+};
+const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
-const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
 
-const response = await fetch(url).catch(() => null);
-const data = response ? await response.json() : { items: [] };
-const allPosts = data.items || [];
+// ▼ 言語別キャッシュ
+const cacheKey = 'bloggerPostsCache_' + lang;
+if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
+  try {
+    const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
+    const response = await fetch(url).catch(() => null);
+    if (response && response.ok) {
+      const data = await response.json();
+      globalThis[cacheKey] = data.items || [];
+    }
+  } catch (e) {}
+}
+const allPosts = globalThis[cacheKey] || [];
 
 const catData = labels.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : slug;
@@ -81,7 +101,6 @@ const getImageUrl = (content) => {
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
 
-// ▼ 国名の多言語化
 const countryLabelMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
@@ -99,7 +118,6 @@ const countryLabelMap: Record<string, Record<string, string>> = {
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 const countryHref = '/' + lang + '/' + country + '/';
 
-// ▼ 「その他の〇〇ニュース」多言語化
 const moreNewsMap: Record<string, string> = {
   ja:      'その他の' + categoryName + 'ニュース',
   en:      'More ' + categoryName + ' News',
@@ -112,7 +130,6 @@ const moreNewsMap: Record<string, string> = {
 };
 const moreNewsTitle = moreNewsMap[lang] || moreNewsMap['en'];
 
-// ▼ 「準備中」多言語化
 const emptyMessageMap: Record<string, string> = {
   ja:      'この記事は現在準備中です。',
   en:      'No articles available yet.',
@@ -151,4 +168,3 @@ const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
   .section-title { font-size: 1.5rem; border-left: 5px solid var(--theme-color, #872732); padding-left: 1rem; font-weight: bold; margin-bottom: 1.25rem; color: #1a1a1a; }
   .empty-message { color: #666; font-size: 16px; margin: 20px 0 0; }
 </style>
-
