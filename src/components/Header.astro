@@ -175,7 +175,6 @@ const languageOptions = [
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
 
-      <!-- ▼ 左矢印：最初は半透明（左端） -->
       <button class="scroll-arrow arrow-left" id="arrow-left" aria-label="左へ" type="button">&#8249;</button>
 
       <div class="pc-category-group">
@@ -214,7 +213,6 @@ const languageOptions = [
         ))}
       </div>
 
-      <!-- ▼ 右矢印：常に表示 -->
       <button class="scroll-arrow arrow-right" id="arrow-right" aria-label="右へ" type="button">&#8250;</button>
 
     </div>
@@ -263,7 +261,6 @@ const languageOptions = [
   .category-bar { width: 100%; background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 4px; display: flex; align-items: center; }
 
-  /* ▼ 矢印：PC版では両方常に表示！半透明で存在感を示す */
   .scroll-arrow {
     background: rgba(255,255,255,0.08);
     border: none;
@@ -280,14 +277,8 @@ const languageOptions = [
     padding: 0;
     transition: all 0.2s;
   }
-  /* ▼ アクティブな矢印（スクロール可能な方向） */
-  .scroll-arrow.active {
-    background: rgba(255,255,255,0.18);
-    color: #ffffff;
-  }
-  .scroll-arrow.active:hover {
-    background: rgba(255,255,255,0.30);
-  }
+  .scroll-arrow.active { background: rgba(255,255,255,0.18); color: #ffffff; }
+  .scroll-arrow.active:hover { background: rgba(255,255,255,0.30); }
 
   .pc-category-group { display: flex; align-items: center; min-width: 0; flex: 1; }
   .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
@@ -318,8 +309,8 @@ const languageOptions = [
   .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 
-  /* ▼ スマホ版（600px未満）← 768→600に下げました！ */
-  @media (max-width: 600px) {
+  /* ▼ 400px未満のみスマホレイアウト */
+  @media (max-width: 400px) {
     .header-top { padding: 8px 10px 6px; gap: 8px; }
     .logo-image { width: 120px; }
     .country-name { font-size: 13px; margin-top: 2px; }
@@ -332,11 +323,6 @@ const languageOptions = [
     .sp-scroll { display: flex; flex: 1; min-width: 0; }
     .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
-
-  @media (max-width: 400px) {
-    .search-input { width: 90px; }
-    .logo-image { width: 100px; }
-  }
 </style>
 
 <script is:inline>
@@ -348,14 +334,11 @@ const languageOptions = [
     if (!scroll || !btnLeft || !btnRight) return;
 
     function updateArrows() {
-      // ▼ 左矢印：スクロール済みならアクティブ
       if (scroll.scrollLeft > 2) {
         btnLeft.classList.add('active');
       } else {
         btnLeft.classList.remove('active');
       }
-
-      // ▼ 右矢印：右端以外ならアクティブ
       if (scroll.scrollLeft < scroll.scrollWidth - scroll.clientWidth - 2) {
         btnRight.classList.add('active');
       } else {
