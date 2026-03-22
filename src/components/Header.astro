@@ -135,13 +135,13 @@ const languageOptions = [
 ].map(opt => ({
   ...opt,
   href: '/' + opt.code + '/' + country + '/',
-  isCurrent: opt.key === localeKey,
   linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option',
 }));
 ---
 
 <header class="site-header">
   <div class="header-top">
+    <!-- ▼ 左：ロゴとJAPAN -->
     <div class="brand-area">
       <a href={homeHref} class="logo-link" aria-label="24Watchin">
         <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
@@ -149,6 +149,7 @@ const languageOptions = [
       <div class="country-name">{displayCountryName}</div>
     </div>
 
+    <!-- ▼ 右：検索と言語切り替え -->
     <div class="right-area">
       <form action={searchAction} method="get" class="search-form">
         <input type="text" name="q" class="search-input" placeholder={searchPlaceholder} aria-label={searchAriaLabel} />
@@ -176,8 +177,7 @@ const languageOptions = [
 
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
-
-      <!-- ▼ PC版：メインカテゴリのみ表示 -->
+      <!-- ▼ PC版：メインカテゴリ + Moreボタン -->
       <div class="category-scroll pc-scroll">
         {mainItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
@@ -186,7 +186,7 @@ const languageOptions = [
         ))}
       </div>
 
-      <!-- ▼ スマホ版：全カテゴリを横スクロールで表示 -->
+      <!-- ▼ スマホ版：全カテゴリを横スクロール -->
       <div class="category-scroll sp-scroll">
         {categoryItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
@@ -195,7 +195,6 @@ const languageOptions = [
         ))}
       </div>
 
-      <!-- ▼ Moreボタン：PC版のみ表示 -->
       {needsMore && (
         <div class="more-wrapper pc-more">
           <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
@@ -213,7 +212,6 @@ const languageOptions = [
           </div>
         </div>
       )}
-
     </div>
   </nav>
 
@@ -236,31 +234,46 @@ const languageOptions = [
 
 <style>
   .site-header { width: 100%; background: #ffffff; }
-  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
-  .brand-area { display: flex; flex-direction: column; align-items: flex-start; }
-  .logo-link { display: inline-block; text-decoration: none; }
-  .logo-image { display: block; width: 240px; max-width: 100%; height: auto; }
-  .country-name { margin-top: 6px; font-size: 18px; font-weight: 700; color: #000000; align-self: flex-end; }
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; padding-top: 8px; }
-  .search-form { display: flex; align-items: center; gap: 8px; }
-  .search-input { width: 190px; height: 36px; padding: 0 12px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 16px; outline: none; }
-  .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
 
+  /* ▼ ヘッダー上部 */
+  .header-top {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 10px 14px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* ▼ 左エリア：ロゴ */
+  .brand-area { display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; }
+  .logo-link { display: inline-block; text-decoration: none; }
+  .logo-image { display: block; width: 200px; max-width: 100%; height: auto; }
+  .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
+
+  /* ▼ 右エリア：検索と言語 */
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .search-form { display: flex; align-items: center; gap: 6px; }
+  .search-input { width: 180px; height: 34px; padding: 0 10px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 15px; outline: none; }
+  .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
+
+  /* ▼ 言語切り替え */
   .lang-switcher { position: relative; }
-  .lang-current { font-size: 14px; color: #333; cursor: pointer; padding: 4px 8px; border-radius: 4px; user-select: none; }
+  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; border-radius: 4px; user-select: none; white-space: nowrap; }
   .lang-current:hover { background: #f0f0f0; }
-  .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 160px; z-index: 999; overflow: hidden; }
+  .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 150px; z-index: 999; overflow: hidden; }
   .lang-switcher:hover .lang-dropdown { display: block; }
-  .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; text-decoration: none; color: #333; font-size: 14px; font-weight: 500; border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
+  .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; font-weight: 500; border-bottom: 1px solid #f0f0f0; }
   .lang-option:last-child { border-bottom: none; }
   .lang-option:hover { background: #f8f8f8; }
   .lang-option.current { background: #f0f0f0; font-weight: 700; }
-  .lang-bar { display: inline-block; width: 4px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+  .lang-bar { display: inline-block; width: 4px; height: 14px; border-radius: 2px; flex-shrink: 0; }
 
+  /* ▼ カテゴリバー */
   .category-bar { width: 100%; background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; }
-
   .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
   .category-scroll::-webkit-scrollbar { display: none; }
 
@@ -268,33 +281,53 @@ const languageOptions = [
   .pc-scroll { display: flex; flex: 1; min-width: 0; }
   .sp-scroll { display: none; }
 
-  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 16px; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
   .category-link:hover .category-link-text { text-decoration: underline; text-decoration-color: #cccccc; text-decoration-thickness: 2px; text-underline-offset: 4px; }
 
   .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn { height: 54px; padding: 0 18px; color: #ffffff; font-size: 16px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; user-select: none; }
+  .more-btn { height: 54px; padding: 0 16px; color: #ffffff; font-size: 15px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; user-select: none; }
   .more-btn:hover { background: rgba(255,255,255,0.1); }
   .more-btn.active { background: var(--theme-color); }
-  .more-chevron { width: 14px; height: 14px; stroke: #ffffff; transition: transform 0.2s ease; }
+  .more-chevron { width: 13px; height: 13px; stroke: #ffffff; transition: transform 0.2s ease; }
   .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
   .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .more-wrapper:hover .more-dropdown { display: block; }
-  .more-link { display: block; padding: 14px 18px; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .more-link { display: block; padding: 14px 18px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
   .more-link:last-child { border-bottom: none; }
   .more-link:hover { background: rgba(255,255,255,0.12); }
   .more-link.active { background: var(--theme-color); }
 
-  /* ▼ スマホ版：sp-scrollを表示・pc-scrollとMoreボタンを非表示 */
+  .header-word-bar { width: 100%; background: #ffffff; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px 12px; display: flex; align-items: center; overflow-x: auto; }
+  .header-word-link { color: #111111; text-decoration: underline; font-size: 14px; white-space: nowrap; }
+  .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
+  .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
+
+  /* ▼ スマホ版（768px未満） */
   @media (max-width: 768px) {
+    .header-top { padding: 8px 10px 6px; gap: 8px; align-items: center; }
+
+    /* ▼ ロゴをスマホで適切なサイズに */
+    .logo-image { width: 120px; }
+    .country-name { font-size: 13px; margin-top: 2px; }
+
+    /* ▼ 検索バーをスマホで小さく */
+    .search-input { width: 120px; height: 30px; font-size: 13px; }
+    .search-button { width: 30px; height: 30px; }
+    .search-icon { width: 14px; height: 14px; }
+    .lang-current { font-size: 12px; }
+
+    /* ▼ カテゴリ：全部横スクロール */
     .pc-scroll { display: none; }
-    .sp-scroll { display: flex; flex: 1; }
+    .sp-scroll { display: flex; flex: 1; min-width: 0; }
     .pc-more { display: none; }
+    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
 
-  .header-word-bar { width: 100%; background: #ffffff; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 11px 32px 13px; display: flex; align-items: center; overflow-x: auto; }
-  .header-word-link { color: #111111; text-decoration: underline; font-size: 16px; }
-  .header-word-separator { margin: 0 1em; color: #b9b9b9; }
-  .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
+  /* ▼ 超小さい画面（400px未満） */
+  @media (max-width: 400px) {
+    .search-input { width: 90px; }
+    .logo-image { width: 100px; }
+  }
 </style>
