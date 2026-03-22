@@ -65,13 +65,26 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
 
-// 言語（enかjpか）を判定します
-const detectedLocale = pathParts.includes('en') ? 'en' : 'jp';
-const locale: SiteLanguageKey = detectedLocale as SiteLanguageKey;
-const labels = categoryLabelMap[locale] || categoryLabelMap.jp;
+// ▼ URLの1番目と2番目のパーツから lang と country を取得
+const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || 'jp';
 
-// ▼ ここを /ja/ に修正しました！
-const basePath = `/ja/${locale}`;
+// ▼ langからcategoryLabelMapのキーに変換（jaはjpにマッピング）
+const localeKeyMap: Record<string, string> = {
+  ja: 'jp',
+  en: 'en',
+  'zh-cn': 'zh-cn',
+  'zh-tw': 'zh-tw',
+  es: 'es',
+  de: 'de',
+  fr: 'fr',
+  ru: 'ru',
+};
+const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
+const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+
+// ▼ ベースパスもURLから動的に生成
+const basePath = `/${lang}/${country}`;
 
 const categoryItems = labels.headerCategories.map((item) => ({
   href: `${basePath}/category/${item.slug}/`,
@@ -116,12 +129,12 @@ const searchAction = `${basePath}/search`;
     </div>
   </div>
 
-  <nav class:list={['category-bar', `locale-${locale}`]} aria-label={labels.categoryBarAriaLabel}>
+  <nav class:list={['category-bar', `locale-${localeKey}`]} aria-label={labels.categoryBarAriaLabel}>
     <div class="category-inner">
       {categoryItems.map((item) => (
-        <a
+        
           href={item.href}
-          class:list={['category-link', currentPath === item.href && 'active']}
+          class:list={['category-link', currentPath === item.href.replace(/\/$/, '') && 'active']}
         >
           <span class="category-link-text">{item.label}</span>
         </a>
