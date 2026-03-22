@@ -2,6 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import RelatedNews from '../../../components/RelatedNews.astro';
 import { getWeatherCondition } from '../../../lib/weatherConditions';
+import { countryCityMap } from '../../../lib/cityConfig';
 
 export async function getStaticPaths() {
   return [
@@ -12,12 +13,34 @@ export async function getStaticPaths() {
     { params: { lang: 'en', country: 'au' } },
     { params: { lang: 'en', country: 'gb' } },
     { params: { lang: 'en', country: 'sg' } },
+    { params: { lang: 'en', country: 'ca' } },
+    { params: { lang: 'en', country: 'nz' } },
+    { params: { lang: 'en', country: 'hk' } },
+    { params: { lang: 'en', country: 'in' } },
+    { params: { lang: 'en', country: 'my' } },
+    { params: { lang: 'en', country: 'ph' } },
+    { params: { lang: 'en', country: 'th' } },
+    { params: { lang: 'en', country: 'vn' } },
+    { params: { lang: 'en', country: 'id' } },
+    { params: { lang: 'en', country: 'kr' } },
+    { params: { lang: 'en', country: 'mx' } },
+    { params: { lang: 'en', country: 'br' } },
+    { params: { lang: 'en', country: 'za' } },
+    { params: { lang: 'en', country: 'eg' } },
+    { params: { lang: 'en', country: 'qa' } },
+    { params: { lang: 'en', country: 'om' } },
+    { params: { lang: 'en', country: 'sa' } },
+    { params: { lang: 'en', country: 'tr' } },
     { params: { lang: 'de', country: 'de' } },
     { params: { lang: 'de', country: 'jp' } },
+    { params: { lang: 'de', country: 'at' } },
     { params: { lang: 'fr', country: 'fr' } },
     { params: { lang: 'fr', country: 'jp' } },
     { params: { lang: 'es', country: 'jp' } },
     { params: { lang: 'es', country: 'es' } },
+    { params: { lang: 'es', country: 'mx' } },
+    { params: { lang: 'es', country: 'ar' } },
+    { params: { lang: 'es', country: 'co' } },
     { params: { lang: 'ru', country: 'jp' } },
     { params: { lang: 'zh-cn', country: 'jp' } },
     { params: { lang: 'zh-cn', country: 'cn' } },
@@ -28,7 +51,6 @@ export async function getStaticPaths() {
 
 const { lang, country } = Astro.params;
 
-// ▼ 言語→APIの言語コード変換
 const apiLangMap: Record<string, string> = {
   ja: 'ja', en: 'en', 'zh-cn': 'zh', 'zh-tw': 'zh',
   fr: 'fr', de: 'de', es: 'es', ru: 'ru',
@@ -57,30 +79,35 @@ const relatedNews = allPosts.filter((post: any) =>
   post.labels.some((label: string) => ['天気', '気象', '災害', 'weather', 'Weather'].includes(label))
 ).slice(0, 3);
 
-// ▼ 都市マップ（WeatherWidgetと同じ）
-const cityMap: Record<string, { name: string; tz: string; display: Record<string, string> }> = {
-  jp: { name: 'Tokyo',       tz: 'Asia/Tokyo',          display: { ja: '東京',         en: 'Tokyo',        'zh-cn': '东京',      'zh-tw': '東京',    es: 'Tokio',        fr: 'Tokyo',      de: 'Tokio',       ru: 'Токио'       } },
-  us: { name: 'New_York',    tz: 'America/New_York',    display: { ja: 'ニューヨーク',  en: 'New York',     'zh-cn': '纽约',      'zh-tw': '紐約',    es: 'Nueva York',   fr: 'New York',   de: 'New York',    ru: 'Нью-Йорк'    } },
-  de: { name: 'Berlin',      tz: 'Europe/Berlin',       display: { ja: 'ベルリン',     en: 'Berlin',       'zh-cn': '柏林',      'zh-tw': '柏林',    es: 'Berlín',       fr: 'Berlin',     de: 'Berlin',      ru: 'Берлин'      } },
-  fr: { name: 'Paris',       tz: 'Europe/Paris',        display: { ja: 'パリ',         en: 'Paris',        'zh-cn': '巴黎',      'zh-tw': '巴黎',    es: 'París',        fr: 'Paris',      de: 'Paris',       ru: 'Париж'       } },
-  gb: { name: 'London',      tz: 'Europe/London',       display: { ja: 'ロンドン',     en: 'London',       'zh-cn': '伦敦',      'zh-tw': '倫敦',    es: 'Londres',      fr: 'Londres',    de: 'London',      ru: 'Лондон'      } },
-  tw: { name: 'Taipei',      tz: 'Asia/Taipei',         display: { ja: '台北',         en: 'Taipei',       'zh-cn': '台北',      'zh-tw': '台北',    es: 'Taipéi',       fr: 'Taipei',     de: 'Taipeh',      ru: 'Тайбэй'      } },
-  kr: { name: 'Seoul',       tz: 'Asia/Seoul',          display: { ja: 'ソウル',       en: 'Seoul',        'zh-cn': '首尔',      'zh-tw': '首爾',    es: 'Seúl',         fr: 'Séoul',      de: 'Seoul',       ru: 'Сеул'        } },
-  cn: { name: 'Beijing',     tz: 'Asia/Shanghai',       display: { ja: '北京',         en: 'Beijing',      'zh-cn': '北京',      'zh-tw': '北京',    es: 'Pekín',        fr: 'Pékin',      de: 'Peking',      ru: 'Пекин'       } },
-  sg: { name: 'Singapore',   tz: 'Asia/Singapore',      display: { ja: 'シンガポール', en: 'Singapore',    'zh-cn': '新加坡',    'zh-tw': '新加坡',  es: 'Singapur',     fr: 'Singapour',  de: 'Singapur',    ru: 'Сингапур'    } },
-  au: { name: 'Sydney',      tz: 'Australia/Sydney',    display: { ja: 'シドニー',     en: 'Sydney',       'zh-cn': '悉尼',      'zh-tw': '雪梨',    es: 'Sídney',       fr: 'Sydney',     de: 'Sydney',      ru: 'Сидней'      } },
-  ae: { name: 'Dubai',       tz: 'Asia/Dubai',          display: { ja: 'ドバイ',       en: 'Dubai',        'zh-cn': '迪拜',      'zh-tw': '杜拜',    es: 'Dubái',        fr: 'Dubaï',      de: 'Dubai',       ru: 'Дубай'       } },
-  es: { name: 'Madrid',      tz: 'Europe/Madrid',       display: { ja: 'マドリード',   en: 'Madrid',       'zh-cn': '马德里',    'zh-tw': '馬德里',  es: 'Madrid',       fr: 'Madrid',     de: 'Madrid',      ru: 'Мадрид'      } },
-};
+// ▼ cityConfig.ts から首都（最初の都市）を取得！
+const cities = countryCityMap[country] || countryCityMap['jp'];
+const defaultCity = cities[0];
+const cityDisplayName = defaultCity.display[lang] || defaultCity.display['en'] || defaultCity.key;
 
-const targetCity = cityMap[country] || cityMap['jp'];
-const cityDisplayName = targetCity.display[lang] || targetCity.display['en'] || targetCity.name;
+// ▼ タイムゾーンマップ（天気予報ページ用）
+const tzMap: Record<string, string> = {
+  jp: 'Asia/Tokyo',         us: 'America/New_York',   de: 'Europe/Berlin',
+  fr: 'Europe/Paris',       gb: 'Europe/London',      tw: 'Asia/Taipei',
+  kr: 'Asia/Seoul',         cn: 'Asia/Shanghai',      sg: 'Asia/Singapore',
+  au: 'Australia/Sydney',   ae: 'Asia/Dubai',         es: 'Europe/Madrid',
+  ca: 'America/Toronto',    nz: 'Pacific/Auckland',   hk: 'Asia/Hong_Kong',
+  in: 'Asia/Kolkata',       my: 'Asia/Kuala_Lumpur',  ph: 'Asia/Manila',
+  th: 'Asia/Bangkok',       vn: 'Asia/Ho_Chi_Minh',   id: 'Asia/Jakarta',
+  mx: 'America/Mexico_City', br: 'America/Sao_Paulo', ar: 'America/Argentina/Buenos_Aires',
+  co: 'America/Bogota',     za: 'Africa/Johannesburg', eg: 'Africa/Cairo',
+  qa: 'Asia/Qatar',         om: 'Asia/Muscat',        sa: 'Asia/Riyadh',
+  tr: 'Europe/Istanbul',    nl: 'Europe/Amsterdam',   ch: 'Europe/Zurich',
+  se: 'Europe/Stockholm',   no: 'Europe/Oslo',        dk: 'Europe/Copenhagen',
+  pt: 'Europe/Lisbon',      gr: 'Europe/Athens',      it: 'Europe/Rome',
+  bd: 'Asia/Dhaka',         np: 'Asia/Kathmandu',     np2: 'Asia/Kathmandu',
+};
+const timezone = tzMap[country] || 'Asia/Tokyo';
 
 let forecastDays: any[] = [];
 let alertFullText = '';
 if (WEATHER_API_KEY) {
   try {
-    const weatherUrl = 'https://api.weatherapi.com/v1/forecast.json?key=' + WEATHER_API_KEY + '&q=' + targetCity.name + '&days=5&aqi=no&alerts=yes&lang=' + apiLang;
+    const weatherUrl = 'https://api.weatherapi.com/v1/forecast.json?key=' + WEATHER_API_KEY + '&q=' + defaultCity.key + '&days=5&aqi=no&alerts=yes&lang=' + apiLang;
     const wResponse = await fetch(weatherUrl);
     if (wResponse.ok) {
       const wData = await wResponse.json();
@@ -90,16 +117,15 @@ if (WEATHER_API_KEY) {
   } catch (e) {}
 }
 
-// ▼ 多言語ラベル
 const allLabels: Record<string, Record<string, string>> = {
-  ja:      { title: '3日間の天気予報', alertTitle: '気象・災害情報', relatedTitle: '関連記事', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
-  en:      { title: '3-Day Forecast', alertTitle: 'Weather/Disaster Info', relatedTitle: 'Related News', hourly: 'Hourly', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
-  'zh-cn': { title: '3天天气预报', alertTitle: '气象·灾害信息', relatedTitle: '相关新闻', hourly: '每小时', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
-  'zh-tw': { title: '3天天氣預報', alertTitle: '氣象・災害資訊', relatedTitle: '相關新聞', hourly: '每小時', time: '時間', weather: '天氣', rain: '降水', humidity: '濕度', wind: '風速', max: '最高', min: '最低', temp: '氣溫' },
-  es:      { title: 'Pronóstico de 3 días', alertTitle: 'Info Meteorológica', relatedTitle: 'Noticias relacionadas', hourly: 'Por hora', time: 'Hora', weather: 'Tiempo', rain: 'Lluvia', humidity: 'Humedad', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
-  fr:      { title: 'Prévisions sur 3 jours', alertTitle: 'Infos Météo', relatedTitle: 'Articles liés', hourly: 'Par heure', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humidité', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
-  de:      { title: '3-Tage-Vorhersage', alertTitle: 'Wetter-/Katastropheninfo', relatedTitle: 'Verwandte Artikel', hourly: 'Stündlich', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Feuchte', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
-  ru:      { title: 'Прогноз на 3 дня', alertTitle: 'Погода/Катастрофы', relatedTitle: 'Связанные статьи', hourly: 'По часам', time: 'Время', weather: 'Погода', rain: 'Дождь', humidity: 'Влажн.', wind: 'Ветер', max: 'Макс', min: 'Мин', temp: 'Темп.' },
+  ja:      { title: '3日間の天気予報', alertTitle: '気象・災害情報', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
+  en:      { title: '3-Day Forecast', alertTitle: 'Weather/Disaster Info', hourly: 'Hourly', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  'zh-cn': { title: '3天天气预报', alertTitle: '气象·灾害信息', hourly: '每小时', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
+  'zh-tw': { title: '3天天氣預報', alertTitle: '氣象・災害資訊', hourly: '每小時', time: '時間', weather: '天氣', rain: '降水', humidity: '濕度', wind: '風速', max: '最高', min: '最低', temp: '氣溫' },
+  es:      { title: 'Pronóstico de 3 días', alertTitle: 'Info Meteorológica', hourly: 'Por hora', time: 'Hora', weather: 'Tiempo', rain: 'Lluvia', humidity: 'Humedad', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
+  fr:      { title: 'Prévisions sur 3 jours', alertTitle: 'Infos Météo', hourly: 'Par heure', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humidité', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
+  de:      { title: '3-Tage-Vorhersage', alertTitle: 'Wetter-/Katastropheninfo', hourly: 'Stündlich', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Feuchte', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  ru:      { title: 'Прогноз на 3 дня', alertTitle: 'Погода/Катастрофы', hourly: 'По часам', time: 'Время', weather: 'Погода', rain: 'Дождь', humidity: 'Влажн.', wind: 'Ветер', max: 'Макс', min: 'Мин', temp: 'Темп.' },
 };
 const labels = allLabels[lang] || allLabels['en'];
 
@@ -125,7 +151,7 @@ const getDayName = (dateStr: string) => {
 ---
 
 <Layout title={cityDisplayName + ' | ' + labels.title} sidebarType="weather">
-  <main class="weather-page" data-timezone={targetCity.tz}>
+  <main class="weather-page" data-timezone={timezone}>
 
     <div class="alert-ticker-container">
       <div class="alert-ticker-label">
