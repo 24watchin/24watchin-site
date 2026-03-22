@@ -127,14 +127,3 @@ const pageTitle = pageTitles[langKey] || 'News';
   .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
   @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
 </style>
-```
-
----
-
-## ⚠️ 重要なお願い！
-
-`getStaticPaths()` の中の組み合わせリストを**実際に使っている言語・国の組み合わせ**に合わせる必要があります！
-
-`weather.astro` の中の `getStaticPaths()` を見せてもらえますか？そこに正しい組み合わせが入っているはずです！📂
-```
-src/pages/[lang]/[country]/weather.astro
