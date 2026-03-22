@@ -124,14 +124,14 @@ const moreText = moreTextMap[localeKey] || 'More';
 const moreHasActive = moreItems.some(item => item.isActive);
 
 const languageOptions = [
-  { code: 'ja', key: 'jp',    label: '日本語',   barStyle: 'background:#872732' },
-  { code: 'en', key: 'en',    label: 'English',  barStyle: 'background:#001580' },
+  { code: 'ja', key: 'jp',      label: '日本語',   barStyle: 'background:#872732' },
+  { code: 'en', key: 'en',      label: 'English',  barStyle: 'background:#001580' },
   { code: 'zh-cn', key: 'zh-cn', label: '简体中文', barStyle: 'background:#0e7c7b' },
   { code: 'zh-tw', key: 'zh-tw', label: '繁體中文', barStyle: 'background:#b33224' },
-  { code: 'es', key: 'es',    label: 'Español',  barStyle: 'background:#b38000' },
-  { code: 'fr', key: 'fr',    label: 'Français', barStyle: 'background:#3d3d99' },
-  { code: 'de', key: 'de',    label: 'Deutsch',  barStyle: 'background:#006600' },
-  { code: 'ru', key: 'ru',    label: 'Русский',  barStyle: 'background:#500d80' },
+  { code: 'es', key: 'es',      label: 'Español',  barStyle: 'background:#b38000' },
+  { code: 'fr', key: 'fr',      label: 'Français', barStyle: 'background:#3d3d99' },
+  { code: 'de', key: 'de',      label: 'Deutsch',  barStyle: 'background:#006600' },
+  { code: 'ru', key: 'ru',      label: 'Русский',  barStyle: 'background:#500d80' },
 ].map(opt => ({
   ...opt,
   href: '/' + opt.code + '/' + country + '/',
@@ -141,7 +141,6 @@ const languageOptions = [
 
 <header class="site-header">
   <div class="header-top">
-    <!-- ▼ 左：ロゴとJAPAN -->
     <div class="brand-area">
       <a href={homeHref} class="logo-link" aria-label="24Watchin">
         <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
@@ -149,7 +148,6 @@ const languageOptions = [
       <div class="country-name">{displayCountryName}</div>
     </div>
 
-    <!-- ▼ 右：検索と言語切り替え -->
     <div class="right-area">
       <form action={searchAction} method="get" class="search-form">
         <input type="text" name="q" class="search-input" placeholder={searchPlaceholder} aria-label={searchAriaLabel} />
@@ -177,8 +175,14 @@ const languageOptions = [
 
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
-      <!-- ▼ PC版：メインカテゴリ + Moreボタン -->
-      <div class="category-scroll pc-scroll">
+
+      <!-- ▼ PC版：左矢印ボタン（必要な時だけ表示） -->
+      <button class="scroll-arrow arrow-left pc-arrow" id="arrow-left" aria-label="左へスクロール" type="button">
+        &#8249;
+      </button>
+
+      <!-- ▼ PC版：メインカテゴリ -->
+      <div class="category-scroll pc-scroll" id="pc-scroll">
         {mainItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
             <span class="category-link-text">{item.label}</span>
@@ -186,7 +190,7 @@ const languageOptions = [
         ))}
       </div>
 
-      <!-- ▼ スマホ版：全カテゴリを横スクロール -->
+      <!-- ▼ スマホ版：全カテゴリ横スクロール -->
       <div class="category-scroll sp-scroll">
         {categoryItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
@@ -195,6 +199,7 @@ const languageOptions = [
         ))}
       </div>
 
+      <!-- ▼ Moreボタン（PC版のみ） -->
       {needsMore && (
         <div class="more-wrapper pc-more">
           <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
@@ -212,6 +217,12 @@ const languageOptions = [
           </div>
         </div>
       )}
+
+      <!-- ▼ PC版：右矢印ボタン（必要な時だけ表示） -->
+      <button class="scroll-arrow arrow-right pc-arrow" id="arrow-right" aria-label="右へスクロール" type="button">
+        &#8250;
+      </button>
+
     </div>
   </nav>
 
@@ -235,31 +246,17 @@ const languageOptions = [
 <style>
   .site-header { width: 100%; background: #ffffff; }
 
-  /* ▼ ヘッダー上部 */
-  .header-top {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 10px 14px 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-  }
-
-  /* ▼ 左エリア：ロゴ */
+  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .brand-area { display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; }
   .logo-link { display: inline-block; text-decoration: none; }
   .logo-image { display: block; width: 200px; max-width: 100%; height: auto; }
   .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
-
-  /* ▼ 右エリア：検索と言語 */
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
   .search-form { display: flex; align-items: center; gap: 6px; }
   .search-input { width: 180px; height: 34px; padding: 0 10px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 15px; outline: none; }
   .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
   .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
 
-  /* ▼ 言語切り替え */
   .lang-switcher { position: relative; }
   .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; border-radius: 4px; user-select: none; white-space: nowrap; }
   .lang-current:hover { background: #f0f0f0; }
@@ -271,13 +268,31 @@ const languageOptions = [
   .lang-option.current { background: #f0f0f0; font-weight: 700; }
   .lang-bar { display: inline-block; width: 4px; height: 14px; border-radius: 2px; flex-shrink: 0; }
 
-  /* ▼ カテゴリバー */
   .category-bar { width: 100%; background: #393737; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 4px; display: flex; align-items: center; }
+
+  /* ▼ 矢印ボタン */
+  .scroll-arrow {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #ffffff;
+    font-size: 22px;
+    width: 28px;
+    height: 54px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: background 0.2s;
+    padding: 0;
+  }
+  .scroll-arrow:hover { background: rgba(255,255,255,0.25); }
+  .scroll-arrow.visible { display: flex; }
+
   .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
   .category-scroll::-webkit-scrollbar { display: none; }
-
-  /* ▼ PC版：pc-scrollを表示・sp-scrollを非表示 */
   .pc-scroll { display: flex; flex: 1; min-width: 0; }
   .sp-scroll { display: none; }
 
@@ -304,30 +319,71 @@ const languageOptions = [
   .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 
-  /* ▼ スマホ版（768px未満） */
+  /* ▼ スマホ版 */
   @media (max-width: 768px) {
-    .header-top { padding: 8px 10px 6px; gap: 8px; align-items: center; }
-
-    /* ▼ ロゴをスマホで適切なサイズに */
+    .header-top { padding: 8px 10px 6px; gap: 8px; }
     .logo-image { width: 120px; }
     .country-name { font-size: 13px; margin-top: 2px; }
-
-    /* ▼ 検索バーをスマホで小さく */
     .search-input { width: 120px; height: 30px; font-size: 13px; }
     .search-button { width: 30px; height: 30px; }
     .search-icon { width: 14px; height: 14px; }
     .lang-current { font-size: 12px; }
-
-    /* ▼ カテゴリ：全部横スクロール */
     .pc-scroll { display: none; }
     .sp-scroll { display: flex; flex: 1; min-width: 0; }
     .pc-more { display: none; }
+    .pc-arrow { display: none !important; }
     .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
 
-  /* ▼ 超小さい画面（400px未満） */
   @media (max-width: 400px) {
     .search-input { width: 90px; }
     .logo-image { width: 100px; }
   }
 </style>
+
+<script is:inline>
+  (function() {
+    var scroll = document.getElementById('pc-scroll');
+    var btnLeft = document.getElementById('arrow-left');
+    var btnRight = document.getElementById('arrow-right');
+
+    if (!scroll || !btnLeft || !btnRight) return;
+
+    // ▼ 矢印の表示・非表示を更新
+    function updateArrows() {
+      // スマホ幅では何もしない
+      if (window.innerWidth <= 768) {
+        btnLeft.classList.remove('visible');
+        btnRight.classList.remove('visible');
+        return;
+      }
+      var canScrollLeft = scroll.scrollLeft > 0;
+      var canScrollRight = scroll.scrollLeft < scroll.scrollWidth - scroll.clientWidth - 1;
+
+      if (canScrollLeft) {
+        btnLeft.classList.add('visible');
+      } else {
+        btnLeft.classList.remove('visible');
+      }
+      if (canScrollRight) {
+        btnRight.classList.add('visible');
+      } else {
+        btnRight.classList.remove('visible');
+      }
+    }
+
+    btnLeft.addEventListener('click', function() {
+      scroll.scrollBy({ left: -200, behavior: 'smooth' });
+    });
+
+    btnRight.addEventListener('click', function() {
+      scroll.scrollBy({ left: 200, behavior: 'smooth' });
+    });
+
+    scroll.addEventListener('scroll', updateArrows);
+    window.addEventListener('resize', updateArrows);
+
+    // ▼ 初回チェック
+    updateArrows();
+  })();
+</script>
