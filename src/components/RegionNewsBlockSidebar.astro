@@ -1,0 +1,42 @@
+---
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+
+const { lang = 'ja', title, cityData = [] } = Astro.props;
+
+const getImageUrl = (content) => {
+  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/72x48/eeeeee/999999?text=No+Image';
+};
+
+const formatPostTime = (dateString) => {
+  if (!dateString) return '';
+  try {
+    return new Date(dateString).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
+  } catch { return ''; }
+};
+
+const getDisplayCategory = (post) => {
+  const labels = post?.labels || [];
+  const mapKey = lang === 'ja' ? 'jp' : lang;
+  const langConfig = categoryLabelMap[mapKey] || categoryLabelMap['en'];
+  const validCategoryNames = langConfig.allCategories.map(cat => cat.label);
+  const categoryLabel = labels.find(label => validCategoryNames.includes(label));
+  if (categoryLabel) return categoryLabel;
+  const fallbackLabel = labels.find(label => {
+    if (!label) return false;
+    if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false;
+    return true;
+  });
+  return fallbackLabel || (lang === 'ja' ? 'ニュース' : 'News');
+};
+---
+
+<section class="sb-region-section">
+  <div class="sb-region-header">
+    <span class="sb-region-title">{title}</span>
+  </div>
+
+  <div class="sb-city-groups">
+    {cityData.map((city) =>
