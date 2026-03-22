@@ -309,7 +309,6 @@ const languageOptions = [
   .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 
-  /* ▼ 400px未満のみスマホレイアウト */
   @media (max-width: 400px) {
     .header-top { padding: 8px 10px 6px; gap: 8px; }
     .logo-image { width: 120px; }
@@ -334,12 +333,26 @@ const languageOptions = [
     if (!scroll || !btnLeft || !btnRight) return;
 
     function updateArrows() {
-      if (scroll.scrollLeft > 2) {
+      var isWide = window.innerWidth > 1000;
+      var atLeft = scroll.scrollLeft <= 2;
+      var atRight = scroll.scrollLeft >= scroll.scrollWidth - scroll.clientWidth - 2;
+
+      // ▼ 1000px以上の広い画面では両方非表示
+      if (isWide) {
+        btnLeft.classList.remove('active');
+        btnRight.classList.remove('active');
+        return;
+      }
+
+      // ▼ 1000px以下：左端以外で左矢印アクティブ
+      if (!atLeft) {
         btnLeft.classList.add('active');
       } else {
         btnLeft.classList.remove('active');
       }
-      if (scroll.scrollLeft < scroll.scrollWidth - scroll.clientWidth - 2) {
+
+      // ▼ 1000px以下：右端以外で右矢印アクティブ
+      if (!atRight) {
         btnRight.classList.add('active');
       } else {
         btnRight.classList.remove('active');
