@@ -1,11 +1,10 @@
 ---
 import GoogleAdBanner from './GoogleAdBanner.astro';
+import GlobalRegionNewsSidebar from './GlobalRegionNewsSidebar.astro';
 
-// 言語と国の情報を受け取ります
 const { lang = 'ja', country = 'jp' } = Astro.props;
 const targetTag = `${lang}-${country}`;
 
-// 1. Cloudflare KV（メモ帳）からPVデータを取得
 const kvData = import.meta.env.NEWS_PV_RANKING;
 let pvMap = new Map();
 
@@ -27,10 +26,8 @@ const sortedPostIds = Array.from(pvMap.entries())
   .slice(0, 10)
   .map(entry => entry[0]);
 
-// 2. 共有メモからデータを読み込む
 let allPosts = globalThis.bloggerPostsCache || [];
 
-// 【修正：保険の追加】もし共有メモが空なら、自分で1回だけ取得します
 if (allPosts.length === 0) {
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
@@ -43,13 +40,11 @@ if (allPosts.length === 0) {
   }
 }
 
-// 3. 厳格なフィルター：このページと同じ「言語-国」タグを持つ記事だけを抽出
 const sitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.includes(targetTag);
 });
 
-// 4. ランキングリストを作成
 let rankingList = [];
 for (const id of sortedPostIds) {
   const matchPost = sitePosts.find(p => p.id === id);
@@ -58,7 +53,6 @@ for (const id of sortedPostIds) {
   }
 }
 
-// 10件に満たない場合の補充（同じ言語・国の最新記事から）
 const existingIds = new Set(rankingList.map(p => p.id));
 for (const post of sitePosts) {
   if (rankingList.length >= 10) break;
@@ -99,6 +93,12 @@ const getImageUrl = (content) => {
       )}
     </div>
   </section>
+
+  <GlobalRegionNewsSidebar
+    lang={lang}
+    country={country}
+    allPosts={allPosts}
+  />
 
   <GoogleAdBanner />
 </aside>
