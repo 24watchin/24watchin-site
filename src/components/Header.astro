@@ -175,7 +175,7 @@ const languageOptions = [
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
 
-      <button class="scroll-arrow arrow-left pc-arrow" id="arrow-left" aria-label="左へ" type="button">&#8249;</button>
+      <button class="scroll-arrow arrow-left" id="arrow-left" aria-label="左へ" type="button">&#8249;</button>
 
       <div class="pc-category-group">
         <div class="category-scroll pc-scroll" id="pc-scroll">
@@ -213,7 +213,7 @@ const languageOptions = [
         ))}
       </div>
 
-      <button class="scroll-arrow arrow-right pc-arrow" id="arrow-right" aria-label="右へ" type="button">&#8250;</button>
+      <button class="scroll-arrow arrow-right" id="arrow-right" aria-label="右へ" type="button">&#8250;</button>
 
     </div>
   </nav>
@@ -261,9 +261,19 @@ const languageOptions = [
   .category-bar { width: 100%; background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 4px; display: flex; align-items: center; }
 
+  /* ▼ 矢印：デフォルトは非表示 */
   .scroll-arrow { background: rgba(255,255,255,0.15); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; display: none; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background 0.2s; }
   .scroll-arrow:hover { background: rgba(255,255,255,0.28); }
-  .scroll-arrow.visible { display: flex; }
+
+  /* ▼ PC幅（769px以上）では右矢印をCSSで常に表示！ */
+  @media (min-width: 769px) {
+    .arrow-right { display: flex; }
+  }
+
+  /* ▼ JSで左矢印を表示するクラス */
+  .arrow-left.show { display: flex; }
+  /* ▼ JSで右矢印を隠すクラス */
+  .arrow-right.hide { display: none; }
 
   .pc-category-group { display: flex; align-items: center; min-width: 0; flex: 1; }
   .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
@@ -304,7 +314,7 @@ const languageOptions = [
     .lang-current { font-size: 12px; }
     .pc-category-group { display: none; }
     .sp-scroll { display: flex; flex: 1; min-width: 0; }
-    .pc-arrow { display: none !important; }
+    .scroll-arrow { display: none !important; }
     .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
 
@@ -323,25 +333,20 @@ const languageOptions = [
     if (!scroll || !btnLeft || !btnRight) return;
 
     function updateArrows() {
-      if (window.innerWidth <= 768) {
-        btnLeft.classList.remove('visible');
-        btnRight.classList.remove('visible');
-        return;
-      }
+      if (window.innerWidth <= 768) return;
 
-      // ▼ PC幅なら右矢印は常に表示
-      btnRight.classList.add('visible');
-
-      // ▼ 左にスクロール済みなら左矢印を表示
+      // ▼ 左矢印：スクロール済みなら表示
       if (scroll.scrollLeft > 2) {
-        btnLeft.classList.add('visible');
+        btnLeft.classList.add('show');
       } else {
-        btnLeft.classList.remove('visible');
+        btnLeft.classList.remove('show');
       }
 
-      // ▼ 右端まで来たら右矢印を消す
+      // ▼ 右矢印：右端なら非表示（CSSで常時表示しているのでhideクラスで隠す）
       if (scroll.scrollLeft >= scroll.scrollWidth - scroll.clientWidth - 2) {
-        btnRight.classList.remove('visible');
+        btnRight.classList.add('hide');
+      } else {
+        btnRight.classList.remove('hide');
       }
     }
 
