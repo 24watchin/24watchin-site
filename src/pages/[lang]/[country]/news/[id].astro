@@ -1,0 +1,150 @@
+---
+import ReactionBar from '../../../components/ReactionBar.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Layout from '../../../layouts/Layout.astro';
+import ShareButtons from '../../../components/ShareButtons.astro';
+import RelatedNews from '../../../components/RelatedNews.astro';
+import EditorPicks from '../../../components/EditorPicks.astro';
+import RecommendedLinks from '../../../components/RecommendedLinks.astro';
+import { categoryLabelMap, type SiteLanguageKey } from '../../../lib/categoryLabels';
+
+export async function getStaticPaths() {
+  const API_KEY = import.meta.env.API_KEY;
+  const BLOG_ID = import.meta.env.BLOG_ID;
+  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
+
+  const response = await fetch(url);
+  const data = await response.json();
+  const posts = data.items || [];
+
+  const langCountryPairs = [
+    { lang: 'ja',    country: 'jp' },
+    { lang: 'en',    country: 'jp' },
+    { lang: 'en',    country: 'us' },
+    { lang: 'en',    country: 'ae' },
+    { lang: 'en',    country: 'au' },
+    { lang: 'en',    country: 'gb' },
+    { lang: 'en',    country: 'sg' },
+    { lang: 'en',    country: 'ca' },
+    { lang: 'zh-cn', country: 'jp' },
+    { lang: 'zh-cn', country: 'cn' },
+    { lang: 'zh-tw', country: 'jp' },
+    { lang: 'zh-tw', country: 'tw' },
+    { lang: 'es',    country: 'jp' },
+    { lang: 'es',    country: 'es' },
+    { lang: 'fr',    country: 'jp' },
+    { lang: 'fr',    country: 'fr' },
+    { lang: 'de',    country: 'jp' },
+    { lang: 'de',    country: 'de' },
+    { lang: 'ru',    country: 'jp' },
+  ];
+
+  const paths = [];
+  for (const { lang, country } of langCountryPairs) {
+    const targetTag = lang + '-' + country;
+    const filteredPosts = posts.filter(p =>
+      p.labels && p.labels.includes(targetTag)
+    );
+    for (const post of filteredPosts) {
+      paths.push({
+        params: { lang, country, id: post.id },
+        props: { post, allPosts: posts },
+      });
+    }
+  }
+  return paths;
+}
+
+const { post, allPosts = [] } = Astro.props;
+const { lang, country } = Astro.params;
+
+const localeKeyMap: Record<string, string> = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
+  es: 'es', fr: 'fr', de: 'de', ru: 'ru',
+};
+const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
+const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+
+const currentCategory = labels.allCategories.find(cat => {
+  if (!post.labels) return false;
+  return post.labels.some(label => cat.keywords.some(key => label.includes(key)));
+});
+
+const categoryLabel = currentCategory ? currentCategory.label : '';
+const categorySlug = currentCategory ? currentCategory.slug : '';
+const categoryHref = categorySlug ? '/' + lang + '/' + country + '/category/' + categorySlug + '/' : '';
+
+// ▼ 国名の多言語化
+const countryLabelMap: Record<string, Record<string, string>> = {
+  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
+  us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
+  ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
+  au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
+  gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'Großbritannien', ru: 'Великобритания' },
+  sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
+  ca: { ja: 'カナダ', en: 'Canada', 'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá', fr: 'Canada', de: 'Kanada', ru: 'Канада' },
+  cn: { ja: '中国', en: 'China', 'zh-cn': '中国', 'zh-tw': '中國', es: 'China', fr: 'Chine', de: 'China', ru: 'Китай' },
+  tw: { ja: '台湾', en: 'Taiwan', 'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán', fr: 'Taïwan', de: 'Taiwan', ru: 'Тайвань' },
+  es: { ja: 'スペイン', en: 'Spain', 'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'España', fr: 'Espagne', de: 'Spanien', ru: 'Испания' },
+  fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
+  de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
+};
+const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
+const countryHref = '/' + lang + '/' + country + '/';
+
+// ▼ 日付フォーマット
+function formatDateTime(dateString: string) {
+  const date = new Date(dateString);
+  return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
+    + ' ' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+}
+
+// ▼ 同じ lang-country タグの記事のみ（自分以外）
+const targetTag = lang + '-' + country;
+const safePosts = allPosts.filter(p =>
+  p.id !== post.id &&
+  p.labels &&
+  p.labels.includes(targetTag)
+);
+
+const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + post.id + '/';
+---
+
+<Layout title={post.title} sidebarType="article">
+  <div class="article-breadcrumb-wrap">
+    <Breadcrumb
+      countryLabel={countryLabel}
+      countryHref={countryHref}
+      categoryLabel={categoryLabel}
+      categoryHref={categoryHref}
+    />
+  </div>
+
+  <article class="post-container">
+    <header class="post-header">
+      <h1 class="post-title">{post.title}</h1>
+      <div class="post-submeta">
+        <time class="post-date">{formatDateTime(post.published)}</time>
+        <ShareButtons articleUrl={articleUrl} articleTitle={post.title} />
+      </div>
+    </header>
+    <div class="post-content" set:html={post.content} />
+    <ReactionBar articleId={post.id} />
+  </article>
+
+  <div slot="bottom-wide">
+    <RelatedNews relatedPosts={safePosts.slice(0, 6)} lang={lang} country={country} />
+    <RecommendedLinks />
+    <EditorPicks lang={lang} country={country} />
+  </div>
+</Layout>
+
+<style>
+  .article-breadcrumb-wrap { margin: -10px 0 6px; }
+  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+  .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
+  .post-date { color: #666; font-size: 14px; }
+  .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
+  .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
+</style>
