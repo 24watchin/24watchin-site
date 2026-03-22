@@ -175,10 +175,8 @@ const languageOptions = [
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
 
-      <!-- ▼ 左矢印（PC版） -->
       <button class="scroll-arrow arrow-left pc-arrow" id="arrow-left" aria-label="左へ" type="button">&#8249;</button>
 
-      <!-- ▼ PC版カテゴリ＋Moreをまとめたラッパー -->
       <div class="pc-category-group">
         <div class="category-scroll pc-scroll" id="pc-scroll">
           {mainItems.map((item) => (
@@ -207,7 +205,6 @@ const languageOptions = [
         )}
       </div>
 
-      <!-- ▼ スマホ版：全カテゴリ横スクロール -->
       <div class="category-scroll sp-scroll">
         {categoryItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
@@ -216,7 +213,6 @@ const languageOptions = [
         ))}
       </div>
 
-      <!-- ▼ 右矢印（PC版） -->
       <button class="scroll-arrow arrow-right pc-arrow" id="arrow-right" aria-label="右へ" type="button">&#8250;</button>
 
     </div>
@@ -265,23 +261,13 @@ const languageOptions = [
   .category-bar { width: 100%; background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 4px; display: flex; align-items: center; }
 
-  /* ▼ 矢印ボタン */
   .scroll-arrow { background: rgba(255,255,255,0.15); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; display: none; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background 0.2s; }
   .scroll-arrow:hover { background: rgba(255,255,255,0.28); }
   .scroll-arrow.visible { display: flex; }
 
-  /* ▼ PC版：カテゴリとMoreをまとめるラッパー */
-  .pc-category-group {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    flex: 1;
-  }
-
+  .pc-category-group { display: flex; align-items: center; min-width: 0; flex: 1; }
   .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
   .category-scroll::-webkit-scrollbar { display: none; }
-
-  /* ▼ PC版：pc-scrollを表示・sp-scrollを非表示 */
   .pc-scroll { display: flex; min-width: 0; }
   .sp-scroll { display: none; }
 
@@ -308,7 +294,6 @@ const languageOptions = [
   .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
   .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 
-  /* ▼ スマホ版 */
   @media (max-width: 768px) {
     .header-top { padding: 8px 10px 6px; gap: 8px; }
     .logo-image { width: 120px; }
@@ -343,10 +328,25 @@ const languageOptions = [
         btnRight.classList.remove('visible');
         return;
       }
-      var canScrollLeft = scroll.scrollLeft > 0;
-      var canScrollRight = scroll.scrollLeft < scroll.scrollWidth - scroll.clientWidth - 1;
-      if (canScrollLeft) { btnLeft.classList.add('visible'); } else { btnLeft.classList.remove('visible'); }
-      if (canScrollRight) { btnRight.classList.add('visible'); } else { btnRight.classList.remove('visible'); }
+
+      var hasOverflow = scroll.scrollWidth > scroll.clientWidth + 1;
+      var isNarrow = window.innerWidth < 1100;
+
+      if (hasOverflow || isNarrow) {
+        if (scroll.scrollLeft > 0) {
+          btnLeft.classList.add('visible');
+        } else {
+          btnLeft.classList.remove('visible');
+        }
+        if (scroll.scrollLeft >= scroll.scrollWidth - scroll.clientWidth - 1) {
+          btnRight.classList.remove('visible');
+        } else {
+          btnRight.classList.add('visible');
+        }
+      } else {
+        btnLeft.classList.remove('visible');
+        btnRight.classList.remove('visible');
+      }
     }
 
     btnLeft.addEventListener('click', function() {
