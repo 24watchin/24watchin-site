@@ -1,0 +1,69 @@
+---
+import RegionNewsBlockSidebar from './RegionNewsBlockSidebar.astro';
+
+const { lang = 'ja', country = '', allPosts = [] } = Astro.props;
+
+// ★ ここが違う！1国につき1記事だけ取得
+const filterByCountryTag = (countryCode, count = 1) => {
+  const tag = `${lang}-${countryCode}`;
+  return allPosts.filter(post => post.labels?.includes(tag)).slice(0, count);
+};
+
+const parentTitles = {
+  ja: '24Watchin Global News',
+  en: '24Watchin Global News',
+  fr: '24Watchin Actualités Mondiales',
+  de: '24Watchin Global News',
+  es: '24Watchin Noticias Globales',
+  ru: '24Watchin Мировые новости',
+  'zh-tw': '24Watchin 全球新聞',
+  'zh-cn': '24Watchin 全球新闻'
+};
+
+const regionNameTable = {
+  asia: { ja: 'アジア', en: 'Asia', fr: 'Asie', de: 'Asien', es: 'Asia', ru: 'Азия', 'zh-tw': '亞洲', 'zh-cn': '亚洲' },
+  europe: { ja: 'ヨーロッパ', en: 'Europe', fr: 'Europe', de: 'Europa', es: 'Europa', ru: 'Европа', 'zh-tw': '歐洲', 'zh-cn': '欧洲' },
+  americas: { ja: '南北アメリカ', en: 'Americas', fr: 'Amériques', de: 'Amerika', es: 'Américas', ru: 'Америка', 'zh-tw': '美洲', 'zh-cn': '美洲' },
+  middleEastAfrica: { ja: '中東・アフリカ', en: 'Middle East & Africa', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', es: 'Oriente Medio & África', ru: 'Ближний Восток & Африка', 'zh-tw': '中東・非洲', 'zh-cn': '中东与非洲' },
+  oceania: { ja: 'オセアニア', en: 'Oceania', fr: 'Océanie', de: 'Ozeanien', es: 'Oceanía', ru: 'Океания', 'zh-tw': '大洋洲', 'zh-cn': '大洋洲' }
+};
+
+const regionsTemplate = [
+  { key: 'asia', cities: [{ name: lang === 'ja' ? '日本' : 'Japan', code: 'jp' }, { name: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' }, { name: lang === 'ja' ? '韓国' : 'South Korea', code: 'kr' }, { name: lang === 'ja' ? 'シンガポール' : 'Singapore', code: 'sg' }] },
+  { key: 'europe', cities: [{ name: lang === 'ja' ? 'ドイツ' : 'Germany', code: 'de' }, { name: lang === 'ja' ? 'フランス' : 'France', code: 'fr' }] },
+  { key: 'americas', cities: [{ name: lang === 'ja' ? 'アメリカ' : 'USA', code: 'us' }] },
+  { key: 'middleEastAfrica', cities: [{ name: lang === 'ja' ? 'アラブ首長国連邦' : 'UAE', code: 'ae' }] },
+  { key: 'oceania', cities: [{ name: lang === 'ja' ? 'オーストラリア' : 'Australia', code: 'au' }] }
+];
+
+const activeRegions = regionsTemplate.map(region => {
+  const activeCities = region.cities
+    .filter(city => city.code !== country)
+    .map(city => ({ ...city, posts: filterByCountryTag(city.code) }))
+    .filter(city => city.posts.length > 0);
+
+  return { title: regionNameTable[region.key][lang] || regionNameTable[region.key]['en'], cities: activeCities };
+}).filter(region => region.cities.length > 0);
+---
+
+{activeRegions.length > 0 && (
+  <div class="sidebar-global-news">
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">{parentTitles[lang] || parentTitles['en']}</h2>
+    </div>
+
+    {activeRegions.map(region => (
+      <RegionNewsBlockSidebar
+        lang={lang}
+        title={region.title}
+        cityData={region.cities}
+      />
+    ))}
+  </div>
+)}
+
+<style>
+  .sidebar-global-news { width: 100%; margin-top: 16px; }
+  .sidebar-header { margin-bottom: 14px; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
+  .sidebar-title { font-size: 15px; font-weight: 800; color: #111; margin: 0; border-left: 5px solid #872732; padding-left: 10px; line-height: 1.2; }
+</style>
