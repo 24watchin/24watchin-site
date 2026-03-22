@@ -45,7 +45,7 @@ const cityDataForJs = cities.map(city => {
     feelsLike: current ? convertTemp(current.feelslike_c, isImperial) : null,
     humidity: current?.humidity ?? null,
     iconUrl,
-    isMoon: iconUrl.includes('113.png'),
+    isMoon: iconUrl.includes('night/113.png'),  // ▼ 修正！
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
