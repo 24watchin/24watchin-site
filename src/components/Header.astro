@@ -94,7 +94,6 @@ const searchPlaceholder = labels.searchPlaceholder;
 const searchAriaLabel = labels.searchAriaLabel;
 const categoryBarAriaLabel = labels.categoryBarAriaLabel;
 
-// ▼ JAPAN表示を各言語に翻訳（jaはそのまま）
 const countryNameMap: Record<string, string> = {
   jp: 'JAPAN',
   en: 'JAPAN',
@@ -107,13 +106,9 @@ const countryNameMap: Record<string, string> = {
 };
 const displayCountryName = countryNameMap[localeKey] || 'JAPAN';
 
-// ▼ Moreボタンが必要な言語
 const needsMore = ['en', 'es', 'fr', 'de', 'ru'].includes(localeKey);
-
-// ▼ More内に入れるカテゴリ
 const moreSlugs = ['environment-energy', 'sports', 'health-life'];
 
-// ▼ メインに表示するカテゴリとMoreの中に入れるカテゴリを分ける
 const mainItems = needsMore
   ? categoryItems.filter(item => !moreSlugs.includes(item.slug))
   : categoryItems;
@@ -121,15 +116,11 @@ const moreItems = needsMore
   ? categoryItems.filter(item => moreSlugs.includes(item.slug))
   : [];
 
-// ▼ Moreボタンのテキスト（各言語）
 const moreTextMap: Record<string, string> = {
   en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё',
 };
 const moreText = moreTextMap[localeKey] || 'More';
-
-// ▼ Moreの中にアクティブなカテゴリがあるか
 const moreHasActive = moreItems.some(item => item.isActive);
-const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
 ---
 
 <header class="site-header">
@@ -157,9 +148,21 @@ const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
   <nav class={navClass} aria-label={categoryBarAriaLabel}>
     <div class="category-inner">
 
+      {/* ▼ メインカテゴリを先に表示 */}
+      {mainItems.map((item) => (
+        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+          <span class="category-link-text">{item.label}</span>
+        </a>
+      ))}
+
+      {/* ▼ Moreボタンは一番右 */}
       {needsMore && (
         <div class="more-wrapper">
-          <button class={moreBtnClass} id="more-btn">
+          <button
+            class={moreHasActive ? 'more-btn active' : 'more-btn'}
+            id="more-btn"
+            type="button"
+          >
             {moreText}
             <svg class="more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -174,12 +177,6 @@ const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
           </div>
         </div>
       )}
-
-      {mainItems.map((item) => (
-        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-          <span class="category-link-text">{item.label}</span>
-        </a>
-      ))}
 
     </div>
   </nav>
@@ -214,7 +211,6 @@ const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
   .search-input { width: 190px; height: 36px; padding: 0 12px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 16px; outline: none; }
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
-
   .category-bar { width: 100%; background: #393737; }
   .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; overflow-x: auto; white-space: nowrap; }
   .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; }
@@ -247,25 +243,25 @@ const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
     width: 14px;
     height: 14px;
     stroke: #ffffff;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease;
   }
   .more-btn.open .more-chevron { transform: rotate(180deg); }
 
-  /* ▼ Moreドロップダウン */
+  /* ▼ ドロップダウン：右端に合わせる */
   .more-dropdown {
     display: none;
     position: absolute;
     top: 54px;
-    left: 0;
+    right: 0;
     background: #393737;
     min-width: 220px;
-    z-index: 100;
+    z-index: 999;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
   .more-dropdown.open { display: block; }
   .more-link {
     display: block;
-    padding: 13px 18px;
+    padding: 14px 18px;
     color: #ffffff;
     text-decoration: none;
     font-size: 15px;
@@ -273,7 +269,7 @@ const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   .more-link:last-child { border-bottom: none; }
-  .more-link:hover { background: rgba(255,255,255,0.1); }
+  .more-link:hover { background: rgba(255,255,255,0.12); }
   .more-link.active { background: var(--theme-color); }
 
   .header-word-bar { width: 100%; background: #ffffff; }
@@ -284,19 +280,30 @@ const moreBtnClass = moreHasActive ? 'more-btn active' : 'more-btn';
 </style>
 
 <script>
-  const btn = document.getElementById('more-btn');
-  const dropdown = document.getElementById('more-dropdown');
+  // ▼ DOMContentLoadedを使わずに直接実行！
+  const moreBtn = document.getElementById('more-btn');
+  const moreDropdown = document.getElementById('more-dropdown');
 
-  if (btn && dropdown) {
-    btn.addEventListener('click', (e) => {
+  if (moreBtn && moreDropdown) {
+    moreBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      btn.classList.toggle('open');
-      dropdown.classList.toggle('open');
+      const isOpen = moreDropdown.classList.contains('open');
+      if (isOpen) {
+        moreDropdown.classList.remove('open');
+        moreBtn.classList.remove('open');
+      } else {
+        moreDropdown.classList.add('open');
+        moreBtn.classList.add('open');
+      }
     });
 
-    document.addEventListener('click', () => {
-      btn.classList.remove('open');
-      dropdown.classList.remove('open');
+    document.addEventListener('click', function() {
+      moreDropdown.classList.remove('open');
+      moreBtn.classList.remove('open');
+    });
+
+    moreDropdown.addEventListener('click', function(e) {
+      e.stopPropagation();
     });
   }
 </script>
