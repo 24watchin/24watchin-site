@@ -100,8 +100,19 @@ const countryNameMap: Record<string, string> = {
 };
 const displayCountryName = countryNameMap[localeKey] || 'JAPAN';
 
-const needsMore = ['en', 'es', 'fr', 'de', 'ru'].includes(localeKey);
-const moreSlugs = ['environment-energy', 'sports', 'health-life'];
+// ▼ 言語ごとにMoreに隠すカテゴリを設定
+const moreSlugsMap: Record<string, string[]> = {
+  jp:      ['health-life', 'weather', 'traffic'],
+  en:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  es:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  fr:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  de:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  ru:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  'zh-cn': [],  // Moreなし・全部表示
+  'zh-tw': [],  // Moreなし・全部表示
+};
+const moreSlugs = moreSlugsMap[localeKey] || [];
+const needsMore = moreSlugs.length > 0;
 
 const mainItems = needsMore
   ? categoryItems.filter(item => !moreSlugs.includes(item.slug))
@@ -110,7 +121,9 @@ const moreItems = needsMore
   ? categoryItems.filter(item => moreSlugs.includes(item.slug))
   : [];
 
+// ▼ Moreボタンのテキスト（言語別）
 const moreTextMap: Record<string, string> = {
+  jp: 'さらに見る',
   en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё',
 };
 const moreText = moreTextMap[localeKey] || 'More';
@@ -150,7 +163,6 @@ const moreHasActive = moreItems.some(item => item.isActive);
         ))}
       </div>
 
-      {/* ▼ Moreボタン：hoverで開閉！ */}
       {needsMore && (
         <div class="more-wrapper">
           <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
@@ -211,7 +223,6 @@ const moreHasActive = moreItems.some(item => item.isActive);
     display: flex;
     align-items: center;
   }
-
   .category-scroll {
     display: flex;
     align-items: center;
@@ -230,11 +241,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
     text-underline-offset: 4px;
   }
 
-  /* ▼ Moreボタン：hoverで開閉！ */
-  .more-wrapper {
-    position: relative;
-    flex-shrink: 0;
-  }
+  .more-wrapper { position: relative; flex-shrink: 0; }
   .more-btn {
     height: 54px;
     padding: 0 18px;
@@ -249,18 +256,14 @@ const moreHasActive = moreItems.some(item => item.isActive);
   }
   .more-btn:hover { background: rgba(255,255,255,0.1); }
   .more-btn.active { background: var(--theme-color); }
-
   .more-chevron {
     width: 14px;
     height: 14px;
     stroke: #ffffff;
     transition: transform 0.2s ease;
   }
-
-  /* ▼ hoverで矢印が回転 */
   .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
 
-  /* ▼ ドロップダウン：hoverで表示！マウスが離れたら消える！ */
   .more-dropdown {
     display: none;
     position: absolute;
@@ -271,10 +274,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
     z-index: 999;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
-
-  /* ▼ more-wrapperにhoverしている間だけ表示！ */
   .more-wrapper:hover .more-dropdown { display: block; }
-
   .more-link {
     display: block;
     padding: 14px 18px;
