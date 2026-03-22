@@ -65,11 +65,9 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
 
-// ▼ URLの1番目と2番目のパーツから lang と country を取得
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// ▼ langからcategoryLabelMapのキーに変換（jaはjpにマッピング）
 const localeKeyMap: Record<string, string> = {
   ja: 'jp',
   en: 'en',
@@ -83,7 +81,6 @@ const localeKeyMap: Record<string, string> = {
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
-// ▼ ベースパスもURLから動的に生成
 const basePath = `/${lang}/${country}`;
 
 const categoryItems = labels.headerCategories.map((item) => ({
@@ -93,6 +90,9 @@ const categoryItems = labels.headerCategories.map((item) => ({
 
 const homeHref = `${basePath}/`;
 const searchAction = `${basePath}/search`;
+
+// ▼ スラッシュなしのパスで比較するための変数
+const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 ---
 
 <header class="site-header">
@@ -134,7 +134,7 @@ const searchAction = `${basePath}/search`;
       {categoryItems.map((item) => (
         
           href={item.href}
-          class:list={['category-link', currentPath === item.href.replace(/\/$/, '') && 'active']}
+          class:list={['category-link', cleanCurrentPath === item.href.slice(0, -1) && 'active']}
         >
           <span class="category-link-text">{item.label}</span>
         </a>
