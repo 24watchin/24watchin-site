@@ -15,9 +15,9 @@ const country = pathParts[1] || 'jp';
 
 <div class="sidebar-wrapper">
   <WeatherWidget />
-  <AccessRanking />
+  <AccessRanking lang={lang} country={country} />
   <GoogleAdBanner />
-  <EditorsPick allPosts={allPosts} />
+  <EditorsPick lang={lang} country={country} />
 
   <GlobalRegionNewsSidebar
     lang={lang}
