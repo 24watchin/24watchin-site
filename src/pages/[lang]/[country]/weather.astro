@@ -1,30 +1,47 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-import RelatedNews from '../../../components/RelatedNews.astro'; // 【追加】部品を読み込みます
+import RelatedNews from '../../../components/RelatedNews.astro';
 import { getWeatherCondition } from '../../../lib/weatherConditions';
 
 export async function getStaticPaths() {
   return [
     { params: { lang: 'ja', country: 'jp' } },
+    { params: { lang: 'en', country: 'jp' } },
     { params: { lang: 'en', country: 'us' } },
+    { params: { lang: 'en', country: 'ae' } },
+    { params: { lang: 'en', country: 'au' } },
+    { params: { lang: 'en', country: 'gb' } },
+    { params: { lang: 'en', country: 'sg' } },
     { params: { lang: 'de', country: 'de' } },
+    { params: { lang: 'de', country: 'jp' } },
     { params: { lang: 'fr', country: 'fr' } },
+    { params: { lang: 'fr', country: 'jp' } },
+    { params: { lang: 'es', country: 'jp' } },
+    { params: { lang: 'es', country: 'es' } },
+    { params: { lang: 'ru', country: 'jp' } },
+    { params: { lang: 'zh-cn', country: 'jp' } },
+    { params: { lang: 'zh-cn', country: 'cn' } },
+    { params: { lang: 'zh-tw', country: 'jp' } },
+    { params: { lang: 'zh-tw', country: 'tw' } },
   ];
 }
 
 const { lang, country } = Astro.params;
-const apiLangMap = { jp: 'ja', en: 'en', cn: 'zh', fr: 'fr', de: 'de', es: 'es', ru: 'ru' };
-const apiLang = apiLangMap[lang] || 'ja';
-const isImperial = lang === 'en';
+
+// ▼ 言語→APIの言語コード変換
+const apiLangMap: Record<string, string> = {
+  ja: 'ja', en: 'en', 'zh-cn': 'zh', 'zh-tw': 'zh',
+  fr: 'fr', de: 'de', es: 'es', ru: 'ru',
+};
+const apiLang = apiLangMap[lang] || 'en';
 
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = import.meta.env.BLOG_ID;
 const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
 
-// 1. 共有メモ（キャッシュ）を活用してGoogleへの通信を削減 
 let allPosts = globalThis.bloggerPostsCache || [];
 if (allPosts.length === 0 && API_KEY && BLOG_ID) {
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
   const response = await fetch(url).catch(() => null);
   if (response && response.ok) {
     const data = await response.json();
@@ -33,58 +50,83 @@ if (allPosts.length === 0 && API_KEY && BLOG_ID) {
   }
 }
 
-// 2. 厳格なタグフィルター：その国・言語の「天気」関連記事だけを抽出
-const targetTag = `${lang}-${country}`;
-const relatedNews = allPosts.filter(post => 
-  post.labels && 
-  post.labels.includes(targetTag) && 
-  post.labels.some(label => ['天気', '気象', '災害', 'weather'].includes(label))
-).slice(0, 3); // 3枚並べるのが一番綺麗です
+const targetTag = lang + '-' + country;
+const relatedNews = allPosts.filter((post: any) =>
+  post.labels &&
+  post.labels.includes(targetTag) &&
+  post.labels.some((label: string) => ['天気', '気象', '災害', 'weather', 'Weather'].includes(label))
+).slice(0, 3);
 
-// 天気データの取得
-const cityMap = {
-  jp: { name: 'Tokyo', tz: 'Asia/Tokyo', display: { ja: '東京', en: 'Tokyo' } },
-  us: { name: 'New_York', tz: 'America/New_York', display: { ja: 'ニューヨーク', en: 'New York' } },
-  de: { name: 'Berlin', tz: 'Europe/Berlin', display: { ja: 'ベルリン', en: 'Berlin' } },
-  fr: { name: 'Paris', tz: 'Europe/Paris', display: { ja: 'パリ', en: 'Paris' } },
+// ▼ 都市マップ（WeatherWidgetと同じ）
+const cityMap: Record<string, { name: string; tz: string; display: Record<string, string> }> = {
+  jp: { name: 'Tokyo',       tz: 'Asia/Tokyo',          display: { ja: '東京',         en: 'Tokyo',        'zh-cn': '东京',      'zh-tw': '東京',    es: 'Tokio',        fr: 'Tokyo',      de: 'Tokio',       ru: 'Токио'       } },
+  us: { name: 'New_York',    tz: 'America/New_York',    display: { ja: 'ニューヨーク',  en: 'New York',     'zh-cn': '纽约',      'zh-tw': '紐約',    es: 'Nueva York',   fr: 'New York',   de: 'New York',    ru: 'Нью-Йорк'    } },
+  de: { name: 'Berlin',      tz: 'Europe/Berlin',       display: { ja: 'ベルリン',     en: 'Berlin',       'zh-cn': '柏林',      'zh-tw': '柏林',    es: 'Berlín',       fr: 'Berlin',     de: 'Berlin',      ru: 'Берлин'      } },
+  fr: { name: 'Paris',       tz: 'Europe/Paris',        display: { ja: 'パリ',         en: 'Paris',        'zh-cn': '巴黎',      'zh-tw': '巴黎',    es: 'París',        fr: 'Paris',      de: 'Paris',       ru: 'Париж'       } },
+  gb: { name: 'London',      tz: 'Europe/London',       display: { ja: 'ロンドン',     en: 'London',       'zh-cn': '伦敦',      'zh-tw': '倫敦',    es: 'Londres',      fr: 'Londres',    de: 'London',      ru: 'Лондон'      } },
+  tw: { name: 'Taipei',      tz: 'Asia/Taipei',         display: { ja: '台北',         en: 'Taipei',       'zh-cn': '台北',      'zh-tw': '台北',    es: 'Taipéi',       fr: 'Taipei',     de: 'Taipeh',      ru: 'Тайбэй'      } },
+  kr: { name: 'Seoul',       tz: 'Asia/Seoul',          display: { ja: 'ソウル',       en: 'Seoul',        'zh-cn': '首尔',      'zh-tw': '首爾',    es: 'Seúl',         fr: 'Séoul',      de: 'Seoul',       ru: 'Сеул'        } },
+  cn: { name: 'Beijing',     tz: 'Asia/Shanghai',       display: { ja: '北京',         en: 'Beijing',      'zh-cn': '北京',      'zh-tw': '北京',    es: 'Pekín',        fr: 'Pékin',      de: 'Peking',      ru: 'Пекин'       } },
+  sg: { name: 'Singapore',   tz: 'Asia/Singapore',      display: { ja: 'シンガポール', en: 'Singapore',    'zh-cn': '新加坡',    'zh-tw': '新加坡',  es: 'Singapur',     fr: 'Singapour',  de: 'Singapur',    ru: 'Сингапур'    } },
+  au: { name: 'Sydney',      tz: 'Australia/Sydney',    display: { ja: 'シドニー',     en: 'Sydney',       'zh-cn': '悉尼',      'zh-tw': '雪梨',    es: 'Sídney',       fr: 'Sydney',     de: 'Sydney',      ru: 'Сидней'      } },
+  ae: { name: 'Dubai',       tz: 'Asia/Dubai',          display: { ja: 'ドバイ',       en: 'Dubai',        'zh-cn': '迪拜',      'zh-tw': '杜拜',    es: 'Dubái',        fr: 'Dubaï',      de: 'Dubai',       ru: 'Дубай'       } },
+  es: { name: 'Madrid',      tz: 'Europe/Madrid',       display: { ja: 'マドリード',   en: 'Madrid',       'zh-cn': '马德里',    'zh-tw': '馬德里',  es: 'Madrid',       fr: 'Madrid',     de: 'Madrid',      ru: 'Мадрид'      } },
 };
-const targetCity = cityMap[country] || cityMap.jp;
-const cityDisplayName = targetCity.display[lang] || targetCity.display.ja || targetCity.display.en;
 
-let forecastDays = [];
-let alertFullText = "";
+const targetCity = cityMap[country] || cityMap['jp'];
+const cityDisplayName = targetCity.display[lang] || targetCity.display['en'] || targetCity.name;
+
+let forecastDays: any[] = [];
+let alertFullText = '';
 if (WEATHER_API_KEY) {
   try {
-    const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${targetCity.name}&days=5&aqi=no&alerts=yes&lang=${apiLang}`;
+    const weatherUrl = 'https://api.weatherapi.com/v1/forecast.json?key=' + WEATHER_API_KEY + '&q=' + targetCity.name + '&days=5&aqi=no&alerts=yes&lang=' + apiLang;
     const wResponse = await fetch(weatherUrl);
     if (wResponse.ok) {
       const wData = await wResponse.json();
       forecastDays = wData.forecast.forecastday;
-      alertFullText = (wData.alerts.alert || []).map(a => a.headline).join(' / ');
+      alertFullText = (wData.alerts.alert || []).map((a: any) => a.headline).join(' / ');
     }
   } catch (e) {}
 }
 
-const allLabels = {
-  ja: { title: '3日間の天気予報', alertTitle: '気象・災害情報', relatedTitle: '関連記事', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
-  en: { title: '3-Day Forecast', alertTitle: 'Weather/Disaster Info', relatedTitle: 'Related News', hourly: 'Hourly', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' }
+// ▼ 多言語ラベル
+const allLabels: Record<string, Record<string, string>> = {
+  ja:      { title: '3日間の天気予報', alertTitle: '気象・災害情報', relatedTitle: '関連記事', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
+  en:      { title: '3-Day Forecast', alertTitle: 'Weather/Disaster Info', relatedTitle: 'Related News', hourly: 'Hourly', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  'zh-cn': { title: '3天天气预报', alertTitle: '气象·灾害信息', relatedTitle: '相关新闻', hourly: '每小时', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
+  'zh-tw': { title: '3天天氣預報', alertTitle: '氣象・災害資訊', relatedTitle: '相關新聞', hourly: '每小時', time: '時間', weather: '天氣', rain: '降水', humidity: '濕度', wind: '風速', max: '最高', min: '最低', temp: '氣溫' },
+  es:      { title: 'Pronóstico de 3 días', alertTitle: 'Info Meteorológica', relatedTitle: 'Noticias relacionadas', hourly: 'Por hora', time: 'Hora', weather: 'Tiempo', rain: 'Lluvia', humidity: 'Humedad', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
+  fr:      { title: 'Prévisions sur 3 jours', alertTitle: 'Infos Météo', relatedTitle: 'Articles liés', hourly: 'Par heure', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humidité', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
+  de:      { title: '3-Tage-Vorhersage', alertTitle: 'Wetter-/Katastropheninfo', relatedTitle: 'Verwandte Artikel', hourly: 'Stündlich', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Feuchte', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  ru:      { title: 'Прогноз на 3 дня', alertTitle: 'Погода/Катастрофы', relatedTitle: 'Связанные статьи', hourly: 'По часам', time: 'Время', weather: 'Погода', rain: 'Дождь', humidity: 'Влажн.', wind: 'Ветер', max: 'Макс', min: 'Мин', temp: 'Темп.' },
 };
-const labels = allLabels[lang] || allLabels.en;
+const labels = allLabels[lang] || allLabels['en'];
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getMonth() + 1}/${date.getDate()}`;
+const dayNamesMap: Record<string, string[]> = {
+  ja:      ['日', '月', '火', '水', '木', '金', '土'],
+  en:      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  'zh-cn': ['日', '一', '二', '三', '四', '五', '六'],
+  'zh-tw': ['日', '一', '二', '三', '四', '五', '六'],
+  es:      ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+  fr:      ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+  de:      ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+  ru:      ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
 };
-const getDayName = (dateStr) => {
+
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return (date.getMonth() + 1) + '/' + date.getDate();
+};
+const getDayName = (dateStr: string) => {
   const dayIndex = new Date(dateStr).getDay();
-  const dayNames = { ja: ['日', '月', '火', '水', '木', '金', '土'], en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
-  return (dayNames[lang] || dayNames.en)[dayIndex];
+  return (dayNamesMap[lang] || dayNamesMap['en'])[dayIndex];
 };
 ---
 
-<Layout title={`${cityDisplayName} | ${labels.title}`} sidebarType="weather">
+<Layout title={cityDisplayName + ' | ' + labels.title} sidebarType="weather">
   <main class="weather-page" data-timezone={targetCity.tz}>
-    
+
     <div class="alert-ticker-container">
       <div class="alert-ticker-label">
         <span class="alert-ticker-icon">ℹ️</span>
@@ -102,14 +144,14 @@ const getDayName = (dateStr) => {
     <section class="forecast-section">
       <h2 class="section-title">{cityDisplayName} {labels.title}</h2>
       <div class="forecast-container">
-        {forecastDays.map((day, index) => (
+        {forecastDays.map((day: any, index: number) => (
           <div class="day-group" data-date={day.date}>
-            <button class="day-summary-btn" aria-expanded="false" data-target={`hourly-${index}`}>
+            <button class="day-summary-btn" aria-expanded="false" data-target={'hourly-' + index}>
               <div class="date-info">
                 <span class="date-text">{formatDate(day.date)}({getDayName(day.date)})</span>
               </div>
               <div class="weather-info">
-                <img src={`https:${day.day.condition.icon}`} alt="" class={`summary-icon ${day.day.condition.icon.includes('113.png') ? 'moon-only' : 'moon-cloud'}`} />
+                <img src={'https:' + day.day.condition.icon} alt="" class={day.day.condition.icon.includes('113.png') ? 'summary-icon moon-only' : 'summary-icon moon-cloud'} />
                 <span class="condition-text">{getWeatherCondition(day.day.condition.code, lang)}</span>
               </div>
               <div class="temp-info">
@@ -127,18 +169,18 @@ const getDayName = (dateStr) => {
               <div class="badge-wrapper"><span class="hourly-badge">{labels.hourly}</span></div>
             </button>
 
-            <div id={`hourly-${index}`} class="hourly-details" hidden>
+            <div id={'hourly-' + index} class="hourly-details" hidden>
               <div class="hourly-scroll-wrapper">
                 <table class="hourly-table">
                   <thead>
                     <tr><th>{labels.time}</th><th>{labels.weather}</th><th>{labels.temp}</th><th>{labels.humidity}</th><th>{labels.wind}</th><th>{labels.rain}</th></tr>
                   </thead>
                   <tbody>
-                    {day.hour.map((h) => (
+                    {day.hour.map((h: any) => (
                       <tr class="hourly-row" data-hour={parseInt(h.time.split(' ')[1].split(':')[0])}>
                         <td class="h-time value-text">{h.time.split(' ')[1]}</td>
                         <td class="h-icon">
-                          <img src={`https:${h.condition.icon}`} alt="" class={h.condition.icon.includes('113.png') ? 'moon-only' : 'moon-cloud'} />
+                          <img src={'https:' + h.condition.icon} alt="" class={h.condition.icon.includes('113.png') ? 'moon-only' : 'moon-cloud'} />
                           <div class="h-condition-text">{getWeatherCondition(h.condition.code, lang)}</div>
                         </td>
                         <td class="h-temp value-text">{Math.round(h.temp_c)}°</td>
@@ -163,37 +205,36 @@ const getDayName = (dateStr) => {
 </Layout>
 
 <script>
-  /* 前回のスクリプトはそのまま維持 */
   function updateWeatherDisplay() {
     const page = document.querySelector('.weather-page');
     if (!page) return;
     const timezone = page.getAttribute('data-timezone') || 'Asia/Tokyo';
     const nowInCity = new Intl.DateTimeFormat('en-US', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', hourCycle: 'h23' }).formatToParts(new Date());
-    const cityFullDate = `${nowInCity.find(p => p.type === 'year').value}-${nowInCity.find(p => p.type === 'month').value}-${nowInCity.find(p => p.type === 'day').value}`;
+    const cityFullDate = nowInCity.find(p => p.type === 'year').value + '-' + nowInCity.find(p => p.type === 'month').value + '-' + nowInCity.find(p => p.type === 'day').value;
     const cityHour = parseInt(nowInCity.find(p => p.type === 'hour').value);
 
     let visibleCount = 0;
     document.querySelectorAll('.day-group').forEach(group => {
       const groupDate = group.getAttribute('data-date');
-      if (groupDate < cityFullDate) { group.style.display = 'none'; }
+      if (groupDate < cityFullDate) { (group as HTMLElement).style.display = 'none'; }
       else if (visibleCount < 3) {
-        group.style.display = 'block';
+        (group as HTMLElement).style.display = 'block';
         visibleCount++;
         if (groupDate === cityFullDate) {
           group.querySelectorAll('.hourly-row').forEach(row => {
-            if (parseInt(row.getAttribute('data-hour')) < cityHour) row.style.display = 'none';
+            if (parseInt(row.getAttribute('data-hour')) < cityHour) (row as HTMLElement).style.display = 'none';
           });
         }
-      } else { group.style.display = 'none'; }
+      } else { (group as HTMLElement).style.display = 'none'; }
     });
 
     document.querySelectorAll('.day-summary-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const targetId = e.currentTarget.getAttribute('data-target');
+        const targetId = (e.currentTarget as HTMLElement).getAttribute('data-target');
         const targetEl = document.getElementById(targetId);
-        const isExpanded = e.currentTarget.getAttribute('aria-expanded') === 'true';
-        e.currentTarget.setAttribute('aria-expanded', String(!isExpanded));
-        targetEl.hidden = isExpanded;
+        const isExpanded = (e.currentTarget as HTMLElement).getAttribute('aria-expanded') === 'true';
+        (e.currentTarget as HTMLElement).setAttribute('aria-expanded', String(!isExpanded));
+        (targetEl as HTMLDetailsElement).hidden = isExpanded;
       });
     });
   }
@@ -202,7 +243,7 @@ const getDayName = (dateStr) => {
 
 <style>
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
-  .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid #872732; padding-left: 12px; font-weight: bold; }
+  .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 12px; font-weight: bold; }
   .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
   .weather-page .summary-icon { width: 72px; height: 72px; display: block; margin: 0 auto; }
   .weather-page img.moon-only[src*="night"] { filter: sepia(100%) saturate(400%) hue-rotate(15deg); width: 90px; height: 90px; }
@@ -217,7 +258,7 @@ const getDayName = (dateStr) => {
   .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; }
   .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; }
   .weather-page .condition-text { font-size: 0.95rem; font-weight: bold; }
-  .weather-page .hourly-badge { background-color: #4141e0; color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
+  .weather-page .hourly-badge { background-color: var(--theme-color, #872732); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
   .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 16px 16px; border-top: 1px solid #eee; overflow-x: auto; }
   .weather-page .hourly-table { width: 100%; min-width: 600px; border-collapse: collapse; }
   .weather-page .hourly-table th { padding: 12px 6px; font-size: 0.85rem; color: #666; border-bottom: 1px solid #ccc; text-align: center; }
