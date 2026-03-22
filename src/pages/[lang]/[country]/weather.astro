@@ -1,255 +1,364 @@
 ---
-import { getWeatherCondition } from '../lib/weatherConditions';
-import { countryCityMap } from '../lib/cityConfig';
+import Layout from '../../../layouts/Layout.astro';
+import RelatedNews from '../../../components/RelatedNews.astro';
+import { getWeatherCondition } from '../../../lib/weatherConditions';
+import { countryCityMap } from '../../../lib/cityConfig';
 
-const currentPath = Astro.url.pathname;
-const pathParts = currentPath.split('/').filter(Boolean);
-const lang = pathParts[0] || 'ja';
-const country = pathParts[1] || 'jp';
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'ja', country: 'jp' } },
+    { params: { lang: 'en', country: 'jp' } },
+    { params: { lang: 'en', country: 'us' } },
+    { params: { lang: 'en', country: 'ae' } },
+    { params: { lang: 'en', country: 'au' } },
+    { params: { lang: 'en', country: 'gb' } },
+    { params: { lang: 'en', country: 'sg' } },
+    { params: { lang: 'en', country: 'ca' } },
+    { params: { lang: 'en', country: 'nz' } },
+    { params: { lang: 'en', country: 'hk' } },
+    { params: { lang: 'en', country: 'in' } },
+    { params: { lang: 'en', country: 'my' } },
+    { params: { lang: 'en', country: 'ph' } },
+    { params: { lang: 'en', country: 'th' } },
+    { params: { lang: 'en', country: 'vn' } },
+    { params: { lang: 'en', country: 'id' } },
+    { params: { lang: 'en', country: 'kr' } },
+    { params: { lang: 'en', country: 'mx' } },
+    { params: { lang: 'en', country: 'br' } },
+    { params: { lang: 'en', country: 'za' } },
+    { params: { lang: 'en', country: 'eg' } },
+    { params: { lang: 'en', country: 'qa' } },
+    { params: { lang: 'en', country: 'om' } },
+    { params: { lang: 'en', country: 'sa' } },
+    { params: { lang: 'en', country: 'tr' } },
+    { params: { lang: 'de', country: 'de' } },
+    { params: { lang: 'de', country: 'jp' } },
+    { params: { lang: 'fr', country: 'fr' } },
+    { params: { lang: 'fr', country: 'jp' } },
+    { params: { lang: 'es', country: 'jp' } },
+    { params: { lang: 'es', country: 'es' } },
+    { params: { lang: 'es', country: 'mx' } },
+    { params: { lang: 'es', country: 'ar' } },
+    { params: { lang: 'es', country: 'co' } },
+    { params: { lang: 'ru', country: 'jp' } },
+    { params: { lang: 'zh-cn', country: 'jp' } },
+    { params: { lang: 'zh-cn', country: 'cn' } },
+    { params: { lang: 'zh-tw', country: 'jp' } },
+    { params: { lang: 'zh-tw', country: 'tw' } },
+  ];
+}
 
-const cities = countryCityMap[country] || countryCityMap['jp'];
+const { lang, country } = Astro.params;
 
-const API_KEY = import.meta.env.WEATHER_API_KEY;
-if (!globalThis.weatherCache) globalThis.weatherCache = {};
+const apiLangMap: Record<string, string> = {
+  ja: 'ja', en: 'en', 'zh-cn': 'zh', 'zh-tw': 'zh',
+  fr: 'fr', de: 'de', es: 'es', ru: 'ru',
+};
+const apiLang = apiLangMap[lang] || 'en';
 
-const allCityWeather: Record<string, any> = {};
-for (const city of cities) {
-  const cityKey = city.key;
-  const now = Date.now();
-  const CACHE = 30 * 60 * 1000;
-  if (globalThis.weatherCache[cityKey] && (now - globalThis.weatherCache[cityKey].time < CACHE)) {
-    allCityWeather[cityKey] = globalThis.weatherCache[cityKey].data;
-  } else if (API_KEY) {
-    try {
-      const url = 'https://api.weatherapi.com/v1/current.json?key=' + API_KEY + '&q=' + cityKey + '&aqi=no';
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        allCityWeather[cityKey] = data;
-        globalThis.weatherCache[cityKey] = { data, time: now };
-      }
-    } catch (e) {}
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = import.meta.env.BLOG_ID;
+const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
+
+let allPosts = globalThis.bloggerPostsCache || [];
+if (allPosts.length === 0 && API_KEY && BLOG_ID) {
+  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
+  const response = await fetch(url).catch(() => null);
+  if (response && response.ok) {
+    const data = await response.json();
+    allPosts = data.items || [];
+    globalThis.bloggerPostsCache = allPosts;
   }
 }
 
-const cityDataForJs = cities.map(city => {
-  const wd = allCityWeather[city.key];
-  const current = wd?.current;
-  const conditionCode = current?.condition?.code;
-  const iconUrl = current?.condition?.icon ? 'https:' + current.condition.icon : '';
-  return {
-    key: city.key,
-    displayName: city.display[lang] || city.display['en'] || city.key,
-    temp: current ? Math.round(current.temp_c) : null,
-    feelsLike: current ? Math.round(current.feelslike_c) : null,
-    humidity: current?.humidity ?? null,
-    iconUrl,
-    isMoon: iconUrl.includes('113.png'),
-    conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
-  };
-});
+const targetTag = lang + '-' + country;
+const relatedNews = allPosts.filter((post: any) =>
+  post.labels &&
+  post.labels.includes(targetTag) &&
+  post.labels.some((label: string) => ['天気', '気象', '災害', 'weather', 'Weather'].includes(label))
+).slice(0, 3);
 
-const weatherBaseLink = '/' + lang + '/' + country + '/weather/';
+const cities = countryCityMap[country] || countryCityMap['jp'];
 
-const titleTextMap: Record<string, string> = {
-  ja: '現在の天気', en: 'Current Weather', 'zh-cn': '当前天气',
-  'zh-tw': '當前天氣', es: 'Clima actual', fr: 'Météo actuelle',
-  de: 'Aktuelles Wetter', ru: 'Текущая погода',
-};
-const cityWeatherTitleMap: Record<string, string> = {
-  ja: '各都市の天気', en: 'City Weather', 'zh-cn': '各城市天气',
-  'zh-tw': '各城市天氣', es: 'Clima por ciudad', fr: 'Météo par ville',
-  de: 'Wetter nach Stadt', ru: 'Погода по городам',
-};
-const feelsLikeMap: Record<string, string> = {
-  ja: '体感:', en: 'Feels:', 'zh-cn': '体感:', 'zh-tw': '體感:',
-  es: 'Sensación:', fr: 'Ressenti:', de: 'Gefühlt:', ru: 'Ощущается:',
-};
-const humidityMap: Record<string, string> = {
-  ja: '湿度:', en: 'Humidity:', 'zh-cn': '湿度:', 'zh-tw': '濕度:',
-  es: 'Humedad:', fr: 'Humidité:', de: 'Luftfeucht.:', ru: 'Влажность:',
-};
-const errorTextMap: Record<string, string> = {
-  ja: '情報が取得できません', en: 'Data unavailable', 'zh-cn': '无法获取信息',
-  'zh-tw': '無法取得資訊', es: 'Datos no disponibles', fr: 'Données indisponibles',
-  de: 'Daten nicht verfügbar', ru: 'Данные недоступны',
+const tzMap: Record<string, string> = {
+  jp: 'Asia/Tokyo',          us: 'America/New_York',    de: 'Europe/Berlin',
+  fr: 'Europe/Paris',        gb: 'Europe/London',       tw: 'Asia/Taipei',
+  kr: 'Asia/Seoul',          cn: 'Asia/Shanghai',       sg: 'Asia/Singapore',
+  au: 'Australia/Sydney',    ae: 'Asia/Dubai',          es: 'Europe/Madrid',
+  ca: 'America/Toronto',     nz: 'Pacific/Auckland',    hk: 'Asia/Hong_Kong',
+  in: 'Asia/Kolkata',        my: 'Asia/Kuala_Lumpur',   ph: 'Asia/Manila',
+  th: 'Asia/Bangkok',        vn: 'Asia/Ho_Chi_Minh',    id: 'Asia/Jakarta',
+  mx: 'America/Mexico_City', br: 'America/Sao_Paulo',   ar: 'America/Argentina/Buenos_Aires',
+  co: 'America/Bogota',      za: 'Africa/Johannesburg', eg: 'Africa/Cairo',
+  qa: 'Asia/Qatar',          om: 'Asia/Muscat',         sa: 'Asia/Riyadh',
+  tr: 'Europe/Istanbul',     nl: 'Europe/Amsterdam',    ch: 'Europe/Zurich',
+  se: 'Europe/Stockholm',    no: 'Europe/Oslo',         dk: 'Europe/Copenhagen',
+  pt: 'Europe/Lisbon',       gr: 'Europe/Athens',       it: 'Europe/Rome',
+  bd: 'Asia/Dhaka',          np: 'Asia/Kathmandu',
 };
 
-const titleText = titleTextMap[lang] || titleTextMap['en'];
-const cityWeatherTitle = cityWeatherTitleMap[lang] || cityWeatherTitleMap['en'];
-const feelsLikeLabel = feelsLikeMap[lang] || feelsLikeMap['en'];
-const humidityLabel = humidityMap[lang] || humidityMap['en'];
-const errorText = errorTextMap[lang] || errorTextMap['en'];
-const defaultData = cityDataForJs[0];
-const showCityButtons = cities.length > 1;
+const allForecastData: Record<string, any> = {};
+for (const city of cities) {
+  if (!WEATHER_API_KEY) break;
+  try {
+    const weatherUrl = 'https://api.weatherapi.com/v1/forecast.json?key=' + WEATHER_API_KEY + '&q=' + city.key + '&days=5&aqi=no&alerts=yes&lang=' + apiLang;
+    const wResponse = await fetch(weatherUrl);
+    if (wResponse.ok) {
+      const wData = await wResponse.json();
+      allForecastData[city.key] = {
+        forecastDays: wData.forecast.forecastday,
+        alertText: (wData.alerts?.alert || []).map((a: any) => a.headline).join(' / '),
+        timezone: tzMap[country] || 'Asia/Tokyo',
+      };
+    }
+  } catch (e) {}
+}
+
+const defaultCity = cities[0];
+const defaultCityName = defaultCity.display[lang] || defaultCity.display['en'] || defaultCity.key;
 const storageKey = 'watchin_weather_city_' + country;
+
+const allLabels: Record<string, Record<string, string>> = {
+  ja:      { title: '3日間の天気予報', alertTitle: '気象・災害情報', hourly: '1時間ごと', time: '時刻', weather: '天気', rain: '降水', humidity: '湿度', wind: '風速', max: '最高', min: '最低', temp: '気温' },
+  en:      { title: '3-Day Forecast', alertTitle: 'Weather/Disaster Info', hourly: 'Hourly', time: 'Time', weather: 'Weather', rain: 'Rain', humidity: 'Humid', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  'zh-cn': { title: '3天天气预报', alertTitle: '气象·灾害信息', hourly: '每小时', time: '时间', weather: '天气', rain: '降水', humidity: '湿度', wind: '风速', max: '最高', min: '最低', temp: '气温' },
+  'zh-tw': { title: '3天天氣預報', alertTitle: '氣象・災害資訊', hourly: '每小時', time: '時間', weather: '天氣', rain: '降水', humidity: '濕度', wind: '風速', max: '最高', min: '最低', temp: '氣溫' },
+  es:      { title: 'Pronóstico de 3 días', alertTitle: 'Info Meteorológica', hourly: 'Por hora', time: 'Hora', weather: 'Tiempo', rain: 'Lluvia', humidity: 'Humedad', wind: 'Viento', max: 'Máx', min: 'Mín', temp: 'Temp' },
+  fr:      { title: 'Prévisions sur 3 jours', alertTitle: 'Infos Météo', hourly: 'Par heure', time: 'Heure', weather: 'Météo', rain: 'Pluie', humidity: 'Humidité', wind: 'Vent', max: 'Max', min: 'Min', temp: 'Temp' },
+  de:      { title: '3-Tage-Vorhersage', alertTitle: 'Wetter-/Katastropheninfo', hourly: 'Stündlich', time: 'Zeit', weather: 'Wetter', rain: 'Regen', humidity: 'Feuchte', wind: 'Wind', max: 'Max', min: 'Min', temp: 'Temp' },
+  ru:      { title: 'Прогноз на 3 дня', alertTitle: 'Погода/Катастрофы', hourly: 'По часам', time: 'Время', weather: 'Погода', rain: 'Дождь', humidity: 'Влажн.', wind: 'Ветер', max: 'Макс', min: 'Мин', temp: 'Темп.' },
+};
+const labels = allLabels[lang] || allLabels['en'];
+
+const cityNameMap: Record<string, string> = {};
+for (const city of cities) {
+  cityNameMap[city.key] = city.display[lang] || city.display['en'] || city.key;
+}
 ---
 
-<div class="weather-widget" id="weather-widget"
-  data-city-data={JSON.stringify(cityDataForJs)}
-  data-weather-base-link={weatherBaseLink}
-  data-storage-key={storageKey}
-  data-feels-label={feelsLikeLabel}
-  data-humidity-label={humidityLabel}
-  data-error-text={errorText}
->
-  <div class="widget-header">
-    <h3 class="widget-title">{titleText}</h3>
-    <a href={weatherBaseLink} class="city-link" id="weather-city-link">
-      {defaultData.displayName}
-    </a>
-  </div>
+<Layout title={defaultCityName + ' | ' + labels.title} sidebarType="weather">
+  <main class="weather-page"
+    data-storage-key={storageKey}
+    data-all-forecast={JSON.stringify(allForecastData)}
+    data-city-names={JSON.stringify(cityNameMap)}
+    data-labels={JSON.stringify(labels)}
+    data-default-city={defaultCity.key}
+  >
 
-  {defaultData.temp !== null ? (
-    <a href={weatherBaseLink} class="widget-body-link" id="weather-body-link">
-      <div class="widget-content">
-        <div class="widget-left">
-          <img
-            src={defaultData.iconUrl}
-            alt={defaultData.conditionText}
-            class={'widget-icon' + (defaultData.isMoon ? ' moon-only' : '')}
-            id="weather-icon"
-          />
-          <span class="widget-desc" id="weather-desc">{defaultData.conditionText}</span>
-        </div>
-        <div class="widget-right">
-          <span class="widget-temp" id="weather-temp">{defaultData.temp}℃</span>
-          <div class="widget-details">
-            <div class="detail-line">
-              <span class="detail-label">{feelsLikeLabel}</span>
-              <span class="detail-value" id="weather-feels">{defaultData.feelsLike}℃</span>
-            </div>
-            <div class="detail-line">
-              <span class="detail-label">{humidityLabel}</span>
-              <span class="detail-value" id="weather-humidity">{defaultData.humidity}%</span>
-            </div>
-          </div>
-        </div>
+    <div class="alert-ticker-container">
+      <div class="alert-ticker-label">
+        <span class="alert-ticker-icon">ℹ️</span>
+        <span class="alert-ticker-name">{labels.alertTitle}（</span>
+        <span id="alert-city-name">{defaultCityName}</span>
+        <span>）：</span>
       </div>
-    </a>
-  ) : (
-    <p class="widget-error" id="weather-error">{errorText}</p>
-  )}
-
-  {showCityButtons && (
-    <div class="city-section">
-      <div class="city-section-header">
-        <span class="city-section-title">{cityWeatherTitle}</span>
-      </div>
-      <div class="city-buttons" id="city-buttons">
-        {cityDataForJs.map((city, i) => (
-          <button class={i === 0 ? 'city-btn active' : 'city-btn'} data-key={city.key}>
-            {city.displayName}
-          </button>
-        ))}
+      <div class="alert-ticker-window">
+        <div id="alert-ticker-content" class="alert-ticker-empty"></div>
       </div>
     </div>
-  )}
-</div>
+
+    <section class="forecast-section">
+      <h2 class="section-title" id="forecast-title">{defaultCityName} {labels.title}</h2>
+      <div class="forecast-container" id="forecast-container"></div>
+    </section>
+
+    {relatedNews.length > 0 && (
+      <RelatedNews relatedPosts={relatedNews} lang={lang} country={country} />
+    )}
+  </main>
+</Layout>
 
 <script is:inline>
 (function() {
-  var widget = document.getElementById('weather-widget');
-  if (!widget) return;
+  var page = document.querySelector('.weather-page');
+  if (!page) return;
 
-  var cityData   = JSON.parse(widget.getAttribute('data-city-data') || '[]');
-  var baseLink   = widget.getAttribute('data-weather-base-link') || '';
-  var storageKey = widget.getAttribute('data-storage-key') || '';
+  var storageKey      = page.getAttribute('data-storage-key') || '';
+  var allForecast     = JSON.parse(page.getAttribute('data-all-forecast') || '{}');
+  var cityNames       = JSON.parse(page.getAttribute('data-city-names') || '{}');
+  var labels          = JSON.parse(page.getAttribute('data-labels') || '{}');
+  var defaultCity     = page.getAttribute('data-default-city') || '';
 
-  var cityLink = document.getElementById('weather-city-link');
-  var bodyLink = document.getElementById('weather-body-link');
-  var icon     = document.getElementById('weather-icon');
-  var desc     = document.getElementById('weather-desc');
-  var temp     = document.getElementById('weather-temp');
-  var feels    = document.getElementById('weather-feels');
-  var humidity = document.getElementById('weather-humidity');
-  var buttons  = document.querySelectorAll('.city-btn');
+  var alertCityName     = document.getElementById('alert-city-name');
+  var alertContent      = document.getElementById('alert-ticker-content');
+  var forecastTitle     = document.getElementById('forecast-title');
+  var forecastContainer = document.getElementById('forecast-container');
 
-  function applyCity(city, saveStorage) {
-    if (!city) return;
-    if (saveStorage && storageKey) {
-      try { localStorage.setItem(storageKey, city.key); } catch(e) {}
-    }
+  function formatDate(dateStr) {
+    var d = new Date(dateStr);
+    return (d.getMonth() + 1) + '/' + d.getDate();
+  }
 
-    var link = baseLink + '?city=' + city.key;
-    if (cityLink) { cityLink.textContent = city.displayName; cityLink.href = link; }
-    if (bodyLink) bodyLink.href = link;
+  var dayLang = document.documentElement.lang || 'ja';
+  var dayNamesMap = {
+    ja: ['日','月','火','水','木','金','土'],
+    en: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    'zh-cn': ['日','一','二','三','四','五','六'],
+    'zh-tw': ['日','一','二','三','四','五','六'],
+    es: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+    fr: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
+    de: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+    ru: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+  };
+  var dayNames = dayNamesMap[dayLang] || dayNamesMap['en'];
+  function getDayName(dateStr) { return dayNames[new Date(dateStr).getDay()]; }
 
-    // ▼ 月アイコンは moon-only クラスで拡大
-    if (icon) {
-      icon.src = city.iconUrl;
-      icon.alt = city.conditionText;
-      icon.className = 'widget-icon' + (city.isMoon ? ' moon-only' : '');
-    }
-    if (desc)     desc.textContent = city.conditionText;
-    if (temp)     temp.textContent = city.temp !== null ? city.temp + '℃' : '--';
-    if (feels)    feels.textContent = city.feelsLike !== null ? city.feelsLike + '℃' : '--';
-    if (humidity) humidity.textContent = city.humidity !== null ? city.humidity + '%' : '--';
-
-    buttons.forEach(function(btn) {
-      btn.classList.toggle('active', btn.getAttribute('data-key') === city.key);
+  function buildForecastHTML(forecastDays) {
+    if (!forecastDays || forecastDays.length === 0) return '<p style="padding:20px;color:#666">--</p>';
+    var html = '';
+    forecastDays.forEach(function(day, index) {
+      var isMoonOnly = day.day.condition.icon.includes('113.png');
+      var iconClass = 'summary-icon' + (isMoonOnly ? ' moon-only' : '');
+      html += '<div class="day-group" data-date="' + day.date + '">';
+      html += '<button class="day-summary-btn" aria-expanded="false" data-target="hourly-' + index + '">';
+      html += '<div class="date-info"><span class="date-text">' + formatDate(day.date) + '(' + getDayName(day.date) + ')</span></div>';
+      html += '<div class="weather-info">';
+      html += '<img src="https:' + day.day.condition.icon + '" alt="" class="' + iconClass + '" />';
+      html += '<span class="condition-text">' + (day.day.condition.text || '') + '</span>';
+      html += '</div>';
+      html += '<div class="temp-info">';
+      html += '<div class="temp-item"><span class="temp-label">' + (labels.max||'Max') + '</span><span class="value-text temp-max">' + Math.round(day.day.maxtemp_c) + '°</span></div>';
+      html += '<span class="temp-sep">/</span>';
+      html += '<div class="temp-item"><span class="temp-label">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + Math.round(day.day.mintemp_c) + '°</span></div>';
+      html += '</div>';
+      html += '<div class="rain-info"><span class="value-text rain-val">' + day.day.daily_chance_of_rain + '%</span></div>';
+      html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '</span></div>';
+      html += '</button>';
+      html += '<div id="hourly-' + index + '" class="hourly-details" hidden>';
+      html += '<div class="hourly-scroll-wrapper"><table class="hourly-table"><thead><tr>';
+      html += '<th>' + (labels.time||'Time') + '</th><th>' + (labels.weather||'Weather') + '</th>';
+      html += '<th>' + (labels.temp||'Temp') + '</th><th>' + (labels.humidity||'Humid') + '</th>';
+      html += '<th>' + (labels.wind||'Wind') + '</th><th>' + (labels.rain||'Rain') + '</th>';
+      html += '</tr></thead><tbody>';
+      day.hour.forEach(function(h) {
+        var hHour = parseInt(h.time.split(' ')[1].split(':')[0]);
+        var hMoon = h.condition.icon.includes('113.png');
+        html += '<tr class="hourly-row" data-hour="' + hHour + '">';
+        html += '<td class="h-time value-text">' + h.time.split(' ')[1] + '</td>';
+        html += '<td class="h-icon"><img src="https:' + h.condition.icon + '" alt="" class="' + (hMoon ? 'moon-only' : '') + '" />';
+        html += '<div class="h-condition-text">' + (h.condition.text || '') + '</div></td>';
+        html += '<td class="h-temp value-text">' + Math.round(h.temp_c) + '°</td>';
+        html += '<td class="h-humidity value-text">' + h.humidity + '%</td>';
+        html += '<td class="h-wind value-text">' + Math.round(h.wind_kph) + '</td>';
+        html += '<td class="h-rain value-text">' + h.chance_of_rain + '%</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div></div></div>';
     });
+    return html;
+  }
 
-    if (typeof window.updateWeatherMain === 'function') {
-      window.updateWeatherMain(city.key);
+  function applyCity(cityKey, saveStorage) {
+    if (!cityKey) return;
+    var data = allForecast[cityKey];
+    if (!data) return;
+    var cityName = cityNames[cityKey] || cityKey;
+
+    if (alertCityName) alertCityName.textContent = cityName;
+    if (alertContent) {
+      if (data.alertText) {
+        alertContent.className = 'alert-ticker-text';
+        alertContent.innerHTML = '<span>' + data.alertText + '　　　' + data.alertText + '</span>';
+      } else {
+        alertContent.className = 'alert-ticker-empty';
+        alertContent.innerHTML = '';
+      }
+    }
+    if (forecastTitle) forecastTitle.textContent = cityName + ' ' + (labels.title || '');
+    if (forecastContainer) {
+      forecastContainer.innerHTML = buildForecastHTML(data.forecastDays);
+      attachHourlyButtons();
+      updateTimeFilter(data.timezone || 'Asia/Tokyo');
+    }
+    if (saveStorage && storageKey) {
+      try { localStorage.setItem(storageKey, cityKey); } catch(e) {}
     }
   }
 
-  buttons.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var key = btn.getAttribute('data-key');
-      var city = cityData.find(function(c) { return c.key === key; });
-      if (city) applyCity(city, true);
+  function attachHourlyButtons() {
+    document.querySelectorAll('.day-summary-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        var targetId = e.currentTarget.getAttribute('data-target');
+        var targetEl = document.getElementById(targetId);
+        var isExpanded = e.currentTarget.getAttribute('aria-expanded') === 'true';
+        e.currentTarget.setAttribute('aria-expanded', String(!isExpanded));
+        if (targetEl) targetEl.hidden = isExpanded;
+      });
     });
-  });
+  }
 
-  function initCity() {
+  function updateTimeFilter(timezone) {
+    var nowInCity = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone, year: 'numeric', month: '2-digit',
+      day: '2-digit', hour: 'numeric', hourCycle: 'h23'
+    }).formatToParts(new Date());
+    var cityFullDate = nowInCity.find(function(p){return p.type==='year';}).value + '-'
+      + nowInCity.find(function(p){return p.type==='month';}).value + '-'
+      + nowInCity.find(function(p){return p.type==='day';}).value;
+    var cityHour = parseInt(nowInCity.find(function(p){return p.type==='hour';}).value);
+    var visibleCount = 0;
+    document.querySelectorAll('.day-group').forEach(function(group) {
+      var groupDate = group.getAttribute('data-date');
+      if (groupDate < cityFullDate) {
+        group.style.display = 'none';
+      } else if (visibleCount < 3) {
+        group.style.display = 'block';
+        visibleCount++;
+        if (groupDate === cityFullDate) {
+          group.querySelectorAll('.hourly-row').forEach(function(row) {
+            if (parseInt(row.getAttribute('data-hour')) < cityHour) row.style.display = 'none';
+          });
+        }
+      } else {
+        group.style.display = 'none';
+      }
+    });
+  }
+
+  window.updateWeatherMain = function(cityKey) { applyCity(cityKey, true); };
+
+  function init() {
     var urlParams = new URLSearchParams(window.location.search);
-    var urlCity = urlParams.get('city');
-    var savedKey = urlCity;
+    var savedKey = urlParams.get('city');
     if (!savedKey && storageKey) {
       try { savedKey = localStorage.getItem(storageKey); } catch(e) {}
     }
-    if (savedKey) {
-      var city = cityData.find(function(c) { return c.key === savedKey; });
-      if (city) { applyCity(city, false); return; }
-    }
-    if (cityData.length > 0) applyCity(cityData[0], false);
+    applyCity(savedKey || defaultCity, false);
   }
 
-  initCity();
+  init();
 })();
 </script>
 
-<style>
-  .weather-widget { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px 20px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .widget-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid var(--theme-color, #872732); padding-bottom: 6px; margin-bottom: 16px; }
-  .widget-title { font-size: 1.1rem; font-weight: bold; margin: 0; color: #1a1a1a; }
-  .city-link { font-size: 1.1rem; font-weight: bold; color: #1a1a1a; text-decoration: none; }
-  .city-link:hover { text-decoration: underline; }
-  .widget-body-link { display: block; text-decoration: none; color: inherit; border-radius: 6px; padding: 8px 4px; }
-  .widget-body-link:hover { background: #f9f9f9; }
-  .widget-content { display: flex; justify-content: center; align-items: center; gap: 28px; }
-  .widget-left { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+<style is:global>
+  .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
+  .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 12px; font-weight: bold; }
+  .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
+  .weather-page .summary-icon { width: 72px; height: 72px; display: block; margin: 0 auto; }
 
-  /* ▼ 通常アイコン */
-  .widget-icon { width: 72px; height: 72px; object-fit: contain; }
-  /* ▼ 月アイコンだけ拡大（青いフィルターなし！自然な色） */
-  .widget-icon.moon-only { transform: scale(1.5); transform-origin: center; }
+  /* ▼ 月アイコンだけ拡大・自然な色 */
+  .weather-page .summary-icon.moon-only { transform: scale(1.5); transform-origin: center; }
+  .weather-page .h-icon img.moon-only { transform: scale(1.5); transform-origin: center; }
 
-  .widget-desc { font-size: 1rem; font-weight: bold; color: #1a1a1a; margin-top: 6px; }
-  .widget-right { display: flex; flex-direction: column; align-items: flex-start; }
-  .widget-temp { font-size: 2.2rem; font-weight: bold; line-height: 1; color: #1a1a1a; margin-bottom: 10px; }
-  .widget-details { display: flex; flex-direction: column; gap: 5px; }
-  .detail-line { font-size: 0.9rem; color: #333; }
-  .detail-label { margin-right: 4px; }
-  .detail-value { font-weight: bold; color: #1a1a1a; }
-  .widget-error { font-size: 0.9rem; color: #666; margin: 0; text-align: center; }
-  .city-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid #eee; }
-  .city-section-header { margin-bottom: 10px; }
-  .city-section-title { font-size: 12px; font-weight: 700; color: #888; letter-spacing: 0.05em; }
-  .city-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
-  .city-btn { padding: 5px 12px; font-size: 12px; font-weight: 600; border: 1px solid #ddd; border-radius: 20px; background: #f5f5f5; color: #444; cursor: pointer; transition: all 0.15s; }
-  .city-btn:hover { background: #e8e8e8; border-color: #bbb; }
-  .city-btn.active { background: var(--theme-color, #872732); color: #fff; border-color: var(--theme-color, #872732); }
+  .weather-page .temp-info { display: flex; gap: 12px; white-space: nowrap; }
+  .weather-page .temp-item { display: flex; align-items: baseline; gap: 4px; }
+  .weather-page .day-summary-btn { width: 100%; display: grid; grid-template-columns: 0.8fr 1.8fr 1.8fr 0.6fr 0.8fr; align-items: center; padding: 12px 16px; background: none; border: none; cursor: pointer; }
+  .weather-page .h-icon { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .weather-page .h-icon img { width: 48px; height: 48px; }
+  .weather-page .h-condition-text { font-size: 0.8rem; color: #1a1a1a; font-weight: bold; }
+  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
+  .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; }
+  .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; }
+  .weather-page .condition-text { font-size: 0.95rem; font-weight: bold; }
+  .weather-page .hourly-badge { background-color: var(--theme-color, #872732); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
+  .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 16px 16px; border-top: 1px solid #eee; overflow-x: auto; }
+  .weather-page .hourly-table { width: 100%; min-width: 600px; border-collapse: collapse; }
+  .weather-page .hourly-table th { padding: 12px 6px; font-size: 0.85rem; color: #666; border-bottom: 1px solid #ccc; text-align: center; }
+  .weather-page .hourly-table td { padding: 12px 6px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; }
+  .alert-ticker-container { background: #f0f7ff; border: 1.5px solid #1fa7db; border-radius: 8px; padding: 6px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; overflow: hidden; }
+  .alert-ticker-label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #0068b7; font-weight: bold; }
+  .alert-ticker-window { flex-grow: 1; background: #fff; border: 1px solid #1fa7db; border-radius: 4px; height: 32px; display: flex; align-items: center; overflow: hidden; position: relative; }
+  .alert-ticker-text { white-space: nowrap; position: absolute; padding-left: 100%; animation: ticker 30s linear infinite; font-size: 0.9rem; color: #c53030; font-weight: bold; }
+  .alert-ticker-empty { width: 100%; }
+  @keyframes ticker { 0% { transform: translate(0,0); } 100% { transform: translate(-100%,0); } }
 </style>
