@@ -69,14 +69,8 @@ const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
 const localeKeyMap: Record<string, string> = {
-  ja: 'jp',
-  en: 'en',
-  'zh-cn': 'zh-cn',
-  'zh-tw': 'zh-tw',
-  es: 'es',
-  de: 'de',
-  fr: 'fr',
-  ru: 'ru',
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
+  'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru',
 };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
@@ -167,16 +161,21 @@ const categoryBarAriaLabel = labels.categoryBarAriaLabel;
   .category-bar { width: 100%; background: #393737; }
   .category-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; overflow-x: auto; white-space: nowrap; }
   .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; }
-  .category-link.active { background: #e8383d; }
+
+  /* ▼ アクティブとホバーにテーマカラーを使用！ */
+  .category-link.active { background: var(--theme-color); }
   .category-link:hover .category-link-text {
     text-decoration: underline;
     text-decoration-color: #cccccc;
     text-decoration-thickness: 2px;
     text-underline-offset: 4px;
   }
+
   .header-word-bar { width: 100%; background: #ffffff; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 11px 32px 13px; display: flex; align-items: center; overflow-x: auto; }
   .header-word-link { color: #111111; text-decoration: underline; font-size: 16px; }
   .header-word-separator { margin: 0 1em; color: #b9b9b9; }
-  .bottom-line { width: 100%; height: 10px; background: #872732; }
+
+  /* ▼ ヘッダー下の太線にテーマカラーを使用！ */
+  .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
 </style>
