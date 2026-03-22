@@ -123,17 +123,22 @@ const moreTextMap: Record<string, string> = {
 const moreText = moreTextMap[localeKey] || 'More';
 const moreHasActive = moreItems.some(item => item.isActive);
 
-// ▼ 言語切り替えリスト
+// ▼ styleを---の中で全部組み立てる！テンプレート内では+を使わない！
 const languageOptions = [
-  { code: 'ja', localeKey: 'jp', label: '日本語', color: '#872732' },
-  { code: 'en', localeKey: 'en', label: 'English', color: '#001580' },
-  { code: 'zh-cn', localeKey: 'zh-cn', label: '简体中文', color: '#0e7c7b' },
-  { code: 'zh-tw', localeKey: 'zh-tw', label: '繁體中文', color: '#b33224' },
-  { code: 'es', localeKey: 'es', label: 'Español', color: '#b38000' },
-  { code: 'fr', localeKey: 'fr', label: 'Français', color: '#3d3d99' },
-  { code: 'de', localeKey: 'de', label: 'Deutsch', color: '#006600' },
-  { code: 'ru', localeKey: 'ru', label: 'Русский', color: '#500d80' },
-];
+  { code: 'ja', key: 'jp',    label: '日本語',   barStyle: 'background:#872732' },
+  { code: 'en', key: 'en',    label: 'English',  barStyle: 'background:#001580' },
+  { code: 'zh-cn', key: 'zh-cn', label: '简体中文', barStyle: 'background:#0e7c7b' },
+  { code: 'zh-tw', key: 'zh-tw', label: '繁體中文', barStyle: 'background:#b33224' },
+  { code: 'es', key: 'es',    label: 'Español',  barStyle: 'background:#b38000' },
+  { code: 'fr', key: 'fr',    label: 'Français', barStyle: 'background:#3d3d99' },
+  { code: 'de', key: 'de',    label: 'Deutsch',  barStyle: 'background:#006600' },
+  { code: 'ru', key: 'ru',    label: 'Русский',  barStyle: 'background:#500d80' },
+].map(opt => ({
+  ...opt,
+  href: '/' + opt.code + '/' + country + '/',
+  isCurrent: opt.key === localeKey,
+  linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option',
+}));
 ---
 
 <header class="site-header">
@@ -146,7 +151,6 @@ const languageOptions = [
     </div>
 
     <div class="right-area">
-      <!-- ▼ 検索バーを上に・言語切り替えを下に -->
       <form action={searchAction} method="get" class="search-form">
         <input type="text" name="q" class="search-input" placeholder={searchPlaceholder} aria-label={searchAriaLabel} />
         <button type="submit" class="search-button" aria-label={searchAriaLabel}>
@@ -157,16 +161,12 @@ const languageOptions = [
         </button>
       </form>
 
-      <!-- ▼ 言語切り替えドロップダウン -->
       <div class="lang-switcher">
         <div class="lang-current">{languageName} ▾</div>
         <div class="lang-dropdown">
           {languageOptions.map((opt) => (
-            
-              href={'/' + opt.code + '/' + country + '/'}
-              class={opt.localeKey === localeKey ? 'lang-option current' : 'lang-option'}
-            >
-              <span class="lang-bar" style={'background:' + opt.color}></span>
+            <a href={opt.href} class={opt.linkClass}>
+              <span class="lang-bar" style={opt.barStyle}></span>
               {opt.label}
             </a>
           ))}
@@ -229,63 +229,22 @@ const languageOptions = [
   .logo-link { display: inline-block; text-decoration: none; }
   .logo-image { display: block; width: 240px; max-width: 100%; height: auto; }
   .country-name { margin-top: 6px; font-size: 18px; font-weight: 700; color: #000000; align-self: flex-end; }
-
-  /* ▼ 右エリア：検索を上、言語切り替えを下 */
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; padding-top: 8px; }
   .search-form { display: flex; align-items: center; gap: 8px; }
   .search-input { width: 190px; height: 36px; padding: 0 12px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 16px; outline: none; }
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
 
-  /* ▼ 言語切り替え */
   .lang-switcher { position: relative; }
-  .lang-current {
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    user-select: none;
-  }
+  .lang-current { font-size: 14px; color: #333; cursor: pointer; padding: 4px 8px; border-radius: 4px; user-select: none; }
   .lang-current:hover { background: #f0f0f0; }
-  .lang-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    min-width: 160px;
-    z-index: 999;
-    overflow: hidden;
-  }
+  .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 160px; z-index: 999; overflow: hidden; }
   .lang-switcher:hover .lang-dropdown { display: block; }
-  .lang-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    font-weight: 500;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background 0.15s;
-  }
+  .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; text-decoration: none; color: #333; font-size: 14px; font-weight: 500; border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
   .lang-option:last-child { border-bottom: none; }
   .lang-option:hover { background: #f8f8f8; }
   .lang-option.current { background: #f0f0f0; font-weight: 700; }
-
-  /* ▼ 各言語の左側の縦線 */
-  .lang-bar {
-    display: inline-block;
-    width: 4px;
-    height: 16px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
+  .lang-bar { display: inline-block; width: 4px; height: 16px; border-radius: 2px; flex-shrink: 0; }
 
   .category-bar { width: 100%; background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; }
