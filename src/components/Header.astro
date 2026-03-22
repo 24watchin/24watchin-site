@@ -27,9 +27,7 @@ if (SPACE_ID && DELIVERY_TOKEN) {
     const res = await fetch(
       `https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`,
       {
-        headers: {
-          Authorization: `Bearer ${DELIVERY_TOKEN}`,
-        },
+        headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` },
       }
     );
     if (res.ok) {
@@ -43,12 +41,11 @@ if (SPACE_ID && DELIVERY_TOKEN) {
           siteId: item?.fields?.siteId ?? '',
           slot: item?.fields?.slot ?? '',
         }))
-        .filter(
-          (item: any) =>
-            item.enabled === true &&
-            item.siteId === SITE_ID &&
-            item.slot === SLOT &&
-            item.label
+        .filter((item: any) =>
+          item.enabled === true &&
+          item.siteId === SITE_ID &&
+          item.slot === SLOT &&
+          item.label
         )
         .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
         .map((item: any) => ({
@@ -100,7 +97,6 @@ const countryNameMap: Record<string, string> = {
 };
 const displayCountryName = countryNameMap[localeKey] || 'JAPAN';
 
-// ▼ 言語ごとにMoreに隠すカテゴリを設定
 const moreSlugsMap: Record<string, string[]> = {
   jp:      ['health-life', 'weather', 'traffic'],
   en:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
@@ -108,8 +104,8 @@ const moreSlugsMap: Record<string, string[]> = {
   fr:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
   de:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
   ru:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
-  'zh-cn': [],  // Moreなし・全部表示
-  'zh-tw': [],  // Moreなし・全部表示
+  'zh-cn': [],
+  'zh-tw': [],
 };
 const moreSlugs = moreSlugsMap[localeKey] || [];
 const needsMore = moreSlugs.length > 0;
@@ -121,13 +117,23 @@ const moreItems = needsMore
   ? categoryItems.filter(item => moreSlugs.includes(item.slug))
   : [];
 
-// ▼ Moreボタンのテキスト（言語別）
 const moreTextMap: Record<string, string> = {
-  jp: 'さらに見る',
-  en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё',
+  jp: 'さらに見る', en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё',
 };
 const moreText = moreTextMap[localeKey] || 'More';
 const moreHasActive = moreItems.some(item => item.isActive);
+
+// ▼ 言語切り替えリスト
+const languageOptions = [
+  { code: 'ja', localeKey: 'jp', label: '日本語', color: '#872732' },
+  { code: 'en', localeKey: 'en', label: 'English', color: '#001580' },
+  { code: 'zh-cn', localeKey: 'zh-cn', label: '简体中文', color: '#0e7c7b' },
+  { code: 'zh-tw', localeKey: 'zh-tw', label: '繁體中文', color: '#b33224' },
+  { code: 'es', localeKey: 'es', label: 'Español', color: '#b38000' },
+  { code: 'fr', localeKey: 'fr', label: 'Français', color: '#3d3d99' },
+  { code: 'de', localeKey: 'de', label: 'Deutsch', color: '#006600' },
+  { code: 'ru', localeKey: 'ru', label: 'Русский', color: '#500d80' },
+];
 ---
 
 <header class="site-header">
@@ -138,8 +144,9 @@ const moreHasActive = moreItems.some(item => item.isActive);
       </a>
       <div class="country-name">{displayCountryName}</div>
     </div>
+
     <div class="right-area">
-      <div class="language-name">{languageName}</div>
+      <!-- ▼ 検索バーを上に・言語切り替えを下に -->
       <form action={searchAction} method="get" class="search-form">
         <input type="text" name="q" class="search-input" placeholder={searchPlaceholder} aria-label={searchAriaLabel} />
         <button type="submit" class="search-button" aria-label={searchAriaLabel}>
@@ -149,12 +156,27 @@ const moreHasActive = moreItems.some(item => item.isActive);
           </svg>
         </button>
       </form>
+
+      <!-- ▼ 言語切り替えドロップダウン -->
+      <div class="lang-switcher">
+        <div class="lang-current">{languageName} ▾</div>
+        <div class="lang-dropdown">
+          {languageOptions.map((opt) => (
+            
+              href={'/' + opt.code + '/' + country + '/'}
+              class={opt.localeKey === localeKey ? 'lang-option current' : 'lang-option'}
+            >
+              <span class="lang-bar" style={'background:' + opt.color}></span>
+              {opt.label}
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   </div>
 
   <nav class="category-bar" aria-label={categoryBarAriaLabel}>
     <div class="category-nav-inner">
-
       <div class="category-scroll">
         {mainItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
@@ -180,7 +202,6 @@ const moreHasActive = moreItems.some(item => item.isActive);
           </div>
         </div>
       )}
-
     </div>
   </nav>
 
@@ -208,82 +229,81 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .logo-link { display: inline-block; text-decoration: none; }
   .logo-image { display: block; width: 240px; max-width: 100%; height: auto; }
   .country-name { margin-top: 6px; font-size: 18px; font-weight: 700; color: #000000; align-self: flex-end; }
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; padding-top: 8px; }
-  .language-name { font-size: 16px; color: #000000; }
+
+  /* ▼ 右エリア：検索を上、言語切り替えを下 */
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; padding-top: 8px; }
   .search-form { display: flex; align-items: center; gap: 8px; }
   .search-input { width: 190px; height: 36px; padding: 0 12px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; color: #000000; font-size: 16px; outline: none; }
   .search-button { width: 36px; height: 36px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
 
-  .category-bar { width: 100%; background: #393737; }
-  .category-nav-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 14px;
-    display: flex;
-    align-items: center;
-  }
-  .category-scroll {
-    display: flex;
-    align-items: center;
-    overflow-x: auto;
-    white-space: nowrap;
-    min-width: 0;
-  }
-  .category-scroll::-webkit-scrollbar { display: none; }
-
-  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; flex-shrink: 0; }
-  .category-link.active { background: var(--theme-color); }
-  .category-link:hover .category-link-text {
-    text-decoration: underline;
-    text-decoration-color: #cccccc;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-  }
-
-  .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn {
-    height: 54px;
-    padding: 0 18px;
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 700;
+  /* ▼ 言語切り替え */
+  .lang-switcher { position: relative; }
+  .lang-current {
+    font-size: 14px;
+    color: #333;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
     user-select: none;
   }
-  .more-btn:hover { background: rgba(255,255,255,0.1); }
-  .more-btn.active { background: var(--theme-color); }
-  .more-chevron {
-    width: 14px;
-    height: 14px;
-    stroke: #ffffff;
-    transition: transform 0.2s ease;
-  }
-  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
-
-  .more-dropdown {
+  .lang-current:hover { background: #f0f0f0; }
+  .lang-dropdown {
     display: none;
     position: absolute;
-    top: 54px;
+    top: 100%;
     right: 0;
-    background: #393737;
-    min-width: 220px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    min-width: 160px;
     z-index: 999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    overflow: hidden;
   }
-  .more-wrapper:hover .more-dropdown { display: block; }
-  .more-link {
-    display: block;
-    padding: 14px 18px;
-    color: #ffffff;
+  .lang-switcher:hover .lang-dropdown { display: block; }
+  .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
     text-decoration: none;
-    font-size: 15px;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
   }
+  .lang-option:last-child { border-bottom: none; }
+  .lang-option:hover { background: #f8f8f8; }
+  .lang-option.current { background: #f0f0f0; font-weight: 700; }
+
+  /* ▼ 各言語の左側の縦線 */
+  .lang-bar {
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .category-bar { width: 100%; background: #393737; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 14px; display: flex; align-items: center; }
+  .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
+  .category-scroll::-webkit-scrollbar { display: none; }
+  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 18px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+  .category-link.active { background: var(--theme-color); }
+  .category-link:hover .category-link-text { text-decoration: underline; text-decoration-color: #cccccc; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+  .more-wrapper { position: relative; flex-shrink: 0; }
+  .more-btn { height: 54px; padding: 0 18px; color: #ffffff; font-size: 16px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; user-select: none; }
+  .more-btn:hover { background: rgba(255,255,255,0.1); }
+  .more-btn.active { background: var(--theme-color); }
+  .more-chevron { width: 14px; height: 14px; stroke: #ffffff; transition: transform 0.2s ease; }
+  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
+  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .more-wrapper:hover .more-dropdown { display: block; }
+  .more-link { display: block; padding: 14px 18px; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
   .more-link:last-child { border-bottom: none; }
   .more-link:hover { background: rgba(255,255,255,0.12); }
   .more-link.active { background: var(--theme-color); }
