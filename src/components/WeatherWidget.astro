@@ -1,126 +1,113 @@
 ---
 import { getWeatherCondition } from '../lib/weatherConditions';
+import { countryCityMap } from '../lib/cityConfig';
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// ▼ 全国対応の都市マップ
-const cityMap: Record<string, { name: string; display: Record<string, string> }> = {
-  jp: { name: 'Tokyo',      display: { ja: '東京',        en: 'Tokyo',       'zh-cn': '东京',    'zh-tw': '東京',    es: 'Tokio',      fr: 'Tokyo',    de: 'Tokio',      ru: 'Токио'      } },
-  us: { name: 'New_York',   display: { ja: 'ニューヨーク', en: 'New York',    'zh-cn': '纽约',    'zh-tw': '紐約',    es: 'Nueva York', fr: 'New York', de: 'New York',   ru: 'Нью-Йорк'   } },
-  de: { name: 'Berlin',     display: { ja: 'ベルリン',    en: 'Berlin',      'zh-cn': '柏林',    'zh-tw': '柏林',    es: 'Berlín',     fr: 'Berlin',   de: 'Berlin',     ru: 'Берлин'     } },
-  fr: { name: 'Paris',      display: { ja: 'パリ',        en: 'Paris',       'zh-cn': '巴黎',    'zh-tw': '巴黎',    es: 'París',      fr: 'Paris',    de: 'Paris',      ru: 'Париж'      } },
-  gb: { name: 'London',     display: { ja: 'ロンドン',    en: 'London',      'zh-cn': '伦敦',    'zh-tw': '倫敦',    es: 'Londres',    fr: 'Londres',  de: 'London',     ru: 'Лондон'     } },
-  tw: { name: 'Taipei',     display: { ja: '台北',        en: 'Taipei',      'zh-cn': '台北',    'zh-tw': '台北',    es: 'Taipéi',     fr: 'Taipei',   de: 'Taipeh',     ru: 'Тайбэй'     } },
-  kr: { name: 'Seoul',      display: { ja: 'ソウル',      en: 'Seoul',       'zh-cn': '首尔',    'zh-tw': '首爾',    es: 'Seúl',       fr: 'Séoul',    de: 'Seoul',      ru: 'Сеул'       } },
-  cn: { name: 'Beijing',    display: { ja: '北京',        en: 'Beijing',     'zh-cn': '北京',    'zh-tw': '北京',    es: 'Pekín',      fr: 'Pékin',    de: 'Peking',     ru: 'Пекин'      } },
-  sg: { name: 'Singapore',  display: { ja: 'シンガポール', en: 'Singapore',   'zh-cn': '新加坡',  'zh-tw': '新加坡',  es: 'Singapur',   fr: 'Singapour', de: 'Singapur',  ru: 'Сингапур'   } },
-  th: { name: 'Bangkok',    display: { ja: 'バンコク',    en: 'Bangkok',     'zh-cn': '曼谷',    'zh-tw': '曼谷',    es: 'Bangkok',    fr: 'Bangkok',  de: 'Bangkok',    ru: 'Бангкок'    } },
-  au: { name: 'Sydney',     display: { ja: 'シドニー',    en: 'Sydney',      'zh-cn': '悉尼',    'zh-tw': '雪梨',    es: 'Sídney',     fr: 'Sydney',   de: 'Sydney',     ru: 'Сидней'     } },
-  ae: { name: 'Dubai',      display: { ja: 'ドバイ',      en: 'Dubai',       'zh-cn': '迪拜',    'zh-tw': '杜拜',    es: 'Dubái',      fr: 'Dubaï',    de: 'Dubai',      ru: 'Дубай'      } },
-  ca: { name: 'Toronto',    display: { ja: 'トロント',    en: 'Toronto',     'zh-cn': '多伦多',  'zh-tw': '多倫多',  es: 'Toronto',    fr: 'Toronto',  de: 'Toronto',    ru: 'Торонто'    } },
-  in: { name: 'Mumbai',     display: { ja: 'ムンバイ',    en: 'Mumbai',      'zh-cn': '孟买',    'zh-tw': '孟買',    es: 'Bombay',     fr: 'Mumbai',   de: 'Mumbai',     ru: 'Мумбаи'     } },
-  br: { name: 'Sao_Paulo',  display: { ja: 'サンパウロ',  en: 'São Paulo',   'zh-cn': '圣保罗',  'zh-tw': '聖保羅',  es: 'São Paulo',  fr: 'São Paulo', de: 'São Paulo', ru: 'Сан-Паулу'  } },
-  nz: { name: 'Auckland',   display: { ja: 'オークランド', en: 'Auckland',   'zh-cn': '奥克兰',  'zh-tw': '奧克蘭',  es: 'Auckland',   fr: 'Auckland', de: 'Auckland',   ru: 'Окленд'     } },
-  za: { name: 'Johannesburg', display: { ja: 'ヨハネスブルク', en: 'Johannesburg', 'zh-cn': '约翰内斯堡', 'zh-tw': '約翰尼斯堡', es: 'Johannesburgo', fr: 'Johannesburg', de: 'Johannesburg', ru: 'Йоханнесбург' } },
-  sa: { name: 'Riyadh',     display: { ja: 'リヤド',      en: 'Riyadh',      'zh-cn': '利雅得',  'zh-tw': '利雅德',  es: 'Riad',       fr: 'Riyad',    de: 'Riad',       ru: 'Эр-Рияд'    } },
-  es: { name: 'Madrid',     display: { ja: 'マドリード',  en: 'Madrid',      'zh-cn': '马德里',  'zh-tw': '馬德里',  es: 'Madrid',     fr: 'Madrid',   de: 'Madrid',     ru: 'Мадрид'     } },
-  it: { name: 'Rome',       display: { ja: 'ローマ',      en: 'Rome',        'zh-cn': '罗马',    'zh-tw': '羅馬',    es: 'Roma',       fr: 'Rome',     de: 'Rom',        ru: 'Рим'        } },
-};
-
-const targetCity = cityMap[country] || cityMap['jp'];
-const cityDisplayName = targetCity.display[lang] || targetCity.display['en'] || targetCity.name;
+// ▼ cityConfig.ts から都市リストを取得！
+const cities = countryCityMap[country] || countryCityMap['jp'];
+const defaultCity = cities[0];
 
 const API_KEY = import.meta.env.WEATHER_API_KEY;
+if (!globalThis.weatherCache) globalThis.weatherCache = {};
 
-if (!globalThis.weatherCache) {
-  globalThis.weatherCache = {};
-}
-
-const cityKey = targetCity.name;
-const CACHE_LIFETIME = 30 * 60 * 1000;
-const now = Date.now();
-
-let weatherData = null;
-
-if (
-  globalThis.weatherCache[cityKey] &&
-  (now - globalThis.weatherCache[cityKey].time < CACHE_LIFETIME)
-) {
-  weatherData = globalThis.weatherCache[cityKey].data;
-} else {
-  if (API_KEY) {
+const allCityWeather: Record<string, any> = {};
+for (const city of cities) {
+  const cityKey = city.key;
+  const now = Date.now();
+  const CACHE = 30 * 60 * 1000;
+  if (globalThis.weatherCache[cityKey] && (now - globalThis.weatherCache[cityKey].time < CACHE)) {
+    allCityWeather[cityKey] = globalThis.weatherCache[cityKey].data;
+  } else if (API_KEY) {
     try {
       const url = 'https://api.weatherapi.com/v1/current.json?key=' + API_KEY + '&q=' + cityKey + '&aqi=no';
-      const response = await fetch(url);
-      if (response.ok) {
-        weatherData = await response.json();
-        globalThis.weatherCache[cityKey] = { data: weatherData, time: now };
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        allCityWeather[cityKey] = data;
+        globalThis.weatherCache[cityKey] = { data, time: now };
       }
     } catch (e) {}
   }
 }
 
-const current = weatherData?.current;
-const conditionCode = current?.condition?.code;
-const conditionText = conditionCode ? getWeatherCondition(conditionCode, lang) : '';
-const iconUrl = current?.condition?.icon ? 'https:' + current.condition.icon : '';
+const cityDataForJs = cities.map(city => {
+  const wd = allCityWeather[city.key];
+  const current = wd?.current;
+  const conditionCode = current?.condition?.code;
+  return {
+    key: city.key,
+    displayName: city.display[lang] || city.display['en'] || city.key,
+    weatherLink: '/' + lang + '/' + country + '/weather/',
+    temp: current ? Math.round(current.temp_c) : null,
+    feelsLike: current ? Math.round(current.feelslike_c) : null,
+    humidity: current?.humidity ?? null,
+    iconUrl: current?.condition?.icon ? 'https:' + current.condition.icon : '',
+    conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
+  };
+});
 
-const weatherLink = '/' + lang + '/' + country + '/weather/';
-
-// ▼ 多言語ラベル
 const titleTextMap: Record<string, string> = {
   ja: '現在の天気', en: 'Current Weather', 'zh-cn': '当前天气',
   'zh-tw': '當前天氣', es: 'Clima actual', fr: 'Météo actuelle',
   de: 'Aktuelles Wetter', ru: 'Текущая погода',
+};
+const cityWeatherTitleMap: Record<string, string> = {
+  ja: '各都市の天気', en: 'City Weather', 'zh-cn': '各城市天气',
+  'zh-tw': '各城市天氣', es: 'Clima por ciudad', fr: 'Météo par ville',
+  de: 'Wetter nach Stadt', ru: 'Погода по городам',
+};
+const feelsLikeMap: Record<string, string> = {
+  ja: '体感:', en: 'Feels:', 'zh-cn': '体感:', 'zh-tw': '體感:',
+  es: 'Sensación:', fr: 'Ressenti:', de: 'Gefühlt:', ru: 'Ощущается:',
+};
+const humidityMap: Record<string, string> = {
+  ja: '湿度:', en: 'Humidity:', 'zh-cn': '湿度:', 'zh-tw': '濕度:',
+  es: 'Humedad:', fr: 'Humidité:', de: 'Luftfeucht.:', ru: 'Влажность:',
 };
 const errorTextMap: Record<string, string> = {
   ja: '情報が取得できません', en: 'Data unavailable', 'zh-cn': '无法获取信息',
   'zh-tw': '無法取得資訊', es: 'Datos no disponibles', fr: 'Données indisponibles',
   de: 'Daten nicht verfügbar', ru: 'Данные недоступны',
 };
-const feelsLikeMap: Record<string, string> = {
-  ja: '体感:', en: 'Feels:', 'zh-cn': '体感:',
-  'zh-tw': '體感:', es: 'Sensación:', fr: 'Ressenti:',
-  de: 'Gefühlt:', ru: 'Ощущается:',
-};
-const humidityMap: Record<string, string> = {
-  ja: '湿度:', en: 'Humidity:', 'zh-cn': '湿度:',
-  'zh-tw': '濕度:', es: 'Humedad:', fr: 'Humidité:',
-  de: 'Luftfeucht.:', ru: 'Влажность:',
-};
 
 const titleText = titleTextMap[lang] || titleTextMap['en'];
-const errorText = errorTextMap[lang] || errorTextMap['en'];
+const cityWeatherTitle = cityWeatherTitleMap[lang] || cityWeatherTitleMap['en'];
 const feelsLikeLabel = feelsLikeMap[lang] || feelsLikeMap['en'];
 const humidityLabel = humidityMap[lang] || humidityMap['en'];
+const errorText = errorTextMap[lang] || errorTextMap['en'];
+const defaultData = cityDataForJs[0];
+const showCityButtons = cities.length > 1;
 ---
 
-<div class="weather-widget">
+<div class="weather-widget" id="weather-widget">
   <div class="widget-header">
     <h3 class="widget-title">{titleText}</h3>
-    <a href={weatherLink} class="city-link">{cityDisplayName}</a>
+    <a href={defaultData.weatherLink} class="city-link" id="weather-city-link">
+      {defaultData.displayName}
+    </a>
   </div>
 
-  {current ? (
-    <a href={weatherLink} class="widget-body-link">
+  {defaultData.temp !== null ? (
+    <a href={defaultData.weatherLink} class="widget-body-link" id="weather-body-link">
       <div class="widget-content">
         <div class="widget-left">
-          {iconUrl && <img src={iconUrl} alt={conditionText} class="widget-icon" />}
-          <span class="widget-desc">{conditionText}</span>
+          <img src={defaultData.iconUrl} alt={defaultData.conditionText} class="widget-icon" id="weather-icon" />
+          <span class="widget-desc" id="weather-desc">{defaultData.conditionText}</span>
         </div>
         <div class="widget-right">
-          <span class="widget-temp">{current.temp_c}℃</span>
+          <span class="widget-temp" id="weather-temp">{defaultData.temp}℃</span>
           <div class="widget-details">
             <div class="detail-line">
               <span class="detail-label">{feelsLikeLabel}</span>
-              <span class="detail-value">{current.feelslike_c}℃</span>
+              <span class="detail-value" id="weather-feels">{defaultData.feelsLike}℃</span>
             </div>
             <div class="detail-line">
               <span class="detail-label">{humidityLabel}</span>
-              <span class="detail-value">{current.humidity}%</span>
+              <span class="detail-value" id="weather-humidity">{defaultData.humidity}%</span>
             </div>
           </div>
         </div>
@@ -129,24 +116,78 @@ const humidityLabel = humidityMap[lang] || humidityMap['en'];
   ) : (
     <p class="widget-error">{errorText}</p>
   )}
+
+  {showCityButtons && (
+    <div class="city-section">
+      <div class="city-section-header">
+        <span class="city-section-title">{cityWeatherTitle}</span>
+      </div>
+      <div class="city-buttons">
+        {cityDataForJs.map((city, i) => (
+          <button
+            class={i === 0 ? 'city-btn active' : 'city-btn'}
+            data-city={JSON.stringify(city)}
+          >
+            {city.displayName}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
 </div>
 
+<script is:inline>
+  (function() {
+    var buttons = document.querySelectorAll('.city-btn');
+    if (!buttons.length) return;
+    buttons.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var city = JSON.parse(btn.getAttribute('data-city'));
+        buttons.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var cityLink = document.getElementById('weather-city-link');
+        var bodyLink = document.getElementById('weather-body-link');
+        var icon = document.getElementById('weather-icon');
+        var desc = document.getElementById('weather-desc');
+        var temp = document.getElementById('weather-temp');
+        var feels = document.getElementById('weather-feels');
+        var humidity = document.getElementById('weather-humidity');
+        if (cityLink) { cityLink.textContent = city.displayName; cityLink.href = city.weatherLink; }
+        if (bodyLink) bodyLink.href = city.weatherLink;
+        if (icon) { icon.src = city.iconUrl; icon.alt = city.conditionText; }
+        if (desc) desc.textContent = city.conditionText;
+        if (temp) temp.textContent = city.temp !== null ? city.temp + '℃' : '--';
+        if (feels) feels.textContent = city.feelsLike !== null ? city.feelsLike + '℃' : '--';
+        if (humidity) humidity.textContent = city.humidity !== null ? city.humidity + '%' : '--';
+      });
+    });
+  })();
+</script>
+
 <style>
-  .weather-widget { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px 24px 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .widget-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid var(--theme-color, #872732); padding-bottom: 6px; margin-bottom: 20px; }
+  .weather-widget { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px 20px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .widget-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid var(--theme-color, #872732); padding-bottom: 6px; margin-bottom: 16px; }
   .widget-title { font-size: 1.1rem; font-weight: bold; margin: 0; color: #1a1a1a; }
-  .city-link { font-size: 1.1rem; font-weight: bold; color: #1a1a1a; text-decoration: none; margin: 0; }
-  .city-link:hover { text-decoration: underline; text-decoration-color: #000; text-decoration-thickness: 1px; }
-  .widget-body-link { display: block; text-decoration: none; color: inherit; margin: -15px -15px -19px -15px; padding: 15px 15px 19px 15px; border-radius: 6px; }
-  .widget-content { display: flex; justify-content: center; align-items: center; gap: 32px; }
+  .city-link { font-size: 1.1rem; font-weight: bold; color: #1a1a1a; text-decoration: none; }
+  .city-link:hover { text-decoration: underline; }
+  .widget-body-link { display: block; text-decoration: none; color: inherit; border-radius: 6px; padding: 8px 4px; }
+  .widget-body-link:hover { background: #f9f9f9; }
+  .widget-content { display: flex; justify-content: center; align-items: center; gap: 28px; }
   .widget-left { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .widget-icon { width: 84px; height: 84px; object-fit: contain; margin-bottom: -6px; }
-  .widget-desc { font-size: 1.05rem; font-weight: bold; color: #1a1a1a; }
+  .widget-icon { width: 72px; height: 72px; object-fit: contain; }
+  .widget-desc { font-size: 1rem; font-weight: bold; color: #1a1a1a; }
   .widget-right { display: flex; flex-direction: column; align-items: flex-start; }
-  .widget-temp { font-size: 2.2rem; font-weight: bold; line-height: 1; color: #1a1a1a; margin-bottom: 12px; }
-  .widget-details { display: flex; flex-direction: column; gap: 6px; }
-  .detail-line { font-size: 0.95rem; color: #333; }
+  .widget-temp { font-size: 2.2rem; font-weight: bold; line-height: 1; color: #1a1a1a; margin-bottom: 10px; }
+  .widget-details { display: flex; flex-direction: column; gap: 5px; }
+  .detail-line { font-size: 0.9rem; color: #333; }
   .detail-label { margin-right: 4px; }
   .detail-value { font-weight: bold; color: #1a1a1a; }
   .widget-error { font-size: 0.9rem; color: #666; margin: 0; text-align: center; }
+  .city-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid #eee; }
+  .city-section-header { margin-bottom: 10px; }
+  .city-section-title { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+  .city-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+  .city-btn { padding: 5px 12px; font-size: 12px; font-weight: 600; border: 1px solid #ddd; border-radius: 20px; background: #f5f5f5; color: #444; cursor: pointer; transition: all 0.15s; }
+  .city-btn:hover { background: #e8e8e8; border-color: #bbb; }
+  .city-btn.active { background: var(--theme-color, #872732); color: #fff; border-color: var(--theme-color, #872732); }
 </style>
