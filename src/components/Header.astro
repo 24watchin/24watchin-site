@@ -238,7 +238,9 @@ const languageOptions = [
 <style>
   .site-header { width: 100%; background: #ffffff; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .brand-area { display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; }
+
+  /* ▼ 変更①：align-items を flex-end に → JAPANがロゴ右端に揃う */
+  .brand-area { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
   .logo-link { display: inline-block; text-decoration: none; }
   .logo-image { display: block; width: 200px; max-width: 100%; height: auto; }
   .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
@@ -248,131 +250,4 @@ const languageOptions = [
   .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
   .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
   .lang-switcher { position: relative; }
-  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; border-radius: 4px; user-select: none; white-space: nowrap; }
-  .lang-current:hover { background: #f0f0f0; }
-  .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 150px; z-index: 999; overflow: hidden; }
-  .lang-switcher:hover .lang-dropdown { display: block; }
-  .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; font-weight: 500; border-bottom: 1px solid #f0f0f0; }
-  .lang-option:last-child { border-bottom: none; }
-  .lang-option:hover { background: #f8f8f8; }
-  .lang-option.current { background: #f0f0f0; font-weight: 700; }
-  .lang-bar { display: inline-block; width: 4px; height: 14px; border-radius: 2px; flex-shrink: 0; }
-
-  .category-bar { width: 100%; background: #393737; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 4px; display: flex; align-items: center; }
-
-  /* ▼ 矢印：デフォルト非表示・activeクラスで表示 */
-  .scroll-arrow {
-    background: rgba(255,255,255,0.18);
-    border: none;
-    color: #ffffff;
-    font-size: 22px;
-    width: 28px;
-    height: 54px;
-    cursor: pointer;
-    flex-shrink: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    padding: 0;
-    transition: background 0.2s;
-  }
-  .scroll-arrow.active { display: flex; }
-  .scroll-arrow.active:hover { background: rgba(255,255,255,0.30); }
-
-  .pc-category-group { display: flex; align-items: center; min-width: 0; flex: 1; }
-  .category-scroll { display: flex; align-items: center; overflow-x: auto; white-space: nowrap; min-width: 0; }
-  .category-scroll::-webkit-scrollbar { display: none; }
-  .pc-scroll { display: flex; min-width: 0; }
-  .sp-scroll { display: none; }
-
-  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 16px; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
-  .category-link.active { background: var(--theme-color); }
-  .category-link:hover .category-link-text { text-decoration: underline; text-decoration-color: #cccccc; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-
-  .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn { height: 54px; padding: 0 16px; color: #ffffff; font-size: 15px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; user-select: none; }
-  .more-btn:hover { background: rgba(255,255,255,0.1); }
-  .more-btn.active { background: var(--theme-color); }
-  .more-chevron { width: 13px; height: 13px; stroke: #ffffff; transition: transform 0.2s ease; }
-  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
-  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-  .more-wrapper:hover .more-dropdown { display: block; }
-  .more-link { display: block; padding: 14px 18px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .more-link:last-child { border-bottom: none; }
-  .more-link:hover { background: rgba(255,255,255,0.12); }
-  .more-link.active { background: var(--theme-color); }
-
-  .header-word-bar { width: 100%; background: #ffffff; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px 12px; display: flex; align-items: center; overflow-x: auto; }
-  .header-word-link { color: #111111; text-decoration: underline; font-size: 14px; white-space: nowrap; }
-  .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
-  .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
-
-  @media (max-width: 400px) {
-    .header-top { padding: 8px 10px 6px; gap: 8px; }
-    .logo-image { width: 120px; }
-    .country-name { font-size: 13px; margin-top: 2px; }
-    .search-input { width: 120px; height: 30px; font-size: 13px; }
-    .search-button { width: 30px; height: 30px; }
-    .search-icon { width: 14px; height: 14px; }
-    .lang-current { font-size: 12px; }
-    .pc-category-group { display: none; }
-    .scroll-arrow { display: none !important; }
-    .sp-scroll { display: flex; flex: 1; min-width: 0; }
-    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
-  }
-</style>
-
-<script is:inline>
-  window.addEventListener('load', function() {
-    var scroll = document.getElementById('pc-scroll');
-    var btnLeft = document.getElementById('arrow-left');
-    var btnRight = document.getElementById('arrow-right');
-
-    if (!scroll || !btnLeft || !btnRight) return;
-
-    function updateArrows() {
-      var isWide = window.innerWidth > 1000;
-      var atLeft = scroll.scrollLeft <= 2;
-      var atRight = scroll.scrollLeft >= scroll.scrollWidth - scroll.clientWidth - 2;
-
-      if (isWide) {
-        btnLeft.classList.remove('active');
-        btnRight.classList.remove('active');
-        return;
-      }
-
-      if (!atLeft) {
-        btnLeft.classList.add('active');
-      } else {
-        btnLeft.classList.remove('active');
-      }
-
-      if (!atRight) {
-        btnRight.classList.add('active');
-      } else {
-        btnRight.classList.remove('active');
-      }
-    }
-
-    btnLeft.addEventListener('click', function() {
-      if (btnLeft.classList.contains('active')) {
-        scroll.scrollBy({ left: -200, behavior: 'smooth' });
-        setTimeout(updateArrows, 300);
-      }
-    });
-
-    btnRight.addEventListener('click', function() {
-      if (btnRight.classList.contains('active')) {
-        scroll.scrollBy({ left: 200, behavior: 'smooth' });
-        setTimeout(updateArrows, 300);
-      }
-    });
-
-    scroll.addEventListener('scroll', updateArrows);
-    window.addEventListener('resize', updateArrows);
-    setTimeout(updateArrows, 100);
-  });
-</script>
+  .lang-current { font-size: 13px; color: #333;
