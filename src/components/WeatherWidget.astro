@@ -36,13 +36,15 @@ const cityDataForJs = cities.map(city => {
   const wd = allCityWeather[city.key];
   const current = wd?.current;
   const conditionCode = current?.condition?.code;
+  const iconUrl = current?.condition?.icon ? 'https:' + current.condition.icon : '';
   return {
     key: city.key,
     displayName: city.display[lang] || city.display['en'] || city.key,
     temp: current ? Math.round(current.temp_c) : null,
     feelsLike: current ? Math.round(current.feelslike_c) : null,
     humidity: current?.humidity ?? null,
-    iconUrl: current?.condition?.icon ? 'https:' + current.condition.icon : '',
+    iconUrl,
+    isMoon: iconUrl.includes('113.png'),  // ▼ 追加！
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
@@ -102,7 +104,13 @@ const storageKey = 'watchin_weather_city_' + country;
     <a href={weatherBaseLink} class="widget-body-link" id="weather-body-link">
       <div class="widget-content">
         <div class="widget-left">
-          <img src={defaultData.iconUrl} alt={defaultData.conditionText} class="widget-icon" id="weather-icon" />
+          <!-- ▼ 月アイコンに moon-only クラスを付与 -->
+          <img
+            src={defaultData.iconUrl}
+            alt={defaultData.conditionText}
+            class={'widget-icon' + (defaultData.isMoon ? ' moon-only' : '')}
+            id="weather-icon"
+          />
           <span class="widget-desc" id="weather-desc">{defaultData.conditionText}</span>
         </div>
         <div class="widget-right">
@@ -145,53 +153,49 @@ const storageKey = 'watchin_weather_city_' + country;
   var widget = document.getElementById('weather-widget');
   if (!widget) return;
 
-  var cityData     = JSON.parse(widget.getAttribute('data-city-data') || '[]');
-  var baseLink     = widget.getAttribute('data-weather-base-link') || '';
-  var storageKey   = widget.getAttribute('data-storage-key') || '';
-  var feelsLabel   = widget.getAttribute('data-feels-label') || '';
-  var humLabel     = widget.getAttribute('data-humidity-label') || '';
-  var errorText    = widget.getAttribute('data-error-text') || '';
+  var cityData   = JSON.parse(widget.getAttribute('data-city-data') || '[]');
+  var baseLink   = widget.getAttribute('data-weather-base-link') || '';
+  var storageKey = widget.getAttribute('data-storage-key') || '';
 
-  var cityLink     = document.getElementById('weather-city-link');
-  var bodyLink     = document.getElementById('weather-body-link');
-  var icon         = document.getElementById('weather-icon');
-  var desc         = document.getElementById('weather-desc');
-  var temp         = document.getElementById('weather-temp');
-  var feels        = document.getElementById('weather-feels');
-  var humidity     = document.getElementById('weather-humidity');
-  var buttons      = document.querySelectorAll('.city-btn');
+  var cityLink = document.getElementById('weather-city-link');
+  var bodyLink = document.getElementById('weather-body-link');
+  var icon     = document.getElementById('weather-icon');
+  var desc     = document.getElementById('weather-desc');
+  var temp     = document.getElementById('weather-temp');
+  var feels    = document.getElementById('weather-feels');
+  var humidity = document.getElementById('weather-humidity');
+  var buttons  = document.querySelectorAll('.city-btn');
 
-  // ▼ ウィジェット表示を更新する関数
   function applyCity(city, saveStorage) {
     if (!city) return;
     if (saveStorage && storageKey) {
       try { localStorage.setItem(storageKey, city.key); } catch(e) {}
     }
 
-    // ヘッダーのリンク
     var link = baseLink + '?city=' + city.key;
     if (cityLink) { cityLink.textContent = city.displayName; cityLink.href = link; }
     if (bodyLink) bodyLink.href = link;
 
-    // 天気表示
-    if (icon)     { icon.src = city.iconUrl; icon.alt = city.conditionText; }
+    // ▼ 月アイコンはクラスで拡大・自然な色
+    if (icon) {
+      icon.src = city.iconUrl;
+      icon.alt = city.conditionText;
+      icon.className = 'widget-icon' + (city.isMoon ? ' moon-only' : '');
+    }
     if (desc)     desc.textContent = city.conditionText;
     if (temp)     temp.textContent = city.temp !== null ? city.temp + '℃' : '--';
     if (feels)    feels.textContent = city.feelsLike !== null ? city.feelsLike + '℃' : '--';
     if (humidity) humidity.textContent = city.humidity !== null ? city.humidity + '%' : '--';
 
-    // アクティブボタン
     buttons.forEach(function(btn) {
       btn.classList.toggle('active', btn.getAttribute('data-key') === city.key);
     });
 
-    // ▼ 天気予報ページのメインコンテンツにも通知
     if (typeof window.updateWeatherMain === 'function') {
       window.updateWeatherMain(city.key);
     }
   }
 
-  // ▼ ボタンクリック
   buttons.forEach(function(btn) {
     btn.addEventListener('click', function() {
       var key = btn.getAttribute('data-key');
@@ -200,26 +204,16 @@ const storageKey = 'watchin_weather_city_' + country;
     });
   });
 
-  // ▼ ページ読み込み時：localStorage または URLパラメーターから復元
   function initCity() {
-    // URLパラメーター優先
     var urlParams = new URLSearchParams(window.location.search);
-    var urlCity = urlParams.get('city');
-    var savedKey = urlCity;
-
-    // なければlocalStorage
+    var savedKey = urlParams.get('city');
     if (!savedKey && storageKey) {
       try { savedKey = localStorage.getItem(storageKey); } catch(e) {}
     }
-
     if (savedKey) {
       var city = cityData.find(function(c) { return c.key === savedKey; });
-      if (city) {
-        applyCity(city, false);
-        return;
-      }
+      if (city) { applyCity(city, false); return; }
     }
-    // デフォルト（最初の都市）
     if (cityData.length > 0) applyCity(cityData[0], false);
   }
 
@@ -237,8 +231,13 @@ const storageKey = 'watchin_weather_city_' + country;
   .widget-body-link:hover { background: #f9f9f9; }
   .widget-content { display: flex; justify-content: center; align-items: center; gap: 28px; }
   .widget-left { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+  /* ▼ 通常アイコン */
   .widget-icon { width: 72px; height: 72px; object-fit: contain; }
-  .widget-desc { font-size: 1rem; font-weight: bold; color: #1a1a1a; }
+  /* ▼ 月アイコンだけ拡大・自然な色！ */
+  .widget-icon.moon-only { transform: scale(1.5); transform-origin: center; }
+
+  .widget-desc { font-size: 1rem; font-weight: bold; color: #1a1a1a; margin-top: 6px; }
   .widget-right { display: flex; flex-direction: column; align-items: flex-start; }
   .widget-temp { font-size: 2.2rem; font-weight: bold; line-height: 1; color: #1a1a1a; margin-bottom: 10px; }
   .widget-details { display: flex; flex-direction: column; gap: 5px; }
