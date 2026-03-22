@@ -78,7 +78,6 @@ const relatedNews = allPosts.filter((post: any) =>
   post.labels.some((label: string) => ['天気', '気象', '災害', 'weather', 'Weather'].includes(label))
 ).slice(0, 3);
 
-// ▼ 全都市の予報データを一括取得
 const cities = countryCityMap[country] || countryCityMap['jp'];
 
 const tzMap: Record<string, string> = {
@@ -98,9 +97,7 @@ const tzMap: Record<string, string> = {
   bd: 'Asia/Dhaka',          np: 'Asia/Kathmandu',
 };
 
-// ▼ 各都市の予報を取得してJSに渡す
 const allForecastData: Record<string, any> = {};
-
 for (const city of cities) {
   if (!WEATHER_API_KEY) break;
   try {
@@ -133,7 +130,6 @@ const allLabels: Record<string, Record<string, string>> = {
 };
 const labels = allLabels[lang] || allLabels['en'];
 
-// ▼ 都市名マップ（JSに渡す）
 const cityNameMap: Record<string, string> = {};
 for (const city of cities) {
   cityNameMap[city.key] = city.display[lang] || city.display['en'] || city.key;
@@ -149,10 +145,10 @@ for (const city of cities) {
     data-default-city={defaultCity.key}
   >
 
-    <!-- ▼ アラートティッカー（JS で更新） -->
     <div class="alert-ticker-container">
       <div class="alert-ticker-label">
         <span class="alert-ticker-icon">ℹ️</span>
+        <span class="alert-ticker-name">{labels.alertTitle}（</span>
         <span id="alert-city-name">{defaultCityName}</span>
         <span>）：</span>
       </div>
@@ -161,11 +157,9 @@ for (const city of cities) {
       </div>
     </div>
 
-    <!-- ▼ 予報セクション（JS で描画） -->
     <section class="forecast-section">
       <h2 class="section-title" id="forecast-title">{defaultCityName} {labels.title}</h2>
       <div class="forecast-container" id="forecast-container">
-        <!-- JS が描画 -->
       </div>
     </section>
 
@@ -180,24 +174,22 @@ for (const city of cities) {
   var page = document.querySelector('.weather-page');
   if (!page) return;
 
-  var storageKey   = page.getAttribute('data-storage-key') || '';
-  var allForecast  = JSON.parse(page.getAttribute('data-all-forecast') || '{}');
-  var cityNames    = JSON.parse(page.getAttribute('data-city-names') || '{}');
-  var labels       = JSON.parse(page.getAttribute('data-labels') || '{}');
-  var defaultCity  = page.getAttribute('data-default-city') || '';
+  var storageKey      = page.getAttribute('data-storage-key') || '';
+  var allForecast     = JSON.parse(page.getAttribute('data-all-forecast') || '{}');
+  var cityNames       = JSON.parse(page.getAttribute('data-city-names') || '{}');
+  var labels          = JSON.parse(page.getAttribute('data-labels') || '{}');
+  var defaultCity     = page.getAttribute('data-default-city') || '';
 
-  var alertCityName  = document.getElementById('alert-city-name');
-  var alertContent   = document.getElementById('alert-ticker-content');
-  var forecastTitle  = document.getElementById('forecast-title');
+  var alertCityName     = document.getElementById('alert-city-name');
+  var alertContent      = document.getElementById('alert-ticker-content');
+  var forecastTitle     = document.getElementById('forecast-title');
   var forecastContainer = document.getElementById('forecast-container');
 
-  // ▼ 日付フォーマット
   function formatDate(dateStr) {
     var d = new Date(dateStr);
     return (d.getMonth() + 1) + '/' + d.getDate();
   }
 
-  // ▼ 曜日（ブラウザのlangから判定）
   var dayLang = document.documentElement.lang || 'ja';
   var dayNamesMap = {
     ja:      ['日','月','火','水','木','金','土'],
@@ -214,7 +206,6 @@ for (const city of cities) {
     return dayNames[new Date(dateStr).getDay()];
   }
 
-  // ▼ 予報HTML生成
   function buildForecastHTML(forecastDays) {
     if (!forecastDays || forecastDays.length === 0) return '<p style="padding:20px;color:#666">--</p>';
     var html = '';
@@ -236,8 +227,6 @@ for (const city of cities) {
       html += '<div class="rain-info"><span class="value-text rain-val">' + day.day.daily_chance_of_rain + '%</span></div>';
       html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '</span></div>';
       html += '</button>';
-
-      // 時間別
       html += '<div id="hourly-' + index + '" class="hourly-details" hidden>';
       html += '<div class="hourly-scroll-wrapper"><table class="hourly-table">';
       html += '<thead><tr>';
@@ -266,7 +255,6 @@ for (const city of cities) {
     return html;
   }
 
-  // ▼ 表示更新
   function applyCity(cityKey, saveStorage) {
     if (!cityKey) return;
     var data = allForecast[cityKey];
@@ -274,8 +262,7 @@ for (const city of cities) {
 
     var cityName = cityNames[cityKey] || cityKey;
 
-    // アラート
-    if (alertCityName) alertCityName.textContent = '（' + cityName;
+    if (alertCityName) alertCityName.textContent = cityName;
     if (alertContent) {
       if (data.alertText) {
         alertContent.className = 'alert-ticker-text';
@@ -286,23 +273,19 @@ for (const city of cities) {
       }
     }
 
-    // タイトル
     if (forecastTitle) forecastTitle.textContent = cityName + ' ' + (labels.title || '');
 
-    // 予報HTML
     if (forecastContainer) {
       forecastContainer.innerHTML = buildForecastHTML(data.forecastDays);
       attachHourlyButtons();
       updateTimeFilter(data.timezone || 'Asia/Tokyo');
     }
 
-    // localStorage に保存
     if (saveStorage && storageKey) {
       try { localStorage.setItem(storageKey, cityKey); } catch(e) {}
     }
   }
 
-  // ▼ アコーディオンボタン
   function attachHourlyButtons() {
     document.querySelectorAll('.day-summary-btn').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
@@ -315,7 +298,6 @@ for (const city of cities) {
     });
   }
 
-  // ▼ 過去時間を非表示
   function updateTimeFilter(timezone) {
     var nowInCity = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone, year: 'numeric', month: '2-digit',
@@ -345,12 +327,10 @@ for (const city of cities) {
     });
   }
 
-  // ▼ サイドバーウィジェットから呼ばれる関数（グローバルに公開）
   window.updateWeatherMain = function(cityKey) {
     applyCity(cityKey, true);
   };
 
-  // ▼ 初期化：URLパラメーター → localStorage → デフォルト
   function init() {
     var urlParams = new URLSearchParams(window.location.search);
     var urlCity = urlParams.get('city');
@@ -365,7 +345,7 @@ for (const city of cities) {
 })();
 </script>
 
-<style>
+<style is:global>
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 12px; font-weight: bold; }
   .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
