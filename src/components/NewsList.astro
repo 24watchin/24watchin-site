@@ -1,12 +1,10 @@
 ---
 const { posts, getImageUrl } = Astro.props;
 
-// URLから言語を自動判定します
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 
-// 8言語対応の「もっと見る」テキスト
 const loadMoreText = {
   ja: 'もっと見る',
   en: 'Load More',
@@ -48,8 +46,7 @@ const buttonLabel = loadMoreText[lang] || loadMoreText['ja'];
   {posts.length > 5 && (
     <div class="button-container">
       <button id="load-more-btn" class="load-more-button">
-        <span class="btn-text">{buttonLabel}</span>
-        <span class="btn-icon">↓</span>
+        {buttonLabel}
       </button>
     </div>
   )}
@@ -92,12 +89,9 @@ const buttonLabel = loadMoreText[lang] || loadMoreText['ja'];
   .list-title { font-size: 1.1rem; margin: 0 0 0.5rem 0; line-height: 1.4; font-weight: bold; color: #1a1a1a; }
   .date { font-size: 0.85rem; color: #888; }
 
-  /* ▼ ボタンのデザイン */
   .button-container { text-align: center; margin-top: 3rem; }
   .load-more-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    display: inline-block;
     background: #fff;
     border: 2px solid #999;
     color: #555;
@@ -111,19 +105,11 @@ const buttonLabel = loadMoreText[lang] || loadMoreText['ja'];
     box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   }
   .load-more-button:hover {
-    background: #f5f5f5;
-    border-color: #666;
-    color: #333;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    background: #555;
+    border-color: #555;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     transform: translateY(-1px);
-  }
-  .btn-icon {
-    font-size: 0.85rem;
-    color: #888;
-    transition: transform 0.2s ease;
-  }
-  .load-more-button:hover .btn-icon {
-    transform: translateY(2px);
   }
 
   @media (max-width: 600px) {
