@@ -1,17 +1,12 @@
 ---
-// サイドバー用「編集部のおすすめ」共有メモ＆厳格フィルター版
-// ページの言語と国情報を受け取ります
 const { lang = 'ja', country = 'jp' } = Astro.props;
-const targetTag = `${lang}-${country}`;
+const targetTag = lang + '-' + country;
 
-// 1. 他のパーツ（index.astroなど）が用意した「共有メモ」をのぞく
 let allPosts = globalThis.bloggerPostsCache || [];
-
-// 2. 【保険】もしメモが空なら、代表して1回だけGoogleに電話する
 if (allPosts.length === 0) {
   const API_KEY = import.meta.env.API_KEY;
   const BLOG_ID = import.meta.env.BLOG_ID;
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
   const response = await fetch(url).catch(() => null);
   if (response && response.ok) {
     const data = await response.json();
@@ -20,17 +15,17 @@ if (allPosts.length === 0) {
   }
 }
 
-// 3. 【重要】このページと同じタグ（ja-jp など）を持つ記事だけを厳選（消去法ではなく、指定方式！）
-const safePosts = allPosts.filter(post => 
+// ▼ lang-country タグで厳選
+const safePosts = allPosts.filter(post =>
   post.labels && post.labels.includes(targetTag)
 );
 
-// 4. 「編集部①」などのタグを探して並べ替える仕組み（ここは元のロジックを維持）
+// ▼ 並べ替えロジック（EditorPicks.astroと同じ）
 const topPostsMap = new Map();
 const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩12345678910])$/;
-const numConverter = { 
+const numConverter: Record<string, number> = {
   '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10,
-  '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10 
+  '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10
 };
 
 safePosts.forEach(post => {
@@ -39,7 +34,7 @@ safePosts.forEach(post => {
     const match = label.match(topLabelRegex);
     if (match) {
       const num = numConverter[match[1]];
-      if (!topPostsMap.has(num)) { topPostsMap.set(num, post); }
+      if (!topPostsMap.has(num)) topPostsMap.set(num, post);
     }
   });
 });
@@ -54,22 +49,47 @@ const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/64x48/eeeeee/999999?text=No+Image';
 };
+
+// ▼ 多言語タイトル
+const titleMap: Record<string, string> = {
+  ja:      '編集部のおすすめ',
+  en:      "Editor's Picks",
+  'zh-cn': '编辑推荐',
+  'zh-tw': '編輯推薦',
+  es:      'Selección del editor',
+  fr:      'Sélection de la rédaction',
+  de:      'Empfehlungen der Redaktion',
+  ru:      'Выбор редакции',
+};
+const widgetTitle = titleMap[lang] || titleMap['en'];
+
+// ▼ サムネイルalt多言語化
+const thumbnailAltMap: Record<string, string> = {
+  ja:      'サムネイル',
+  en:      'Thumbnail',
+  'zh-cn': '缩略图',
+  'zh-tw': '縮圖',
+  es:      'Miniatura',
+  fr:      'Miniature',
+  de:      'Vorschaubild',
+  ru:      'Миниатюра',
+};
+const thumbnailAlt = thumbnailAltMap[lang] || thumbnailAltMap['en'];
 ---
 
 <div class="ep-container">
   <div class="ep-header">
-    <h3 class="ep-title">編集部のおすすめ</h3>
+    <h3 class="ep-title">{widgetTitle}</h3>
   </div>
 
   <ul class="ep-list">
     {displayPosts.map((post) => (
       <li class="ep-item">
         <div class="ep-info">
-          {/* リンクを自動化：どの言語ページでも正しく飛びます */}
-          <a href={`/${lang}/${country}/news/${post.id}/`} class="ep-post-title">{post.title}</a>
+          <a href={'/' + lang + '/' + country + '/news/' + post.id + '/'} class="ep-post-title">{post.title}</a>
         </div>
         <div class="ep-thumbnail">
-          <img src={getImageUrl(post.content)} alt="サムネイル" />
+          <img src={getImageUrl(post.content)} alt={thumbnailAlt} />
         </div>
       </li>
     ))}
@@ -77,9 +97,9 @@ const getImageUrl = (content) => {
 </div>
 
 <style>
-  /* スタイルは以前の綺麗なデザインをそのまま維持 */
-  .ep-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px 16px 16px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); font-family: sans-serif; }
-  .ep-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid #872732; padding-bottom: 6px; margin-bottom: 12px; }
+  .ep-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px 16px 16px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-family: sans-serif; }
+  /* ▼ テーマカラー適用 */
+  .ep-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid var(--theme-color, #872732); padding-bottom: 6px; margin-bottom: 12px; }
   .ep-title { font-size: 1.1rem; font-weight: bold; margin: 0; color: #1a1a1a; }
   .ep-list { list-style: none; padding: 0; margin: 0; }
   .ep-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px dashed #ccc; gap: 10px; }
