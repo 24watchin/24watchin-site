@@ -22,7 +22,6 @@ export async function getStaticPaths() {
 
 const { lang, country } = Astro.params;
 
-// 補助関数：画像抽出とテキスト抽出
 function extractImageSrc(html = '') {
   const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
   return match ? match[1] : '';
@@ -31,7 +30,6 @@ function stripHtml(html = '') {
   return html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
 }
 
-// 共有メモから記事を取得し、現在の「言語-地域」タグで絞り込む
 const rawPosts = globalThis.bloggerPostsCache || [];
 const targetTag = `${lang}-${country}`;
 const currentPosts = rawPosts.filter(post => 
@@ -46,7 +44,6 @@ const searchIndex = currentPosts.map((post) => ({
   plainText: stripHtml(post.content || ''),
 }));
 
-// テーマカラー設定
 const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
@@ -54,7 +51,6 @@ const langKey = langKeyMap[lang as keyof typeof langKeyMap] || 'jp';
 const themeData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
 const themeColor = themeData.themeColor;
 
-// 言語別ラベル
 const labels: Record<string, any> = {
   ja: { title: '検索結果', count: '件', noResult: 'に一致する記事は見つかりませんでした。', more: 'さらに表示' },
   en: { title: 'Search Results', count: 'results', noResult: 'No articles found for', more: 'Load More' },
@@ -69,7 +65,6 @@ const t = labels[lang] || labels['en'];
 ---
 
 <Layout title={t.title}>
-  {/* ▼ パンくずリストを枠の外に配置 */}
   <Breadcrumb lang={lang} country={country} categoryLabel={t.title} />
 
   <div class="search-main-wrapper">
@@ -117,7 +112,6 @@ const t = labels[lang] || labels['en'];
 
   function createCard(post) {
     const card = document.createElement('a');
-    // ▼ リンク先を現在の言語・地域に合わせて動的に作成
     card.href = `/${lang}/${country}/news/${post.id}/`;
     card.className = 'grid-item';
 
@@ -160,24 +154,79 @@ const t = labels[lang] || labels['en'];
   loadMoreBtn?.addEventListener('click', () => { displayItems(PAGE_SIZE); });
 </script>
 
-<style define:vars={{ themeColor }}>
-  .search-main-wrapper { width: 100%; min-width: 0; margin: 0; padding: 20px; box-sizing: border-box; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .search-header-area { margin: 0 0 25px 0; padding: 0 0 10px 0; border-bottom: 2px solid var(--themeColor); }
-  .search-title { font-size: 1.25rem; font-weight: bold; color: #333; }
-  .results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; width: 100%; }
-  .grid-item { display: block; text-decoration: none !important; color: inherit !important; }
-  .post-image-box { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #f0f0f0; border-radius: 4px; }
-  .post-image-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
-  .grid-item:hover img { transform: scale(1.05); }
-  .post-meta-line { margin: 10px 0 5px 0; font-size: 13px; color: #999; }
-  .post-title-text { font-size: 16px; font-weight: bold; line-height: 1.4; color: #333; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .grid-item:hover .post-title-text { color: var(--themeColor); text-decoration: underline; }
-  .no-results { margin-top: 40px; text-align: center; color: #666; font-size: 15px; }
-  .load-more-area { text-align: center; margin: 40px 0; }
-  .load-more-btn { background: #fff; border: 1px solid #ccc; padding: 12px 40px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
-  .load-more-btn:hover { border-color: var(--themeColor); color: var(--themeColor); }
+<style is:global define:vars={{ themeColor }}>
+  /* is:global を追加し、JSで生成される要素にもデザインが当たるようにしました */
+  .search-main-wrapper { 
+    width: 100%; 
+    min-width: 0; 
+    margin: 0; 
+    padding: 30px; 
+    box-sizing: border-box; 
+    background: #fff; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+  }
+  .search-header-area { 
+    margin-bottom: 30px; 
+    padding-bottom: 12px; 
+    border-bottom: 3px solid var(--themeColor); 
+  }
+  .search-title { font-size: 24px; font-weight: bold; color: #1a1a1a; margin: 0; }
   
-  @media (max-width: 1024px) { .results-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .search-main-wrapper { padding: 16px; } }
+  .results-grid { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 30px 20px; 
+    width: 100%; 
+  }
+  
+  .grid-item { display: block; text-decoration: none !important; color: inherit !important; }
+  .post-image-box { 
+    width: 100%; 
+    aspect-ratio: 16 / 9; 
+    overflow: hidden; 
+    background: #f0f0f0; 
+    border-radius: 6px; 
+    margin-bottom: 12px;
+  }
+  .post-image-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+  .grid-item:hover .post-image-box img { transform: scale(1.05); }
+  
+  .post-meta-line { font-size: 13px; color: #888; margin-bottom: 6px; }
+  
+  /* ▼ ここでタイトルの大きさを16pxにしっかり固定しました */
+  .post-title-text { 
+    font-size: 16px !important; 
+    font-weight: bold; 
+    line-height: 1.5; 
+    color: #1a1a1a; 
+    margin: 0;
+    display: -webkit-box; 
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+  }
+  .grid-item:hover .post-title-text { color: var(--themeColor); text-decoration: underline; }
+  
+  .no-results { margin: 60px 0; text-align: center; color: #666; font-size: 16px; }
+  .load-more-area { text-align: center; margin: 50px 0; }
+  .load-more-btn { 
+    background: #fff; 
+    border: 2px solid var(--themeColor); 
+    color: var(--themeColor);
+    padding: 12px 50px; 
+    border-radius: 30px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    transition: all 0.2s; 
+  }
+  .load-more-btn:hover { background: var(--themeColor); color: #fff; }
+  
+  @media (max-width: 1024px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) { 
+    .results-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 15px; } 
+    .search-main-wrapper { padding: 20px 15px; }
+    .search-title { font-size: 20px; }
+  }
   @media (max-width: 480px) { .results-grid { grid-template-columns: 1fr; } }
 </style>
