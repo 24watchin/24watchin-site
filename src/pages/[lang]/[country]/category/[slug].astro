@@ -69,8 +69,8 @@ const API_KEY = import.meta.env.API_KEY;
 const cacheKey = 'bloggerPostsCache_' + lang;
 
 if (!globalThis[cacheKey]) {
-  // ★ ここでもAstroの記憶を無視して必ず最新を取りに行かせます
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID.trim()}/posts?key=${API_KEY.trim()}&maxResults=500&nocache=${Date.now()}`;
+  // ★ ここもエラーの原因だった .trim() を削除しました！
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
   
   globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
     .then(res => res.ok ? res.json() : { items: [] })
@@ -109,7 +109,7 @@ const getImageUrl = (content) => {
 const countryLabelMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
-  ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
+  ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿联酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
   au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
   gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'Großbritannien', ru: 'Великобритания' },
   sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
