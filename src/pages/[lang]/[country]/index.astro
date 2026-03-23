@@ -40,31 +40,31 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ 共有メモ（原因調査用の探偵版）
+// ▼ 共有メモ（キャッシュ強制無視＆待ち合わせ機能付き）
 const cacheKey = 'bloggerPostsCache_' + lang;
 
 if (!globalThis[cacheKey]) {
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
-  globalThis[cacheKey] = fetch(url).then(async res => {
-    if (!res.ok) {
-      const text = await res.text();
-      return { error: `[APIエラー ${res.status}] ${text}`, items: [] };
-    }
-    const data = await res.json();
-    return { error: null, items: data.items || [] };
-  }).catch(err => {
-    return { error: `[通信エラー] ${err.message}`, items: [] };
-  });
+  // ★ nocache=${Date.now()} をつけることで、Astroの記憶を無視して毎回必ず最新を取りに行かせます
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID.trim()}/posts?key=${API_KEY.trim()}&maxResults=500&nocache=${Date.now()}`;
+  
+  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
+    .then(res => res.ok ? res.json() : { items: [] })
+    .then(data => data.items || [])
+    .catch(err => {
+      console.error("記事の取得に失敗しました", err);
+      return [];
+    });
 }
 
-const cacheResult = await globalThis[cacheKey];
-const allPosts = cacheResult.items || [];
-const debugError = cacheResult.error;
+let allPosts = await globalThis[cacheKey];
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
+}
 
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.includes(targetTag);
+  return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
 });
 
 const langKeyMap = {
@@ -108,23 +108,6 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
 ---
 
 <Layout title={pageTitle} allPosts={allPosts}>
-  
-  {/* ▼ 探偵パネル：エラー時や記事0件の時だけ表示されます ▼ */}
-  {(debugError || allPosts.length === 0) && (
-    <div style="background: #ffebee; border: 2px solid #f44336; padding: 20px; margin: 20px; color: #b71c1c; border-radius: 8px;">
-      <h2 style="margin-top: 0;">🚨 記事が取得できていません（原因調査パネル）</h2>
-      <ul style="font-weight: bold; font-size: 16px; line-height: 1.8;">
-        <li>対象ページ: /{lang}/{country}/</li>
-        <li>BLOG_ID: {BLOG_ID ? BLOG_ID : '取得失敗（未設定）'}</li>
-        <li>API_KEY: {API_KEY ? '設定済み' : '取得失敗（未設定）'}</li>
-        <li>エラー内容: {debugError || 'エラーはありませんが、記事が0件です'}</li>
-        <li>Bloggerから取得できた全記事数: {allPosts.length}件</li>
-        <li>「{targetTag}」タグのついた記事数: {mainSitePosts.length}件</li>
-      </ul>
-    </div>
-  )}
-  {/* ▲ ここまで ▲ */}
-
   <div slot="top-full">
     <MainNewsLayout posts={mainSitePosts} lang={lang} country={country} />
     <TrendScroll lang={lang} country={country} />
@@ -147,8 +130,8 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
           ))}
         </>
       ) : (
-        <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666; font-weight: bold;">
-          記事データを取得できませんでした。上の赤いパネルを確認してください。
+        <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
+          現在記事を準備中です。
         </p>
       )}
   </div>
