@@ -10,7 +10,6 @@ import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/category
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
-
   const langCountryPairs = [
     { lang: 'ja',    country: 'jp',  blogId: import.meta.env.BLOG_ID_JA },
     { lang: 'en',    country: 'jp',  blogId: import.meta.env.BLOG_ID_EN },
@@ -32,7 +31,6 @@ export async function getStaticPaths() {
     { lang: 'de',    country: 'de',  blogId: import.meta.env.BLOG_ID_DE },
     { lang: 'ru',    country: 'jp',  blogId: import.meta.env.BLOG_ID_RU },
   ];
-
   const paths = [];
   for (const { lang, country, blogId } of langCountryPairs) {
     if (!blogId) continue;
@@ -43,14 +41,9 @@ export async function getStaticPaths() {
       const data = await response.json();
       const posts = data.items || [];
       const targetTag = lang + '-' + country;
-      const filteredPosts = posts.filter(p =>
-        p.labels && p.labels.includes(targetTag)
-      );
+      const filteredPosts = posts.filter(p => p.labels && p.labels.includes(targetTag));
       for (const post of filteredPosts) {
-        paths.push({
-          params: { lang, country, id: post.id },
-          props: { post, allPosts: posts },
-        });
+        paths.push({ params: { lang, country, id: post.id }, props: { post, allPosts: posts } });
       }
     } catch (e) {}
   }
@@ -59,11 +52,7 @@ export async function getStaticPaths() {
 
 const { post, allPosts = [] } = Astro.props;
 const { lang, country } = Astro.params;
-
-const localeKeyMap: Record<string, string> = {
-  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
-  es: 'es', fr: 'fr', de: 'de', ru: 'ru',
-};
+const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', fr: 'fr', de: 'de', ru: 'ru' };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
@@ -79,43 +68,37 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
   ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
-  au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
-  gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'Großbritannien', ru: 'Великобритания' },
-  sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Синガポール' },
-  ca: { ja: 'カナダ',   en: 'Canada',       'zh-cn': 'カナダ', 'zh-tw': 'カナダ', es: 'Canadá', fr: 'Canada', de: 'Kanada', ru: 'カナダ' },
-  cn: { ja: '中国',     en: 'China',        'zh-cn': '中国', 'zh-tw': '中國', es: 'China', fr: 'Chine', de: 'China', ru: 'Китай' },
-  tw: { ja: '台湾',     en: 'Taiwan',       'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán', fr: 'Taïwan', de: 'Taiwan', ru: 'Тайвань' },
-  es: { ja: 'スペイン', en: 'Spain',        'zh-cn': 'スペイン', 'zh-tw': 'スペイン', es: 'España', fr: 'Espagne', de: 'Spanien', ru: 'スペイン' },
-  fr: { ja: 'フランス', en: 'France',       'zh-cn': 'フランス', 'zh-tw': 'フランス', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'フランス' },
-  de: { ja: 'ドイツ',   en: 'Germany',      'zh-cn': 'ドイツ', 'zh-tw': 'ドイツ', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'ドイツ' },
 };
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 const countryHref = '/' + lang + '/' + country + '/';
 
 function formatDateTime(dateString: string) {
   const date = new Date(dateString);
-  return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
-    + ' ' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+  return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' ' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
 }
 
 const targetTag = lang + '-' + country;
-const safePosts = allPosts.filter(p =>
-  p.id !== post.id &&
-  p.labels &&
-  p.labels.includes(targetTag)
-);
-
+const safePosts = allPosts.filter(p => p.id !== post.id && p.labels && p.labels.includes(targetTag));
 const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + post.id + '/';
+
+// 言語別ラベル
+const btnLabels: Record<string, string> = {
+  ja: 'サイズ', en: 'Size', 'zh-cn': '大小', 'zh-tw': '大小',
+  es: 'Tamaño', fr: 'Taille', de: 'Größe', ru: 'Размер'
+};
+const btnTitle = btnLabels[lang] || btnLabels['en'];
 ---
 
 <Layout title={post.title} sidebarType="article">
   <div class="article-breadcrumb-wrap">
-    <Breadcrumb
-      countryLabel={countryLabel}
-      countryHref={countryHref}
-      categoryLabel={categoryLabel}
-      categoryHref={categoryHref}
-    />
+    <Breadcrumb countryLabel={countryLabel} countryHref={countryHref} categoryLabel={categoryLabel} categoryHref={categoryHref} />
+    
+    {/* ▼ 文字サイズ切り替えボタンをパンくずリストの右側に配置 */}
+    <div class="font-size-selector" aria-label={btnTitle}>
+      <button class="size-btn" data-size="s">小</button>
+      <button class="size-btn active" data-size="m">中</button>
+      <button class="size-btn" data-size="l">大</button>
+    </div>
   </div>
 
   <article class="post-container">
@@ -126,7 +109,9 @@ const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + 
         <ShareButtons articleUrl={articleUrl} articleTitle={post.title} />
       </div>
     </header>
-    <div class="post-content" set:html={post.content} />
+
+    <div id="post-body" class="post-content font-m" set:html={post.content} />
+    
     <ReactionBar articleId={post.id} />
   </article>
 
@@ -137,19 +122,75 @@ const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + 
   </div>
 </Layout>
 
+<script is:inline>
+  const body = document.getElementById('post-body');
+  const buttons = document.querySelectorAll('.size-btn');
+
+  // スマホ判定（画面幅が768px以下の場合のみ機能を有効化）
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    const savedSize = localStorage.getItem('articleFontSize') || 'm';
+    applySize(savedSize);
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const size = btn.getAttribute('data-size');
+        applySize(size);
+        localStorage.setItem('articleFontSize', size);
+      });
+    });
+  }
+
+  function applySize(size) {
+    if (!body) return;
+    body.classList.remove('font-s', 'font-m', 'font-l');
+    body.classList.add('font-' + size);
+    
+    buttons.forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-size') === size);
+    });
+  }
+</script>
+
 <style>
-  .article-breadcrumb-wrap { margin: -10px 0 6px; }
+  /* パンくずリストとボタンを横並びにし、ボタンを右端へ */
+  .article-breadcrumb-wrap { 
+    margin: -10px 0 6px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ▼ PCではボタンを隠す */
+  .font-size-selector { display: none; }
+
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
+  
   .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 
-  /* ▼ スマホ版：左右の余白を詰め、文字を読みやすく調整 */
+  /* ▼ スマホ版の設定 */
   @media (max-width: 768px) {
-    .post-container { padding: 20px 10px; } /* 15pxから10pxにさらに削りました */
-    .post-title { font-size: 22px; } 
+    /* ボタンを表示 */
+    .font-size-selector { display: flex; align-items: center; gap: 4px; }
+    .size-btn { border: 1px solid #ccc; background: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; color: #666; }
+    .size-btn.active { background: #393737; color: #fff; border-color: #393737; }
+
+    .post-container { padding: 20px 15px; } 
+    .post-title { font-size: 22px; }
     .article-breadcrumb-wrap { margin: 0 0 10px; }
+
+    /* 本文のみサイズ調整を反映（H2見出しのサイズは維持） */
+    .post-content.font-m :global(p) { font-size: 17px; } /* 中（標準）：以前より大きく */
+    .post-content.font-s :global(p) { font-size: 15px; } /* 小 */
+    .post-content.font-l :global(p) { font-size: 19px; } /* 大 */
+    
+    /* H2見出しはバランスを考え固定（または微調整） */
+    .post-content :global(h2) { font-size: 20px !important; font-weight: bold; margin: 24px 0 12px; }
   }
 </style>
