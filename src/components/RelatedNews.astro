@@ -40,7 +40,8 @@ const getImageUrl = (content) => {
 
 <style>
   .bottom-section { margin-bottom: 50px; }
-  .section-title { font-size: 20px; color: #1a1a1a; margin-bottom: 20px; border-bottom: 3px solid #872732; padding-bottom: 10px; display: inline-block; font-weight: bold; }
+  /* ↓ border-bottom を削除！赤線がなくなります */
+  .section-title { font-size: 20px; color: #1a1a1a; margin-bottom: 20px; padding-bottom: 10px; display: inline-block; font-weight: bold; }
   .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
   .related-card { text-decoration: none; color: #1a1a1a; display: block; }
   .related-card:hover .related-text h4 { text-decoration: underline; }
