@@ -40,22 +40,23 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ 言語別キャッシュ
+// ▼ 言語別キャッシュ（API制限回避の最強版）
 const cacheKey = 'bloggerPostsCache_' + lang;
-if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
-  try {
-    const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
-    const response = await fetch(url).catch(() => null);
-    if (response && response.ok) {
-      const data = await response.json();
-      globalThis[cacheKey] = data.items || [];
-    }
-  } catch (e) {
-    console.error("記事の取得に失敗しました", e);
-  }
+
+// まだ誰もBloggerに取りに行っていない場合だけ、取得の「タスク」をメモする
+if (!globalThis[cacheKey]) {
+  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
+  globalThis[cacheKey] = fetch(url)
+    .then(res => res.ok ? res.json() : { items: [] })
+    .then(data => data.items || [])
+    .catch(err => {
+      console.error("記事の取得に失敗しました", err);
+      return [];
+    });
 }
 
-const allPosts = globalThis[cacheKey] || [];
+// 同時に作られている他のページも、最初の1回が終わるのをここでお行儀よく待つ
+const allPosts = await globalThis[cacheKey];
 
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
@@ -113,23 +114,24 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
   <GoogleAdBanner position="上部" />
 
   <div class="genre-grid">
-    {allPosts.length > 0 ? (
-      <>
-        {categoryItems.map((cat) => (
-          <CategoryNews
-            title={cat.title}
-            slug={cat.slug}
-            posts={cat.posts}
-            lang={lang}
-            country={country}
-          />
-        ))}
-      </>
-    ) : (
-      <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
-        Loading news. Please refresh in a few minutes.
-      </p>
-    )}
+    {allPosts.length > 0 ?
+      (
+        <>
+          {categoryItems.map((cat) => (
+            <CategoryNews
+              title={cat.title}
+              slug={cat.slug}
+              posts={cat.posts}
+              lang={lang}
+              country={country}
+            />
+          ))}
+        </>
+      ) : (
+        <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
+          Loading news. Please refresh in a few minutes.
+        </p>
+      )}
   </div>
 
   <GoogleAdBanner position="下部" />
