@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import RelatedNews from '../../../components/RelatedNews.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
 import { getWeatherCondition, getUnitSystem, convertTemp, convertWind } from '../../../lib/weatherConditions';
 import { countryCityMap } from '../../../lib/cityConfig';
 
@@ -147,6 +148,63 @@ const allLabels: Record<string, Record<string, string>> = {
 };
 const labels = allLabels[lang] || allLabels['en'];
 
+// ============================================================
+// ▼▼▼ パンくずリスト用ラベル（追加部分） ▼▼▼
+// ============================================================
+
+// 天気予報・災害ページの名称（8言語）
+const weatherPageLabels: Record<string, string> = {
+  ja:      '天気予報・災害',
+  en:      'Weather Forecast & Disasters',
+  'zh-cn': '天气预报・灾害',
+  'zh-tw': '天氣預報・災害',
+  es:      'Pronóstico del Tiempo y Desastres',
+  fr:      'Prévisions Météo et Catastrophes',
+  de:      'Wettervorhersage & Katastrophen',
+  ru:      'Прогноз погоды и катастрофы',
+};
+const weatherPageLabel = weatherPageLabels[lang] || weatherPageLabels['en'];
+
+// トップページへのリンク用 国名ラベル（言語×国コード）
+const countryLabelMap: Record<string, Record<string, string>> = {
+  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
+  us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
+  de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
+  fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
+  es: { ja: 'スペイン', en: 'Spain', 'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'España', fr: 'Espagne', de: 'Spanien', ru: 'Испания' },
+  gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'UK', ru: 'Великобритания' },
+  cn: { ja: '中国', en: 'China', 'zh-cn': '中国', 'zh-tw': '中國', es: 'China', fr: 'Chine', de: 'China', ru: 'Китай' },
+  tw: { ja: '台湾', en: 'Taiwan', 'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán', fr: 'Taïwan', de: 'Taiwan', ru: 'Тайвань' },
+  ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'ÉAU', de: 'VAE', ru: 'ОАЭ' },
+  au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳大利亞', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
+  sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
+  ca: { ja: 'カナダ', en: 'Canada', 'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá', fr: 'Canada', de: 'Kanada', ru: 'Канада' },
+  nz: { ja: 'ニュージーランド', en: 'New Zealand', 'zh-cn': '新西兰', 'zh-tw': '紐西蘭', es: 'Nueva Zelanda', fr: 'Nouvelle-Zélande', de: 'Neuseeland', ru: 'Новая Зеландия' },
+  hk: { ja: '香港', en: 'Hong Kong', 'zh-cn': '香港', 'zh-tw': '香港', es: 'Hong Kong', fr: 'Hong Kong', de: 'Hongkong', ru: 'Гонконг' },
+  in: { ja: 'インド', en: 'India', 'zh-cn': '印度', 'zh-tw': '印度', es: 'India', fr: 'Inde', de: 'Indien', ru: 'Индия' },
+  my: { ja: 'マレーシア', en: 'Malaysia', 'zh-cn': '马来西亚', 'zh-tw': '馬來西亞', es: 'Malasia', fr: 'Malaisie', de: 'Malaysia', ru: 'Малайзия' },
+  ph: { ja: 'フィリピン', en: 'Philippines', 'zh-cn': '菲律宾', 'zh-tw': '菲律賓', es: 'Filipinas', fr: 'Philippines', de: 'Philippinen', ru: 'Филиппины' },
+  th: { ja: 'タイ', en: 'Thailand', 'zh-cn': '泰国', 'zh-tw': '泰國', es: 'Tailandia', fr: 'Thaïlande', de: 'Thailand', ru: 'Таイランド' },
+  vn: { ja: 'ベトナム', en: 'Vietnam', 'zh-cn': '越南', 'zh-tw': '越南', es: 'Vietnam', fr: 'Vietnam', de: 'Vietnam', ru: 'Вьетнам' },
+  id: { ja: 'インドネシア', en: 'Indonesia', 'zh-cn': '印度尼西亚', 'zh-tw': '印尼', es: 'Indonesia', fr: 'Indonésie', de: 'Indonesien', ru: 'Индонезия' },
+  kr: { ja: '韓国', en: 'South Korea', 'zh-cn': '韩国', 'zh-tw': '韓國', es: 'Corea del Sur', fr: 'Corée du Sud', de: 'Südkorea', ru: 'Южная Корея' },
+  mx: { ja: 'メキシコ', en: 'Mexico', 'zh-cn': '墨西哥', 'zh-tw': '墨西哥', es: 'México', fr: 'Mexique', de: 'Mexiko', ru: 'Мексика' },
+  br: { ja: 'ブラジル', en: 'Brazil', 'zh-cn': '巴西', 'zh-tw': '巴西', es: 'Brasil', fr: 'Brésil', de: 'Brasilien', ru: 'Бразилия' },
+  za: { ja: '南アフリカ', en: 'South Africa', 'zh-cn': '南非', 'zh-tw': '南非', es: 'Sudáfrica', fr: 'Afrique du Sud', de: 'Südafrika', ru: 'ЮАР' },
+  eg: { ja: 'エジプト', en: 'Egypt', 'zh-cn': '埃及', 'zh-tw': '埃及', es: 'Egipto', fr: 'Égypte', de: 'Ägypten', ru: 'Египет' },
+  qa: { ja: 'カタール', en: 'Qatar', 'zh-cn': '卡塔尔', 'zh-tw': '卡達', es: 'Catar', fr: 'Qatar', de: 'Katar', ru: 'Катар' },
+  om: { ja: 'オマーン', en: 'Oman', 'zh-cn': '阿曼', 'zh-tw': '阿曼', es: 'Omán', fr: 'Oman', de: 'Oman', ru: 'Оман' },
+  sa: { ja: 'サウジアラビア', en: 'Saudi Arabia', 'zh-cn': '沙特阿拉伯', 'zh-tw': '沙烏地阿拉伯', es: 'Arabia Saudita', fr: 'Arabie Saoudite', de: 'Saudi-Arabien', ru: 'Саудовская Аравия' },
+  tr: { ja: 'トルコ', en: 'Turkey', 'zh-cn': '土耳其', 'zh-tw': '土耳其', es: 'Turquía', fr: 'Turquie', de: 'Türkei', ru: 'Турция' },
+  ar: { ja: 'アルゼンチン', en: 'Argentina', 'zh-cn': '阿根廷', 'zh-tw': '阿根廷', es: 'Argentina', fr: 'Argentine', de: 'Argentinien', ru: 'Аргентина' },
+  co: { ja: 'コロンビア', en: 'Colombia', 'zh-cn': '哥伦比亚', 'zh-tw': '哥倫比亞', es: 'Colombia', fr: 'Colombie', de: 'Kolumbien', ru: 'Колумбия' },
+};
+const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
+
+// ============================================================
+// ▲▲▲ パンくずリスト用ラベル（追加部分ここまで） ▲▲▲
+// ============================================================
+
 const cityNameMap: Record<string, string> = {};
 for (const city of cities) {
   cityNameMap[city.key] = city.display[lang] || city.display['en'] || city.key;
@@ -163,6 +221,15 @@ for (const city of cities) {
     data-temp-unit={tempUnit}
     data-wind-unit={windUnit}
   >
+
+    <!-- ▼▼▼ パンくずリスト（追加部分） ▼▼▼ -->
+    <Breadcrumb
+      countryLabel={countryLabel}
+      countryHref={`/${lang}/${country}/`}
+      categoryLabel={weatherPageLabel}
+      categoryHref=""
+    />
+    <!-- ▲▲▲ パンくずリスト（追加部分ここまで） ▲▲▲ -->
 
     <div class="alert-ticker-container">
       <div class="alert-ticker-label">
