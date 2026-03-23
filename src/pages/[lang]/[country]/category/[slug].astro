@@ -67,19 +67,21 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ 言語別キャッシュ
+// ▼ 言語別キャッシュ（API制限回避の最強版）
 const cacheKey = 'bloggerPostsCache_' + lang;
-if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
-  try {
-    const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
-    const response = await fetch(url).catch(() => null);
-    if (response && response.ok) {
-      const data = await response.json();
-      globalThis[cacheKey] = data.items || [];
-    }
-  } catch (e) {}
+
+if (!globalThis[cacheKey]) {
+  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
+  globalThis[cacheKey] = fetch(url)
+    .then(res => res.ok ? res.json() : { items: [] })
+    .then(data => data.items || [])
+    .catch(err => {
+      console.error("記事の取得に失敗しました", err);
+      return [];
+    });
 }
-const allPosts = globalThis[cacheKey] || [];
+
+const allPosts = await globalThis[cacheKey];
 
 const catData = labels.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : slug;
@@ -151,16 +153,17 @@ const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
     categoryHref={'/' + lang + '/' + country + '/category/' + slug + '/'}
   />
 
-  {categoryPosts.length > 0 ? (
-    <>
-      <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} lang={lang} country={country} />
-      <hr class="divider" />
-      <h2 class="section-title">{moreNewsTitle}</h2>
-      <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
-    </>
-  ) : (
-    <p class="empty-message">{emptyMessage}</p>
-  )}
+  {categoryPosts.length > 0 ?
+    (
+      <>
+        <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} lang={lang} country={country} />
+        <hr class="divider" />
+        <h2 class="section-title">{moreNewsTitle}</h2>
+        <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
+      </>
+    ) : (
+      <p class="empty-message">{emptyMessage}</p>
+    )}
 </Layout>
 
 <style>
