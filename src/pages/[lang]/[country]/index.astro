@@ -44,8 +44,8 @@ const API_KEY = import.meta.env.API_KEY;
 const cacheKey = 'bloggerPostsCache_' + lang;
 
 if (!globalThis[cacheKey]) {
-  // ★ nocache=${Date.now()} をつけることで、Astroの記憶を無視して毎回必ず最新を取りに行かせます
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID.trim()}/posts?key=${API_KEY.trim()}&maxResults=500&nocache=${Date.now()}`;
+  // ★ エラーの原因だった .trim() を削除しました！
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
   
   globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
     .then(res => res.ok ? res.json() : { items: [] })
@@ -100,7 +100,7 @@ const categoryItems = displayCategories.map(slug => {
 const pageTitleMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本のニュース', en: 'Japan News', 'zh-cn': '日本新闻', 'zh-tw': '日本新聞', es: 'Noticias de Japón', fr: 'Actualités du Japon', de: 'Japan Nachrichten', ru: 'Новости Японии' },
   us: { ja: 'アメリカのニュース', en: 'USA News', 'zh-cn': '美国新闻', 'zh-tw': '美國新聞', es: 'Noticias de EE.UU.', fr: 'Actualités des États-Unis', de: 'USA Nachrichten', ru: 'Новости США' },
-  ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿聯酋新聞', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
+  ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿联酋新闻', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
   de: { ja: 'ドイツのニュース', en: 'Germany News', 'zh-cn': '德国新闻', 'zh-tw': '德國新聞', es: 'Noticias de Alemania', fr: 'Actualités d\'Allemagne', de: 'Deutschland Nachrichten', ru: 'Новости Германии' },
   fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': '法国新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости Франции' },
 };
