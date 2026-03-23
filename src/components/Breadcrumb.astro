@@ -1,14 +1,38 @@
 ---
 const {
-  countryLabel = '日本',
-  countryHref = '/ja/jp/',
+  // 以前のページでエラーが出ないように、既存の項目も残しておきます
+  countryLabel, 
+  countryHref,
   categoryLabel = 'ニュース',
   categoryHref = '',
+  // ▼ 新しく追加：言語と国を受け取るための項目
+  lang = 'ja', 
+  country = 'jp' 
 } = Astro.props;
+
+// ▼ 新しく追加：各言語の「トップ（ホーム）」の翻訳辞書
+const homeLabels: Record<string, string> = {
+  ja: 'トップ',
+  en: 'Home',
+  'zh-cn': '首页',
+  'zh-tw': '首頁',
+  es: 'Inicio',
+  de: 'Startseite',
+  fr: 'Accueil',
+  ru: 'Главная',
+};
+
+// ▼ 新しく追加：表示する文字とリンクの自動判定
+// countryLabelが指定されていない場合は、上の辞書から現在の言語の「トップ」を選ぶ
+const displayHomeLabel = countryLabel || homeLabels[lang] || homeLabels['en'];
+
+// countryHrefが指定されていない場合は、現在の言語・国のトップページURLを自動で作る
+const displayHomeHref = countryHref || `/${lang}/${country}/`;
 ---
 
 <nav class="breadcrumb" aria-label="パンくずリスト">
-  <a href={countryHref} class="breadcrumb-link">{countryLabel}</a>
+  {/* 自動判定したリンクと文字を使います */}
+  <a href={displayHomeHref} class="breadcrumb-link">{displayHomeLabel}</a>
   <span class="breadcrumb-separator">＞</span>
 
   {categoryHref ? (
@@ -33,7 +57,7 @@ const {
   .breadcrumb-link {
     color: #666;
     text-decoration: none;
-    cursor: pointer; /* ← 追加！指マークが出るように */
+    cursor: pointer;
   }
 
   .breadcrumb-link.current {
