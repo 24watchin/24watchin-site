@@ -53,7 +53,6 @@ const localeKeyMap: Record<string, string> = {
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
-// ▼ 言語別BLOG_ID
 const blogIdMap: Record<string, string> = {
   ja:      import.meta.env.BLOG_ID_JA,
   en:      import.meta.env.BLOG_ID_EN,
@@ -67,12 +66,13 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ 共有メモ（API制限回避 ＆ 待ち合わせ機能付き）
 const cacheKey = 'bloggerPostsCache_' + lang;
 
 if (!globalThis[cacheKey]) {
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
-  globalThis[cacheKey] = fetch(url)
+  // ★ ここでもAstroの記憶を無視して必ず最新を取りに行かせます
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID.trim()}/posts?key=${API_KEY.trim()}&maxResults=500&nocache=${Date.now()}`;
+  
+  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
     .then(res => res.ok ? res.json() : { items: [] })
     .then(data => data.items || [])
     .catch(err => {
@@ -81,10 +81,7 @@ if (!globalThis[cacheKey]) {
     });
 }
 
-// 引換券の場合は、本物のデータが届くまで待ちます
 let allPosts = await globalThis[cacheKey];
-
-// 万が一エラーで配列以外が返ってきた場合の安全対策
 if (!Array.isArray(allPosts)) {
   allPosts = [];
 }
@@ -96,12 +93,12 @@ const keywords = catData ? catData.keywords : [slug];
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.includes(targetTag);
+  return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
 });
 
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => keywords.some(key => label.includes(key)));
+  return post.labels.some(label => keywords.some(key => label.toLowerCase().includes(key.toLowerCase())));
 });
 
 const getImageUrl = (content) => {
