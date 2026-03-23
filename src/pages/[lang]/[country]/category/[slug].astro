@@ -5,7 +5,6 @@ import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
 import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels.ts';
 
-// ▼ トップページと同じく、最初に全カテゴリ分のデータを準備します
 export async function getStaticPaths() {
   const langCountryPairs = [
     { lang: 'ja',    country: 'jp' },
@@ -29,65 +28,41 @@ export async function getStaticPaths() {
     { lang: 'ru',    country: 'jp' },
   ];
 
-  const API_KEY = import.meta.env.API_KEY;
-  const blogIdMap: Record<string, string> = {
-    ja: import.meta.env.BLOG_ID_JA,
-    en: import.meta.env.BLOG_ID_EN,
-    'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
-    'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
-    es: import.meta.env.BLOG_ID_ES,
-    fr: import.meta.env.BLOG_ID_FR,
-    de: import.meta.env.BLOG_ID_DE,
-    ru: import.meta.env.BLOG_ID_RU,
-  };
-
   const localeKeyMap: Record<string, string> = {
     ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
     es: 'es', fr: 'fr', de: 'de', ru: 'ru',
   };
 
   const paths = [];
-  const postsByLang: Record<string, any[]> = {};
-
   for (const { lang, country } of langCountryPairs) {
-    if (!postsByLang[lang]) {
-      const BLOG_ID = blogIdMap[lang] || blogIdMap['ja'];
-      if (BLOG_ID) {
-        const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
-        try {
-          const response = await fetch(url);
-          if (response.ok) {
-            const data = await response.json();
-            postsByLang[lang] = data.items || [];
-          } else {
-            postsByLang[lang] = [];
-          }
-        } catch (e) {
-          postsByLang[lang] = [];
-        }
-      } else {
-        postsByLang[lang] = [];
-      }
-    }
-
     const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
-    // @ts-ignore
-    const labels = categoryLabelMap[localeKey] || categoryLabelMap['jp'];
-    const slugs = labels.allCategories.map((cat: any) => cat.slug);
-
+    const slugs = categoryLabelMap[localeKey].allCategories.map(cat => cat.slug);
     for (const slug of slugs) {
-      paths.push({ 
-        params: { lang, country, slug },
-        props: { allPosts: postsByLang[lang] }
-      });
+      paths.push({ params: { lang, country, slug } });
     }
   }
-
   return paths;
 }
 
 const { lang, country, slug } = Astro.params;
-const { allPosts = [] } = Astro.props;
+
+const blogIdMap: Record<string, string> = {
+  ja:      import.meta.env.BLOG_ID_JA,
+  en:      import.meta.env.BLOG_ID_EN,
+  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
+  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
+  es:      import.meta.env.BLOG_ID_ES,
+  fr:      import.meta.env.BLOG_ID_FR,
+  de:      import.meta.env.BLOG_ID_DE,
+  ru:      import.meta.env.BLOG_ID_RU,
+};
+const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
+const API_KEY = import.meta.env.API_KEY;
+
+const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
+const response = await fetch(url).catch(() => null);
+const data = response && response.ok ? await response.json() : { items: [] };
+const allPosts = data.items || [];
 
 const localeKeyMap: Record<string, string> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
@@ -103,32 +78,23 @@ const keywords = catData ? catData.keywords : [slug];
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
+  return post.labels.includes(targetTag);
 });
 
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => keywords.some((key: string) => label.toLowerCase().includes(key.toLowerCase())));
+  return post.labels.some(label => keywords.some(key => label.includes(key)));
 });
 
-const getImageUrl = (content: string) => {
+const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
 
 const countryLabelMap: Record<string, Record<string, string>> = {
-  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
+  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Яぽん' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
   ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
-  au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
-  gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'Großbritannien', ru: 'Великобритания' },
-  sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
-  ca: { ja: 'カナダ', en: 'Canada', 'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá', fr: 'Canada', de: 'Kanada', ru: 'Канада' },
-  cn: { ja: '中国', en: 'China', 'zh-cn': '中国', 'zh-tw': '中國', es: 'China', fr: 'Chine', de: 'China', ru: 'Китай' },
-  tw: { ja: '台湾', en: 'Taiwan', 'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán', fr: 'Taïwan', de: 'Taiwan', ru: 'Тайвань' },
-  es: { ja: 'スペイン', en: 'Spain', 'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'España', fr: 'Espagne', de: 'Spanien', ru: 'Испания' },
-  fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
-  de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
 };
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 const countryHref = '/' + lang + '/' + country + '/';
@@ -141,7 +107,7 @@ const moreNewsMap: Record<string, string> = {
   es:      'Más noticias de ' + categoryName,
   fr:      'Plus de nouvelles sur ' + categoryName,
   de:      'Weitere ' + categoryName + '-Nachrichten',
-  ru:      'Больше новостей: ' + categoryName,
+  ru:      'Большеニュース: ' + categoryName,
 };
 const moreNewsTitle = moreNewsMap[lang] || moreNewsMap['en'];
 
@@ -166,17 +132,16 @@ const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
     categoryHref={'/' + lang + '/' + country + '/category/' + slug + '/'}
   />
 
-  {categoryPosts.length > 0 ?
-    (
-      <>
-        <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} lang={lang} country={country} />
-        <hr class="divider" />
-        <h2 class="section-title">{moreNewsTitle}</h2>
-        <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
-      </>
-    ) : (
-      <p class="empty-message">{emptyMessage}</p>
-    )}
+  {categoryPosts.length > 0 ? (
+    <>
+      <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} lang={lang} country={country} />
+      <hr class="divider" />
+      <h2 class="section-title">{moreNewsTitle}</h2>
+      <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
+    </>
+  ) : (
+    <p class="empty-message">{emptyMessage}</p>
+  )}
 </Layout>
 
 <style>
