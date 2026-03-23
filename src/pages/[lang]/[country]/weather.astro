@@ -149,10 +149,9 @@ const allLabels: Record<string, Record<string, string>> = {
 const labels = allLabels[lang] || allLabels['en'];
 
 // ============================================================
-// ▼▼▼ パンくずリスト用ラベル（追加部分） ▼▼▼
+// ▼▼▼ パンくずリスト用ラベル ▼▼▼
 // ============================================================
 
-// 天気予報・災害ページの名称（8言語）
 const weatherPageLabels: Record<string, string> = {
   ja:      '天気予報・災害',
   en:      'Weather Forecast & Disasters',
@@ -165,7 +164,6 @@ const weatherPageLabels: Record<string, string> = {
 };
 const weatherPageLabel = weatherPageLabels[lang] || weatherPageLabels['en'];
 
-// トップページへのリンク用 国名ラベル（言語×国コード）
 const countryLabelMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
@@ -184,7 +182,7 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   in: { ja: 'インド', en: 'India', 'zh-cn': '印度', 'zh-tw': '印度', es: 'India', fr: 'Inde', de: 'Indien', ru: 'Индия' },
   my: { ja: 'マレーシア', en: 'Malaysia', 'zh-cn': '马来西亚', 'zh-tw': '馬來西亞', es: 'Malasia', fr: 'Malaisie', de: 'Malaysia', ru: 'Малайзия' },
   ph: { ja: 'フィリピン', en: 'Philippines', 'zh-cn': '菲律宾', 'zh-tw': '菲律賓', es: 'Filipinas', fr: 'Philippines', de: 'Philippinen', ru: 'Филиппины' },
-  th: { ja: 'タイ', en: 'Thailand', 'zh-cn': '泰国', 'zh-tw': '泰國', es: 'Tailandia', fr: 'Thaïlande', de: 'Thailand', ru: 'Таイランド' },
+  th: { ja: 'タイ', en: 'Thailand', 'zh-cn': '泰国', 'zh-tw': '泰國', es: 'Tailandia', fr: 'Thaïlande', de: 'Thailand', ru: 'Таиланд' },
   vn: { ja: 'ベトナム', en: 'Vietnam', 'zh-cn': '越南', 'zh-tw': '越南', es: 'Vietnam', fr: 'Vietnam', de: 'Vietnam', ru: 'Вьетнам' },
   id: { ja: 'インドネシア', en: 'Indonesia', 'zh-cn': '印度尼西亚', 'zh-tw': '印尼', es: 'Indonesia', fr: 'Indonésie', de: 'Indonesien', ru: 'Индонезия' },
   kr: { ja: '韓国', en: 'South Korea', 'zh-cn': '韩国', 'zh-tw': '韓國', es: 'Corea del Sur', fr: 'Corée du Sud', de: 'Südkorea', ru: 'Южная Корея' },
@@ -202,7 +200,7 @@ const countryLabelMap: Record<string, Record<string, string>> = {
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 
 // ============================================================
-// ▲▲▲ パンくずリスト用ラベル（追加部分ここまで） ▲▲▲
+// ▲▲▲ パンくずリスト用ラベルここまで ▲▲▲
 // ============================================================
 
 const cityNameMap: Record<string, string> = {};
@@ -212,6 +210,16 @@ for (const city of cities) {
 ---
 
 <Layout title={defaultCityName + ' | ' + labels.title} sidebarType="weather">
+
+  <!-- ▼▼▼ パンくずリスト：<main>の外！他ページと位置が揃います ▼▼▼ -->
+  <Breadcrumb
+    countryLabel={countryLabel}
+    countryHref={`/${lang}/${country}/`}
+    categoryLabel={weatherPageLabel}
+    categoryHref=""
+  />
+  <!-- ▲▲▲ パンくずリストここまで ▲▲▲ -->
+
   <main class="weather-page"
     data-storage-key={storageKey}
     data-all-forecast={JSON.stringify(allForecastData)}
@@ -221,15 +229,6 @@ for (const city of cities) {
     data-temp-unit={tempUnit}
     data-wind-unit={windUnit}
   >
-
-    <!-- ▼▼▼ パンくずリスト（追加部分） ▼▼▼ -->
-    <Breadcrumb
-      countryLabel={countryLabel}
-      countryHref={`/${lang}/${country}/`}
-      categoryLabel={weatherPageLabel}
-      categoryHref=""
-    />
-    <!-- ▲▲▲ パンくずリスト（追加部分ここまで） ▲▲▲ -->
 
     <div class="alert-ticker-container">
       <div class="alert-ticker-label">
@@ -295,7 +294,7 @@ for (const city of cities) {
     if (!forecastDays || forecastDays.length === 0) return '<p style="padding:20px;color:#666">--</p>';
     var html = '';
     forecastDays.forEach(function(day, index) {
-      var isMoonOnly = day.conditionIcon.includes('night/113.png');  // ▼ 修正！
+      var isMoonOnly = day.conditionIcon.includes('night/113.png');
       var iconClass = 'summary-icon' + (isMoonOnly ? ' moon-only' : '');
       html += '<div class="day-group" data-date="' + day.date + '">';
       html += '<button class="day-summary-btn" aria-expanded="false" data-target="hourly-' + index + '">';
@@ -323,7 +322,7 @@ for (const city of cities) {
       html += '</tr></thead><tbody>';
       day.hour.forEach(function(h) {
         var hHour = parseInt(h.time.split(':')[0]);
-        var hMoon = h.conditionIcon.includes('night/113.png');  // ▼ 修正！
+        var hMoon = h.conditionIcon.includes('night/113.png');
         html += '<tr class="hourly-row" data-hour="' + hHour + '">';
         html += '<td class="h-time value-text">' + h.time + '</td>';
         html += '<td class="h-icon"><img src="https:' + h.conditionIcon + '" alt="" class="' + (hMoon ? 'moon-only' : '') + '" />';
