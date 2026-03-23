@@ -7,10 +7,36 @@ const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/400x300/eeeeee/999999?text=No+Image';
 };
+
+// ▼ 多言語タイトル
+const titleMap: Record<string, string> = {
+  ja:      '関連記事',
+  en:      'Related Articles',
+  'zh-cn': '相关文章',
+  'zh-tw': '相關文章',
+  es:      'Artículos relacionados',
+  fr:      'Articles connexes',
+  de:      'Verwandte Artikel',
+  ru:      'Похожие статьи',
+};
+const sectionTitle = titleMap[lang] || titleMap['en'];
+
+// ▼ 「関連記事なし」メッセージも多言語化
+const emptyMap: Record<string, string> = {
+  ja:      '関連記事はまだありません。',
+  en:      'No related articles yet.',
+  'zh-cn': '暂无相关文章。',
+  'zh-tw': '暫無相關文章。',
+  es:      'No hay artículos relacionados aún.',
+  fr:      'Aucun article connexe pour le moment.',
+  de:      'Noch keine verwandten Artikel.',
+  ru:      'Похожих статей пока нет.',
+};
+const emptyText = emptyMap[lang] || emptyMap['en'];
 ---
 
 <div class="bottom-section">
-  <h3 class="section-title">関連記事</h3>
+  <h3 class="section-title">{sectionTitle}</h3>
 
   {relatedPosts.length > 0 ? (
     <div class="related-grid">
@@ -34,14 +60,14 @@ const getImageUrl = (content) => {
       ))}
     </div>
   ) : (
-    <p class="empty-text">関連記事はまだありません。</p>
+    <p class="empty-text">{emptyText}</p>
   )}
 </div>
 
 <style>
   .bottom-section { margin-bottom: 50px; }
-  /* ↓ border-bottom を削除！赤線がなくなります */
-  .section-title { font-size: 20px; color: #1a1a1a; margin-bottom: 20px; padding-bottom: 10px; display: inline-block; font-weight: bold; }
+  /* ▼ EditorPicksと同じスタイル！テーマカラーの下線 */
+  .section-title { font-size: 19px; color: #333; margin-bottom: 20px; border-bottom: 3px solid var(--theme-color, #872732); padding-bottom: 5px; display: inline-block; font-weight: bold; }
   .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
   .related-card { text-decoration: none; color: #1a1a1a; display: block; }
   .related-card:hover .related-text h4 { text-decoration: underline; }
