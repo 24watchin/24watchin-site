@@ -1,42 +1,10 @@
----
-import Layout from '../../../layouts/Layout.astro';
+// src/lib/info/aboutData.ts
 
-const currentPath = Astro.url.pathname;
-const pathParts = currentPath.split('/').filter(Boolean);
-const lang = pathParts[0] || 'ja';
-const country = pathParts[1] || 'jp';
-
-const titles: Record<string, string> = {
-  ja: 'About 24Watchin',
-  en: 'About 24Watchin',
-  de: 'Über 24Watchin',
-  fr: 'À propos de 24Watchin',
-  es: 'Acerca de 24Watchin',
-  ru: 'О 24Watchin',
-  'zh-cn': '关于 24Watchin',
-  'zh-tw': '關於 24Watchin',
-};
-
-const descriptions: Record<string, string> = {
-  ja: '24Watchinの運営者情報・サイト概要です。海外在住者向けの多言語グローバルニュースメディアです。',
-  en: 'About 24Watchin. A multilingual global news media for international residents around the world.',
-  de: 'Über 24Watchin. Ein mehrsprachiges globales Nachrichtenmedium für im Ausland lebende Menschen.',
-  fr: 'À propos de 24Watchin. Un média d\'information mondial multilingue pour les résidents étrangers.',
-  es: 'Acerca de 24Watchin. Un medio de comunicación global multilingüe para residentes en el extranjero.',
-  ru: 'О 24Watchin. Многоязычное глобальное новостное издание для иностранных резидентов.',
-  'zh-cn': '关于24Watchin。面向海外居民的多语言全球新闻媒体。',
-  'zh-tw': '關於24Watchin。面向海外居民的多語言全球新聞媒體。',
-};
-
-const pageTitle = titles[lang] ?? titles['en'];
-const pageDescription = descriptions[lang] ?? descriptions['en'];
----
-
-<Layout title={pageTitle} description={pageDescription} sidebarType="article">
-  <div class="info-container">
-    <h1 class="info-title">{pageTitle}</h1>
-    <div class="info-content">
-
+export const aboutData = {
+  ja: {
+    title: 'About 24Watchin',
+    description: '24Watchinの運営者情報・サイト概要です。海外在住者向けの多言語グローバルニュースメディアです。',
+    content: `
       <p class="lead">
         24Watchinは、海外で暮らす人々に向けて、現地のニュースや生活情報を<strong>母国語で</strong>わかりやすくお届けする、グローバル情報メディアです。
       </p>
@@ -86,7 +54,7 @@ const pageDescription = descriptions[lang] ?? descriptions['en'];
           <tr>
             <th>お問い合わせ</th>
             <td>
-              <a href={`/${lang}/${country}/contact/`}>お問い合わせフォームはこちら</a>
+              <a href="/ja/jp/contact/">お問い合わせフォームはこちら</a>
             </td>
           </tr>
         </table>
@@ -96,75 +64,88 @@ const pageDescription = descriptions[lang] ?? descriptions['en'];
         <h2>免責事項</h2>
         <p>
           掲載情報については、できる限り正確性・最新性に配慮しています。
-          詳細については、<a href={`/${lang}/${country}/terms/`}>利用規約</a>、<a href={`/${lang}/${country}/privacy/`}>プライバシーポリシー</a>、<a href={`/${lang}/${country}/corrections/`}>訂正・修正ポリシー</a>をご確認ください。
+          詳細については、<a href="/ja/jp/info/terms/">利用規約</a>、<a href="/ja/jp/info/privacy/">プライバシーポリシー</a>、<a href="/ja/jp/info/corrections/">訂正・修正ポリシー</a>をご確認ください。
         </p>
       </section>
+    `
+  },
+  en: {
+    title: 'About 24Watchin',
+    description: 'About 24Watchin. A multilingual global news media for international residents around the world.',
+    content: `
+      <p class="lead">This is a dummy text for the About page. The actual translated text will be inserted here later.</p>
+      <section>
+        <h2>Dummy Heading</h2>
+        <p>Dummy text...</p>
+      </section>
+    `
+  },
+  'zh-cn': {
+    title: '关于 24Watchin',
+    description: '关于24Watchin。面向海外居民的多语言全球新闻媒体。',
+    content: `
+      <p class="lead">这是关于页面的占位符文本（ダミーテキスト）。</p>
+      <section>
+        <h2>Dummy Heading</h2>
+        <p>占位符文本...</p>
+      </section>
+    `
+  },
+  'zh-tw': {
+    title: '關於 24Watchin',
+    description: '關於24Watchin。面向海外居民的多語言全球新聞媒體。',
+    content: `
+      <p class="lead">這是關於頁面的佔位符文本（ダミーテキスト）。</p>
+      <section>
+        <h2>Dummy Heading</h2>
+        <p>佔位符文本...</p>
+      </section>
+    `
+  },
+  es: {
+    title: 'Acerca de 24Watchin',
+    description: 'Acerca de 24Watchin. Un medio de comunicación global multilingüe para residentes en el extranjero.',
+    content: `
+      <p class="lead">Este es un texto simulado (dummy text) para la página Acerca de.</p>
+      <section>
+        <h2>Dummy Heading</h2>
+        <p>Texto simulado...</p>
+      </section>
+    `
+  },
+  de: {
+    title: 'Über 24Watchin',
+    description: 'Über 24Watchin. Ein mehrsprachiges globales Nachrichtenmedium für im Ausland lebende Menschen.',
+    content: `
+      <p class="lead">Dies ist ein Blindtext (dummy text) für die Über-Seite.</p>
+      <section>
+        <h2>Dummy Heading</h2>
+        <p>Blindtext...</p>
+      </section>
+    `
+  },
+  fr: {
+    title: 'À propos de 24Watchin',
+    description: 'À propos de 24Watchin. Un média d\'information mondial multilingue pour les résidents étrangers.',
+    content: `
+      <p class="lead">Ceci est un texte factice (dummy text) pour la page À propos.</p>
+      <section>
+        <h2>Dummy Heading</h2>
+        <p>Texte factice...</p>
+      </section>
+    `
+  },
+  ru: {
+    title: 'О 24Watchin',
+    description: 'О 24Watchin. Многоязычное глобальное новостное издание для иностранных резидентов.',
+    content: `
+      <p class="lead">Это фиктивный текст (dummy text) для страницы О нас.</p>
+      <section>
+        <h2>Dummy Heading</h2>
+        <p>Фиктивный текст...</p>
+      </section>
+    `
+  }
+} as const;
 
-    </div>
-  </div>
-</Layout>
-
-<style>
-  .info-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .info-title {
-    font-size: 26px;
-    color: #1a1a1a;
-    margin: 0 0 24px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #872732;
-  }
-  .lead {
-    font-size: 17px;
-    line-height: 1.8;
-    color: #1a1a1a;
-    background: #f8f4f4;
-    border-left: 4px solid #872732;
-    padding: 16px 20px;
-    border-radius: 4px;
-    margin-bottom: 32px;
-  }
-  .info-content section { margin-bottom: 32px; }
-  .info-content h2 {
-    font-size: 18px;
-    color: #1a1a1a;
-    margin: 0 0 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #872732;
-  }
-  .info-content p {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    margin-bottom: 12px;
-  }
-  .info-content a { color: #872732; text-decoration: underline; }
-  .info-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-  }
-  .info-table th {
-    width: 140px;
-    padding: 10px 16px;
-    background: #f8f4f4;
-    color: #555;
-    font-weight: bold;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .info-table td {
-    padding: 10px 16px;
-    border: 1px solid #e5e7eb;
-    color: #1a1a1a;
-  }
-  @media (max-width: 600px) {
-    .info-container { padding: 20px 16px; }
-    .info-table th { width: 100px; font-size: 13px; }
-  }
-</style>
+export type AboutDataKey = keyof typeof aboutData;
