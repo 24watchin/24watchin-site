@@ -1,6 +1,6 @@
 import rss from '@astrojs/rss';
 
-// ▼ どの言語・地域の組み合わせでRSSを作るかを指定します
+// ▼ 購読用ファイルを作成する言語・地域の組み合わせ
 export async function getStaticPaths() {
   return [
     { params: { lang: 'ja',    country: 'jp' } },
@@ -21,32 +21,40 @@ export async function getStaticPaths() {
 export async function GET(context) {
   const { lang, country } = context.params;
   const API_KEY = import.meta.env.API_KEY;
-  const BLOG_ID = import.meta.env.BLOG_ID;
-  
-  // Bloggerから全記事を取得
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}`;
+
+  // ▼ 表示している言語に合わせて、Cloudflare上の適切なブログIDを選択します
+  const blogIdMap = {
+    ja: 'BLOG_ID_JA',
+    en: 'BLOG_ID_EN',
+    de: 'BLOG_ID_DE',
+    fr: 'BLOG_ID_FR',
+    es: 'BLOG_ID_ES',
+    ru: 'BLOG_ID_RU',
+    'zh-cn': 'BLOG_ID_ZH_CN',
+    'zh-tw': 'BLOG_ID_ZH_TW'
+  };
+
+  const envKey = blogIdMap[lang] || 'BLOG_ID_JA';
+  const BLOG_ID = import.meta.env[envKey] || import.meta.env.BLOG_ID;
+
+  // ▼ Bloggerから、その言語・地域のタグがついた最新記事だけを直接取得します
+  const targetTag = `${lang}-${country}`;
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&labels=${targetTag}&maxResults=100`;
+
   const response = await fetch(url);
   const data = await response.json();
-  const allArticles = data.items || [];
-
-  // ▼ 現在の「言語-地域」（例：ja-jp）のタグがついている記事だけを絞り込みます
-  const targetTag = `${lang}-${country}`;
-  const filteredArticles = allArticles.filter(article => 
-    article.labels && article.labels.includes(targetTag)
-  );
+  const articles = data.items || [];
 
   return rss({
-    // タイトルも言語に合わせて変えたい場合はここを修正できます
     title: `24Watchin - ${lang.toUpperCase()}/${country.toUpperCase()}`,
     description: 'Global News Media for International Residents',
-    // ★ サイトの住所を現在の言語・地域に合わせます
-    site: `https://24watchin.com/${lang}/${country}/`, 
-    items: filteredArticles.map((article) => ({
+    // サイトの住所を各言語のトップページに合わせます
+    site: `https://24watchin.com/${lang}/${country}/`,
+    items: articles.map((article) => ({
       title: article.title,
       pubDate: new Date(article.published),
-      // ★ 記事のリンク先も現在の言語・地域のニュースページへ案内します
-      link: `/${lang}/${country}/news/${article.id}/`, 
+      // ニュース記事へのリンクも各言語のページを向くようにします
+      link: `/${lang}/${country}/news/${article.id}/`,
     })),
   });
 }
-
