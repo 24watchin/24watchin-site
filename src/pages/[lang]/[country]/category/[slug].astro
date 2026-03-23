@@ -67,11 +67,11 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ 言語別キャッシュ（API制限回避の最強版）
+// ▼ 共有メモ（API制限回避 ＆ 待ち合わせ機能付き）
 const cacheKey = 'bloggerPostsCache_' + lang;
 
 if (!globalThis[cacheKey]) {
-  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
   globalThis[cacheKey] = fetch(url)
     .then(res => res.ok ? res.json() : { items: [] })
     .then(data => data.items || [])
@@ -81,7 +81,13 @@ if (!globalThis[cacheKey]) {
     });
 }
 
-const allPosts = await globalThis[cacheKey];
+// 引換券の場合は、本物のデータが届くまで待ちます
+let allPosts = await globalThis[cacheKey];
+
+// 万が一エラーで配列以外が返ってきた場合の安全対策
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
+}
 
 const catData = labels.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : slug;
@@ -171,4 +177,3 @@ const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
   .section-title { font-size: 1.5rem; border-left: 5px solid var(--theme-color, #872732); padding-left: 1rem; font-weight: bold; margin-bottom: 1.25rem; color: #1a1a1a; }
   .empty-message { color: #666; font-size: 16px; margin: 20px 0 0; }
 </style>
-
