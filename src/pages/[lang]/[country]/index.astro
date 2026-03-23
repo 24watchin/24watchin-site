@@ -26,6 +26,7 @@ export async function getStaticPaths() {
 
 const { lang, country } = Astro.params;
 
+// ▼ 言語別BLOG_ID
 const blogIdMap: Record<string, string> = {
   ja:      import.meta.env.BLOG_ID_JA,
   en:      import.meta.env.BLOG_ID_EN,
@@ -39,11 +40,20 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// シンプルな取得方式に戻しました
-const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
-const response = await fetch(url).catch(() => null);
-const data = response && response.ok ? await response.json() : { items: [] };
-const allPosts = data.items || [];
+// ▼ 言語別キャッシュ
+const cacheKey = 'bloggerPostsCache_' + lang;
+if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
+  try {
+    const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
+    const response = await fetch(url).catch(() => null);
+    if (response && response.ok) {
+      const data = await response.json();
+      globalThis[cacheKey] = data.items || [];
+    }
+  } catch (e) {}
+}
+
+const allPosts = globalThis[cacheKey] || [];
 
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
@@ -81,12 +91,13 @@ const categoryItems = displayCategories.map(slug => {
   };
 });
 
+// ▼ 国別ページタイトル
 const pageTitleMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本のニュース', en: 'Japan News', 'zh-cn': '日本新闻', 'zh-tw': '日本新聞', es: 'Noticias de Japón', fr: 'Actualités du Japon', de: 'Japan Nachrichten', ru: 'Новости Японии' },
   us: { ja: 'アメリカのニュース', en: 'USA News', 'zh-cn': '美国新闻', 'zh-tw': '美國新聞', es: 'Noticias de EE.UU.', fr: 'Actualités des États-Unis', de: 'USA Nachrichten', ru: 'Новости США' },
   ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿聯酋新聞', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
   de: { ja: 'ドイツのニュース', en: 'Germany News', 'zh-cn': '德国新闻', 'zh-tw': '德國新聞', es: 'Noticias de Alemania', fr: 'Actualités d\'Allemagne', de: 'Deutschland Nachrichten', ru: 'Новости Германии' },
-  fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': '法国新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости フランス' },
+  fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': 'フランス新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости フランス' },
 };
 const pageTitle = pageTitleMap[country]?.[lang] || 'News';
 ---
@@ -114,7 +125,7 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
       </>
     ) : (
       <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
-        Loading news...
+        Loading news. Please refresh in a few minutes.
       </p>
     )}
   </div>
