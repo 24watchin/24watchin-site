@@ -7,59 +7,73 @@ import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
 import GlobalRegionNews from '../../../components/GlobalRegionNews.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
 
+// ▼ 作業員が走り出す前に、ここでデータを取得して各ページに配ります
 export async function getStaticPaths() {
-  return [
-    { params: { lang: 'ja',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'us' } },
-    { params: { lang: 'en',    country: 'ae' } },
-    { params: { lang: 'zh-cn', country: 'jp' } },
-    { params: { lang: 'zh-tw', country: 'jp' } },
-    { params: { lang: 'es',    country: 'jp' } },
-    { params: { lang: 'fr',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'jp' } },
-    { params: { lang: 'ru',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'de' } },
-    { params: { lang: 'fr',    country: 'fr' } },
+  const langCountryPairs = [
+    { lang: 'ja',    country: 'jp' },
+    { lang: 'en',    country: 'jp' },
+    { lang: 'en',    country: 'us' },
+    { lang: 'en',    country: 'ae' },
+    { lang: 'zh-cn', country: 'jp' },
+    { lang: 'zh-tw', country: 'jp' },
+    { lang: 'es',    country: 'jp' },
+    { lang: 'fr',    country: 'jp' },
+    { lang: 'de',    country: 'jp' },
+    { lang: 'ru',    country: 'jp' },
+    { lang: 'de',    country: 'de' },
+    { lang: 'fr',    country: 'fr' },
   ];
+
+  const API_KEY = import.meta.env.API_KEY;
+  const blogIdMap: Record<string, string> = {
+    ja: import.meta.env.BLOG_ID_JA,
+    en: import.meta.env.BLOG_ID_EN,
+    'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
+    'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
+    es: import.meta.env.BLOG_ID_ES,
+    fr: import.meta.env.BLOG_ID_FR,
+    de: import.meta.env.BLOG_ID_DE,
+    ru: import.meta.env.BLOG_ID_RU,
+  };
+
+  const paths = [];
+  const postsByLang: Record<string, any[]> = {};
+
+  // 各言語につき1回だけBloggerから記事を取得します
+  for (const { lang, country } of langCountryPairs) {
+    if (!postsByLang[lang]) {
+      const BLOG_ID = blogIdMap[lang] || blogIdMap['ja'];
+      if (BLOG_ID) {
+        const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            const data = await response.json();
+            postsByLang[lang] = data.items || [];
+          } else {
+            postsByLang[lang] = [];
+          }
+        } catch (e) {
+          postsByLang[lang] = [];
+        }
+      } else {
+        postsByLang[lang] = [];
+      }
+    }
+    
+    // 取得した記事データ（allPosts）をページに渡します
+    paths.push({ 
+      params: { lang, country },
+      props: { allPosts: postsByLang[lang] }
+    });
+  }
+
+  return paths;
 }
 
 const { lang, country } = Astro.params;
-
-// ▼ 言語別BLOG_ID
-const blogIdMap: Record<string, string> = {
-  ja:      import.meta.env.BLOG_ID_JA,
-  en:      import.meta.env.BLOG_ID_EN,
-  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
-  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
-  es:      import.meta.env.BLOG_ID_ES,
-  fr:      import.meta.env.BLOG_ID_FR,
-  de:      import.meta.env.BLOG_ID_DE,
-  ru:      import.meta.env.BLOG_ID_RU,
-};
-const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
-const API_KEY = import.meta.env.API_KEY;
-
-// ▼ 共有メモ（キャッシュ強制無視＆待ち合わせ機能付き）
-const cacheKey = 'bloggerPostsCache_' + lang;
-
-if (!globalThis[cacheKey]) {
-  // ★ エラーの原因だった .trim() を削除しました！
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
-  
-  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
-    .then(res => res.ok ? res.json() : { items: [] })
-    .then(data => data.items || [])
-    .catch(err => {
-      console.error("記事の取得に失敗しました", err);
-      return [];
-    });
-}
-
-let allPosts = await globalThis[cacheKey];
-if (!Array.isArray(allPosts)) {
-  allPosts = [];
-}
+// ▼ 配られた記事データを受け取ります
+const { allPosts = [] } = Astro.props;
 
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
@@ -80,16 +94,16 @@ const displayCategories = [
   'entertainment', 'sports', 'health-life', 'weather', 'traffic'
 ];
 
-const filterByCategory = (slug, count = 3) => {
-  const catData = categoryData.allCategories.find(c => c.slug === slug);
+const filterByCategory = (slug: string, count = 3) => {
+  const catData = categoryData.allCategories.find((c: any) => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
   return mainSitePosts.filter(post =>
-    post.labels?.some(label => keywords.some(key => label.includes(key)))
+    post.labels?.some(label => keywords.some((key: string) => label.includes(key)))
   ).slice(0, count);
 };
 
 const categoryItems = displayCategories.map(slug => {
-  const catData = categoryData.allCategories.find(c => c.slug === slug);
+  const catData = categoryData.allCategories.find((c: any) => c.slug === slug);
   return {
     slug,
     title: catData ? catData.label : slug,
@@ -100,7 +114,7 @@ const categoryItems = displayCategories.map(slug => {
 const pageTitleMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本のニュース', en: 'Japan News', 'zh-cn': '日本新闻', 'zh-tw': '日本新聞', es: 'Noticias de Japón', fr: 'Actualités du Japon', de: 'Japan Nachrichten', ru: 'Новости Японии' },
   us: { ja: 'アメリカのニュース', en: 'USA News', 'zh-cn': '美国新闻', 'zh-tw': '美國新聞', es: 'Noticias de EE.UU.', fr: 'Actualités des États-Unis', de: 'USA Nachrichten', ru: 'Новости США' },
-  ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿联酋新闻', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
+  ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿聯酋新聞', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
   de: { ja: 'ドイツのニュース', en: 'Germany News', 'zh-cn': '德国新闻', 'zh-tw': '德國新聞', es: 'Noticias de Alemania', fr: 'Actualités d\'Allemagne', de: 'Deutschland Nachrichten', ru: 'Новости Германии' },
   fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': '法国新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости Франции' },
 };
@@ -131,7 +145,7 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
         </>
       ) : (
         <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
-          現在記事を準備中です。
+          現在記事を準備中です。しばらくしてから再読み込みしてください。
         </p>
       )}
   </div>
