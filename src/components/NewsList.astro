@@ -1,11 +1,8 @@
 ---
-const { posts, getImageUrl } = Astro.props;
+// ▼ lang と country を props で受け取るように変更！（URLパース方式から切り替え）
+const { posts, getImageUrl, lang = 'ja', country = 'jp' } = Astro.props;
 
-const currentPath = Astro.url.pathname;
-const pathParts = currentPath.split('/').filter(Boolean);
-const lang = pathParts[0] || 'ja';
-
-const loadMoreText = {
+const loadMoreText: Record<string, string> = {
   ja: 'もっと見る',
   en: 'Load More',
   'zh-cn': '加载更多',
@@ -15,15 +12,22 @@ const loadMoreText = {
   de: 'Mehr laden',
   ru: 'Загрузить ещё',
 };
-
 const buttonLabel = loadMoreText[lang] || loadMoreText['ja'];
+
+// ▼ 日付フォーマット：言語に合わせる
+const localeMap: Record<string, string> = {
+  ja: 'ja-JP', en: 'en-US', 'zh-cn': 'zh-CN', 'zh-tw': 'zh-TW',
+  es: 'es-ES', fr: 'fr-FR', de: 'de-DE', ru: 'ru-RU',
+};
+const dateLocale = localeMap[lang] || 'en-US';
 ---
 
 <div class="news-list-container">
   <div class="more-news-list" id="news-list">
     {posts.map((post, index) => (
       <article class={`list-item ${index >= 5 ? 'is-hidden' : ''}`}>
-        <a href={`/ja/jp/news/${post.id}/`} class="item-link">
+        <!-- ▼ /ja/jp/ → /${lang}/${country}/ に修正！ -->
+        <a href={`/${lang}/${country}/news/${post.id}/`} class="item-link">
           <div class="image-wrapper">
             <img
               src={getImageUrl(post.content)}
@@ -35,7 +39,7 @@ const buttonLabel = loadMoreText[lang] || loadMoreText['ja'];
           <div class="list-content">
             <h4 class="list-title">{post.title}</h4>
             <time datetime={post.published} class="date">
-              {new Date(post.published).toLocaleDateString('ja-JP')}
+              {new Date(post.published).toLocaleDateString(dateLocale)}
             </time>
           </div>
         </a>
