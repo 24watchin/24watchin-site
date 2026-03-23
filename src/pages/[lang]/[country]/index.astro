@@ -40,36 +40,32 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ デバッグ（調査）用の変数を準備
-let debugMsg = "エラーなし";
-let fetchStatus = 0;
-
-// ▼ 以前の安定したキャッシュ方式
+// ▼ 共有メモ（API制限回避 ＆ 待ち合わせ機能付き）
 const cacheKey = 'bloggerPostsCache_' + lang;
-if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
-  try {
-    const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
-    const response = await fetch(url);
-    fetchStatus = response.status;
-    
-    if (response.ok) {
-      const data = await response.json();
-      globalThis[cacheKey] = data.items || [];
-    } else {
-      debugMsg = "API通信エラー: " + response.statusText;
-    }
-  } catch (e) {
-    debugMsg = "プログラムエラー: " + e.message;
-  }
+
+if (!globalThis[cacheKey]) {
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
+  globalThis[cacheKey] = fetch(url)
+    .then(res => res.ok ? res.json() : { items: [] })
+    .then(data => data.items || [])
+    .catch(err => {
+      console.error("記事の取得に失敗しました", err);
+      return [];
+    });
 }
 
-const allPosts = globalThis[cacheKey] || [];
-const targetTag = lang + '-' + country;
+// 引換券の場合は、本物のデータが届くまで待ちます
+let allPosts = await globalThis[cacheKey];
 
-// ▼ 念のため大文字小文字の違いを無視してタグを判定
+// 万が一エラーで配列以外が返ってきた場合の安全対策
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
+}
+
+const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
+  return post.labels.includes(targetTag);
 });
 
 const langKeyMap = {
@@ -113,18 +109,6 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
 ---
 
 <Layout title={pageTitle} allPosts={allPosts}>
-
-  <div style="background: #ffebee; border: 2px solid #f44336; padding: 15px; margin: 20px auto; max-width: 1280px; border-radius: 8px; color: #b71c1c;">
-    <h3 style="margin-top: 0; border-bottom: 1px solid #f44336; padding-bottom: 5px;">【原因調査用パネル】</h3>
-    <ul style="font-size: 15px; line-height: 1.6; font-weight: bold;">
-      <li>API通信ステータス: {fetchStatus === 0 ? 'キャッシュ利用' : fetchStatus}</li>
-      <li>エラー情報: {debugMsg}</li>
-      <li>APIキーの設定: {API_KEY ? 'あり' : 'なし（取得失敗）'}</li>
-      <li>ブログIDの設定: {BLOG_ID ? 'あり' : 'なし'}</li>
-      <li>Bloggerから取得できた全記事数: {allPosts.length} 件</li>
-      <li>「{targetTag}」タグで絞り込んだ後の記事数: {mainSitePosts.length} 件</li>
-    </ul>
-  </div>
   <div slot="top-full">
     <MainNewsLayout posts={mainSitePosts} lang={lang} country={country} />
     <TrendScroll lang={lang} country={country} />
@@ -148,7 +132,7 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
         </>
       ) : (
         <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
-          記事データを取得中です。またはエラーが発生しています。
+          記事データを取得中です。または記事がありません。
         </p>
       )}
   </div>
