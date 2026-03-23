@@ -65,7 +65,7 @@ const categorySlug = currentCategory ? currentCategory.slug : '';
 const categoryHref = categorySlug ? '/' + lang + '/' + country + '/category/' + categorySlug + '/' : '';
 
 const countryLabelMap: Record<string, Record<string, string>> = {
-  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Яぽん' },
+  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
   ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
 };
@@ -115,7 +115,7 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
 
   <div slot="bottom-wide">
     <RelatedNews relatedPosts={safePosts.slice(0, 6)} lang={lang} country={country} />
-    <RecommendedLinks />
+    <RecommendedLinks lang={lang} />
     <EditorPicks lang={lang} country={country} />
   </div>
 </Layout>
