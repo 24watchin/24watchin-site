@@ -1,8 +1,28 @@
 ---
-// 【24Watchin】以前のデザインを完全再現し、安定性を強化した検索ページ
 import Layout from '../../../layouts/Layout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
 
-// 補助関数：画像抽出とHTMLタグ削除（バックアップから継承）
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'ja',    country: 'jp' } },
+    { params: { lang: 'en',    country: 'jp' } },
+    { params: { lang: 'en',    country: 'us' } },
+    { params: { lang: 'en',    country: 'ae' } },
+    { params: { lang: 'zh-cn', country: 'jp' } },
+    { params: { lang: 'zh-tw', country: 'jp' } },
+    { params: { lang: 'es',    country: 'jp' } },
+    { params: { lang: 'fr',    country: 'jp' } },
+    { params: { lang: 'de',    country: 'jp' } },
+    { params: { lang: 'ru',    country: 'jp' } },
+    { params: { lang: 'de',    country: 'de' } },
+    { params: { lang: 'fr',    country: 'fr' } },
+  ];
+}
+
+const { lang, country } = Astro.params;
+
+// 補助関数
 function extractImageSrc(html = '') {
   const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
   return match ? match[1] : '';
@@ -11,31 +31,45 @@ function stripHtml(html = '') {
   return html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
 }
 
-// 【重要】index.astro が取得済みの「共有メモ」を再利用（電話はしません）
+// 共有メモから記事を取得して、現在の言語・地域タグで絞り込む
 const rawPosts = globalThis.bloggerPostsCache || [];
+const targetTag = `${lang}-${country}`;
+const currentPosts = rawPosts.filter(post => 
+  post.labels && post.labels.includes(targetTag)
+);
 
-const isForeignPost = (post) => {
-  if (!post.labels) return false;
-  return post.labels.some(label => /^[a-z]{2}-ja$/.test(label) && label !== 'jp-ja');
-};
-
-const mainSitePosts = rawPosts.filter(post => !isForeignPost(post));
-
-// 検索用データの作成（バックアップの構造を維持）
-const searchIndex = mainSitePosts.map((post) => ({
+// 検索用データの作成
+const searchIndex = currentPosts.map((post) => ({
   id: post.id,
   title: post.title || '',
   published: post.published || '',
   imageUrl: extractImageSrc(post.content || ''),
   plainText: stripHtml(post.content || ''),
 }));
+
+// テーマカラー設定
+const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
+};
+const langKey = langKeyMap[lang as keyof typeof langKeyMap] || 'jp';
+const themeData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
+const themeColor = themeData.themeColor;
+
+// 言語別タイトル
+const searchTitleMap: Record<string, string> = {
+  ja: '検索結果', en: 'Search Results', 'zh-cn': '搜索结果', 'zh-tw': '搜尋結果',
+  es: 'Resultados de búsqueda', de: 'Suchergebnisse', fr: 'Résultats de recherche', ru: 'Результаты поиска'
+};
+const pageTitle = searchTitleMap[lang as keyof typeof searchTitleMap] || searchTitleMap['en'];
 ---
 
-<Layout title="検索結果">
+<Layout title={pageTitle}>
+  <Breadcrumb lang={lang} country={country} categoryLabel={pageTitle} />
+  
   <div class="search-main-wrapper">
     <div class="search-header-area">
       <h1 class="search-title">
-        「<span id="displayWord"></span>」の検索結果：<span id="resultCount">0</span>件
+        「<span id="displayWord"></span>」の{pageTitle}：<span id="resultCount">0</span>件
       </h1>
     </div>
 
@@ -51,8 +85,7 @@ const searchIndex = mainSitePosts.map((post) => ({
   </div>
 </Layout>
 
-<script is:inline define:vars={{ searchIndex }}>
-  // ヘッダーからの検索ワード（q=...）を受け取る仕組み
+<script is:inline define:vars={{ searchIndex, lang, country }}>
   const params = new URLSearchParams(window.location.search);
   const q = (params.get('q') || '').trim();
   const searchWord = q.toLowerCase();
@@ -62,7 +95,6 @@ const searchIndex = mainSitePosts.map((post) => ({
   document.getElementById('displayWord').textContent = q;
   document.getElementById('displayWordNo').textContent = q;
 
-  // 共有メモから検索
   const filtered = searchIndex.filter((post) => {
     if (!searchWord) return false;
     return post.title.toLowerCase().includes(searchWord) || post.plainText.toLowerCase().includes(searchWord);
@@ -74,27 +106,24 @@ const searchIndex = mainSitePosts.map((post) => ({
   const loadMoreArea = document.getElementById('loadMoreArea');
   const noResults = document.getElementById('noResults');
   const loadMoreBtn = document.getElementById('loadMoreBtn');
-  
   let currentCount = 0;
   const PAGE_SIZE = 20;
 
-  // カード作成（バックアップのデザインを100%再現）
   function createCard(post) {
     const card = document.createElement('a');
-    card.href = `/ja/jp/news/${post.id}/`;
+    // ▼ リンク先を現在の言語・地域に合わせて動的に作成
+    card.href = `/${lang}/${country}/news/${post.id}/`;
     card.className = 'grid-item';
 
     const imageBox = document.createElement('div');
     imageBox.className = 'post-image-box';
-
     const img = document.createElement('img');
     img.src = post.imageUrl || PLACEHOLDER_IMAGE;
     img.alt = post.title || '';
-
     imageBox.appendChild(img);
+
     const metaLine = document.createElement('div');
     metaLine.className = 'post-meta-line';
-    
     const time = document.createElement('time');
     time.textContent = post.published ? dateFormatter.format(new Date(post.published)) : '';
     metaLine.appendChild(time);
@@ -106,15 +135,12 @@ const searchIndex = mainSitePosts.map((post) => ({
     card.appendChild(imageBox);
     card.appendChild(metaLine);
     card.appendChild(title);
-
     return card;
   }
 
   function displayItems(limit) {
     const nextItems = filtered.slice(currentCount, currentCount + limit);
-    nextItems.forEach((post) => {
-      grid.appendChild(createCard(post));
-    });
+    nextItems.forEach((post) => { grid.appendChild(createCard(post)); });
     currentCount += nextItems.length;
     loadMoreArea.style.display = currentCount < filtered.length ? 'block' : 'none';
   }
@@ -125,15 +151,12 @@ const searchIndex = mainSitePosts.map((post) => ({
     noResults.style.display = 'block';
   }
 
-  loadMoreBtn?.addEventListener('click', () => {
-    displayItems(PAGE_SIZE);
-  });
+  loadMoreBtn?.addEventListener('click', () => { displayItems(PAGE_SIZE); });
 </script>
 
-<style is:global>
-  /* バックアップのCSSをそのまま適用 */
+<style define:vars={{ themeColor }}>
   .search-main-wrapper { width: 100%; min-width: 0; margin: 0; padding: 20px; box-sizing: border-box; }
-  .search-header-area { margin: 0 0 25px 0; padding: 0 0 10px 0; border-bottom: 1px solid #ddd; }
+  .search-header-area { margin: 0 0 25px 0; padding: 0 0 10px 0; border-bottom: 2px solid var(--themeColor); }
   .search-title { font-size: 1.25rem; font-weight: bold; color: #333; }
   .results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; width: 100%; }
   .grid-item { display: block; text-decoration: none !important; color: inherit !important; }
@@ -141,9 +164,11 @@ const searchIndex = mainSitePosts.map((post) => ({
   .post-image-box img { width: 100%; height: 100%; object-fit: cover; }
   .post-meta-line { margin: 10px 0 5px 0; font-size: 13px; color: #999; }
   .post-title-text { font-size: 16px; font-weight: bold; line-height: 1.4; color: #333; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .post-title-text:hover { color: var(--themeColor); }
   .no-results { margin-top: 40px; text-align: center; color: #666; }
   .load-more-area { text-align: center; margin: 40px 0; }
   .load-more-btn { background: #fff; border: 1px solid #ccc; padding: 12px 40px; border-radius: 4px; cursor: pointer; }
+  .load-more-btn:hover { border-color: var(--themeColor); color: var(--themeColor); }
   
   @media (max-width: 1024px) { .results-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 768px) { .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
