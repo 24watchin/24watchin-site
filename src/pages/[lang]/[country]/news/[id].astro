@@ -65,7 +65,7 @@ const categorySlug = currentCategory ? currentCategory.slug : '';
 const categoryHref = categorySlug ? '/' + lang + '/' + country + '/category/' + categorySlug + '/' : '';
 
 const countryLabelMap: Record<string, Record<string, string>> = {
-  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
+  jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Яぽん' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
   ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
 };
@@ -176,15 +176,28 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
     .post-title { font-size: 22px; }
     .article-breadcrumb-wrap { margin: 0 0 10px; }
 
-    /* 本文全体の行間を詰め、文字サイズを再定義 */
+    /* 全体の行間を1.6に設定 */
     .post-content { line-height: 1.6 !important; }
 
-    /* 最初の数行の漏れを防ぐため、全体とタグ個別の両方にサイズを指定 */
-    .post-content.font-s, .post-content.font-s :global(*) { font-size: 17px !important; }
-    .post-content.font-m, .post-content.font-m :global(*) { font-size: 19px !important; }
-    .post-content.font-l, .post-content.font-l :global(*) { font-size: 21px !important; }
+    /* スマホ限定のサイズ適用（キャプション以外） */
+    .post-content.font-s { font-size: 17px !important; }
+    .post-content.font-s :global(*:not(.tr-caption):not(.tr-caption *)) { font-size: 17px !important; }
+
+    .post-content.font-m { font-size: 19px !important; }
+    .post-content.font-m :global(*:not(.tr-caption):not(.tr-caption *)) { font-size: 19px !important; }
+
+    .post-content.font-l { font-size: 21px !important; }
+    .post-content.font-l :global(*:not(.tr-caption):not(.tr-caption *)) { font-size: 21px !important; }
     
-    /* 見出し（H2）は大きくなりすぎないよう固定 */
+    /* ▼ 画像説明（キャプション）はサイズ固定 */
+    .post-content :global(.tr-caption),
+    .post-content :global(.tr-caption *) {
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+      color: #666 !important;
+    }
+
+    /* 見出し（H2）は大きくなりすぎないよう調整 */
     .post-content :global(h2) { font-size: 20px !important; font-weight: bold; margin: 24px 0 12px; }
   }
 </style>
