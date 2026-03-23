@@ -108,3 +108,4 @@ export const privacyData = {
 } as const;
 
 export type PrivacyDataKey = keyof typeof privacyData;
+
