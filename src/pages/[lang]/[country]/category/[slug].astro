@@ -5,6 +5,7 @@ import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
 import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels.ts';
 
+// ▼ トップページと同じく、最初に全カテゴリ分のデータを準備します
 export async function getStaticPaths() {
   const langCountryPairs = [
     { lang: 'ja',    country: 'jp' },
@@ -28,23 +29,65 @@ export async function getStaticPaths() {
     { lang: 'ru',    country: 'jp' },
   ];
 
+  const API_KEY = import.meta.env.API_KEY;
+  const blogIdMap: Record<string, string> = {
+    ja: import.meta.env.BLOG_ID_JA,
+    en: import.meta.env.BLOG_ID_EN,
+    'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
+    'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
+    es: import.meta.env.BLOG_ID_ES,
+    fr: import.meta.env.BLOG_ID_FR,
+    de: import.meta.env.BLOG_ID_DE,
+    ru: import.meta.env.BLOG_ID_RU,
+  };
+
   const localeKeyMap: Record<string, string> = {
     ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
     es: 'es', fr: 'fr', de: 'de', ru: 'ru',
   };
 
   const paths = [];
+  const postsByLang: Record<string, any[]> = {};
+
   for (const { lang, country } of langCountryPairs) {
+    if (!postsByLang[lang]) {
+      const BLOG_ID = blogIdMap[lang] || blogIdMap['ja'];
+      if (BLOG_ID) {
+        const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            const data = await response.json();
+            postsByLang[lang] = data.items || [];
+          } else {
+            postsByLang[lang] = [];
+          }
+        } catch (e) {
+          postsByLang[lang] = [];
+        }
+      } else {
+        postsByLang[lang] = [];
+      }
+    }
+
     const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
-    const slugs = categoryLabelMap[localeKey].allCategories.map(cat => cat.slug);
+    // @ts-ignore
+    const labels = categoryLabelMap[localeKey] || categoryLabelMap['jp'];
+    const slugs = labels.allCategories.map((cat: any) => cat.slug);
+
     for (const slug of slugs) {
-      paths.push({ params: { lang, country, slug } });
+      paths.push({ 
+        params: { lang, country, slug },
+        props: { allPosts: postsByLang[lang] }
+      });
     }
   }
+
   return paths;
 }
 
 const { lang, country, slug } = Astro.params;
+const { allPosts = [] } = Astro.props;
 
 const localeKeyMap: Record<string, string> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
@@ -52,39 +95,6 @@ const localeKeyMap: Record<string, string> = {
 };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
-
-const blogIdMap: Record<string, string> = {
-  ja:      import.meta.env.BLOG_ID_JA,
-  en:      import.meta.env.BLOG_ID_EN,
-  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
-  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
-  es:      import.meta.env.BLOG_ID_ES,
-  fr:      import.meta.env.BLOG_ID_FR,
-  de:      import.meta.env.BLOG_ID_DE,
-  ru:      import.meta.env.BLOG_ID_RU,
-};
-const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
-const API_KEY = import.meta.env.API_KEY;
-
-const cacheKey = 'bloggerPostsCache_' + lang;
-
-if (!globalThis[cacheKey]) {
-  // ★ ここもエラーの原因だった .trim() を削除しました！
-  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
-  
-  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
-    .then(res => res.ok ? res.json() : { items: [] })
-    .then(data => data.items || [])
-    .catch(err => {
-      console.error("記事の取得に失敗しました", err);
-      return [];
-    });
-}
-
-let allPosts = await globalThis[cacheKey];
-if (!Array.isArray(allPosts)) {
-  allPosts = [];
-}
 
 const catData = labels.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : slug;
@@ -98,10 +108,10 @@ const mainSitePosts = allPosts.filter(post => {
 
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => keywords.some(key => label.toLowerCase().includes(key.toLowerCase())));
+  return post.labels.some(label => keywords.some((key: string) => label.toLowerCase().includes(key.toLowerCase())));
 });
 
-const getImageUrl = (content) => {
+const getImageUrl = (content: string) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
@@ -109,7 +119,7 @@ const getImageUrl = (content) => {
 const countryLabelMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
-  ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿联酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
+  ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
   au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
   gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'Großbritannien', ru: 'Великобритания' },
   sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
