@@ -81,7 +81,6 @@ const targetTag = lang + '-' + country;
 const safePosts = allPosts.filter(p => p.id !== post.id && p.labels && p.labels.includes(targetTag));
 const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + post.id + '/';
 
-// 言語別ラベル
 const btnLabels: Record<string, string> = {
   ja: 'サイズ', en: 'Size', 'zh-cn': '大小', 'zh-tw': '大小',
   es: 'Tamaño', fr: 'Taille', de: 'Größe', ru: 'Размер'
@@ -93,7 +92,6 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
   <div class="article-breadcrumb-wrap">
     <Breadcrumb countryLabel={countryLabel} countryHref={countryHref} categoryLabel={categoryLabel} categoryHref={categoryHref} />
     
-    {/* ▼ 文字サイズ切り替えボタンをパンくずリストの右側に配置 */}
     <div class="font-size-selector" aria-label={btnTitle}>
       <button class="size-btn" data-size="s">小</button>
       <button class="size-btn active" data-size="m">中</button>
@@ -125,8 +123,6 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
 <script is:inline>
   const body = document.getElementById('post-body');
   const buttons = document.querySelectorAll('.size-btn');
-
-  // スマホ判定（画面幅が768px以下の場合のみ機能を有効化）
   const isMobile = window.innerWidth <= 768;
 
   if (isMobile) {
@@ -146,7 +142,6 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
     if (!body) return;
     body.classList.remove('font-s', 'font-m', 'font-l');
     body.classList.add('font-' + size);
-    
     buttons.forEach(b => {
       b.classList.toggle('active', b.getAttribute('data-size') === size);
     });
@@ -154,7 +149,6 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
 </script>
 
 <style>
-  /* パンくずリストとボタンを横並びにし、ボタンを右端へ */
   .article-breadcrumb-wrap { 
     margin: -10px 0 6px; 
     display: flex; 
@@ -162,8 +156,6 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
     align-items: center;
     gap: 10px;
   }
-
-  /* ▼ PCではボタンを隠す */
   .font-size-selector { display: none; }
 
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -171,12 +163,11 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
   
-  .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
+  /* PCの基本設定 */
+  .post-content { font-size: 16px; line-height: 1.7; color: #1a1a1a; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 
-  /* ▼ スマホ版の設定 */
   @media (max-width: 768px) {
-    /* ボタンを表示 */
     .font-size-selector { display: flex; align-items: center; gap: 4px; }
     .size-btn { border: 1px solid #ccc; background: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; color: #666; }
     .size-btn.active { background: #393737; color: #fff; border-color: #393737; }
@@ -185,12 +176,15 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
     .post-title { font-size: 22px; }
     .article-breadcrumb-wrap { margin: 0 0 10px; }
 
-    /* 本文のみサイズ調整を反映（H2見出しのサイズは維持） */
-    .post-content.font-m :global(p) { font-size: 17px; } /* 中（標準）：以前より大きく */
-    .post-content.font-s :global(p) { font-size: 15px; } /* 小 */
-    .post-content.font-l :global(p) { font-size: 19px; } /* 大 */
+    /* 本文全体の行間を詰め、文字サイズを再定義 */
+    .post-content { line-height: 1.6 !important; }
+
+    /* 最初の数行の漏れを防ぐため、全体とタグ個別の両方にサイズを指定 */
+    .post-content.font-s, .post-content.font-s :global(*) { font-size: 17px !important; }
+    .post-content.font-m, .post-content.font-m :global(*) { font-size: 19px !important; }
+    .post-content.font-l, .post-content.font-l :global(*) { font-size: 21px !important; }
     
-    /* H2見出しはバランスを考え固定（または微調整） */
+    /* 見出し（H2）は大きくなりすぎないよう固定 */
     .post-content :global(h2) { font-size: 20px !important; font-weight: bold; margin: 24px 0 12px; }
   }
 </style>
