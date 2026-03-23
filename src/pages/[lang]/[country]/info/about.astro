@@ -2,7 +2,7 @@
 import Layout from '../../../../layouts/Layout.astro';
 import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import { categoryLabelMap } from '../../../../lib/categoryLabels.ts';
-import { aboutData } from '../../../../lib/info/aboutData.ts'; // ステップ1で作った辞書を読み込みます
+import { aboutData } from '../../../../lib/info/aboutData.ts';
 
 export async function getStaticPaths() {
   return [
@@ -22,11 +22,8 @@ export async function getStaticPaths() {
 }
 
 const { lang, country } = Astro.params;
-
-// ▼ 現在の言語の文章データを取得します
 const currentAboutData = aboutData[lang as keyof typeof aboutData] || aboutData['en'];
 
-// ▼ テーマカラーを正確に取得するための変換機能です
 const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
@@ -36,85 +33,27 @@ const themeColor = themeData.themeColor;
 ---
 
 <Layout title={currentAboutData.title} description={currentAboutData.description} sidebarType="article">
+  {/* ▼ パンくずリストを枠の外に移動しました */}
+  <Breadcrumb lang={lang} country={country} categoryLabel={currentAboutData.title} />
+  
   <div class="info-container">
-    
-    <Breadcrumb lang={lang} country={country} categoryLabel={currentAboutData.title} />
-
     <h1 class="info-title">{currentAboutData.title}</h1>
     <div class="info-content">
-
-      {/* ▼ 辞書ファイルに書いたHTMLの文章を、ここに出力します */}
       <div set:html={currentAboutData.content}></div>
-
     </div>
   </div>
 </Layout>
 
 <style define:vars={{ themeColor }}>
-  .info-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .info-title {
-    font-size: 26px;
-    color: #1a1a1a;
-    margin: 0 0 24px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid var(--themeColor); /* テーマカラーに連動 */
-  }
-  
-  /* aboutページ特有のデザイン（.lead）も、外部から読み込むため :global() を付けます */
-  .info-content :global(.lead) {
-    font-size: 17px;
-    line-height: 1.8;
-    color: #1a1a1a;
-    background: #f8f4f4;
-    border-left: 4px solid var(--themeColor); /* テーマカラーに連動 */
-    padding: 16px 20px;
-    border-radius: 4px;
-    margin-bottom: 32px;
-  }
-  
+  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 24px; padding-bottom: 12px; border-bottom: 3px solid var(--themeColor); }
+  .info-content :global(.lead) { font-size: 17px; line-height: 1.8; color: #1a1a1a; background: #f8f4f4; border-left: 4px solid var(--themeColor); padding: 16px 20px; border-radius: 4px; margin-bottom: 32px; }
   .info-content :global(section) { margin-bottom: 32px; }
-  .info-content :global(h2) {
-    font-size: 18px;
-    color: #1a1a1a;
-    margin: 0 0 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--themeColor); /* テーマカラーに連動 */
-  }
-  .info-content :global(p) {
-    font-size: 15px;
-    line-height: 1.9;
-    color: #333;
-    margin-bottom: 12px;
-  }
+  .info-content :global(h2) { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--themeColor); }
+  .info-content :global(p) { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
   .info-content :global(a) { color: var(--themeColor); text-decoration: underline; }
-  
-  .info-content :global(.info-table) {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-  }
-  .info-content :global(.info-table th) {
-    width: 140px;
-    padding: 10px 16px;
-    background: #f8f4f4;
-    color: #555;
-    font-weight: bold;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .info-content :global(.info-table td) {
-    padding: 10px 16px;
-    border: 1px solid #e5e7eb;
-    color: #1a1a1a;
-  }
-  @media (max-width: 600px) {
-    .info-container { padding: 20px 16px; }
-    .info-content :global(.info-table th) { width: 100px; font-size: 13px; }
-  }
+  .info-content :global(.info-table) { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .info-content :global(.info-table th) { width: 140px; padding: 10px 16px; background: #f8f4f4; color: #555; font-weight: bold; border: 1px solid #e5e7eb; text-align: left; white-space: nowrap; }
+  .info-content :global(.info-table td) { padding: 10px 16px; border: 1px solid #e5e7eb; color: #1a1a1a; }
+  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-content :global(.info-table th) { width: 100px; font-size: 13px; } }
 </style>
