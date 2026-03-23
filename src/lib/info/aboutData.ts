@@ -149,3 +149,4 @@ export const aboutData = {
 } as const;
 
 export type AboutDataKey = keyof typeof aboutData;
+
