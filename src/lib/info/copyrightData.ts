@@ -1,0 +1,146 @@
+// src/lib/info/copyrightData.ts
+
+export const copyrightData = {
+  ja: {
+    title: '著作権・転載・引用について',
+    description: '24Watchinの著作権・転載・引用に関するポリシーです。コンテンツの利用ルールをご確認ください。',
+    lastUpdated: '最終更新日：2026年3月20日',
+    content: `
+      <p>24Watchin（以下「当サイト」といいます）に掲載される記事、見出し、文章、写真、画像、図表、動画、音声、ロゴ、デザイン、レイアウト、データその他一切のコンテンツ（以下「当サイトコンテンツ」といいます）に関する著作権、商標権、その他の知的財産権は、当サイト運営者または正当な権利者に帰属します。</p>
+
+      <section>
+        <h2>1. 無断利用の禁止</h2>
+        <p>当サイトコンテンツについて、法令で認められる場合を除き、当サイト運営者または権利者の事前の許諾なく、次の行為を禁止します。</p>
+        <ul>
+          <li>複製、転載、配布、販売、貸与</li>
+          <li>公衆送信、送信可能化、アップロード</li>
+          <li>改変、翻案、要約、編集、再構成</li>
+          <li>記事全文または実質的に全文に近い転載</li>
+          <li>写真、画像、図表、動画、音声の無断利用</li>
+          <li>見出しのみを変更した転載や再掲載</li>
+          <li>データベース化、アーカイブ化</li>
+          <li>商用利用</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>2. 引用について</h2>
+        <p>当サイトコンテンツは、著作権法上認められる適法な引用の範囲内で利用することができます。引用を行う場合は、次の条件を満たしてください。</p>
+        <ul>
+          <li>引用部分が従であり、利用者自身の記述が主であること</li>
+          <li>引用の必要性があること</li>
+          <li>引用部分とそれ以外が明確に区別されていること</li>
+          <li>出所を明示すること</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. 写真・画像・図表・動画等の利用について</h2>
+        <p>当サイトに掲載される写真、画像、図表、動画、音声その他の素材は、記事本文以上に権利処理が厳格な場合があります。これらの素材については、<strong>無断利用はしないでください。</strong></p>
+      </section>
+
+      <section>
+        <h2>4. AI学習・自動取得等の禁止</h2>
+        <p>当サイトコンテンツについて、当サイト運営者または権利者の事前の許諾なく、次の行為を禁止します。</p>
+        <ul>
+          <li>AIモデル、生成AI、機械学習モデル等の学習・追加学習への利用</li>
+          <li>ベクトル化、埋め込み化、RAGその他類似用途への利用</li>
+          <li>テキスト・データマイニング</li>
+          <li>スクレイピング、クローリング、ロボット等による自動取得</li>
+          <li>データセット化、学習用コーパス化</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>5. リンクについて</h2>
+        <p>当サイトへのリンクは、原則として自由です。ただし、次の各号に該当するリンクはお断りします。</p>
+        <ul>
+          <li>違法または公序良俗に反する内容を含むサイトからのリンク</li>
+          <li>当サイトまたは第三者の信用を害するおそれのあるリンク</li>
+          <li>フレーム内表示その他、当サイトのコンテンツであることが不明確となる方法によるリンク</li>
+          <li>当サイトとの提携等の関係があるとの誤認を生じさせるリンク</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>6. 利用許諾が必要な場合</h2>
+        <p>次のような場合は、事前に当サイト運営者へご相談ください。</p>
+        <ul>
+          <li>記事、写真、図表、動画等を転載したい場合</li>
+          <li>印刷物、書籍、雑誌、教材等に利用したい場合</li>
+          <li>ウェブサイト、アプリ、SNS広告等に掲載したい場合</li>
+          <li>商用利用をしたい場合</li>
+          <li>翻訳掲載、再編集掲載をしたい場合</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>7. 権利侵害のご連絡について</h2>
+        <p>当サイトコンテンツが無断利用されているとお考えの場合は、お問い合わせフォームよりご連絡ください。内容を確認のうえ、必要に応じて削除、修正その他の措置を行います。</p>
+      </section>
+
+      <section>
+        <h2>8. 本ページの変更</h2>
+        <p>当サイト運営者は、必要に応じて本ページの内容を改定することがあります。変更後の内容は、当サイト上に掲載した時点から適用されるものとします。</p>
+      </section>
+
+      <section>
+        <h2>9. お問い合わせ窓口</h2>
+        <table class="info-table">
+          <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
+          <tr><th>お問い合わせ</th><td><a href="/ja/jp/contact/">お問い合わせフォームはこちら</a></td></tr>
+        </table>
+      </section>
+    `
+  },
+  en: {
+    title: 'Copyright / Reuse',
+    description: 'Copyright and reuse policy of 24Watchin. Please review the rules for using our content.',
+    lastUpdated: 'Last Updated: March 20, 2026',
+    content: `
+      <p>This is a dummy text for the Copyright policy. The actual translated text will be inserted here later.</p>
+      <section>
+        <h2>1. Prohibition of Unauthorized Use</h2>
+        <p>Dummy text...</p>
+      </section>
+    `
+  },
+  'zh-cn': {
+    title: '版权声明',
+    description: '24Watchin的版权和转载政策。请查阅内容使用规则。',
+    lastUpdated: '最后更新：2026年3月20日',
+    content: `<p>这是版权声明的占位符文本。</p>`
+  },
+  'zh-tw': {
+    title: '版權聲明',
+    description: '24Watchin的版權和轉載政策。請查閱內容使用規則。',
+    lastUpdated: '最後更新：2026年3月20日',
+    content: `<p>這是版權聲明的佔位符文本。</p>`
+  },
+  es: {
+    title: 'Derechos de autor',
+    description: 'Política de derechos de autor de 24Watchin. Por favor, revise las reglas para el uso del contenido.',
+    lastUpdated: 'Última actualización: 20 de marzo de 2026',
+    content: `<p>Este es un texto simulado para la política de derechos de autor.</p>`
+  },
+  de: {
+    title: 'Urheberrecht',
+    description: 'Urheberrechts- und Nutzungsrichtlinie von 24Watchin. Bitte lesen Sie die Regeln zur Inhaltsnutzung.',
+    lastUpdated: 'Zuletzt aktualisiert: 20. März 2026',
+    content: `<p>Dies ist ein Blindtext für die Urheberrechtsrichtlinie.</p>`
+  },
+  fr: {
+    title: "Droits d'auteur",
+    description: "Politique de droits d'auteur de 24Watchin. Veuillez consulter les règles d'utilisation du contenu.",
+    lastUpdated: 'Dernière mise à jour : 20 mars 2026',
+    content: `<p>Ceci est un texte factice pour la politique des droits d'auteur.</p>`
+  },
+  ru: {
+    title: 'Авторские права',
+    description: 'Политика авторских прав 24Watchin. Пожалуйста, ознакомьтесь с правилами использования контента.',
+    lastUpdated: 'Последнее обновление: 20 марта 2026 г.',
+    content: `<p>Это фиктивный текст для политики авторских прав.</p>`
+  }
+} as const;
+
+export type CopyrightDataKey = keyof typeof copyrightData;
