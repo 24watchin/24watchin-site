@@ -22,7 +22,6 @@ export async function getStaticPaths() {
 }
 
 const { lang, country } = Astro.params;
-
 const currentPrivacyData = privacyData[lang as keyof typeof privacyData] || privacyData['en'];
 
 const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
@@ -34,16 +33,13 @@ const themeColor = themeData.themeColor;
 ---
 
 <Layout title={currentPrivacyData.title} description={currentPrivacyData.description} sidebarType="article">
+  <Breadcrumb lang={lang} country={country} categoryLabel={currentPrivacyData.title} />
+  
   <div class="info-container">
-    
-    <Breadcrumb lang={lang} country={country} categoryLabel={currentPrivacyData.title} />
-
     <h1 class="info-title">{currentPrivacyData.title}</h1>
     <div class="info-content">
       <p class="update-date">{currentPrivacyData.lastUpdated}</p>
-
       <div set:html={currentPrivacyData.content}></div>
-
     </div>
   </div>
 </Layout>
@@ -52,20 +48,12 @@ const themeColor = themeData.themeColor;
   .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 8px; padding-bottom: 12px; border-bottom: 3px solid var(--themeColor); }
   .update-date { font-size: 13px; color: #888; margin: 0 0 24px; }
-  
   .info-content :global(section) { margin-bottom: 32px; }
   .info-content :global(h2) { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--themeColor); }
-  .info-content :global(h3) { font-size: 15px; color: #333; margin: 16px 0 8px; font-weight: bold; }
   .info-content :global(p) { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
-  .info-content :global(ul), .info-content :global(ol) { font-size: 15px; line-height: 1.9; color: #333; padding-left: 24px; margin-bottom: 12px; }
   .info-content :global(a) { color: var(--themeColor); text-decoration: underline; }
-  
-  .info-content :global(.info-table) { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  .info-content :global(.info-table) { width: 100%; border-collapse: collapse; font-size: 15px; }
   .info-content :global(.info-table th) { width: 140px; padding: 10px 16px; background: #f8f4f4; color: #555; font-weight: bold; border: 1px solid #e5e7eb; text-align: left; white-space: nowrap; }
   .info-content :global(.info-table td) { padding: 10px 16px; border: 1px solid #e5e7eb; color: #1a1a1a; }
-  
-  @media (max-width: 600px) { 
-    .info-container { padding: 20px 16px; } 
-    .info-content :global(.info-table th) { width: 100px; font-size: 13px; } 
-  }
+  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-content :global(.info-table th) { width: 100px; font-size: 13px; } }
 </style>
