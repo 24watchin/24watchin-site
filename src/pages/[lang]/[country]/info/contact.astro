@@ -1,128 +1,46 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
+import Layout from '../../../../layouts/Layout.astro';
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
+import { categoryLabelMap } from '../../../../lib/categoryLabels.ts';
+import { contactData } from '../../../../lib/info/contactData.ts';
 
-const currentPath = Astro.url.pathname;
-const pathParts = currentPath.split('/').filter(Boolean);
-const lang = pathParts[0] || 'ja';
-const country = pathParts[1] || 'jp';
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'ja',    country: 'jp' } },
+    { params: { lang: 'en',    country: 'jp' } },
+    { params: { lang: 'en',    country: 'us' } },
+    { params: { lang: 'en',    country: 'ae' } },
+    { params: { lang: 'zh-cn', country: 'jp' } },
+    { params: { lang: 'zh-tw', country: 'jp' } },
+    { params: { lang: 'es',    country: 'jp' } },
+    { params: { lang: 'fr',    country: 'jp' } },
+    { params: { lang: 'de',    country: 'jp' } },
+    { params: { lang: 'ru',    country: 'jp' } },
+    { params: { lang: 'de',    country: 'de' } },
+    { params: { lang: 'fr',    country: 'fr' } },
+  ];
+}
 
-const titles: Record<string, string> = {
-  ja: 'お問い合わせ',
-  en: 'Contact',
-  de: 'Kontakt',
-  fr: 'Contact',
-  es: 'Contacto',
-  ru: 'Контакты',
-  'zh-cn': '联系我们',
-  'zh-tw': '聯絡我們',
+const { lang, country } = Astro.params;
+
+// ▼ 現在の言語のテキストデータを取得します
+const tx = contactData[lang as keyof typeof contactData] || contactData['en'];
+
+// ▼ テーマカラーを取得するための変換機能です
+const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
-
-const descriptions: Record<string, string> = {
-  ja: '24Watchinへのお問い合わせはこちらから。記事の訂正・転載・著作権などもお気軽にどうぞ。',
-  en: 'Contact 24Watchin here. Feel free to reach out about article corrections, reprints, copyright, and more.',
-  de: 'Kontaktieren Sie 24Watchin hier.',
-  fr: 'Contactez 24Watchin ici.',
-  es: 'Contacte a 24Watchin aquí.',
-  ru: 'Свяжитесь с 24Watchin здесь.',
-  'zh-cn': '在这里联系24Watchin。',
-  'zh-tw': '在這裡聯絡24Watchin。',
-};
-
-// 言語別テキスト
-const t: Record<string, Record<string, string>> = {
-  ja: {
-    intro1: '24Watchinをご利用いただきありがとうございます。当サイトに関するご意見、ご感想、お問い合わせは、下記フォームよりご連絡ください。',
-    intro2: '記事内容に関するご意見・ご指摘、訂正のご連絡、著作権・転載に関するお問い合わせ、広告掲載・提携に関するご相談などを受け付けています。',
-    beforeTitle: 'お問い合わせの前にご確認ください',
-    before1: 'お問い合わせの内容、件数、確認状況その他の事情により、回答までお時間をいただく場合や、回答を差し上げられない場合があります。',
-    before2: '土曜、日曜、祝日、年末年始にいただいたお問い合わせは、翌営業日以降の確認となる場合があります。',
-    before3: '当サイトからの回答内容について、無断で転載、引用、再配布することはご遠慮ください。',
-    before4: '営業・勧誘・宣伝のみを目的とした送信については、回答いたしかねる場合があります。',
-    privacyTitle: '個人情報の取り扱いについて',
-    privacyText: 'お問い合わせフォームにご入力いただいた情報は、お問い合わせへの対応、内容の確認、必要なご連絡その他これらに付随する目的のために利用します。詳細については',
-    privacyLink: 'プライバシーポリシー',
-    privacyEnd: 'をご確認ください。',
-    formTitle: 'お問い合わせフォーム',
-    typeLabel: 'お問い合わせの種類',
-    typePlaceholder: '選択してください',
-    typeOptions: ['一般のお問い合わせ', '記事内容に関するご意見・ご指摘', '訂正・修正のご連絡', '著作権・転載・引用に関するお問い合わせ', '画像・写真・掲載素材に関するお問い合わせ', '個人情報の取り扱いに関するお問い合わせ', '広告掲載・提携に関するお問い合わせ', 'その他'],
-    nameLabel: 'お名前',
-    namePlaceholder: '例：山田 太郎',
-    emailLabel: '連絡可能なメールアドレス',
-    emailPlaceholder: '例：example@email.com',
-    companyLabel: '会社名・団体名',
-    companyPlaceholder: '例：株式会社〇〇',
-    subjectLabel: '件名',
-    subjectPlaceholder: '例：記事について',
-    urlLabel: '対象ページURL',
-    urlPlaceholder: '例：https://24watchin.com/...',
-    urlNote: '記事やページについてのお問い合わせの場合は、該当URLをご記入ください。',
-    messageLabel: 'お問い合わせ内容',
-    messagePlaceholder: 'できるだけ具体的にご記入ください。',
-    agreementText: 'ご入力いただいた情報の取り扱いについて、プライバシーポリシーを確認し、同意します。',
-    submitBtn: '送信する',
-    sending: '送信中...',
-    required: '必須',
-    optional: '任意',
-    successTitle: 'お問い合わせを受け付けました。',
-    successText: '内容を確認のうえ、必要に応じてご連絡いたします。',
-    errorText: '送信に失敗しました。時間をおいて再度お試しください。',
-  },
-  en: {
-    intro1: 'Thank you for using 24Watchin. Please use the form below to send us your questions, opinions, or feedback.',
-    intro2: 'We accept inquiries about article content, corrections, copyright and reprints, advertising, and more.',
-    beforeTitle: 'Before You Contact Us',
-    before1: 'Depending on the nature and volume of inquiries, we may not be able to respond to every message.',
-    before2: 'Inquiries received on weekends or holidays will be addressed on the next day.',
-    before3: 'Please do not reprint or redistribute our responses without permission.',
-    before4: 'We may not respond to messages sent solely for promotional or solicitation purposes.',
-    privacyTitle: 'Privacy',
-    privacyText: 'Information you submit will be used to respond to your inquiry. For details, please see our',
-    privacyLink: 'Privacy Policy',
-    privacyEnd: '.',
-    formTitle: 'Contact Form',
-    typeLabel: 'Type of Inquiry',
-    typePlaceholder: 'Please select',
-    typeOptions: ['General Inquiry', 'Opinion / Feedback on Article', 'Correction Request', 'Copyright / Reprint Inquiry', 'Image / Media Inquiry', 'Privacy Inquiry', 'Advertising / Partnership', 'Other'],
-    nameLabel: 'Your Name',
-    namePlaceholder: 'e.g. John Smith',
-    emailLabel: 'Email Address',
-    emailPlaceholder: 'e.g. example@email.com',
-    companyLabel: 'Company / Organization',
-    companyPlaceholder: 'e.g. Example Inc.',
-    subjectLabel: 'Subject',
-    subjectPlaceholder: 'e.g. About an article',
-    urlLabel: 'Relevant Page URL',
-    urlPlaceholder: 'e.g. https://24watchin.com/...',
-    urlNote: 'If your inquiry is about a specific page or article, please include the URL.',
-    messageLabel: 'Message',
-    messagePlaceholder: 'Please describe your inquiry in detail.',
-    agreementText: 'I have read and agree to the Privacy Policy regarding the handling of my information.',
-    submitBtn: 'Send',
-    sending: 'Sending...',
-    required: 'Required',
-    optional: 'Optional',
-    successTitle: 'Your message has been received.',
-    successText: 'We will review your inquiry and get back to you if needed.',
-    errorText: 'Failed to send. Please try again later.',
-  },
-  // (中略：他の言語設定はそのまま保持されます)
-  de: { intro1: 'Vielen Dank...', /* 他の言語もそのまま含めてください */ },
-  fr: { intro1: 'Merci...', /* 他の言語もそのまま含めてください */ },
-  es: { intro1: 'Gracias...', /* 他の言語もそのまま含めてください */ },
-  ru: { intro1: 'Спасибо...', /* 他の言語もそのまま含めてください */ },
-  'zh-cn': { intro1: '感谢您...', /* 他の言語もそのまま含めてください */ },
-  'zh-tw': { intro1: '感謝您...', /* 他の言語もそのまま含めてください */ },
-};
-
-const tx = t[lang] ?? t['en'];
-const pageTitle = titles[lang] ?? titles['en'];
-const pageDescription = descriptions[lang] ?? descriptions['en'];
+const langKey = langKeyMap[lang as keyof typeof langKeyMap] || 'jp';
+const themeData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
+const themeColor = themeData.themeColor;
 ---
 
-<Layout title={pageTitle} description={pageDescription} sidebarType="article">
+<Layout title={tx.title} description={tx.description} sidebarType="article">
   <div class="info-container">
-    <h1 class="info-title">{pageTitle}</h1>
+
+    <Breadcrumb lang={lang} country={country} categoryLabel={tx.title} />
+
+    <h1 class="info-title">{tx.title}</h1>
     <div class="info-content">
       <p>{tx.intro1}</p>
       <p>{tx.intro2}</p>
@@ -141,7 +59,7 @@ const pageDescription = descriptions[lang] ?? descriptions['en'];
         <h2>{tx.privacyTitle}</h2>
         <p>
           {tx.privacyText}
-          <a href={`/${lang}/${country}/privacy/`}>{tx.privacyLink}</a>
+          <a href={`/${lang}/${country}/info/privacy/`}>{tx.privacyLink}</a>
           {tx.privacyEnd}
         </p>
       </section>
@@ -225,6 +143,7 @@ const pageDescription = descriptions[lang] ?? descriptions['en'];
   const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
   const successMsg = document.getElementById('form-success') as HTMLDivElement;
   const errorMsg = document.getElementById('form-error') as HTMLDivElement;
+
   const sendLabel = submitBtn.dataset.send || 'Send';
   const sendingLabel = submitBtn.dataset.sending || 'Sending...';
 
@@ -239,7 +158,6 @@ const pageDescription = descriptions[lang] ?? descriptions['en'];
     const data = Object.fromEntries(formData.entries());
 
     try {
-      // 送信先を新しく作った Worker のURLに書き換えました
       const response = await fetch('https://contact-form.24watchin-news.workers.dev/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -263,33 +181,41 @@ const pageDescription = descriptions[lang] ?? descriptions['en'];
   });
 </script>
 
-<style>
-  /* スタイル設定は変更なしのためそのままです */
+<style define:vars={{ themeColor }}>
   .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 24px; padding-bottom: 12px; border-bottom: 3px solid #872732; }
+  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 24px; padding-bottom: 12px; border-bottom: 3px solid var(--themeColor); }
+  
   .info-content section { margin-bottom: 32px; }
-  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid #872732; }
+  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--themeColor); }
   .info-content p { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
   .info-content ul { font-size: 15px; line-height: 1.9; color: #333; padding-left: 24px; margin-bottom: 12px; }
-  .info-content a { color: #872732; text-decoration: underline; }
+  .info-content a { color: var(--themeColor); text-decoration: underline; }
+  
   .contact-form { display: flex; flex-direction: column; gap: 20px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-label { font-size: 14px; font-weight: bold; color: #1a1a1a; }
-  .required { background: #872732; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; }
+  
+  /* 必須ラベルとボタンにもテーマカラーを適用します */
+  .required { background: var(--themeColor); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; }
   .optional { background: #9ca3af; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; }
+  
   .form-input, .form-select, .form-textarea { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; color: #1a1a1a; transition: border-color 0.2s; width: 100%; box-sizing: border-box; }
-  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #872732; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--themeColor); }
   .form-textarea { resize: vertical; }
   .form-note { font-size: 12px; color: #6b7280; margin: 4px 0 0; }
+  
   .form-checkbox { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #333; cursor: pointer; }
-  .form-checkbox input { margin-top: 3px; accent-color: #872732; }
+  .form-checkbox input { margin-top: 3px; accent-color: var(--themeColor); }
+  
   .form-submit { display: flex; justify-content: center; margin-top: 8px; }
-  .submit-btn { background: #872732; color: #fff; border: none; padding: 14px 48px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-  .submit-btn:hover { background: #6e1f27; }
-  .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+  .submit-btn { background: var(--themeColor); color: #fff; border: none; padding: 14px 48px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: filter 0.2s; }
+  .submit-btn:hover { filter: brightness(0.8); } /* テーマカラーをそのまま少し暗くするテクニックです */
+  .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; filter: none; }
+  
   .form-success { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; }
   .form-success p { color: #166534; font-size: 15px; margin: 0 0 6px; }
   .form-error { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; }
   .form-error p { color: #991b1b; font-size: 15px; margin: 0; }
+  
   @media (max-width: 600px) { .info-container { padding: 20px 16px; } .submit-btn { width: 100%; } }
 </style>
