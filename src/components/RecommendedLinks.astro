@@ -1,15 +1,29 @@
 ---
 // 「あわせて読みたい」枠（Google AdSense マルチプレックス広告）
+const { lang = 'ja' } = Astro.props;
+
+// ▼ 多言語タイトル
+const titleMap: Record<string, string> = {
+  ja:      'あわせて読みたい',
+  en:      'You May Also Like',
+  'zh-cn': '猜你喜欢',
+  'zh-tw': '猜你喜歡',
+  es:      'También te puede interesar',
+  fr:      'Vous aimerez aussi',
+  de:      'Das könnte Sie auch interessieren',
+  ru:      'Вам также может понравиться',
+};
+const sectionTitle = titleMap[lang] || titleMap['en'];
 ---
 
 <div class="bottom-section">
   <div class="sponsored-header">
-    <h3 class="section-title">あわせて読みたい</h3>
+    <h3 class="section-title">{sectionTitle}</h3>
     <span class="sponsor-credit">PR</span>
   </div>
   
   <div class="adsense-container">
-    {/* ▼ なるさん専用のGoogle AdSenseコード ▼ */}
+    {/* ▼ Google AdSenseコード ▼ */}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2614349930540151" crossorigin="anonymous"></script>
     <ins class="adsbygoogle"
          style="display:block"
@@ -25,15 +39,15 @@
 
 <style>
   .bottom-section { margin-bottom: 50px; }
-  
-  .sponsored-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-  .section-title { font-size: 22px; color: #1a1a1a; margin-bottom: 5px; padding-bottom: 0; display: inline-block; border-bottom: none; font-weight: bold; }
-  
-  /* PRの文字を産経新聞のように少し控えめなグレーにして自然に馴染ませます */
+
+  /* ▼ sponsored-headerのborder-bottomは削除、下線はsection-titleに移動 */
+  .sponsored-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+
+  /* ▼ EditorPicksと同じスタイル！テーマカラーの下線 */
+  .section-title { font-size: 19px; color: #333; margin-bottom: 0; border-bottom: 3px solid var(--theme-color, #872732); padding-bottom: 5px; display: inline-block; font-weight: bold; }
+
+  /* PRの文字：控えめなグレー */
   .sponsor-credit { font-size: 13px; color: #888888; font-weight: bold; margin-bottom: 5px; }
-  
-  .adsense-container {
-    width: 100%;
-    overflow: hidden; /* 広告が枠からはみ出ないようにするための安全対策です */
-  }
+
+  .adsense-container { width: 100%; overflow: hidden; }
 </style>
