@@ -58,26 +58,48 @@ const apiLangMap: Record<string, string> = {
 const apiLang = apiLangMap[lang] || 'en';
 const { isImperial, tempUnit, windUnit } = getUnitSystem(lang);
 
+// ▼ 言語別のBLOG_IDを割り当てます
+const blogIdMap: Record<string, string> = {
+  ja:      import.meta.env.BLOG_ID_JA,
+  en:      import.meta.env.BLOG_ID_EN,
+  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
+  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
+  es:      import.meta.env.BLOG_ID_ES,
+  fr:      import.meta.env.BLOG_ID_FR,
+  de:      import.meta.env.BLOG_ID_DE,
+  ru:      import.meta.env.BLOG_ID_RU,
+};
+const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
 const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
 
-let allPosts = globalThis.bloggerPostsCache || [];
-if (allPosts.length === 0 && API_KEY && BLOG_ID) {
-  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
-  const response = await fetch(url).catch(() => null);
-  if (response && response.ok) {
-    const data = await response.json();
-    allPosts = data.items || [];
-    globalThis.bloggerPostsCache = allPosts;
-  }
+// ▼ 新しい「言語別の省エネメモ」からデータを読み込みます
+const cacheKey = 'bloggerPostsCache_' + lang;
+if (!globalThis[cacheKey]) {
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
+  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
+    .then(res => res.ok ? res.json() : { items: [] })
+    .then(data => data.items || [])
+    .catch(err => {
+      console.error("記事の取得に失敗しました", err);
+      return [];
+    });
+}
+
+let allPosts = await globalThis[cacheKey];
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
 }
 
 const targetTag = lang + '-' + country;
+
+// ▼ どんな言語の「天気」タグでも拾えるようにキーワードを拡張しました
+const weatherKeywords = ['天気', '気象', '災害', 'weather', 'disaster', 'clima', 'météo', 'wetter', 'погода', '天气', '天氣'];
+
 const relatedNews = allPosts.filter((post: any) =>
   post.labels &&
-  post.labels.includes(targetTag) &&
-  post.labels.some((label: string) => ['天気', '気象', '災害', 'weather', 'Weather'].includes(label))
+  post.labels.some((label: string) => label.toLowerCase().includes(targetTag.toLowerCase())) &&
+  post.labels.some((label: string) => weatherKeywords.some(kw => label.toLowerCase().includes(kw.toLowerCase())))
 ).slice(0, 3);
 
 const cities = countryCityMap[country] || countryCityMap['jp'];
@@ -148,10 +170,6 @@ const allLabels: Record<string, Record<string, string>> = {
 };
 const labels = allLabels[lang] || allLabels['en'];
 
-// ============================================================
-// ▼▼▼ パンくずリスト用ラベル ▼▼▼
-// ============================================================
-
 const weatherPageLabels: Record<string, string> = {
   ja:      '天気予報・災害',
   en:      'Weather Forecast & Disasters',
@@ -199,10 +217,6 @@ const countryLabelMap: Record<string, Record<string, string>> = {
 };
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 
-// ============================================================
-// ▲▲▲ パンくずリスト用ラベルここまで ▲▲▲
-// ============================================================
-
 const cityNameMap: Record<string, string> = {};
 for (const city of cities) {
   cityNameMap[city.key] = city.display[lang] || city.display['en'] || city.key;
@@ -211,14 +225,12 @@ for (const city of cities) {
 
 <Layout title={defaultCityName + ' | ' + labels.title} sidebarType="weather">
 
-  <!-- ▼▼▼ パンくずリスト：<main>の外！他ページと位置が揃います ▼▼▼ -->
   <Breadcrumb
     countryLabel={countryLabel}
     countryHref={`/${lang}/${country}/`}
     categoryLabel={weatherPageLabel}
     categoryHref=""
   />
-  <!-- ▲▲▲ パンくずリストここまで ▲▲▲ -->
 
   <main class="weather-page"
     data-storage-key={storageKey}
@@ -247,6 +259,7 @@ for (const city of cities) {
       <div class="forecast-container" id="forecast-container"></div>
     </section>
 
+    {/* ▼ 自動翻訳＆テーマカラー対応の RelatedNews がここで呼び出されます */}
     {relatedNews.length > 0 && (
       <RelatedNews relatedPosts={relatedNews} lang={lang} country={country} />
     )}
@@ -265,7 +278,7 @@ for (const city of cities) {
   var defaultCity     = page.getAttribute('data-default-city') || '';
   var tempUnit        = page.getAttribute('data-temp-unit') || '°C';
   var windUnit        = page.getAttribute('data-wind-unit') || 'km/h';
-
+  
   var alertCityName     = document.getElementById('alert-city-name');
   var alertContent      = document.getElementById('alert-ticker-content');
   var forecastTitle     = document.getElementById('forecast-title');
