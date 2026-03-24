@@ -38,8 +38,7 @@ const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : 
 
 const categoryItems = (labels.headerCategories || []).map((item) => {
   const href = basePath + '/category/' + item.slug + '/';
-  const isActive = cleanCurrentPath === (basePath + '/category/' + item.slug);
-  return { href, label: item.label, isActive, slug: item.slug };
+  return { href, label: item.label, isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), slug: item.slug };
 });
 
 const homeHref = basePath + '/';
@@ -58,50 +57,31 @@ const languageOptions = [
   { code: 'ru', key: 'ru', label: 'Русский', barStyle: 'background:#500d80' },
 ].filter(opt => allowedLangs.includes(opt.code)).map(opt => ({ ...opt, href: '/' + opt.code + '/' + country + '/', linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option' }));
 
-const moreSlugsMap: Record<string, string[]> = { 
-  jp: ['health-life', 'weather', 'traffic'], 
-  en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
-  es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
-  fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
-  de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
-  ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
-  'zh-cn': [], 'zh-tw': [] 
-};
+const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
 const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
-const moreTextMap: Record<string, string> = { jp: 'さらに見る', en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё' };
-const moreText = moreTextMap[localeKey] || 'More';
 const moreHasActive = moreItems.some(item => item.isActive);
 ---
 
 <header class="site-header">
   <div class="header-top">
     <div class="brand-area">
-      <a href={homeHref} class="logo-link" aria-label="24Watchin">
-        <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
-      </a>
+      <a href={homeHref} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" /></a>
       <div class="country-name">{countryLabel}</div>
     </div>
-
     <div class="right-area">
       <form action={searchAction} method="get" class="search-form">
         <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
         <button type="submit" class="search-button">
-          <svg class="search-icon" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="6.5"></circle>
-            <line x1="16" x2="21" y2="21"></line>
-          </svg>
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
         </button>
       </form>
       <div class="lang-switcher">
         <div class="lang-current">{labels.languageName} ▾</div>
         <div class="lang-dropdown">
           {languageOptions.map((opt) => (
-            <a href={opt.href} class={opt.linkClass}>
-              <span class="lang-bar" style={opt.barStyle}></span>
-              {opt.label}
-            </a>
+            <a href={opt.href} class={opt.linkClass}><span class="lang-bar" style={opt.barStyle}></span>{opt.label}</a>
           ))}
         </div>
       </div>
@@ -123,21 +103,17 @@ const moreHasActive = moreItems.some(item => item.isActive);
         {moreItems.length > 0 && (
           <div class="more-wrapper">
             <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
-              {moreText}
+              {lang === 'ja' ? 'さらに見る' : 'More'}
               <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="more-dropdown">
-              {moreItems.map((item) => (
-                <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>
-                  {item.label}
-                </a>
-              ))}
+              {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>{item.label}</a>)}
             </div>
           </div>
         )}
       </div>
 
-      <div class="category-scroll sp-scroll">
+      <div class="category-scroll sp-scroll" id="sp-scroll">
         {categoryItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
             <span class="category-link-text">{item.label}</span>
@@ -152,10 +128,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
   <div class="header-word-bar">
     <div class="header-word-inner">
       {headerWords.map((item, index) => (
-        <>
-          {index > 0 && <span class="header-word-separator">|</span>}
-          <a href={item.url} class="header-word-link">{item.label}</a>
-        </>
+        <a href={item.url} class="header-word-link">{item.label}</a>
       ))}
     </div>
   </div>
@@ -165,7 +138,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
 <style>
   .site-header { width: 100%; background: #ffffff; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .brand-area { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+  .brand-area { display: flex; flex-direction: column; align-items: flex-end; }
   .logo-image { width: 200px; height: auto; }
   .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
@@ -174,15 +147,14 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
   .lang-switcher { position: relative; }
-  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; white-space: nowrap; }
+  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; }
   .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e0e0e0; min-width: 150px; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
   .lang-switcher:hover .lang-dropdown { display: block; }
   .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
-  .lang-option:last-child { border-bottom: none; }
   .lang-bar { width: 4px; height: 14px; border-radius: 2px; }
   
   .category-bar { background: #393737; width: 100%; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; position: relative; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
   .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
   .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; }
   .category-scroll::-webkit-scrollbar { display: none; }
@@ -197,24 +169,19 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .more-wrapper:hover .more-dropdown { display: block; }
   .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
   .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .more-link.active { background: var(--theme-color); }
 
   .scroll-arrow { 
-    display: none; /* JSで表示制御 */
-    background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; padding: 0; z-index: 10;
+    display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10;
   }
   .scroll-arrow.active { display: flex; }
 
-  .header-word-bar { background: #fff; border-bottom: 1px solid #eee; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; align-items: center; }
+  .header-word-bar { background: #fff; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; }
   .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
-  .header-word-separator { color: #b9b9b9; }
-  .bottom-line { height: 10px; width: 100%; }
+  .bottom-line { height: 10px; }
 
   .sp-scroll { display: none; }
-
   @media (max-width: 768px) { 
-    .logo-image { width: 140px; } 
     .pc-category-group { display: none; } 
     .sp-scroll { display: flex; }
     .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
@@ -223,34 +190,46 @@ const moreHasActive = moreItems.some(item => item.isActive);
 
 <script is:inline>
   window.addEventListener('load', function() {
-    var scroll = document.getElementById('pc-scroll');
+    var pcScroll = document.getElementById('pc-scroll');
+    var spScroll = document.getElementById('sp-scroll');
     var btnLeft = document.getElementById('arrow-left');
     var btnRight = document.getElementById('arrow-right');
-    if (!scroll || !btnLeft || !btnRight) return;
+    if (!btnLeft || !btnRight) return;
 
     function updateArrows() {
       var width = window.innerWidth;
-      var atLeft = scroll.scrollLeft <= 5;
-      var atRight = scroll.scrollLeft >= (scroll.scrollWidth - scroll.clientWidth - 5);
-
-      // 1000pxより大きい時、または450px以下の時は矢印を出さない
+      // 1000pxより大きい、または450px以下の時は矢印を隠す
       if (width > 1000 || width <= 450) {
         btnLeft.classList.remove('active');
         btnRight.classList.remove('active');
         return;
       }
 
-      // それ以外の幅（451〜1000）で、スクロールが必要な場合に出す
+      // 現在表示されている方のスクロールエリアを選択
+      var activeScroll = (width > 768) ? pcScroll : spScroll;
+      if (!activeScroll) return;
+
+      var atLeft = activeScroll.scrollLeft <= 5;
+      var atRight = activeScroll.scrollLeft >= (activeScroll.scrollWidth - activeScroll.clientWidth - 5);
+
       if (!atLeft) { btnLeft.classList.add('active'); } else { btnLeft.classList.remove('active'); }
       if (!atRight) { btnRight.classList.add('active'); } else { btnRight.classList.remove('active'); }
     }
 
-    btnLeft.addEventListener('click', function() { scroll.scrollBy({ left: -200, behavior: 'smooth' }); });
-    btnRight.addEventListener('click', function() { scroll.scrollBy({ left: 200, behavior: 'smooth' }); });
+    btnLeft.addEventListener('click', function() {
+      var width = window.innerWidth;
+      var activeScroll = (width > 768) ? pcScroll : spScroll;
+      activeScroll.scrollBy({ left: -200, behavior: 'smooth' });
+    });
+    btnRight.addEventListener('click', function() {
+      var width = window.innerWidth;
+      var activeScroll = (width > 768) ? pcScroll : spScroll;
+      activeScroll.scrollBy({ left: 200, behavior: 'smooth' });
+    });
     
-    scroll.addEventListener('scroll', updateArrows);
+    if (pcScroll) pcScroll.addEventListener('scroll', updateArrows);
+    if (spScroll) spScroll.addEventListener('scroll', updateArrows);
     window.addEventListener('resize', updateArrows);
-    // 初期実行
-    setTimeout(updateArrows, 100);
+    updateArrows();
   });
 </script>
