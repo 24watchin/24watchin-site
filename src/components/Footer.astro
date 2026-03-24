@@ -1,6 +1,7 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
+// マスターリストを読み込み
 import { getCountryLabel } from '../lib/countryData.ts';
 
 const currentPath = Astro.url.pathname;
@@ -29,15 +30,23 @@ const globalRegionsRaw = [
 const regionNames: Record<string, Record<string, string>> = {
   asia:     { ja: 'アジア', en: 'Asia', 'zh-cn': '亚洲', 'zh-tw': '亞洲', es: 'Asia', fr: 'Asie', de: 'Asien', ru: 'Азия' },
   europe:   { ja: 'ヨーロッパ', en: 'Europe', 'zh-cn': '欧洲', 'zh-tw': '歐洲', es: 'Europa', fr: 'Europe', de: 'Europa', ru: 'Европа' },
-  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Америка' },
-  mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中东与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
+  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Аメリka' },
+  mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中東与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
   oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'オセアニア' },
 };
 
 const globalRegions = globalRegionsRaw.map(region => {
   const activeCountries = region.countries
     .filter(code => allPosts.some(p => p.labels?.includes(lang + '-' + code)))
-    .map(code => ({ code, label: getCountryLabel(code, lang) }));
+    .map(code => {
+      // 通常通りマスターリストから取得
+      let label = getCountryLabel(code, lang);
+      // ▼ フッターだけの特別ルール：日本語版で日本を指す時だけ「日本」にする
+      if (lang === 'ja' && code === 'jp') {
+        label = '日本';
+      }
+      return { code, label };
+    });
   return {
     name: regionNames[region.key]?.[lang] || regionNames[region.key]?.['en'] || region.key,
     countries: activeCountries,
@@ -46,11 +55,11 @@ const globalRegions = globalRegionsRaw.map(region => {
 
 const infoMenus: Record<string, { label: string; href: string }[]> = {
   ja: [
-    { label: 'About 24Watchin', href: `/${lang}/${country}/info/about/` },
-    { label: 'プライバシーポリシー', href: `/${lang}/${country}/info/privacy/` },
-    { label: '利用規約', href: `/${lang}/${country}/info/terms/` },
-    { label: 'お問い合わせ', href: `/${lang}/${country}/info/contact/` },
-    { label: '訂正・修正ポリシー', href: `/${lang}/${country}/info/corrections/` },
+    { label: 'About 24Watchin',           href: `/${lang}/${country}/info/about/` },
+    { label: 'プライバシーポリシー',       href: `/${lang}/${country}/info/privacy/` },
+    { label: '利用規約',                   href: `/${lang}/${country}/info/terms/` },
+    { label: 'お問い合わせ',               href: `/${lang}/${country}/info/contact/` },
+    { label: '訂正・修正ポリシー',         href: `/${lang}/${country}/info/corrections/` },
     { label: '著作権・転載・引用について', href: `/${lang}/${country}/info/copyright/` },
   ],
   en: [
@@ -66,7 +75,7 @@ const infoMenus: Record<string, { label: string; href: string }[]> = {
   es: [ { label: 'Acerca de 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Política de privacidad', href: `/${lang}/${country}/info/privacy/` }, { label: 'Términos de uso', href: `/${lang}/${country}/info/terms/` }, { label: 'Contacto', href: `/${lang}/${country}/info/contact/` }, { label: 'Política de correcciones', href: `/${lang}/${country}/info/corrections/` }, { label: 'Derechos de autor', href: `/${lang}/${country}/info/copyright/` } ],
   fr: [ { label: 'À propos de 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Politique de confidentialité', href: `/${lang}/${country}/info/privacy/` }, { label: "Conditions d'utilisation", href: `/${lang}/${country}/info/terms/` }, { label: 'Contact', href: `/${lang}/${country}/info/contact/` }, { label: 'Politique de corrections', href: `/${lang}/${country}/info/corrections/` }, { label: "Droits d'auteur", href: `/${lang}/${country}/info/copyright/` } ],
   de: [ { label: 'Über 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Datenschutzrichtlinie', href: `/${lang}/${country}/info/privacy/` }, { label: 'Nutzungsbedingungen', href: `/${lang}/${country}/info/terms/` }, { label: 'Kontakt', href: `/${lang}/${country}/info/contact/` }, { label: 'Korrekturrichtlinie', href: `/${lang}/${country}/info/corrections/` }, { label: 'Urheberrecht', href: `/${lang}/${country}/info/copyright/` } ],
-  ru: [ { label: 'О 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Политика конфиденциальности', href: `/${lang}/${country}/info/privacy/` }, { label: 'Условия использования', href: `/${lang}/${country}/info/terms/` }, { label: 'Контакты', href: `/${lang}/${country}/info/contact/` }, { label: 'Политика исправлений', href: `/${lang}/${country}/info/corrections/` }, { label: 'Авторские права', href: `/${lang}/${country}/info/copyright/` } ],
+  ru: [ { label: 'О 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Политика конфиденциальности', href: `/${lang}/${country}/info/privacy/` }, { label: 'Условия использования', href: `/${lang}/${country}/info/terms/` }, { label: 'Контакты', href: `/${lang}/${country}/info/contact/` }, { label: 'Поリチカ испраvleniy', href: `/${lang}/${country}/info/corrections/` }, { label: 'Авторские права', href: `/${lang}/${country}/info/copyright/` } ],
 };
 const currentMenu = infoMenus[lang] || infoMenus['en'];
 
