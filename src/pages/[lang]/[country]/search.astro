@@ -1,23 +1,14 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
-import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
+import { categoryLabelMap, type SiteLanguageKey } from '../../../lib/categoryLabels.ts';
+// ▼ カンペとマスターリストを読み込む
+import { langCountryPairs, getBlogId } from '../../../lib/siteRoutes.ts';
+import { getCountryLabel } from '../../../lib/countryData.ts';
 
 export async function getStaticPaths() {
-  return [
-    { params: { lang: 'ja',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'us' } },
-    { params: { lang: 'en',    country: 'ae' } },
-    { params: { lang: 'zh-cn', country: 'jp' } },
-    { params: { lang: 'zh-tw', country: 'jp' } },
-    { params: { lang: 'es',    country: 'jp' } },
-    { params: { lang: 'fr',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'jp' } },
-    { params: { lang: 'ru',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'de' } },
-    { params: { lang: 'fr',    country: 'fr' } },
-  ];
+  // カンペを使って全言語・全国の検索ページを生成
+  return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
 const { lang, country } = Astro.params;
@@ -30,34 +21,21 @@ function stripHtml(html = '') {
   return html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
 }
 
-// ▼ 【今回の最重要修正】Cloudflareの設定に合わせて、適切なブログIDを選択します
-const blogIdMap: Record<string, string> = {
-  ja: 'BLOG_ID_JA',
-  en: 'BLOG_ID_EN',
-  de: 'BLOG_ID_DE',
-  fr: 'BLOG_ID_FR',
-  es: 'BLOG_ID_ES',
-  ru: 'BLOG_ID_RU',
-  'zh-cn': 'BLOG_ID_ZH_CN',
-  'zh-tw': 'BLOG_ID_ZH_TW'
-};
-
-const envKey = blogIdMap[lang as keyof typeof blogIdMap] || 'BLOG_ID_JA';
-const BLOG_ID = import.meta.env[envKey] || import.meta.env.BLOG_ID;
+// カンペから正しいブログIDを取得
+const BLOG_ID = getBlogId(lang);
 const API_KEY = import.meta.env.API_KEY;
 
 const targetTag = `${lang}-${country}`;
 let rawPosts = [];
 
 if (API_KEY && BLOG_ID) {
-  // 正しいブログIDに対して、その国(targetTag)の記事だけをリクエストします
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&labels=${targetTag}&maxResults=500`;
   try {
     const response = await fetch(url);
     const data = await response.json();
     rawPosts = data.items || [];
   } catch (e) {
-    console.error("Fetch error:", e);
+    console.error("Search Fetch error:", e);
   }
 }
 
@@ -69,14 +47,13 @@ const searchIndex = rawPosts.map((post) => ({
   plainText: stripHtml(post.content || ''),
 }));
 
-// テーマカラー設定
 const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
 const langKey = langKeyMap[lang as keyof typeof langKeyMap] || 'jp';
-const themeColor = categoryLabelMap[langKey]?.themeColor || categoryLabelMap['jp'].themeColor;
+const themeColor = categoryLabelMap[langKey]?.themeColor || '#872732';
 
-const labels: Record<string, any> = {
+const uiLabels: Record<string, any> = {
   ja: { title: '検索結果', count: '件', noResult: 'に一致する記事は見つかりませんでした。', more: 'さらに表示' },
   en: { title: 'Search Results', count: 'results', noResult: 'No articles found for', more: 'Load More' },
   'zh-cn': { title: '搜索结果', count: '条', noResult: '未找到与...匹配的文章', more: '加载更多' },
@@ -86,12 +63,19 @@ const labels: Record<string, any> = {
   fr: { title: 'Résultats de recherche', count: 'résultats', noResult: 'Aucun article trouvé pour', more: 'Afficher plus' },
   ru: { title: 'Результаты поиска', count: 'результатов', noResult: 'Статьи по запросу ... не найдены', more: 'Показать еще' },
 };
-const t = labels[lang] || labels['en'];
+const t = uiLabels[lang] || uiLabels['en'];
+
+// マスターリストから国名を取得
+const countryLabel = getCountryLabel(country, lang);
 ---
 
 <Layout title={t.title}>
-  {/* パンくずリストを枠の外に配置して位置を修正 */}
-  <Breadcrumb lang={lang} country={country} categoryLabel={t.title} />
+  <Breadcrumb
+    countryLabel={countryLabel}
+    countryHref={`/${lang}/${country}/`}
+    categoryLabel={t.title}
+    categoryHref=""
+  />
 
   <div class="search-main-wrapper">
     <div class="search-header-area">
@@ -112,7 +96,7 @@ const t = labels[lang] || labels['en'];
   </div>
 </Layout>
 
-<script is:inline define:vars={{ searchIndex, lang, country }}>
+<script is:inline define:vars={{ searchIndex, lang, country, themeColor }}>
   const params = new URLSearchParams(window.location.search);
   const q = (params.get('q') || '').trim();
   const searchWord = q.toLowerCase();
@@ -121,12 +105,10 @@ const t = labels[lang] || labels['en'];
 
   document.getElementById('displayWord').textContent = q;
   document.getElementById('displayWordNo').textContent = q;
-
   const filtered = searchIndex.filter((post) => {
     if (!searchWord) return false;
     return post.title.toLowerCase().includes(searchWord) || post.plainText.toLowerCase().includes(searchWord);
   });
-
   document.getElementById('resultCount').textContent = filtered.length;
 
   const grid = document.getElementById('resultsGrid');
@@ -176,7 +158,6 @@ const t = labels[lang] || labels['en'];
 </script>
 
 <style is:global define:vars={{ themeColor }}>
-  /* is:global と !important を使い、デザインを確実に上書きします */
   .search-main-wrapper { width: 100%; min-width: 0; margin: 0; padding: 30px; box-sizing: border-box; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .search-header-area { margin-bottom: 30px; padding-bottom: 12px; border-bottom: 3px solid var(--themeColor); }
   .search-title { font-size: 24px; font-weight: bold; color: #1a1a1a; margin: 0; }
@@ -185,11 +166,8 @@ const t = labels[lang] || labels['en'];
   .post-image-box { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #f0f0f0; border-radius: 6px; margin-bottom: 12px; }
   .post-image-box img { width: 100%; height: 100%; object-fit: cover; }
   .post-meta-line { font-size: 13px; color: #888; margin-bottom: 6px; }
-  
-  /* 記事タイトルの大きさを16pxにしっかり固定 */
   .post-title-text { font-size: 16px !important; font-weight: bold; line-height: 1.5; color: #1a1a1a; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .grid-item:hover .post-title-text { color: var(--themeColor); text-decoration: underline; }
-  
   .no-results { margin: 60px 0; text-align: center; color: #666; font-size: 16px; }
   .load-more-area { text-align: center; margin: 50px 0; }
   .load-more-btn { background: #fff; border: 2px solid var(--themeColor); color: var(--themeColor); padding: 12px 50px; border-radius: 30px; cursor: pointer; font-weight: bold; }
