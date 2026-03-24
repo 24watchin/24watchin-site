@@ -1,5 +1,10 @@
 ---
-const { lang = 'ja', country = 'jp' } = Astro.props;
+// ▼ PropsとParamsの両方から「今の言語」を自動で察知する強力な仕組みです
+const { lang: propLang, country: propCountry } = Astro.props;
+const { lang: paramLang, country: paramCountry } = Astro.params;
+
+const lang = propLang || paramLang || 'ja';
+const country = propCountry || paramCountry || 'jp';
 
 // ▼ 言語・国に合わせたタグ
 const targetTag = lang + '-' + country;
@@ -26,13 +31,17 @@ const sortedPostIds = Array.from(pvMap.entries())
   .slice(0, 10)
   .map(entry => entry[0]);
 
-// 2. 共有メモからデータを読み込む
-let allPosts = globalThis.bloggerPostsCache || [];
+// 2. 共有メモからデータを読み込む（▼ここを新しい「言語別の省エネメモ」に直しました！）
+const cacheKey = 'bloggerPostsCache_' + lang;
+let allPosts = await globalThis[cacheKey];
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
+}
 
 // 3. ▼ lang-country タグが付いている記事だけを厳選
 const filteredPosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.includes(targetTag);
+  return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
 });
 
 // 4. ランキングリストを作成
@@ -46,7 +55,10 @@ for (const id of sortedPostIds) {
 const existingIds = new Set(rankingList.map(p => p.id));
 for (const post of filteredPosts) {
   if (rankingList.length >= 10) break;
-  if (!existingIds.has(post.id)) rankingList.push(post);
+  if (!existingIds.has(post.id)) {
+    rankingList.push(post);
+    existingIds.add(post.id);
+  }
 }
 
 const getImageUrl = (content) => {
@@ -92,7 +104,6 @@ const basePath = '/' + lang + '/' + country;
       <li class="ranking-item">
         <div class="rank-number">{index + 1}</div>
         <div class="post-info">
-          <!-- ▼ リンクも lang/country に合わせて動的に -->
           <a href={basePath + '/news/' + post.id + '/'} class="post-title">{post.title}</a>
         </div>
         <div class="post-thumbnail">
