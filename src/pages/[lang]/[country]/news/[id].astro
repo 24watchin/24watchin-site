@@ -133,7 +133,7 @@ const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + 
 
   <div slot="bottom-wide">
     <RelatedNews relatedPosts={safePosts.slice(0, 6)} lang={lang} country={country} />
-    <RecommendedLinks />
+    <RecommendedLinks lang={lang} />
     <EditorPicks lang={lang} country={country} />
   </div>
 </Layout>
