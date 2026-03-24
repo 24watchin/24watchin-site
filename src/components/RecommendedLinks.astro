@@ -1,10 +1,28 @@
 ---
 // 「あわせて読みたい」枠（Google AdSense マルチプレックス広告）
+
+// ▼ 記事ページから「今の言語（lang）」のバトンを受け取ります
+const { lang = 'ja' } = Astro.props;
+
+// ▼ 言語ごとの「あわせて読みたい」の翻訳辞書です
+const titleMap: Record<string, string> = {
+  ja:      'あわせて読みたい',
+  en:      'Recommended for you',
+  'zh-cn': '推荐阅读',
+  'zh-tw': '推薦閱讀',
+  es:      'Recomendado para ti',
+  fr:      'Recommandé pour vous',
+  de:      'Empfohlen für Sie',
+  ru:      'Рекомендуем к прочтению',
+};
+// 今の言語に合わせたタイトルを選びます（見つからなければ英語にします）
+const sectionTitle = titleMap[lang] || titleMap['en'];
 ---
 
 <div class="bottom-section">
   <div class="sponsored-header">
-    <h3 class="section-title">あわせて読みたい</h3>
+    {/* ▼ 日本語の固定文字から、翻訳された文字（sectionTitle）に書き換えました */}
+    <h3 class="section-title">{sectionTitle}</h3>
     <span class="sponsor-credit">PR</span>
   </div>
   
@@ -27,9 +45,20 @@
   .bottom-section { margin-bottom: 50px; }
   
   .sponsored-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-  .section-title { font-size: 22px; color: #1a1a1a; margin-bottom: 5px; padding-bottom: 0; display: inline-block; border-bottom: none; font-weight: bold; }
   
-  /* PRの文字を産経新聞のように少し控えめなグレーにして自然に馴染ませます */
+  /* ▼ ここがデザインの修正部分です ▼ */
+  .section-title { 
+    font-size: 22px; 
+    color: #1a1a1a; 
+    margin-bottom: -1px; /* 下にある薄いグレーの線とぴったり重ねるための微調整です */
+    padding-bottom: 5px; 
+    display: inline-block; 
+    /* Editor's Picksと同じように、テーマカラーの太い下線（3px）を引きます */
+    border-bottom: 3px solid var(--theme-color, #872732); 
+    font-weight: bold; 
+  }
+  
+  /* PRの文字を少し控えめなグレーにして自然に馴染ませます */
   .sponsor-credit { font-size: 13px; color: #888888; font-weight: bold; margin-bottom: 5px; }
   
   .adsense-container {
