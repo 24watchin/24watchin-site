@@ -1,5 +1,12 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Sidebar from '../components/Sidebar.astro';
+import CategorySidebar from '../components/CategorySidebar.astro';
+import ArticleSidebar from '../components/ArticleSidebar.astro';
+import WeatherSidebar from '../components/WeatherSidebar.astro';
 
 const {
   title,
@@ -16,10 +23,10 @@ const localeKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
   'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
-const localeKey = localeKeyMap[lang] || 'jp';
+const localeKey = (localeKeyMap[lang as keyof typeof localeKeyMap] || 'jp') as keyof typeof categoryLabelMap;
 const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
 
-const defaultDescriptions = {
+const defaultDescriptions: Record<string, string> = {
   ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
   en: 'News from around the world, in your language. 24Watchin delivers the latest local news and stories, clearly explained for international residents.',
   de: 'Nachrichten aus aller Welt in Ihrer Sprache. 24Watchin liefert aktuelle lokale Nachrichten und Berichte, verständlich erklärt.',
@@ -31,17 +38,7 @@ const defaultDescriptions = {
 };
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
-
-// ▼ インラインスタイル文字列として組み立てる
 const bodyStyle = '--theme-color: ' + themeColor + ';';
-
-import '../styles/global.css';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import Sidebar from '../components/Sidebar.astro';
-import CategorySidebar from '../components/CategorySidebar.astro';
-import ArticleSidebar from '../components/ArticleSidebar.astro';
-import WeatherSidebar from '../components/WeatherSidebar.astro';
 ---
 <!DOCTYPE html>
 <html lang={lang}>
@@ -58,51 +55,33 @@ import WeatherSidebar from '../components/WeatherSidebar.astro';
       .main-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: start; }
       .content-area, .sidebar-area { display: block; width: 100%; min-width: 0; margin: 0; padding: 0; align-self: start; }
       .bottom-wide { margin-top: 20px; width: 100%; }
-      @media (max-width: 900px) {
-        .main-layout { grid-template-columns: minmax(0, 1fr); }
-        .sidebar-area { display: none; }
-      }
+      @media (max-width: 900px) { .main-layout { grid-template-columns: minmax(0, 1fr); } .sidebar-area { display: none; } }
       @media (max-width: 640px) { .container { padding: 0 14px; } }
     </style>
   </head>
-
-  <!-- ▼ bodyにインラインスタイルでCSS変数を設定！全パーツに届く！ -->
   <body style={bodyStyle}>
     <Header />
-
     <div class="container page-shell">
       <slot name="top-full" />
-
       <div class="main-layout">
         <main class="content-area">
           <slot />
         </main>
-
         <aside class="sidebar-area">
-          {sidebarType === 'category'
-            ? <CategorySidebar />
-            : sidebarType === 'article'
-              ? <ArticleSidebar />
-              : sidebarType === 'weather'
-                ? <WeatherSidebar />
-                : <Sidebar />}
+          {sidebarType === 'category' ? <CategorySidebar />
+            : sidebarType === 'article' ? <ArticleSidebar />
+            : sidebarType === 'weather' ? <WeatherSidebar />
+            : <Sidebar />}
         </aside>
       </div>
-
       <div class="bottom-wide">
         <slot name="bottom-wide" />
       </div>
     </div>
-
     <Footer allPosts={allPosts} />
-
-    <script>
+    <script is:inline>
       document.addEventListener('contextmenu', e => e.preventDefault());
-    </script>
-    <script>
-      document.querySelectorAll('img').forEach(img => {
-        img.setAttribute('loading', 'lazy');
-      });
+      document.querySelectorAll('img').forEach(img => { img.setAttribute('loading', 'lazy'); });
     </script>
   </body>
 </html>
