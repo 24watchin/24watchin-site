@@ -6,11 +6,15 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// ▼ 修正ポイント：フッター自身が「新しい言語別のメモ」を正しく探せるように順番と名前を直しました！
 let { allPosts = [] } = Astro.props;
 const cacheKey = 'bloggerPostsCache_' + lang;
-if (allPosts.length === 0 && globalThis[cacheKey]) {
-  allPosts = globalThis[cacheKey];
+
+// ▼ 修正ポイント：メモが「準備中」だった場合に備えて「await」で確実に待つようにし、安全装置を追加しました！
+if ((!allPosts || allPosts.length === 0) && globalThis[cacheKey]) {
+  allPosts = await globalThis[cacheKey];
+}
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
 }
 
 // ▼ テーマカラーをlangから取得
