@@ -5,16 +5,32 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+// ▼ 追加：テーマカラーを取得するために読み込みます
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
 type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+
+// ▼ 追加：現在のパスから言語（lang）を判定します
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+
+// ▼ 追加：テーマカラーの設定（Layout.astroと同じ仕組み）
+const localeKeyMap: Record<string, string> = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
+  'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
+};
+const localeKey = localeKeyMap[lang] || 'jp';
+const themeColor = categoryLabelMap[localeKey as keyof typeof categoryLabelMap]?.themeColor || '#872732';
+const bodyStyle = '--theme-color: ' + themeColor + ';';
 ---
 
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<BaseHead title={title} description={description} />
-		<style>
+		<style define:vars={{ themeColor }}>
 			main {
 				width: calc(100% - 2em);
 				max-width: 100%;
@@ -41,6 +57,8 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				padding: 1em 0;
 				text-align: center;
 				line-height: 1;
+        /* タイトルの下にテーマカラーの線を入れる設定 */
+        border-bottom: 3px solid var(--themeColor);
 			}
 			.title h1 {
 				margin: 0 0 0.5em 0;
@@ -55,7 +73,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		</style>
 	</head>
 
-	<body>
+	<body style={bodyStyle}>
 		<Header />
 		<main>
 			<article>
@@ -75,7 +93,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							}
 						</div>
 						<h1>{title}</h1>
-						<hr />
 					</div>
 					<slot />
 				</div>
