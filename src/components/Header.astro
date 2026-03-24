@@ -1,7 +1,6 @@
 ---
 import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
-// ▼ マスターリストを読み込み
 import { getCountryLabel } from '../lib/countryData.ts';
 
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
@@ -45,7 +44,7 @@ const categoryItems = (labels.headerCategories || []).map((item) => {
 
 const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
-const countryLabel = getCountryLabel(country, lang); // マスターリストから取得
+const countryLabel = getCountryLabel(country, lang);
 
 const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
 const languageOptions = [
@@ -73,6 +72,7 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 const moreTextMap: Record<string, string> = { jp: 'さらに見る', en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё' };
 const moreText = moreTextMap[localeKey] || 'More';
+const moreHasActive = moreItems.some(item => item.isActive);
 ---
 
 <header class="site-header">
@@ -111,6 +111,7 @@ const moreText = moreTextMap[localeKey] || 'More';
   <nav class="category-bar">
     <div class="category-nav-inner">
       <button class="scroll-arrow arrow-left" id="arrow-left" type="button">&#8249;</button>
+      
       <div class="pc-category-group">
         <div class="category-scroll pc-scroll" id="pc-scroll">
           {mainItems.map((item) => (
@@ -121,7 +122,7 @@ const moreText = moreTextMap[localeKey] || 'More';
         </div>
         {moreItems.length > 0 && (
           <div class="more-wrapper">
-            <div class="more-btn">
+            <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
               {moreText}
               <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
@@ -135,6 +136,7 @@ const moreText = moreTextMap[localeKey] || 'More';
           </div>
         )}
       </div>
+
       <div class="category-scroll sp-scroll">
         {categoryItems.map((item) => (
           <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
@@ -142,6 +144,7 @@ const moreText = moreTextMap[localeKey] || 'More';
           </a>
         ))}
       </div>
+
       <button class="scroll-arrow arrow-right" id="arrow-right" type="button">&#8250;</button>
     </div>
   </nav>
@@ -149,7 +152,10 @@ const moreText = moreTextMap[localeKey] || 'More';
   <div class="header-word-bar">
     <div class="header-word-inner">
       {headerWords.map((item, index) => (
-        <a href={item.url} class="header-word-link">{item.label}</a>
+        <>
+          {index > 0 && <span class="header-word-separator">|</span>}
+          <a href={item.url} class="header-word-link">{item.label}</a>
+        </>
       ))}
     </div>
   </div>
@@ -159,7 +165,7 @@ const moreText = moreTextMap[localeKey] || 'More';
 <style>
   .site-header { width: 100%; background: #ffffff; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .brand-area { display: flex; flex-direction: column; align-items: flex-end; }
+  .brand-area { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
   .logo-image { width: 200px; height: auto; }
   .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
@@ -168,38 +174,49 @@ const moreText = moreTextMap[localeKey] || 'More';
   .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
   .lang-switcher { position: relative; }
-  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; }
+  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; white-space: nowrap; }
   .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e0e0e0; min-width: 150px; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
   .lang-switcher:hover .lang-dropdown { display: block; }
-  .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; }
+  .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+  .lang-option:last-child { border-bottom: none; }
   .lang-bar { width: 4px; height: 14px; border-radius: 2px; }
-  .category-bar { background: #393737; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
+  
+  .category-bar { background: #393737; width: 100%; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; position: relative; }
   .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
-  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; }
   .category-scroll::-webkit-scrollbar { display: none; }
   .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
+  
   .more-wrapper { position: relative; flex-shrink: 0; }
   .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .more-btn.active { background: var(--theme-color); }
   .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
-  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 200px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .more-wrapper:hover .more-dropdown { display: block; }
   .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
   .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .more-link:last-child { border-bottom: none; }
+  .more-link.active { background: var(--theme-color); }
+
+  .scroll-arrow { 
+    display: none; /* JSで表示制御 */
+    background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; padding: 0; z-index: 10;
+  }
+  .scroll-arrow.active { display: flex; }
+
   .header-word-bar { background: #fff; border-bottom: 1px solid #eee; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px; display: flex; gap: 15px; overflow-x: auto; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; align-items: center; }
   .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
-  .bottom-line { height: 10px; }
-  .scroll-arrow { display: none; color: #fff; background: rgba(255,255,255,0.1); border: none; height: 54px; width: 30px; cursor: pointer; font-size: 22px; justify-content: center; align-items: center; }
+  .header-word-separator { color: #b9b9b9; }
+  .bottom-line { height: 10px; width: 100%; }
+
   .sp-scroll { display: none; }
 
   @media (max-width: 768px) { 
-    .header-top { padding: 8px 10px 6px; }
-    .brand-area .logo-image { width: 140px; } 
+    .logo-image { width: 140px; } 
     .pc-category-group { display: none; } 
-    .sp-scroll { display: flex; flex: 1; }
+    .sp-scroll { display: flex; }
     .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
 </style>
@@ -210,16 +227,30 @@ const moreText = moreTextMap[localeKey] || 'More';
     var btnLeft = document.getElementById('arrow-left');
     var btnRight = document.getElementById('arrow-right');
     if (!scroll || !btnLeft || !btnRight) return;
+
     function updateArrows() {
-      var isWide = window.innerWidth > 1000;
-      if (isWide) { btnLeft.style.display = 'none'; btnRight.style.display = 'none'; return; }
-      btnLeft.style.display = scroll.scrollLeft > 5 ? 'flex' : 'none';
-      btnRight.style.display = scroll.scrollLeft < (scroll.scrollWidth - scroll.clientWidth - 5) ? 'flex' : 'none';
+      var width = window.innerWidth;
+      var atLeft = scroll.scrollLeft <= 5;
+      var atRight = scroll.scrollLeft >= (scroll.scrollWidth - scroll.clientWidth - 5);
+
+      // 1000pxより大きい時、または450px以下の時は矢印を出さない
+      if (width > 1000 || width <= 450) {
+        btnLeft.classList.remove('active');
+        btnRight.classList.remove('active');
+        return;
+      }
+
+      // それ以外の幅（451〜1000）で、スクロールが必要な場合に出す
+      if (!atLeft) { btnLeft.classList.add('active'); } else { btnLeft.classList.remove('active'); }
+      if (!atRight) { btnRight.classList.add('active'); } else { btnRight.classList.remove('active'); }
     }
+
     btnLeft.addEventListener('click', function() { scroll.scrollBy({ left: -200, behavior: 'smooth' }); });
     btnRight.addEventListener('click', function() { scroll.scrollBy({ left: 200, behavior: 'smooth' }); });
+    
     scroll.addEventListener('scroll', updateArrows);
     window.addEventListener('resize', updateArrows);
-    updateArrows();
+    // 初期実行
+    setTimeout(updateArrows, 100);
   });
 </script>
