@@ -46,6 +46,14 @@ export async function getStaticPaths() {
 
 const { lang, country, slug } = Astro.params;
 
+const localeKeyMap: Record<string, string> = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
+  es: 'es', fr: 'fr', de: 'de', ru: 'ru',
+};
+const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
+const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+
+// ▼ 言語別BLOG_ID
 const blogIdMap: Record<string, string> = {
   ja:      import.meta.env.BLOG_ID_JA,
   en:      import.meta.env.BLOG_ID_EN,
@@ -73,13 +81,6 @@ if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
 }
 const allPosts = globalThis[cacheKey] || [];
 
-const localeKeyMap: Record<string, string> = {
-  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
-  es: 'es', fr: 'fr', de: 'de', ru: 'ru',
-};
-const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
-const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
-
 const catData = labels.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : slug;
 const keywords = catData ? catData.keywords : [slug];
@@ -106,13 +107,13 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
   au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
   gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'Großbritannien', ru: 'Великобритания' },
-  sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Синガポール' },
+  sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
   ca: { ja: 'カナダ', en: 'Canada', 'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá', fr: 'Canada', de: 'Kanada', ru: 'Канада' },
   cn: { ja: '中国', en: 'China', 'zh-cn': '中国', 'zh-tw': '中國', es: 'China', fr: 'Chine', de: 'China', ru: 'Китай' },
   tw: { ja: '台湾', en: 'Taiwan', 'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán', fr: 'Taïwan', de: 'Taiwan', ru: 'Тайвань' },
   es: { ja: 'スペイン', en: 'Spain', 'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'España', fr: 'Espagne', de: 'Spanien', ru: 'Испания' },
-  fr: { ja: 'フランス', en: 'France', 'zh-cn': 'フランス', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'フランス' },
-  de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': 'ドイツ', 'zh-tw': 'ドイツ', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Гェルマニア' },
+  fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
+  de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
 };
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 const countryHref = '/' + lang + '/' + country + '/';
@@ -152,7 +153,7 @@ const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
 
   {categoryPosts.length > 0 ? (
     <>
-      <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} lang={lang} country={country} />
+      <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} />
       <hr class="divider" />
       <h2 class="section-title">{moreNewsTitle}</h2>
       <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
