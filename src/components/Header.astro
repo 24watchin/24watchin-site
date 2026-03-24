@@ -1,6 +1,7 @@
 ---
 import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
+// ▼ マスターリストを読み込み
 import { getCountryLabel } from '../lib/countryData.ts';
 
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
@@ -36,15 +37,15 @@ const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 const basePath = '/' + lang + '/' + country;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
+// 安全装置付きのカテゴリ生成
 const categoryItems = (labels.headerCategories || []).map((item) => {
   const href = basePath + '/category/' + item.slug + '/';
-  const isActive = cleanCurrentPath === (basePath + '/category/' + item.slug);
-  return { href, label: item.label, isActive, slug: item.slug };
+  return { href, label: item.label, isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), slug: item.slug };
 });
 
 const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
-const countryLabel = getCountryLabel(country, lang);
+const countryLabel = getCountryLabel(country, lang); // マスターリストから取得
 
 const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
 const languageOptions = [
@@ -63,7 +64,6 @@ const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = moreSlugs.length > 0 ? categoryItems.filter(item => !moreSlugs.includes(item.slug)) : categoryItems;
 const moreItems = moreSlugs.length > 0 ? categoryItems.filter(item => moreSlugs.includes(item.slug)) : [];
 const moreTextMap: Record<string, string> = { jp: 'さらに見る', en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё' };
-const moreText = moreTextMap[localeKey] || 'More';
 ---
 
 <header class="site-header">
@@ -97,7 +97,7 @@ const moreText = moreTextMap[localeKey] || 'More';
         </div>
         {moreItems.length > 0 && (
           <div class="more-wrapper">
-            <div class="more-btn">{moreText} ▾</div>
+            <div class="more-btn">{moreTextMap[localeKey] || 'More'} ▾</div>
             <div class="more-dropdown">
               {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>{item.label}</a>)}
             </div>
@@ -124,7 +124,7 @@ const moreText = moreTextMap[localeKey] || 'More';
   .country-name { font-size: 16px; font-weight: 700; color: #000; }
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
   .search-form { display: flex; align-items: center; gap: 6px; }
-  .search-input { width: 180px; height: 34px; padding: 0 10px; border-radius: 8px; border: 1px solid #ccc; }
+  .search-input { width: 180px; height: 34px; padding: 0 10px; border-radius: 8px; border: 1px solid #ccc; background: #eee; }
   .lang-switcher { position: relative; }
   .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #eee; z-index: 999; min-width: 150px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   .lang-switcher:hover .lang-dropdown { display: block; }
@@ -136,11 +136,11 @@ const moreText = moreTextMap[localeKey] || 'More';
   .category-link.active { background: var(--theme-color); }
   .more-wrapper { position: relative; }
   .more-btn { height: 54px; padding: 0 16px; color: #fff; display: flex; align-items: center; cursor: pointer; font-weight: bold; }
-  .more-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #393737; min-width: 200px; z-index: 999; }
+  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 200px; z-index: 999; }
   .more-wrapper:hover .more-dropdown { display: block; }
   .more-link { display: block; padding: 12px 16px; color: #fff; text-decoration: none; font-size: 14px; }
   .header-word-bar { background: #fff; border-bottom: 1px solid #eee; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px; display: flex; gap: 15px; }
-  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px; display: flex; gap: 15px; overflow-x: auto; }
+  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
   .bottom-line { width: 100%; height: 10px; }
 </style>
