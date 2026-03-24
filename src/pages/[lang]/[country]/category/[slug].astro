@@ -50,6 +50,7 @@ const localeKeyMap: Record<string, string> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
   es: 'es', fr: 'fr', de: 'de', ru: 'ru',
 };
+
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
@@ -63,16 +64,15 @@ const blogIdMap: Record<string, string> = {
   de:      import.meta.env.BLOG_ID_DE,
   ru:      import.meta.env.BLOG_ID_RU,
 };
+
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
 // ▼ 共有メモ（キャッシュ強制無視＆待ち合わせ機能付き）
-// ※エラーの原因だった .trim() は取り除いてあります
 const cacheKey = 'bloggerPostsCache_' + lang;
 
 if (!globalThis[cacheKey]) {
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
-  
   globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
     .then(res => res.ok ? res.json() : { items: [] })
     .then(data => data.items || [])
@@ -99,7 +99,8 @@ const mainSitePosts = allPosts.filter(post => {
 
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => keywords.some(key => label.toLowerCase().includes(key.toLowerCase())));
+  // ▼ ここを「含む（includes）」から「完全一致（===）」に変更しました！
+  return post.labels.some(label => keywords.some(key => label.toLowerCase() === key.toLowerCase()));
 });
 
 const getImageUrl = (content) => {
@@ -121,6 +122,7 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
   de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
 };
+
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 const countryHref = '/' + lang + '/' + country + '/';
 
@@ -134,6 +136,7 @@ const moreNewsMap: Record<string, string> = {
   de:      'Weitere ' + categoryName + '-Nachrichten',
   ru:      'Больше новостей: ' + categoryName,
 };
+
 const moreNewsTitle = moreNewsMap[lang] || moreNewsMap['en'];
 
 const emptyMessageMap: Record<string, string> = {
