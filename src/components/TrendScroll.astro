@@ -1,32 +1,58 @@
 ---
+// ▼ Propsから言語と国を取得
 const { lang = 'ja', country = 'jp' } = Astro.props;
 const targetTag = lang + '-' + country;
 
-const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = import.meta.env.BLOG_ID;
-
-let allPosts = globalThis.bloggerPostsCache || [];
-
-if (allPosts.length === 0) {
-  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=50';
-  const response = await fetch(url).catch(() => null);
-  if (response && response.ok) {
-    const data = await response.json();
-    allPosts = data.items || [];
-    globalThis.bloggerPostsCache = allPosts;
-  }
+// ▼ 新しい「言語別の省エネメモ」からデータを読み込むように修正しました！
+const cacheKey = 'bloggerPostsCache_' + lang;
+let allPosts = await globalThis[cacheKey];
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
 }
 
-const posts = allPosts
-  .filter(post => post.labels && post.labels.includes(targetTag))
-  .slice(0, 10);
+// ▼ まず現在の言語・国のタグを持つ記事を厳選
+const safePosts = allPosts.filter(post =>
+  post.labels && post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()))
+);
 
+// ▼ 並べ替えロジック（「トレンド①」「トレンド②」…タグで順番決定）を追加しました！
+const trendPostsMap = new Map();
+const trendLabelRegex = /^トレンド([①②③④⑤⑥⑦⑧⑨⑩12345678910])$/;
+const numConverter: Record<string, number> = {
+  '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10,
+  '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10
+};
+
+safePosts.forEach(post => {
+  if (!post.labels) return;
+  post.labels.forEach(label => {
+    const match = label.match(trendLabelRegex);
+    if (match) {
+      const num = numConverter[match[1]];
+      if (!trendPostsMap.has(num)) trendPostsMap.set(num, post);
+    }
+  });
+});
+
+// タグ指定されたものを順番通りに配列化
+let finalPosts = Array.from(trendPostsMap.entries()).sort((a, b) => a[0] - b[0]).map(entry => entry[1]);
+
+// ▼ タグ指定が10件に満たない場合は、残りの通常記事から順番に補充します
+const usedIds = new Set(finalPosts.map(p => p.id));
+const normalPosts = safePosts.filter(p => !usedIds.has(p.id));
+while (finalPosts.length < 10 && normalPosts.length > 0) {
+  finalPosts.push(normalPosts.shift());
+}
+const posts = finalPosts.slice(0, 10);
+
+// ▼ 画像取得用関数
 const getImageUrl = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/300x200/eeeeee/999999?text=Trend';
 };
 
-const trendTitles = {
+// ▼ 多言語タイトル
+const trendTitles: Record<string, string> = {
   ja:      'トレンドWatchin！',
   en:      'Watchin Trends!',
   'zh-cn': 'Watchin 趋势！',
@@ -36,9 +62,9 @@ const trendTitles = {
   de:      'Watchin Trends!',
   ru:      'Тренды Watchin!',
 };
-const trendTitle = trendTitles[lang] || trendTitles['ja'];
+const trendTitle = trendTitles[lang] || trendTitles['en'];
 
-const loadingMessages = {
+const loadingMessages: Record<string, string> = {
   ja:      'トレンド記事を読み込み中です...',
   en:      'Loading trending articles...',
   'zh-cn': '正在加载热点文章...',
@@ -48,7 +74,7 @@ const loadingMessages = {
   de:      'Beiträge werden geladen...',
   ru:      'Загрузка популярных статей...',
 };
-const loadingMessage = loadingMessages[lang] || loadingMessages['ja'];
+const loadingMessage = loadingMessages[lang] || loadingMessages['en'];
 ---
 
 <section class="bing-trend-section">
