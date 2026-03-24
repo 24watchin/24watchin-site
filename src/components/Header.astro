@@ -1,128 +1,96 @@
 ---
 import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
+// ▼ siteRoutes（大元のリスト）を読み込みます
+import { langCountryPairs } from '../lib/siteRoutes.ts';
 
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
 
-const SITE_ID = 'jp-ja';
+// 共通の国とパス情報を取得
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || 'jp';
+
+const SITE_ID = 'jp-ja'; 
 const SLOT = 'header_words';
 
-type HeaderWord = {
-  label: string;
-  url: string;
-  displayOrder: number;
-};
+type HeaderWord = { label: string; url: string; displayOrder: number; };
 let headerWords: HeaderWord[] = [];
 
 if (SPACE_ID && DELIVERY_TOKEN) {
   try {
     const params = new URLSearchParams({
-      content_type: 'headerWord',
-      'fields.siteId': SITE_ID,
-      'fields.slot': SLOT,
-      'fields.enabled': 'true',
-      order: 'fields.displayOrder',
-      limit: '20',
+      content_type: 'headerWord', 'fields.siteId': SITE_ID, 'fields.slot': SLOT,
+      'fields.enabled': 'true', order: 'fields.displayOrder', limit: '20',
     });
-    const res = await fetch(
-      `https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`,
-      {
-        headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` },
-      }
+    const res = await fetch(`https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`,
+      { headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` } }
     );
     if (res.ok) {
       const data = await res.json();
-      headerWords = (data.items ?? [])
-        .map((item: any) => ({
-          label: item?.fields?.label ?? '',
-          url: item?.fields?.url ?? '#',
-          displayOrder: Number(item?.fields?.displayOrder ?? 9999),
-          enabled: item?.fields?.enabled ?? false,
-          siteId: item?.fields?.siteId ?? '',
-          slot: item?.fields?.slot ?? '',
-        }))
-        .filter((item: any) =>
-          item.enabled === true &&
-          item.siteId === SITE_ID &&
-          item.slot === SLOT &&
-          item.label
-        )
+      headerWords = (data.items ?? []).map((item: any) => ({
+        label: item?.fields?.label ?? '',
+        url: item?.fields?.url ?? '#',
+        displayOrder: Number(item?.fields?.displayOrder ?? 9999),
+        enabled: item?.fields?.enabled ?? false,
+        siteId: item?.fields?.siteId ?? '',
+        slot: item?.fields?.slot ?? '',
+      })).filter((item: any) => item.enabled === true && item.siteId === SITE_ID && item.slot === SLOT && item.label)
         .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
-        .map((item: any) => ({
-          label: item.label,
-          url: item.url,
-          displayOrder: item.displayOrder,
-        }));
+        .map((item: any) => ({ label: item.label, url: item.url, displayOrder: item.displayOrder }));
     }
-  } catch (e) {
-    headerWords = [];
-  }
+  } catch (e) { headerWords = []; }
 }
 
-const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
-const pathParts = currentPath.split('/').filter(Boolean);
-
-const lang = pathParts[0] || 'ja';
-const country = pathParts[1] || 'jp';
-
 const localeKeyMap: Record<string, string> = {
-  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
-  'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru',
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru',
 };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
-
 const basePath = '/' + lang + '/' + country;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
+// カテゴリメニュー
 const categoryItems = labels.headerCategories.map((item) => {
   const href = basePath + '/category/' + item.slug + '/';
-  const hrefClean = basePath + '/category/' + item.slug;
-  const isActive = cleanCurrentPath === hrefClean;
+  const isActive = cleanCurrentPath === (basePath + '/category/' + item.slug);
   return { href, label: item.label, isActive, slug: item.slug };
 });
 
 const homeHref = basePath + '/';
-// ▼ 検索の送り先に末尾のスラッシュを追加し、確実に search.astro を向くように修正
 const searchAction = basePath + '/search/';
-
 const languageName = labels.languageName;
-const searchPlaceholder = labels.searchPlaceholder;
-const searchAriaLabel = labels.searchAriaLabel;
-const categoryBarAriaLabel = labels.categoryBarAriaLabel;
 
-const countryNameMap: Record<string, string> = {
-  jp: 'JAPAN', en: 'JAPAN', 'zh-cn': '日本',
-  'zh-tw': '日本', es: 'JAPÓN', fr: 'JAPON',
-  de: 'JAPAN', ru: 'ЯПОНИЯ',
+// ▼ 国名の多言語対応マップ（jpのjaをJAPANに設定しました）
+const countryNameDict: Record<string, Record<string, string>> = {
+  jp: { ja: 'JAPAN', en: 'JAPAN', 'zh-cn': '日本', 'zh-tw': '日本', es: 'JAPÓN', fr: 'JAPON', de: 'JAPAN', ru: 'ЯПОНИЯ' },
+  us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'USA', de: 'USA', ru: 'США' },
+  ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
+  au: { ja: 'オーストラリア', en: 'AUSTRALIA', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'AUSTRALIA', fr: 'AUSTRALIE', de: 'AUSTRALIEN', ru: 'АВСТРАЛИЯ' },
+  ca: { ja: 'カナダ', en: 'CANADA', 'zh-cn': '加拿大', 'zh-tw': 'カナダ', es: 'CANADÁ', fr: 'CANADA', de: 'KANADA', ru: 'КАНАДА' },
+  sg: { ja: 'シンガポール', en: 'SINGAPORE', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'SINGAPUR', fr: 'SINGAPOUR', de: 'SINGAPUR', ru: 'СИНГАПУР' },
+  de: { ja: 'ドイツ', en: 'GERMANY', 'zh-cn': '德国', 'zh-tw': '德國', es: 'ALEMANIA', fr: 'ALLEMAGNE', de: 'DEUTSCHLAND', ru: 'ГЕРМАНИЯ' },
+  vn: { ja: 'ベトナム', en: 'VIETNAM', 'zh-cn': '越南', 'zh-tw': '越南', es: 'VIETNAM', fr: 'VIETNAM', de: 'VIETNAM', ru: 'ВЬЕТНАム' },
+  my: { ja: 'マレーシア', en: 'MALAYSIA', 'zh-cn': '马来西亚', 'zh-tw': '馬來西亞', es: 'MALASIA', fr: 'MALAISIE', de: 'MALAYSIA', ru: 'МАЛАЙЗИЯ' },
+  tw: { ja: '台湾', en: 'TAIWAN', 'zh-cn': '台湾', 'zh-tw': '台灣', es: 'TAIWÁN', fr: 'TAÏWAN', de: 'TAIWAN', ru: 'ТАЙВАНЬ' },
+  mx: { ja: 'メキシコ', en: 'MEXICO', 'zh-cn': '墨西哥', 'zh-tw': '墨西哥', es: 'MÉXICO', fr: 'MEXIQUE', de: 'MEXIKO', ru: 'МЕКСИКА' },
+  ar: { ja: 'アルゼンチン', en: 'ARGENTINA', 'zh-cn': '阿根廷', 'zh-tw': '阿根廷', es: 'ARGENTINA', fr: 'ARGENTINE', de: 'ARGENTINIEN', ru: 'АРГЕНТИНА' },
+  gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'REINO UNIDO', fr: 'ROYAUME-UNI', de: 'UK', ru: 'ВЕЛИКОБРИТАНИЯ' },
+  it: { ja: 'イタリア', en: 'ITALY', 'zh-cn': '意大利', 'zh-tw': '義大利', es: 'ITALIA', fr: 'ITALIE', de: 'ITALIEN', ru: 'ИТАЛИЯ' },
+  eg: { ja: 'エジプト', en: 'EGYPT', 'zh-cn': '埃及', 'zh-tw': '埃及', es: 'EGIPTO', fr: 'ÉGYPTE', de: 'ÄGYPTEN', ru: 'ЕГИПЕТ' },
+  nl: { ja: 'オランダ', en: 'NETHERLANDS', 'zh-cn': '荷兰', 'zh-tw': '荷蘭', es: 'PAÍSES BAJOS', fr: 'PAYS-BAS', de: 'NIEDERLANDE', ru: 'НИДЕРЛАНДЫ' },
+  sa: { ja: 'サウジアラビア', en: 'SAUDI ARABIA', 'zh-cn': '沙特阿拉伯', 'zh-tw': '沙烏地阿拉伯', es: 'ARABIA SAUDITA', fr: 'ARABIE SAOUDITE', de: 'SAUDI-ARABIEN', ru: 'САУДОВСКАЯ АРАВИЯ' },
+  es: { ja: 'スペイン', en: 'SPAIN', 'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'ESPAÑA', fr: 'ESPAGNE', de: 'SPANIEN', ru: 'ИСПАНИЯ' },
+  nz: { ja: 'ニュージーランド', en: 'NEW ZEALAND', 'zh-cn': '新西兰', 'zh-tw': '紐西蘭', es: 'NUEVA ZELANDA', fr: 'NOUVELLE-ZÉLANDÉ', de: 'NEUSEELAND', ru: 'НОВАЯ ЗЕЛАНДИЯ' },
+  hk: { ja: '香港', en: 'HONG KONG', 'zh-cn': '香港', 'zh-tw': '香港', es: 'HONG KONG', fr: 'HONG KONG', de: 'HONGKONG', ru: 'ГОНКОНГ' },
 };
-const displayCountryName = countryNameMap[localeKey] || 'JAPAN';
+const displayCountryName = countryNameDict[country]?.[lang] || country.toUpperCase();
 
-const moreSlugsMap: Record<string, string[]> = {
-  jp:      ['health-life', 'weather', 'traffic'],
-  en:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
-  es:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
-  fr:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
-  de:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
-  ru:      ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
-  'zh-cn': [],
-  'zh-tw': [],
-};
-const moreSlugs = moreSlugsMap[localeKey] || [];
-const needsMore = moreSlugs.length > 0;
-
-const mainItems = needsMore
-  ? categoryItems.filter(item => !moreSlugs.includes(item.slug))
-  : categoryItems;
-const moreItems = needsMore
-  ? categoryItems.filter(item => moreSlugs.includes(item.slug))
-  : [];
-
-const moreTextMap: Record<string, string> = {
-  jp: 'さらに見る', en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё',
-};
-const moreText = moreTextMap[localeKey] || 'More';
-const moreHasActive = moreItems.some(item => item.isActive);
+// この国で「許可されている言語」だけを siteRoutes から抽出
+const allowedLangs = langCountryPairs
+  .filter(pair => pair.country === country)
+  .map(pair => pair.lang);
 
 const languageOptions = [
   { code: 'ja',    key: 'jp',    label: '日本語',   barStyle: 'background:#872732' },
@@ -133,11 +101,30 @@ const languageOptions = [
   { code: 'fr',    key: 'fr',    label: 'Français', barStyle: 'background:#3d3d99' },
   { code: 'de',    key: 'de',    label: 'Deutsch',  barStyle: 'background:#006600' },
   { code: 'ru',    key: 'ru',    label: 'Русский',  barStyle: 'background:#500d80' },
-].map(opt => ({
+]
+.filter(opt => allowedLangs.includes(opt.code))
+.map(opt => ({
   ...opt,
   href: '/' + opt.code + '/' + country + '/',
   linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option',
 }));
+
+const moreSlugsMap: Record<string, string[]> = {
+  jp: ['health-life', 'weather', 'traffic'],
+  en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'],
+  'zh-cn': [], 'zh-tw': [],
+};
+const moreSlugs = moreSlugsMap[localeKey] || [];
+const needsMore = moreSlugs.length > 0;
+const mainItems = needsMore ? categoryItems.filter(item => !moreSlugs.includes(item.slug)) : categoryItems;
+const moreItems = needsMore ? categoryItems.filter(item => moreSlugs.includes(item.slug)) : [];
+const moreTextMap: Record<string, string> = { jp: 'さらに見る', en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё' };
+const moreText = moreTextMap[localeKey] || 'More';
+const moreHasActive = moreItems.some(item => item.isActive);
 ---
 
 <header class="site-header">
@@ -151,11 +138,11 @@ const languageOptions = [
 
     <div class="right-area">
       <form action={searchAction} method="get" class="search-form">
-        <input type="text" name="q" class="search-input" placeholder={searchPlaceholder} aria-label={searchAriaLabel} />
-        <button type="submit" class="search-button" aria-label={searchAriaLabel}>
+        <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} aria-label={labels.searchAriaLabel} />
+        <button type="submit" class="search-button" aria-label={labels.searchAriaLabel}>
           <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <circle cx="11" cy="11" r="6.5"></circle>
-            <line x1="16" y1="16" x2="21" y2="21"></line>
+            <line x1="16" x2="21" y2="21"></line>
           </svg>
         </button>
       </form>
@@ -173,7 +160,7 @@ const languageOptions = [
     </div>
   </div>
 
-  <nav class="category-bar" aria-label={categoryBarAriaLabel}>
+  <nav class="category-bar" aria-label={labels.categoryBarAriaLabel}>
     <div class="category-nav-inner">
       <button class="scroll-arrow arrow-left" id="arrow-left" aria-label="左へ" type="button">&#8249;</button>
       <div class="pc-category-group">
@@ -227,11 +214,10 @@ const languageOptions = [
       )}
     </div>
   </div>
-  <div class="bottom-line"></div>
+  <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
 </header>
 
 <style>
-  /* スタイル設定は変更なし（全上書きのためそのまま含めています） */
   .site-header { width: 100%; background: #ffffff; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .brand-area { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
@@ -282,7 +268,7 @@ const languageOptions = [
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px 12px; display: flex; align-items: center; overflow-x: auto; }
   .header-word-link { color: #111111; text-decoration: underline; font-size: 14px; white-space: nowrap; }
   .header-word-separator { margin: 0 0.8em; color: #b9b9b9; }
-  .bottom-line { width: 100%; height: 10px; background: var(--theme-color); }
+  .bottom-line { width: 100%; height: 10px; }
 
   @media (max-width: 768px) {
     .header-top { padding: 8px 10px 6px; gap: 8px; }
@@ -300,7 +286,6 @@ const languageOptions = [
 </style>
 
 <script is:inline>
-  /* スクリプト設定は変更なし */
   window.addEventListener('load', function() {
     var scroll = document.getElementById('pc-scroll');
     var btnLeft = document.getElementById('arrow-left');
