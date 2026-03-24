@@ -1,15 +1,17 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
-let { allPosts = [] } = Astro.props;
-if (allPosts.length === 0 && globalThis.bloggerPostsCache) {
-  allPosts = globalThis.bloggerPostsCache;
-}
-
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
+
+// ▼ 修正ポイント：フッター自身が「新しい言語別のメモ」を正しく探せるように順番と名前を直しました！
+let { allPosts = [] } = Astro.props;
+const cacheKey = 'bloggerPostsCache_' + lang;
+if (allPosts.length === 0 && globalThis[cacheKey]) {
+  allPosts = globalThis[cacheKey];
+}
 
 // ▼ テーマカラーをlangから取得
 const localeKeyMap: Record<string, string> = {
@@ -83,7 +85,7 @@ const infoMenus: Record<string, { label: string; href: string }[]> = {
     { label: 'À propos de 24Watchin', href: '/' + lang + '/' + country + '/info/about/' },
     { label: 'Politique de confidentialité', href: '/' + lang + '/' + country + '/info/privacy/' },
     { label: "Conditions d'utilisation", href: '/' + lang + '/' + country + '/info/terms/' },
-    { label: 'Contact',              href: '/' + lang + '/' + country + '/info/contact/' },
+    { label: 'Contact',               href: '/' + lang + '/' + country + '/info/contact/' },
     { label: 'Politique de corrections', href: '/' + lang + '/' + country + '/info/corrections/' },
     { label: "Droits d'auteur",      href: '/' + lang + '/' + country + '/info/copyright/' },
   ],
