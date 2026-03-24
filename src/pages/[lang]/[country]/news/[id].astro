@@ -10,6 +10,7 @@ import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/category
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
+
   const langCountryPairs = [
     { lang: 'ja',    country: 'jp',  blogId: import.meta.env.BLOG_ID_JA },
     { lang: 'en',    country: 'jp',  blogId: import.meta.env.BLOG_ID_EN },
@@ -31,6 +32,7 @@ export async function getStaticPaths() {
     { lang: 'de',    country: 'de',  blogId: import.meta.env.BLOG_ID_DE },
     { lang: 'ru',    country: 'jp',  blogId: import.meta.env.BLOG_ID_RU },
   ];
+
   const paths = [];
   for (const { lang, country, blogId } of langCountryPairs) {
     if (!blogId) continue;
@@ -41,9 +43,14 @@ export async function getStaticPaths() {
       const data = await response.json();
       const posts = data.items || [];
       const targetTag = lang + '-' + country;
-      const filteredPosts = posts.filter(p => p.labels && p.labels.includes(targetTag));
+      const filteredPosts = posts.filter(p =>
+        p.labels && p.labels.includes(targetTag)
+      );
       for (const post of filteredPosts) {
-        paths.push({ params: { lang, country, id: post.id }, props: { post, allPosts: posts } });
+        paths.push({
+          params: { lang, country, id: post.id },
+          props: { post, allPosts: posts },
+        });
       }
     } catch (e) {}
   }
@@ -52,7 +59,11 @@ export async function getStaticPaths() {
 
 const { post, allPosts = [] } = Astro.props;
 const { lang, country } = Astro.params;
-const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', fr: 'fr', de: 'de', ru: 'ru' };
+
+const localeKeyMap: Record<string, string> = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
+  es: 'es', fr: 'fr', de: 'de', ru: 'ru',
+};
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
@@ -60,6 +71,7 @@ const currentCategory = labels.allCategories.find(cat => {
   if (!post.labels) return false;
   return post.labels.some(label => cat.keywords.some(key => label.includes(key)));
 });
+
 const categoryLabel = currentCategory ? currentCategory.label : '';
 const categorySlug = currentCategory ? currentCategory.slug : '';
 const categoryHref = categorySlug ? '/' + lang + '/' + country + '/category/' + categorySlug + '/' : '';
@@ -68,35 +80,43 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
   ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU', fr: 'EAU', de: 'VAE', ru: 'ОАЭ' },
+  au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
+  gb: { ja: 'イギリス', en: 'UK', 'zh-cn': '英国', 'zh-tw': '英國', es: 'Reino Unido', fr: 'Royaume-Uni', de: 'Großbritannien', ru: 'Великобритания' },
+  sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
+  ca: { ja: 'カナダ', en: 'Canada', 'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá', fr: 'Canada', de: 'Kanada', ru: 'Канада' },
+  cn: { ja: '中国', en: 'China', 'zh-cn': '中国', 'zh-tw': '中國', es: 'China', fr: 'Chine', de: 'China', ru: 'Китай' },
+  tw: { ja: '台湾', en: 'Taiwan', 'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán', fr: 'Taïwan', de: 'Taiwan', ru: 'Тайвань' },
+  es: { ja: 'スペイン', en: 'Spain', 'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'España', fr: 'Espagne', de: 'Spanien', ru: 'Испания' },
+  fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
+  de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
 };
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 const countryHref = '/' + lang + '/' + country + '/';
 
 function formatDateTime(dateString: string) {
   const date = new Date(dateString);
-  return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' ' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+  return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
+    + ' ' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
 }
 
 const targetTag = lang + '-' + country;
-const safePosts = allPosts.filter(p => p.id !== post.id && p.labels && p.labels.includes(targetTag));
-const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + post.id + '/';
+const safePosts = allPosts.filter(p =>
+  p.id !== post.id &&
+  p.labels &&
+  p.labels.includes(targetTag)
+);
 
-const btnLabels: Record<string, string> = {
-  ja: 'サイズ', en: 'Size', 'zh-cn': '大小', 'zh-tw': '大小',
-  es: 'Tamaño', fr: 'Taille', de: 'Größe', ru: 'Размер'
-};
-const btnTitle = btnLabels[lang] || btnLabels['en'];
+const articleUrl = 'https://24watchin.com/' + lang + '/' + country + '/news/' + post.id + '/';
 ---
 
 <Layout title={post.title} sidebarType="article">
   <div class="article-breadcrumb-wrap">
-    <Breadcrumb countryLabel={countryLabel} countryHref={countryHref} categoryLabel={categoryLabel} categoryHref={categoryHref} />
-    
-    <div class="font-size-selector" aria-label={btnTitle}>
-      <button class="size-btn" data-size="s">小</button>
-      <button class="size-btn active" data-size="m">中</button>
-      <button class="size-btn" data-size="l">大</button>
-    </div>
+    <Breadcrumb
+      countryLabel={countryLabel}
+      countryHref={countryHref}
+      categoryLabel={categoryLabel}
+      categoryHref={categoryHref}
+    />
   </div>
 
   <article class="post-container">
@@ -107,98 +127,23 @@ const btnTitle = btnLabels[lang] || btnLabels['en'];
         <ShareButtons articleUrl={articleUrl} articleTitle={post.title} />
       </div>
     </header>
-
-    <div id="post-body" class="post-content font-m" set:html={post.content} />
-    
+    <div class="post-content" set:html={post.content} />
     <ReactionBar articleId={post.id} />
   </article>
 
   <div slot="bottom-wide">
     <RelatedNews relatedPosts={safePosts.slice(0, 6)} lang={lang} country={country} />
-    <RecommendedLinks lang={lang} />
+    <RecommendedLinks />
     <EditorPicks lang={lang} country={country} />
   </div>
 </Layout>
 
-<script is:inline>
-  const body = document.getElementById('post-body');
-  const buttons = document.querySelectorAll('.size-btn');
-  const isMobile = window.innerWidth <= 768;
-
-  if (isMobile) {
-    const savedSize = localStorage.getItem('articleFontSize') || 'm';
-    applySize(savedSize);
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const size = btn.getAttribute('data-size');
-        applySize(size);
-        localStorage.setItem('articleFontSize', size);
-      });
-    });
-  }
-
-  function applySize(size) {
-    if (!body) return;
-    body.classList.remove('font-s', 'font-m', 'font-l');
-    body.classList.add('font-' + size);
-    buttons.forEach(b => {
-      b.classList.toggle('active', b.getAttribute('data-size') === size);
-    });
-  }
-</script>
-
 <style>
-  .article-breadcrumb-wrap { 
-    margin: -10px 0 6px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    gap: 10px;
-  }
-  .font-size-selector { display: none; }
-
+  .article-breadcrumb-wrap { margin: -10px 0 6px; }
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
-  
-  /* PCの基本設定 */
-  .post-content { font-size: 16px; line-height: 1.7; color: #1a1a1a; }
+  .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
-
-  @media (max-width: 768px) {
-    .font-size-selector { display: flex; align-items: center; gap: 4px; }
-    .size-btn { border: 1px solid #ccc; background: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; color: #666; }
-    .size-btn.active { background: #393737; color: #fff; border-color: #393737; }
-
-    .post-container { padding: 20px 15px; } 
-    .post-title { font-size: 22px; }
-    .article-breadcrumb-wrap { margin: 0 0 10px; }
-
-    /* 全体の行間を1.6に設定 */
-    .post-content { line-height: 1.6 !important; }
-
-    /* スマホ限定のサイズ適用（キャプション以外） */
-    .post-content.font-s { font-size: 17px !important; }
-    .post-content.font-s :global(*:not(.tr-caption):not(.tr-caption *)) { font-size: 17px !important; }
-
-    .post-content.font-m { font-size: 19px !important; }
-    .post-content.font-m :global(*:not(.tr-caption):not(.tr-caption *)) { font-size: 19px !important; }
-
-    .post-content.font-l { font-size: 21px !important; }
-    .post-content.font-l :global(*:not(.tr-caption):not(.tr-caption *)) { font-size: 21px !important; }
-    
-    /* ▼ 画像説明（キャプション）はサイズ固定 */
-    .post-content :global(.tr-caption),
-    .post-content :global(.tr-caption *) {
-      font-size: 12px !important;
-      line-height: 1.4 !important;
-      color: #666 !important;
-    }
-
-    /* 見出し（H2）は大きくなりすぎないよう調整 */
-    .post-content :global(h2) { font-size: 20px !important; font-weight: bold; margin: 24px 0 12px; }
-  }
 </style>
-
