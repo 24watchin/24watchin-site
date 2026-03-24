@@ -2,10 +2,10 @@
 import GoogleAdBanner from './GoogleAdBanner.astro';
 import GlobalRegionNewsSidebar from './GlobalRegionNewsSidebar.astro';
 import AccessRanking from './AccessRanking.astro';
-// ▼ 修正ポイント1：「s」なしの古いファイルではなく、先ほど直した「EditorPicks（sあり）」を読み込みます！
-import EditorPicks from './EditorPicks.astro';
+// ▼ ここを「EditorsPick」（sなし）の縦並び部品に戻します
+import EditorsPick from './EditorsPick.astro';
 
-// ▼ 修正ポイント2：強制的に「ja」にするのをやめ、サイドバー自身にも「URLからの言語察知（GPS）」を持たせます
+// ▼ GPS機能は残しておきます
 const { lang: propLang, country: propCountry, allPosts = [] } = Astro.props;
 const { lang: paramLang, country: paramCountry } = Astro.params;
 
@@ -21,8 +21,8 @@ const country = propCountry || paramCountry || urlCountry || 'jp';
 
   <AccessRanking lang={lang} country={country} />
 
-  {/* ▼ 修正ポイント3：呼び出すタグも EditorPicks に変更します */}
-  <EditorPicks lang={lang} country={country} />
+  {/* ▼ 呼び出すコンポーネントも EditorsPick に戻します */}
+  <EditorsPick lang={lang} country={country} />
 
   <GlobalRegionNewsSidebar
     lang={lang}
