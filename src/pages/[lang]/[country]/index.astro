@@ -6,47 +6,25 @@ import TrendScroll from '../../../components/TrendScroll.astro';
 import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
 import GlobalRegionNews from '../../../components/GlobalRegionNews.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
+// ▼ 追加：大元のカンペを読み込みます
+import { langCountryPairs, getBlogId } from '../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
-  return [
-    { params: { lang: 'ja',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'us' } },
-    { params: { lang: 'en',    country: 'ae' } },
-    { params: { lang: 'zh-cn', country: 'jp' } },
-    { params: { lang: 'zh-tw', country: 'jp' } },
-    { params: { lang: 'es',    country: 'jp' } },
-    { params: { lang: 'fr',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'jp' } },
-    { params: { lang: 'ru',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'de' } },
-    { params: { lang: 'fr',    country: 'fr' } },
-  ];
+  // ▼ 変更：長いリストを消し、カンペから自動で全ページを作ります！
+  return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
 const { lang, country } = Astro.params;
 
-// ▼ 言語別BLOG_ID
-const blogIdMap: Record<string, string> = {
-  ja:      import.meta.env.BLOG_ID_JA,
-  en:      import.meta.env.BLOG_ID_EN,
-  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
-  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
-  es:      import.meta.env.BLOG_ID_ES,
-  fr:      import.meta.env.BLOG_ID_FR,
-  de:      import.meta.env.BLOG_ID_DE,
-  ru:      import.meta.env.BLOG_ID_RU,
-};
-const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
+// ▼ 変更：BLOG_IDもカンペから1行で呼び出します！
+const BLOG_ID = getBlogId(lang);
 const API_KEY = import.meta.env.API_KEY;
 
 // ▼ 共有メモ（キャッシュ強制無視＆待ち合わせ機能付き）
-// ※エラーの原因だった .trim() は取り除いてあります
 const cacheKey = 'bloggerPostsCache_' + lang;
 
 if (!globalThis[cacheKey]) {
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
-  
   globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
     .then(res => res.ok ? res.json() : { items: [] })
     .then(data => data.items || [])
@@ -62,6 +40,7 @@ if (!Array.isArray(allPosts)) {
 }
 
 const targetTag = lang + '-' + country;
+
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
   return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
@@ -71,6 +50,7 @@ const langKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
   'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
+
 const langKey = langKeyMap[lang] || 'jp';
 const categoryData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
 
@@ -104,6 +84,7 @@ const pageTitleMap: Record<string, Record<string, string>> = {
   de: { ja: 'ドイツのニュース', en: 'Germany News', 'zh-cn': '德国新闻', 'zh-tw': '德國新聞', es: 'Noticias de Alemania', fr: 'Actualités d\'Allemagne', de: 'Deutschland Nachrichten', ru: 'Новости Германии' },
   fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': '法国新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости Франции' },
 };
+
 const pageTitle = pageTitleMap[country]?.[lang] || 'News';
 ---
 
@@ -147,4 +128,3 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
   .genre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
   @media (max-width: 900px) { .genre-grid { grid-template-columns: 1fr; } }
 </style>
-
