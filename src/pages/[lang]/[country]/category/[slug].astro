@@ -53,7 +53,6 @@ const localeKeyMap: Record<string, string> = {
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
-// ▼ 言語別BLOG_ID
 const blogIdMap: Record<string, string> = {
   ja:      import.meta.env.BLOG_ID_JA,
   en:      import.meta.env.BLOG_ID_EN,
@@ -67,19 +66,26 @@ const blogIdMap: Record<string, string> = {
 const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ 言語別キャッシュ
+// ▼ 共有メモ（キャッシュ強制無視＆待ち合わせ機能付き）
+// ※エラーの原因だった .trim() は取り除いてあります
 const cacheKey = 'bloggerPostsCache_' + lang;
-if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
-  try {
-    const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=500';
-    const response = await fetch(url).catch(() => null);
-    if (response && response.ok) {
-      const data = await response.json();
-      globalThis[cacheKey] = data.items || [];
-    }
-  } catch (e) {}
+
+if (!globalThis[cacheKey]) {
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
+  
+  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
+    .then(res => res.ok ? res.json() : { items: [] })
+    .then(data => data.items || [])
+    .catch(err => {
+      console.error("記事の取得に失敗しました", err);
+      return [];
+    });
 }
-const allPosts = globalThis[cacheKey] || [];
+
+let allPosts = await globalThis[cacheKey];
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
+}
 
 const catData = labels.allCategories.find(c => c.slug === slug);
 const categoryName = catData ? catData.label : slug;
@@ -88,12 +94,12 @@ const keywords = catData ? catData.keywords : [slug];
 const targetTag = lang + '-' + country;
 const mainSitePosts = allPosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.includes(targetTag);
+  return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
 });
 
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
-  return post.labels.some(label => keywords.some(key => label.includes(key)));
+  return post.labels.some(label => keywords.some(key => label.toLowerCase().includes(key.toLowerCase())));
 });
 
 const getImageUrl = (content) => {
@@ -151,16 +157,17 @@ const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
     categoryHref={'/' + lang + '/' + country + '/category/' + slug + '/'}
   />
 
-  {categoryPosts.length > 0 ? (
-    <>
-      <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} />
-      <hr class="divider" />
-      <h2 class="section-title">{moreNewsTitle}</h2>
-      <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
-    </>
-  ) : (
-    <p class="empty-message">{emptyMessage}</p>
-  )}
+  {categoryPosts.length > 0 ?
+    (
+      <>
+        <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} lang={lang} country={country} />
+        <hr class="divider" />
+        <h2 class="section-title">{moreNewsTitle}</h2>
+        <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
+      </>
+    ) : (
+      <p class="empty-message">{emptyMessage}</p>
+    )}
 </Layout>
 
 <style>
