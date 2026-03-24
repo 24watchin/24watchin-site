@@ -1,128 +1,127 @@
 // src/lib/siteRoutes.ts
 
 // ▼ 作成する「言語」と「国」の組み合わせリスト
-// active: true  -> 本番環境でも公開する
-// active: false -> 本番環境では隠す（自分のパソコンでのみ見れる）
+// 全て active: true に設定しました。これで全URLが生成されます。
 const rawLangCountryPairs = [
-  // 日本（当初は日本語、英語、中国語のみ公開）
+  // 日本
   { lang: 'ja', country: 'jp', active: true },
   { lang: 'en', country: 'jp', active: true },
   { lang: 'zh-cn', country: 'jp', active: true },
   { lang: 'zh-tw', country: 'jp', active: true },
-  { lang: 'es', country: 'jp', active: false }, 
-  { lang: 'fr', country: 'jp', active: false }, 
-  { lang: 'de', country: 'jp', active: false }, 
-  { lang: 'ru', country: 'jp', active: false },
+  { lang: 'es', country: 'jp', active: true },
+  { lang: 'fr', country: 'jp', active: true },
+  { lang: 'de', country: 'jp', active: true },
+  { lang: 'ru', country: 'jp', active: true },
 
-  // UAE（日本語＋英語、中国語）
-  { lang: 'ja', country: 'ae', active: false }, 
-  { lang: 'en', country: 'ae', active: false }, 
-  { lang: 'zh-cn', country: 'ae', active: false }, 
-  { lang: 'zh-tw', country: 'ae', active: false },
+  // UAE
+  { lang: 'ja', country: 'ae', active: true }, 
+  { lang: 'en', country: 'ae', active: true }, 
+  { lang: 'zh-cn', country: 'ae', active: true }, 
+  { lang: 'zh-tw', country: 'ae', active: true },
 
-  // アメリカ（日本語＋スペイン語、中国語）
-  { lang: 'ja', country: 'us', active: false }, 
-  { lang: 'es', country: 'us', active: false }, 
-  { lang: 'zh-cn', country: 'us', active: false }, 
-  { lang: 'zh-tw', country: 'us', active: false },
+  // アメリカ
+  { lang: 'ja', country: 'us', active: true }, 
+  { lang: 'es', country: 'us', active: true }, 
+  { lang: 'zh-cn', country: 'us', active: true }, 
+  { lang: 'zh-tw', country: 'us', active: true },
 
-  // オーストラリア（日本語＋中国語、スペイン語）
-  { lang: 'ja', country: 'au', active: false }, 
-  { lang: 'zh-cn', country: 'au', active: false }, 
-  { lang: 'zh-tw', country: 'au', active: false }, 
-  { lang: 'es', country: 'au', active: false },
+  // オーストラリア
+  { lang: 'ja', country: 'au', active: true }, 
+  { lang: 'zh-cn', country: 'au', active: true }, 
+  { lang: 'zh-tw', country: 'au', active: true }, 
+  { lang: 'es', country: 'au', active: true },
 
-  // カナダ（日本語＋中国語、スペイン語）
-  { lang: 'ja', country: 'ca', active: false }, 
-  { lang: 'zh-cn', country: 'ca', active: false }, 
-  { lang: 'zh-tw', country: 'ca', active: false }, 
-  { lang: 'es', country: 'ca', active: false },
+  // カナダ
+  { lang: 'ja', country: 'ca', active: true }, 
+  { lang: 'zh-cn', country: 'ca', active: true }, 
+  { lang: 'zh-tw', country: 'ca', active: true }, 
+  { lang: 'es', country: 'ca', active: true },
 
-  // シンガポール（日本語＋フランス語、ドイツ語）
-  { lang: 'ja', country: 'sg', active: false }, 
-  { lang: 'fr', country: 'sg', active: false }, 
-  { lang: 'de', country: 'sg', active: false },
+  // シンガポール
+  { lang: 'ja', country: 'sg', active: true }, 
+  { lang: 'fr', country: 'sg', active: true }, 
+  { lang: 'de', country: 'sg', active: true },
 
-  // ドイツ（日本語＋英語、ロシア語）
-  { lang: 'ja', country: 'de', active: false }, 
-  { lang: 'en', country: 'de', active: false }, 
-  { lang: 'ru', country: 'de', active: false },
+  // ドイツ
+  { lang: 'ja', country: 'de', active: true }, 
+  { lang: 'en', country: 'de', active: true }, 
+  { lang: 'ru', country: 'de', active: true },
 
-  // ベトナム（日本語＋英語、中国語）
-  { lang: 'ja', country: 'vn', active: false }, 
-  { lang: 'en', country: 'vn', active: false }, 
-  { lang: 'zh-cn', country: 'vn', active: false }, 
-  { lang: 'zh-tw', country: 'vn', active: false },
+  // ベトナム
+  { lang: 'ja', country: 'vn', active: true }, 
+  { lang: 'en', country: 'vn', active: true }, 
+  { lang: 'zh-cn', country: 'vn', active: true }, 
+  { lang: 'zh-tw', country: 'vn', active: true },
 
-  // マレーシア（日本語＋英語、中国語）
-  { lang: 'ja', country: 'my', active: false }, 
-  { lang: 'en', country: 'my', active: false }, 
-  { lang: 'zh-cn', country: 'my', active: false }, 
-  { lang: 'zh-tw', country: 'my', active: false },
+  // マレーシア
+  { lang: 'ja', country: 'my', active: true }, 
+  { lang: 'en', country: 'my', active: true }, 
+  { lang: 'zh-cn', country: 'my', active: true }, 
+  { lang: 'zh-tw', country: 'my', active: true },
 
-  // 台湾（日本語＋英語）
-  { lang: 'ja', country: 'tw', active: false }, 
-  { lang: 'en', country: 'tw', active: false },
+  // 台湾
+  { lang: 'ja', country: 'tw', active: true }, 
+  { lang: 'en', country: 'tw', active: true },
 
-  // メキシコ（日本語＋英語、中国語）
-  { lang: 'ja', country: 'mx', active: false }, 
-  { lang: 'en', country: 'mx', active: false }, 
-  { lang: 'zh-cn', country: 'mx', active: false }, 
-  { lang: 'zh-tw', country: 'mx', active: false },
+  // メキシコ
+  { lang: 'ja', country: 'mx', active: true }, 
+  { lang: 'en', country: 'mx', active: true }, 
+  { lang: 'zh-cn', country: 'mx', active: true }, 
+  { lang: 'zh-tw', country: 'mx', active: true },
 
-  // アルゼンチン（日本語＋英語、ドイツ語）
-  { lang: 'ja', country: 'ar', active: false }, 
-  { lang: 'en', country: 'ar', active: false }, 
-  { lang: 'de', country: 'ar', active: false },
+  // アルゼンチン
+  { lang: 'ja', country: 'ar', active: true }, 
+  { lang: 'en', country: 'ar', active: true }, 
+  { lang: 'de', country: 'ar', active: true },
 
-  // イギリス（日本語＋スペイン語、中国語）
-  { lang: 'ja', country: 'gb', active: false }, 
-  { lang: 'es', country: 'gb', active: false }, 
-  { lang: 'zh-cn', country: 'gb', active: false }, 
-  { lang: 'zh-tw', country: 'gb', active: false },
+  // イギリス
+  { lang: 'ja', country: 'gb', active: true }, 
+  { lang: 'es', country: 'gb', active: true }, 
+  { lang: 'zh-cn', country: 'gb', active: true }, 
+  { lang: 'zh-tw', country: 'gb', active: true },
 
-  // イタリア（日本語＋英語、中国語）
-  { lang: 'ja', country: 'it', active: false }, 
-  { lang: 'en', country: 'it', active: false }, 
-  { lang: 'zh-cn', country: 'it', active: false }, 
-  { lang: 'zh-tw', country: 'it', active: false },
+  // イタリア
+  { lang: 'ja', country: 'it', active: true }, 
+  { lang: 'en', country: 'it', active: true }, 
+  { lang: 'zh-cn', country: 'it', active: true }, 
+  { lang: 'zh-tw', country: 'it', active: true },
 
-  // エジプト（日本語＋英語、ロシア語）
-  { lang: 'ja', country: 'eg', active: false }, 
-  { lang: 'en', country: 'eg', active: false }, 
-  { lang: 'ru', country: 'eg', active: false },
+  // エジプト
+  { lang: 'ja', country: 'eg', active: true }, 
+  { lang: 'en', country: 'eg', active: true }, 
+  { lang: 'ru', country: 'eg', active: true },
 
-  // オランダ（日本語＋英語、ドイツ語）
-  { lang: 'ja', country: 'nl', active: false }, 
-  { lang: 'en', country: 'nl', active: false }, 
-  { lang: 'de', country: 'nl', active: false },
+  // オランダ
+  { lang: 'ja', country: 'nl', active: true }, 
+  { lang: 'en', country: 'nl', active: true }, 
+  { lang: 'de', country: 'nl', active: true },
 
-  // サウジアラビア（日本語＋英語、フランス語）
-  { lang: 'ja', country: 'sa', active: false }, 
-  { lang: 'en', country: 'sa', active: false }, 
-  { lang: 'fr', country: 'sa', active: false },
+  // サウジアラビア
+  { lang: 'ja', country: 'sa', active: true }, 
+  { lang: 'en', country: 'sa', active: true }, 
+  { lang: 'fr', country: 'sa', active: true },
 
-  // スペイン（日本語＋英語、ドイツ語）
-  { lang: 'ja', country: 'es', active: false }, 
-  { lang: 'en', country: 'es', active: false }, 
-  { lang: 'de', country: 'es', active: false },
+  // スペイン
+  { lang: 'ja', country: 'es', active: true }, 
+  { lang: 'en', country: 'es', active: true }, 
+  { lang: 'de', country: 'es', active: true },
 
-  // ニュージーランド（日本語＋中国語、ドイツ語）
-  { lang: 'ja', country: 'nz', active: false }, 
-  { lang: 'zh-cn', country: 'nz', active: false }, 
-  { lang: 'zh-tw', country: 'nz', active: false }, 
-  { lang: 'de', country: 'nz', active: false },
+  // ニュージーランド
+  { lang: 'ja', country: 'nz', active: true }, 
+  { lang: 'zh-cn', country: 'nz', active: true }, 
+  { lang: 'zh-tw', country: 'nz', active: true }, 
+  { lang: 'de', country: 'nz', active: true },
 
-  // 香港（日本語＋フランス語、ドイツ語）
-  { lang: 'ja', country: 'hk', active: false }, 
-  { lang: 'fr', country: 'hk', active: false }, 
-  { lang: 'de', country: 'hk', active: false }
+  // 香港
+  { lang: 'ja', country: 'hk', active: true }, 
+  { lang: 'fr', country: 'hk', active: true }, 
+  { lang: 'de', country: 'hk', active: true }
 ];
 
-export const langCountryPairs = import.meta.env.DEV
-  ? rawLangCountryPairs
-  : rawLangCountryPairs.filter(pair => pair.active);
+// ▼ 全て公開設定にしたため、本番環境でも全てのページが生成されます
+export const langCountryPairs = rawLangCountryPairs;
 
+// ▼ 各言語がどのBloggerを見るべきかを決める設定
 export const getBlogId = (lang: string) => {
   const blogIdMap: Record<string, string> = {
     ja:      import.meta.env.BLOG_ID_JA,
