@@ -50,7 +50,9 @@ if (!globalThis[cacheKey] || globalThis[cacheKey].length === 0) {
       const data = await response.json();
       globalThis[cacheKey] = data.items || [];
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error("記事の取得に失敗しました", e);
+  }
 }
 
 const allPosts = globalThis[cacheKey] || [];
@@ -97,7 +99,7 @@ const pageTitleMap: Record<string, Record<string, string>> = {
   us: { ja: 'アメリカのニュース', en: 'USA News', 'zh-cn': '美国新闻', 'zh-tw': '美國新聞', es: 'Noticias de EE.UU.', fr: 'Actualités des États-Unis', de: 'USA Nachrichten', ru: 'Новости США' },
   ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿聯酋新聞', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
   de: { ja: 'ドイツのニュース', en: 'Germany News', 'zh-cn': '德国新闻', 'zh-tw': '德國新聞', es: 'Noticias de Alemania', fr: 'Actualités d\'Allemagne', de: 'Deutschland Nachrichten', ru: 'Новости Германии' },
-  fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': 'フランス新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости フランス' },
+  fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': '法国新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости Франции' },
 };
 const pageTitle = pageTitleMap[country]?.[lang] || 'News';
 ---
