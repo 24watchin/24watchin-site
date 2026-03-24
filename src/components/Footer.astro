@@ -1,5 +1,7 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
+// ▼ カンペを読み込み
+import { langCountryPairs, getBlogId } from '../lib/siteRoutes.ts';
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
@@ -9,7 +11,6 @@ const country = pathParts[1] || 'jp';
 let { allPosts = [] } = Astro.props;
 const cacheKey = 'bloggerPostsCache_' + lang;
 
-// ▼ 修正ポイント：メモが「準備中」だった場合に備えて「await」で確実に待つようにし、安全装置を追加しました！
 if ((!allPosts || allPosts.length === 0) && globalThis[cacheKey]) {
   allPosts = await globalThis[cacheKey];
 }
@@ -17,7 +18,6 @@ if (!Array.isArray(allPosts)) {
   allPosts = [];
 }
 
-// ▼ テーマカラーをlangから取得
 const localeKeyMap: Record<string, string> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
   'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru',
@@ -26,7 +26,6 @@ const localeKey = localeKeyMap[lang] || 'jp';
 const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
 const footerStyle = '--theme-color:' + themeColor + ';';
 
-// ▼ SNS設定
 const snsConfig: Record<string, { x: string; fb: string; showX: boolean; showFb: boolean }> = {
   ja:      { x: 'https://x.com/24watchin_ja', fb: 'https://facebook.com/24watchin.ja', showX: true,  showFb: true  },
   en:      { x: 'https://x.com/24watchin_en', fb: 'https://facebook.com/24watchin.en', showX: true,  showFb: true  },
@@ -43,7 +42,6 @@ const snsLinks = [
   { label: 'Facebook', href: currentSns.fb, icon: 'facebook', show: currentSns.showFb },
 ];
 
-// ▼ Informationメニュー（8言語対応・新フォルダ /info/ に対応済み）
 const infoMenus: Record<string, { label: string; href: string }[]> = {
   ja: [
     { label: 'About 24Watchin',           href: '/' + lang + '/' + country + '/info/about/' },
@@ -96,7 +94,7 @@ const infoMenus: Record<string, { label: string; href: string }[]> = {
   de: [
     { label: 'Über 24Watchin',      href: '/' + lang + '/' + country + '/info/about/' },
     { label: 'Datenschutzrichtlinie', href: '/' + lang + '/' + country + '/info/privacy/' },
-    { label: 'Nutzungsbedingungen', href: '/' + lang + '/' + country + '/info/terms/' },
+    { label: 'Nutz物の規定',        href: '/' + lang + '/' + country + '/info/terms/' },
     { label: 'Kontakt',             href: '/' + lang + '/' + country + '/info/contact/' },
     { label: 'Korrekturrichtlinie', href: '/' + lang + '/' + country + '/info/corrections/' },
     { label: 'Urheberrecht',        href: '/' + lang + '/' + country + '/info/copyright/' },
@@ -112,7 +110,6 @@ const infoMenus: Record<string, { label: string; href: string }[]> = {
 };
 const currentMenu = infoMenus[lang] || infoMenus['en'];
 
-// ▼ タイトル多言語化
 const infoTitleMap: Record<string, string> = {
   ja: 'インフォメーション', en: 'Information', 'zh-cn': '信息',
   'zh-tw': '資訊', es: 'Información', fr: 'Informations',
@@ -127,14 +124,14 @@ const globalTitleMap: Record<string, string> = {
 };
 const globalTitle = globalTitleMap[lang] || globalTitleMap['en'];
 
-// ▼ 国名の多言語対応
+// ▼ 国名の多言語対応（UAEを修正しました）
 const countryNames: Record<string, Record<string, string>> = {
   jp:  { ja: '日本',     en: 'Japan',        'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón',         fr: 'Japon',        de: 'Japan',        ru: 'Япония'       },
   tw:  { ja: '台湾',     en: 'Taiwan',       'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán',        fr: 'Taïwan',       de: 'Taiwan',       ru: 'Тайвань'      },
   kr:  { ja: '韓国',     en: 'South Korea',  'zh-cn': '韩国', 'zh-tw': '韓國', es: 'Corea del Sur', fr: 'Corée du Sud', de: 'Südkorea',     ru: 'Южная Корея'  },
   cn:  { ja: '中国',     en: 'China',        'zh-cn': '中国', 'zh-tw': '中國', es: 'China',         fr: 'Chine',        de: 'China',        ru: 'Китай'        },
   th:  { ja: 'タイ',     en: 'Thailand',     'zh-cn': '泰国', 'zh-tw': '泰國', es: 'Tailandia',     fr: 'Thaïlande',    de: 'Thailand',     ru: 'Таиランド'      },
-  sg:  { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour',    de: 'Singapur',     ru: 'Сингапур'     },
+  sg:  { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour',    de: 'Singapur',     ru: 'Синガпуル'     },
   in:  { ja: 'インド',   en: 'India',        'zh-cn': '印度', 'zh-tw': '印度', es: 'India',         fr: 'Inde',         de: 'Indien',       ru: 'Индия'        },
   de:  { ja: 'ドイツ',   en: 'Germany',      'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania',      fr: 'Allemagne',    de: 'Deutschland',  ru: 'Германия'     },
   fr:  { ja: 'フランス', en: 'France',       'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia',       fr: 'France',       de: 'Frankreich',   ru: 'Франция'      },
@@ -142,26 +139,32 @@ const countryNames: Record<string, Record<string, string>> = {
   it:  { ja: 'イタリア', en: 'Italy',        'zh-cn': '意大利', 'zh-tw': '義大利', es: 'Italia',     fr: 'Italie',       de: 'Italien',      ru: 'Италия'       },
   es:  { ja: 'スペイン', en: 'Spain',        'zh-cn': '西班牙', 'zh-tw': '西班牙', es: 'España',     fr: 'Espagne',      de: 'Spanien',      ru: 'Испания'      },
   us:  { ja: 'アメリカ', en: 'USA',          'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.',        fr: 'États-Unis',   de: 'USA',          ru: 'США'          },
-  ca:  { ja: 'カナダ',   en: 'Canada',       'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá',     fr: 'Canada',       de: 'Kanada',       ru: 'Канада'       },
+  ca:  { ja: 'カナダ',   en: 'Canada',       'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá',     fr: 'Canada',       de: 'Kanada',       ru: 'Каナダ'       },
   br:  { ja: 'ブラジル', en: 'Brazil',       'zh-cn': '巴西', 'zh-tw': '巴西', es: 'Brasil',        fr: 'Brésil',       de: 'Brasilien',    ru: 'Бразилия'     },
-  ae:  { ja: 'アラブ首長国連邦', en: 'UAE',  'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU',       fr: 'EAU',          de: 'VAE',          ru: 'ОАЭ'          },
+  ae:  { ja: 'UAE（アラブ首長国連邦）', en: 'UAE',  'zh-cn': '阿联酋', 'zh-tw': '阿聯酋', es: 'EAU',  fr: 'EAU',          de: 'VAE',          ru: 'ОАЭ'          },
   sa:  { ja: 'サウジアラビア', en: 'Saudi Arabia', 'zh-cn': '沙特阿拉伯', 'zh-tw': '沙烏地阿拉伯', es: 'Arabia Saudita', fr: 'Arabie saoudite', de: 'Saudi-Arabien', ru: 'Саудовская Аравия' },
   za:  { ja: '南アフリカ', en: 'South Africa', 'zh-cn': '南非', 'zh-tw': '南非', es: 'Sudáfrica',   fr: 'Afrique du Sud', de: 'Südafrika',  ru: 'ЮАР'          },
-  au:  { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie',   de: 'Australien',   ru: 'Австралия'    },
+  au:  { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie',   de: 'Australien',   ru: 'Австраリア'    },
   nz:  { ja: 'ニュージーランド', en: 'New Zealand', 'zh-cn': '新西兰', 'zh-tw': '紐西蘭', es: 'Nueva Zelanda', fr: 'Nouvelle-Zélande', de: 'Neuseeland', ru: 'Новая Зеландия' },
+  vn:  { ja: 'ベトナム', en: 'Vietnam',      'zh-cn': '越南', 'zh-tw': '越南', es: 'Vietnam',      fr: 'Vietnam',      de: 'Vietnam',      ru: 'Вьетナム'      },
+  my:  { ja: 'マレーシア', en: 'Malaysia',   'zh-cn': '马来西亚', 'zh-tw': '馬來西亞', es: 'Malasia',     fr: 'Malaisie',     de: 'Malaysia',     ru: 'マレイシア'     },
+  hk:  { ja: '香港',     en: 'Hong Kong',    'zh-cn': '香港', 'zh-tw': '香港', es: 'Hong Kong',    fr: 'Hong Kong',    de: 'Hongkong',     ru: 'Гонkong'      },
+  nl:  { ja: 'オランダ', en: 'Netherlands', 'zh-cn': '荷兰', 'zh-tw': '荷蘭', es: 'Países Bajos', fr: 'Pays-Bas',     de: 'Niederlande',  ru: 'ニデルランディ'   },
+  mx:  { ja: 'メキシコ', en: 'Mexico',      'zh-cn': '墨西哥', 'zh-tw': '墨西哥', es: 'México',      fr: 'Mexique',      de: 'Mexiko',       ru: 'メヒコ'       },
+  ar:  { ja: 'アルゼンチン', en: 'Argentina', 'zh-cn': '阿根廷', 'zh-tw': '阿根廷', es: 'Argentina',  fr: 'Argentine',    de: 'Argentinien',  ru: 'アルゲンティナ'   },
+  eg:  { ja: 'エジプト', en: 'Egypt',        'zh-cn': '埃及', 'zh-tw': '埃及', es: 'Egipto',     fr: 'Égypte',       de: 'Ägypten',      ru: 'エジプト'      },
 };
 
 const getCountryLabel = (code: string) => {
   return countryNames[code]?.[lang] || countryNames[code]?.['en'] || code.toUpperCase();
 };
 
-// ▼ 地域名の多言語化
 const regionNames: Record<string, Record<string, string>> = {
   asia:     { ja: 'アジア', en: 'Asia', 'zh-cn': '亚洲', 'zh-tw': '亞洲', es: 'Asia', fr: 'Asie', de: 'Asien', ru: 'Азия' },
   europe:   { ja: 'ヨーロッパ', en: 'Europe', 'zh-cn': '欧洲', 'zh-tw': '歐洲', es: 'Europa', fr: 'Europe', de: 'Europa', ru: 'Европа' },
-  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Америка' },
+  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Аメリka' },
   mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中东与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
-  oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'Океания' },
+  oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'オセアニア' },
 };
 
 const hasContent = (countryCode: string) => {
@@ -170,10 +173,10 @@ const hasContent = (countryCode: string) => {
 };
 
 const globalRegionsRaw = [
-  { key: 'asia',     countries: ['jp','tw','kr','cn','th','sg','in'] },
-  { key: 'europe',   countries: ['de','fr','gb','it','es'] },
-  { key: 'americas', countries: ['us','ca','br'] },
-  { key: 'mideast',  countries: ['ae','sa','za'] },
+  { key: 'asia',     countries: ['jp','tw','kr','cn','th','sg','in','hk','vn','my'] },
+  { key: 'europe',   countries: ['de','fr','gb','it','es','nl'] },
+  { key: 'americas', countries: ['us','ca','br','mx','ar'] },
+  { key: 'mideast',  countries: ['ae','sa','za','eg'] },
   { key: 'oceania',  countries: ['au','nz'] },
 ];
 
@@ -187,7 +190,6 @@ const globalRegions = globalRegionsRaw.map(region => {
   };
 }).filter(region => region.countries.length > 0);
 
-// ▼ フッター下部テキストの多言語化
 const footerTextMap: Record<string, { notice1: string; notice2: string; copyright: string }> = {
   ja: {
     notice1: '24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。',
