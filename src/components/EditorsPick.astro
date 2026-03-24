@@ -1,26 +1,30 @@
 ---
-const { lang = 'ja', country = 'jp' } = Astro.props;
+// ▼ Props, Params, URLの3段構えで「今の言語」を確実に察知します
+const { lang: propLang, country: propCountry } = Astro.props;
+const { lang: paramLang, country: paramCountry } = Astro.params;
+
+const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
+const urlLang = pathSegments[0];
+const urlCountry = pathSegments[1];
+
+const lang = propLang || paramLang || urlLang || 'ja';
+const country = propCountry || paramCountry || urlCountry || 'jp';
+
 const targetTag = lang + '-' + country;
 
-let allPosts = globalThis.bloggerPostsCache || [];
-if (allPosts.length === 0) {
-  const API_KEY = import.meta.env.API_KEY;
-  const BLOG_ID = import.meta.env.BLOG_ID;
-  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
-  const response = await fetch(url).catch(() => null);
-  if (response && response.ok) {
-    const data = await response.json();
-    allPosts = data.items || [];
-    globalThis.bloggerPostsCache = allPosts;
-  }
+// ▼ 新しい「言語別の省エネメモ」からデータを読み込むように修正しました
+const cacheKey = 'bloggerPostsCache_' + lang;
+let allPosts = await globalThis[cacheKey];
+if (!Array.isArray(allPosts)) {
+  allPosts = [];
 }
 
 // ▼ lang-country タグで厳選
 const safePosts = allPosts.filter(post =>
-  post.labels && post.labels.includes(targetTag)
+  post.labels && post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()))
 );
 
-// ▼ 並べ替えロジック（EditorPicks.astroと同じ）
+// ▼ 並べ替えロジック（そのまま）
 const topPostsMap = new Map();
 const topLabelRegex = /^編集部([①②③④⑤⑥⑦⑧⑨⑩12345678910])$/;
 const numConverter: Record<string, number> = {
@@ -42,7 +46,9 @@ safePosts.forEach(post => {
 let finalPosts = Array.from(topPostsMap.entries()).sort((a, b) => a[0] - b[0]).map(entry => entry[1]);
 const usedIds = new Set(finalPosts.map(p => p.id));
 const normalPosts = safePosts.filter(p => !usedIds.has(p.id));
-while (finalPosts.length < 5 && normalPosts.length > 0) { finalPosts.push(normalPosts.shift()); }
+while (finalPosts.length < 5 && normalPosts.length > 0) { 
+  finalPosts.push(normalPosts.shift());
+}
 const displayPosts = finalPosts.slice(0, 5);
 
 const getImageUrl = (content) => {
@@ -109,4 +115,3 @@ const thumbnailAlt = thumbnailAltMap[lang] || thumbnailAltMap['en'];
   .ep-post-title:hover { text-decoration: underline; }
   .ep-thumbnail img { width: 64px; height: 48px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
 </style>
-
