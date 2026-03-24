@@ -7,45 +7,31 @@ import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
 import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels';
+// ▼ 追加：大元のカンペを読み込みます
+import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
-
-  const langCountryPairs = [
-    { lang: 'ja',    country: 'jp',  blogId: import.meta.env.BLOG_ID_JA },
-    { lang: 'en',    country: 'jp',  blogId: import.meta.env.BLOG_ID_EN },
-    { lang: 'en',    country: 'us',  blogId: import.meta.env.BLOG_ID_EN },
-    { lang: 'en',    country: 'ae',  blogId: import.meta.env.BLOG_ID_EN },
-    { lang: 'en',    country: 'au',  blogId: import.meta.env.BLOG_ID_EN },
-    { lang: 'en',    country: 'gb',  blogId: import.meta.env.BLOG_ID_EN },
-    { lang: 'en',    country: 'sg',  blogId: import.meta.env.BLOG_ID_EN },
-    { lang: 'en',    country: 'ca',  blogId: import.meta.env.BLOG_ID_EN },
-    { lang: 'zh-cn', country: 'jp',  blogId: import.meta.env.BLOG_ID_ZH_CN },
-    { lang: 'zh-cn', country: 'cn',  blogId: import.meta.env.BLOG_ID_ZH_CN },
-    { lang: 'zh-tw', country: 'jp',  blogId: import.meta.env.BLOG_ID_ZH_TW },
-    { lang: 'zh-tw', country: 'tw',  blogId: import.meta.env.BLOG_ID_ZH_TW },
-    { lang: 'es',    country: 'jp',  blogId: import.meta.env.BLOG_ID_ES },
-    { lang: 'es',    country: 'es',  blogId: import.meta.env.BLOG_ID_ES },
-    { lang: 'fr',    country: 'jp',  blogId: import.meta.env.BLOG_ID_FR },
-    { lang: 'fr',    country: 'fr',  blogId: import.meta.env.BLOG_ID_FR },
-    { lang: 'de',    country: 'jp',  blogId: import.meta.env.BLOG_ID_DE },
-    { lang: 'de',    country: 'de',  blogId: import.meta.env.BLOG_ID_DE },
-    { lang: 'ru',    country: 'jp',  blogId: import.meta.env.BLOG_ID_RU },
-  ];
-
   const paths = [];
-  for (const { lang, country, blogId } of langCountryPairs) {
+
+  // ▼ 変更：カンペを使って全言語・全国の記事を一気に生成します
+  for (const { lang, country } of langCountryPairs) {
+    const blogId = getBlogId(lang);
     if (!blogId) continue;
+
     try {
       const url = 'https://www.googleapis.com/blogger/v3/blogs/' + blogId + '/posts?key=' + API_KEY + '&maxResults=500';
       const response = await fetch(url).catch(() => null);
       if (!response || !response.ok) continue;
+      
       const data = await response.json();
       const posts = data.items || [];
       const targetTag = lang + '-' + country;
+
       const filteredPosts = posts.filter(p =>
         p.labels && p.labels.includes(targetTag)
       );
+
       for (const post of filteredPosts) {
         paths.push({
           params: { lang, country, id: post.id },
@@ -64,6 +50,7 @@ const localeKeyMap: Record<string, string> = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
   es: 'es', fr: 'fr', de: 'de', ru: 'ru',
 };
+
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
@@ -74,6 +61,7 @@ const currentCategory = labels.allCategories.find(cat => {
 
 const categoryLabel = currentCategory ? currentCategory.label : '';
 const categorySlug = currentCategory ? currentCategory.slug : '';
+
 const categoryHref = categorySlug ? '/' + lang + '/' + country + '/category/' + categorySlug + '/' : '';
 
 const countryLabelMap: Record<string, Record<string, string>> = {
@@ -90,6 +78,7 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
   de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
 };
+
 const countryLabel = countryLabelMap[country]?.[lang] || country.toUpperCase();
 const countryHref = '/' + lang + '/' + country + '/';
 
