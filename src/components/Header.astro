@@ -1,22 +1,146 @@
 ---
 import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
-// ▼ マスターリストを読み込み
 import { getCountryLabel } from '../lib/countryData.ts';
+
+const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
+const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-// (Contentful取得などのロジックは維持...)
-// 中略
+const SITE_ID = 'jp-ja'; 
+const SLOT = 'header_words';
+type HeaderWord = { label: string; url: string; displayOrder: number; };
+let headerWords: HeaderWord[] = [];
 
-const countryLabel = getCountryLabel(country, lang); // マスターリストから取得
+if (SPACE_ID && DELIVERY_TOKEN) {
+  try {
+    const params = new URLSearchParams({ content_type: 'headerWord', 'fields.siteId': SITE_ID, 'fields.slot': SLOT, 'fields.enabled': 'true', order: 'fields.displayOrder', limit: '20' });
+    const res = await fetch(`https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`, { headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` } });
+    if (res.ok) {
+      const data = await res.json();
+      headerWords = (data.items ?? []).map((item: any) => ({ label: item?.fields?.label ?? '', url: item?.fields?.url ?? '#', displayOrder: Number(item?.fields?.displayOrder ?? 9999), enabled: item?.fields?.enabled ?? false, siteId: item?.fields?.siteId ?? '', slot: item?.fields?.slot ?? '' }))
+        .filter((item: any) => item.enabled === true && item.siteId === SITE_ID && item.slot === SLOT && item.label)
+        .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+        .map((item: any) => ({ label: item.label, url: item.url, displayOrder: item.displayOrder }));
+    }
+  } catch (e) { headerWords = []; }
+}
+
+const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
+const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
+const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+const basePath = '/' + lang + '/' + country;
+const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
+
+const categoryItems = (labels.headerCategories || []).map((item) => {
+  const href = basePath + '/category/' + item.slug + '/';
+  const isActive = cleanCurrentPath === (basePath + '/category/' + item.slug);
+  return { href, label: item.label, isActive, slug: item.slug };
+});
+
+const homeHref = basePath + '/';
+const searchAction = basePath + '/search/';
+const countryLabel = getCountryLabel(country, lang);
+
+const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
+const languageOptions = [
+  { code: 'ja', key: 'jp', label: '日本語', barStyle: 'background:#872732' },
+  { code: 'en', key: 'en', label: 'English', barStyle: 'background:#001580' },
+  { code: 'zh-cn', key: 'zh-cn', label: '简体中文', barStyle: 'background:#0e7c7b' },
+  { code: 'zh-tw', key: 'zh-tw', label: '繁體中文', barStyle: 'background:#b33224' },
+  { code: 'es', key: 'es', label: 'Español', barStyle: 'background:#b38000' },
+  { code: 'fr', key: 'fr', label: 'Français', barStyle: 'background:#3d3d99' },
+  { code: 'de', key: 'de', label: 'Deutsch', barStyle: 'background:#006600' },
+  { code: 'ru', key: 'ru', label: 'Русский', barStyle: 'background:#500d80' },
+].filter(opt => allowedLangs.includes(opt.code)).map(opt => ({ ...opt, href: '/' + opt.code + '/' + country + '/', linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option' }));
+
+const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
+const moreSlugs = moreSlugsMap[localeKey] || [];
+const mainItems = moreSlugs.length > 0 ? categoryItems.filter(item => !moreSlugs.includes(item.slug)) : categoryItems;
+const moreItems = moreSlugs.length > 0 ? categoryItems.filter(item => moreSlugs.includes(item.slug)) : [];
+const moreTextMap: Record<string, string> = { jp: 'さらに見る', en: 'More', es: 'Más', fr: 'Plus', de: 'Mehr', ru: 'Ещё' };
+const moreText = moreTextMap[localeKey] || 'More';
 ---
+
 <header class="site-header">
   <div class="header-top">
     <div class="brand-area">
-      <a href={`/${lang}/${country}/`} class="logo-link"><img src="/images/logo-24watchin.png" class="logo-image" /></a>
-      <div class="country-name">{countryLabel}</div> </div>
-    </header>
+      <a href={homeHref} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" /></a>
+      <div class="country-name">{countryLabel}</div>
+    </div>
+    <div class="right-area">
+      <form action={searchAction} method="get" class="search-form">
+        <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
+        <button type="submit" class="search-button">🔍</button>
+      </form>
+      <div class="lang-switcher">
+        <div class="lang-current">{labels.languageName} ▾</div>
+        <div class="lang-dropdown">
+          {languageOptions.map((opt) => (
+            <a href={opt.href} class={opt.linkClass}><span class="lang-bar" style={opt.barStyle}></span>{opt.label}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="category-bar">
+    <div class="category-nav-inner">
+      <div class="pc-category-group">
+        <div class="category-scroll pc-scroll" id="pc-scroll">
+          {mainItems.map((item) => (
+            <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}><span>{item.label}</span></a>
+          ))}
+        </div>
+        {moreItems.length > 0 && (
+          <div class="more-wrapper">
+            <div class="more-btn">{moreText} ▾</div>
+            <div class="more-dropdown">
+              {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>{item.label}</a>)}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </nav>
+  <div class="header-word-bar">
+    <div class="header-word-inner">
+      {headerWords.map((item, index) => (
+        <a href={item.url} class="header-word-link">{item.label}</a>
+      ))}
+    </div>
+  </div>
+  <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
+</header>
+
+<style>
+  .site-header { width: 100%; background: #fff; }
+  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .brand-area { display: flex; flex-direction: column; align-items: flex-end; }
+  .logo-image { width: 200px; height: auto; }
+  .country-name { font-size: 16px; font-weight: 700; color: #000; }
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .search-form { display: flex; align-items: center; gap: 6px; }
+  .search-input { width: 180px; height: 34px; padding: 0 10px; border-radius: 8px; border: 1px solid #ccc; }
+  .lang-switcher { position: relative; }
+  .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #eee; z-index: 999; min-width: 150px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .lang-switcher:hover .lang-dropdown { display: block; }
+  .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px; text-decoration: none; color: #333; font-size: 13px; }
+  .lang-bar { width: 4px; height: 14px; border-radius: 2px; }
+  .category-bar { background: #393737; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; }
+  .category-link { display: inline-flex; align-items: center; height: 54px; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; }
+  .category-link.active { background: var(--theme-color); }
+  .more-wrapper { position: relative; }
+  .more-btn { height: 54px; padding: 0 16px; color: #fff; display: flex; align-items: center; cursor: pointer; font-weight: bold; }
+  .more-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #393737; min-width: 200px; z-index: 999; }
+  .more-wrapper:hover .more-dropdown { display: block; }
+  .more-link { display: block; padding: 12px 16px; color: #fff; text-decoration: none; font-size: 14px; }
+  .header-word-bar { background: #fff; border-bottom: 1px solid #eee; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px; display: flex; gap: 15px; }
+  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; }
+  .bottom-line { width: 100%; height: 10px; }
+</style>
