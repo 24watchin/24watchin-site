@@ -6,86 +6,56 @@ import TrendScroll from '../../../components/TrendScroll.astro';
 import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
 import GlobalRegionNews from '../../../components/GlobalRegionNews.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
-// ▼ 追加：大元のカンペを読み込みます
+// ▼ カンペとマスターリストを読み込み
 import { langCountryPairs, getBlogId } from '../../../lib/siteRoutes.ts';
+import { getCountryLabel } from '../../../lib/countryData.ts';
 
 export async function getStaticPaths() {
-  // ▼ 変更：長いリストを消し、カンペから自動で全ページを作ります！
+  // カンペから自動生成
   return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
 const { lang, country } = Astro.params;
-
-// ▼ 変更：BLOG_IDもカンペから1行で呼び出します！
 const BLOG_ID = getBlogId(lang);
 const API_KEY = import.meta.env.API_KEY;
 
-// ▼ 共有メモ（キャッシュ強制無視＆待ち合わせ機能付き）
 const cacheKey = 'bloggerPostsCache_' + lang;
-
 if (!globalThis[cacheKey]) {
   const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500&nocache=${Date.now()}`;
   globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
     .then(res => res.ok ? res.json() : { items: [] })
     .then(data => data.items || [])
-    .catch(err => {
-      console.error("記事の取得に失敗しました", err);
-      return [];
-    });
+    .catch(() => []);
 }
 
 let allPosts = await globalThis[cacheKey];
-if (!Array.isArray(allPosts)) {
-  allPosts = [];
-}
-
 const targetTag = lang + '-' + country;
+const mainSitePosts = allPosts.filter(post => 
+  post.labels?.some(label => label.toLowerCase().includes(targetTag.toLowerCase()))
+);
 
-const mainSitePosts = allPosts.filter(post => {
-  if (!post.labels) return false;
-  return post.labels.some(label => label.toLowerCase().includes(targetTag.toLowerCase()));
-});
-
-const langKeyMap = {
-  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
-  'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
-};
-
+const langKeyMap = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const langKey = langKeyMap[lang] || 'jp';
 const categoryData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
 
-const displayCategories = [
-  'politics', 'society', 'international', 'economy',
-  'environment-energy', 'business', 'technology-ai',
-  'entertainment', 'sports', 'health-life', 'weather', 'traffic'
-];
-
-const filterByCategory = (slug, count = 3) => {
-  const catData = categoryData.allCategories.find(c => c.slug === slug);
-  const keywords = catData ? catData.keywords : [slug];
-  return mainSitePosts.filter(post =>
-    post.labels?.some(label => keywords.some(key => label.includes(key)))
-  ).slice(0, count);
-};
+const displayCategories = ['politics', 'society', 'international', 'economy', 'environment-energy', 'business', 'technology-ai', 'entertainment', 'sports', 'health-life', 'weather', 'traffic'];
 
 const categoryItems = displayCategories.map(slug => {
   const catData = categoryData.allCategories.find(c => c.slug === slug);
+  const keywords = catData ? catData.keywords : [slug];
   return {
     slug,
     title: catData ? catData.label : slug,
-    posts: filterByCategory(slug, 3),
+    posts: mainSitePosts.filter(post => post.labels?.some(label => keywords.some(key => label.includes(key)))).slice(0, 3),
   };
 });
 
-const pageTitleMap: Record<string, Record<string, string>> = {
-  jp: { ja: '日本のニュース', en: 'Japan News', 'zh-cn': '日本新闻', 'zh-tw': '日本新聞', es: 'Noticias de Japón', fr: 'Actualités du Japon', de: 'Japan Nachrichten', ru: 'Новости Японии' },
-  us: { ja: 'アメリカのニュース', en: 'USA News', 'zh-cn': '美国新闻', 'zh-tw': '美國新聞', es: 'Noticias de EE.UU.', fr: 'Actualités des États-Unis', de: 'USA Nachrichten', ru: 'Новости США' },
-  ae: { ja: 'UAEのニュース', en: 'UAE News', 'zh-cn': '阿联酋新闻', 'zh-tw': '阿聯酋新闻', es: 'Noticias de EAU', fr: 'Actualités des EAU', de: 'VAE Nachrichten', ru: 'Новости ОАЭ' },
-  de: { ja: 'ドイツのニュース', en: 'Germany News', 'zh-cn': '德国新闻', 'zh-tw': '德國新聞', es: 'Noticias de Alemania', fr: 'Actualités d\'Allemagne', de: 'Deutschland Nachrichten', ru: 'Новости Германии' },
-  fr: { ja: 'フランスのニュース', en: 'France News', 'zh-cn': '法国新闻', 'zh-tw': '法國新聞', es: 'Noticias de Francia', fr: 'Actualités de France', de: 'Frankreich Nachrichten', ru: 'Новости Франции' },
+// ▼ マスターリストから「〇〇のニュース」というタイトルを動的に作成
+const countryLabel = getCountryLabel(country, lang);
+const titleSuffixMap: Record<string, string> = {
+  ja: 'のニュース', en: ' News', 'zh-cn': '新闻', 'zh-tw': '新聞', es: ' Noticias', fr: ' Actualités', de: ' Nachrichten', ru: ' Новости'
 };
-
-const pageTitle = pageTitleMap[country]?.[lang] || 'News';
+const pageTitle = countryLabel + (titleSuffixMap[lang] || titleSuffixMap['en']);
 ---
 
 <Layout title={pageTitle} allPosts={allPosts}>
@@ -93,32 +63,13 @@ const pageTitle = pageTitleMap[country]?.[lang] || 'News';
     <MainNewsLayout posts={mainSitePosts} lang={lang} country={country} />
     <TrendScroll lang={lang} country={country} />
   </div>
-
   <GoogleAdBanner position="上部" />
-
   <div class="genre-grid">
-    {allPosts.length > 0 ?
-      (
-        <>
-          {categoryItems.map((cat) => (
-            <CategoryNews
-              title={cat.title}
-              slug={cat.slug}
-              posts={cat.posts}
-              lang={lang}
-              country={country}
-            />
-          ))}
-        </>
-      ) : (
-        <p style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
-          現在記事を準備中です。
-        </p>
-      )}
+    {categoryItems.map((cat) => (
+      <CategoryNews title={cat.title} slug={cat.slug} posts={cat.posts} lang={lang} country={country} />
+    ))}
   </div>
-
   <GoogleAdBanner position="下部" />
-
   <div slot="bottom-wide">
     <GlobalRegionNews lang={lang} country={country} allPosts={allPosts} />
   </div>
