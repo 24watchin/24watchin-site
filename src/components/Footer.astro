@@ -1,7 +1,6 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
-// ▼ マスターリスト読み込み
 import { getCountryLabel } from '../lib/countryData.ts';
 
 const currentPath = Astro.url.pathname;
@@ -16,7 +15,7 @@ if ((!allPosts || allPosts.length === 0) && globalThis[cacheKey]) {
 }
 if (!Array.isArray(allPosts)) { allPosts = []; }
 
-const localeKeyMap = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
+const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const themeColor = categoryLabelMap[localeKeyMap[lang] || 'jp']?.themeColor || '#872732';
 
 const globalRegionsRaw = [
@@ -27,37 +26,103 @@ const globalRegionsRaw = [
   { key: 'oceania',  countries: ['au','nz'] },
 ];
 
-const regionNames = {
-  asia: { ja: 'アジア', en: 'Asia', 'zh-cn': '亚洲', 'zh-tw': '亞洲' },
-  europe: { ja: 'ヨーロッパ', en: 'Europe', 'zh-cn': '欧洲', 'zh-tw': '歐洲' },
-  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲' },
-  mideast: { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中东与非洲', 'zh-tw': '中東與非洲' },
-  oceania: { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲' },
+const regionNames: Record<string, Record<string, string>> = {
+  asia:     { ja: 'アジア', en: 'Asia', 'zh-cn': '亚洲', 'zh-tw': '亞洲', es: 'Asia', fr: 'Asie', de: 'Asien', ru: 'Азия' },
+  europe:   { ja: 'ヨーロッパ', en: 'Europe', 'zh-cn': '欧洲', 'zh-tw': '歐洲', es: 'Europa', fr: 'Europe', de: 'Europa', ru: 'Европа' },
+  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Америка' },
+  mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中东与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
+  oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'オセアニア' },
 };
 
 const globalRegions = globalRegionsRaw.map(region => {
   const activeCountries = region.countries
     .filter(code => allPosts.some(p => p.labels?.includes(lang + '-' + code)))
-    .map(code => ({ code, label: getCountryLabel(code, lang) })); // マスターリストから取得
+    .map(code => ({ code, label: getCountryLabel(code, lang) }));
   return {
     name: regionNames[region.key]?.[lang] || regionNames[region.key]?.['en'] || region.key,
     countries: activeCountries,
   };
 }).filter(region => region.countries.length > 0);
 
-// SNSやインフォメーションメニューの設定は維持...
-const infoMenus = {
+const infoMenus: Record<string, { label: string; href: string }[]> = {
   ja: [
-    { label: 'About 24Watchin', href: `/${lang}/${country}/info/about/` },
-    { label: 'プライバシーポリシー', href: `/${lang}/${country}/info/privacy/` },
-    { label: '利用規約', href: `/${lang}/${country}/info/terms/` },
-    { label: 'お問い合わせ', href: `/${lang}/${country}/info/contact/` },
-    { label: '訂正・修正ポリシー', href: `/${lang}/${country}/info/corrections/` },
+    { label: 'About 24Watchin',           href: `/${lang}/${country}/info/about/` },
+    { label: 'プライバシーポリシー',       href: `/${lang}/${country}/info/privacy/` },
+    { label: '利用規約',                   href: `/${lang}/${country}/info/terms/` },
+    { label: 'お問い合わせ',               href: `/${lang}/${country}/info/contact/` },
+    { label: '訂正・修正ポリシー',         href: `/${lang}/${country}/info/corrections/` },
     { label: '著作権・転載・引用について', href: `/${lang}/${country}/info/copyright/` },
   ],
-  // 他の言語も同様... (省略していますが全言語含まれます)
+  en: [
+    { label: 'About 24Watchin',    href: `/${lang}/${country}/info/about/` },
+    { label: 'Privacy Policy',     href: `/${lang}/${country}/info/privacy/` },
+    { label: 'Terms of Use',       href: `/${lang}/${country}/info/terms/` },
+    { label: 'Contact',            href: `/${lang}/${country}/info/contact/` },
+    { label: 'Corrections Policy', href: `/${lang}/${country}/info/corrections/` },
+    { label: 'Copyright / Reuse',  href: `/${lang}/${country}/info/copyright/` },
+  ],
+  'zh-cn': [
+    { label: '关于 24Watchin',  href: `/${lang}/${country}/info/about/` },
+    { label: '隐私政策',        href: `/${lang}/${country}/info/privacy/` },
+    { label: '使用条款',        href: `/${lang}/${country}/info/terms/` },
+    { label: '联系我们',        href: `/${lang}/${country}/info/contact/` },
+    { label: '更正政策',        href: `/${lang}/${country}/info/corrections/` },
+    { label: '版权声明',        href: `/${lang}/${country}/info/copyright/` },
+  ],
+  'zh-tw': [
+    { label: '關於 24Watchin',  href: `/${lang}/${country}/info/about/` },
+    { label: '隱私政策',        href: `/${lang}/${country}/info/privacy/` },
+    { label: '使用條款',        href: `/${lang}/${country}/info/terms/` },
+    { label: '聯絡我們',        href: `/${lang}/${country}/info/contact/` },
+    { label: '更正政策',        href: `/${lang}/${country}/info/corrections/` },
+    { label: '版權聲明',        href: `/${lang}/${country}/info/copyright/` },
+  ],
+  es: [
+    { label: 'Acerca de 24Watchin', href: `/${lang}/${country}/info/about/` },
+    { label: 'Política de privacidad', href: `/${lang}/${country}/info/privacy/` },
+    { label: 'Términos de uso',     href: `/${lang}/${country}/info/terms/` },
+    { label: 'Contacto',            href: `/${lang}/${country}/info/contact/` },
+    { label: 'Política de correcciones', href: `/${lang}/${country}/info/corrections/` },
+    { label: 'Derechos de autor',   href: `/${lang}/${country}/info/copyright/` },
+  ],
+  fr: [
+    { label: 'À propos de 24Watchin', href: `/${lang}/${country}/info/about/` },
+    { label: 'Politique de confidentialité', href: `/${lang}/${country}/info/privacy/` },
+    { label: "Conditions d'utilisation", href: `/${lang}/${country}/info/terms/` },
+    { label: 'Contact',               href: `/${lang}/${country}/info/contact/` },
+    { label: 'Politique de corrections', href: `/${lang}/${country}/info/corrections/` },
+    { label: "Droits d'auteur",      href: `/${lang}/${country}/info/copyright/` },
+  ],
+  de: [
+    { label: 'Über 24Watchin',      href: `/${lang}/${country}/info/about/` },
+    { label: 'Datenschutzrichtlinie', href: `/${lang}/${country}/info/privacy/` },
+    { label: 'Nutzungsbedingungen', href: `/${lang}/${country}/info/terms/` },
+    { label: 'Kontakt',             href: `/${lang}/${country}/info/contact/` },
+    { label: 'Korrekturrichtlinie', href: `/${lang}/${country}/info/corrections/` },
+    { label: 'Urheberrecht',        href: `/${lang}/${country}/info/copyright/` },
+  ],
+  ru: [
+    { label: 'О 24Watchin',         href: `/${lang}/${country}/info/about/` },
+    { label: 'Политика конфиденциальности', href: `/${lang}/${country}/info/privacy/` },
+    { label: 'Условия использования', href: `/${lang}/${country}/info/terms/` },
+    { label: 'Контакты',            href: `/${lang}/${country}/info/contact/` },
+    { label: 'Политика исправлений', href: `/${lang}/${country}/info/corrections/` },
+    { label: 'Авторские права',     href: `/${lang}/${country}/info/copyright/` },
+  ],
 };
 const currentMenu = infoMenus[lang] || infoMenus['en'];
+
+const footerTextMap = {
+  ja: { notice1: '24Watchin.com に掲載している記事、写真、画像、図表、その他のコンテンツの無断転載・無断利用を禁止します。', notice2: '著作権は The Dexent Media Enterprises または正当な権利者に帰属します。', copyright: '© 2026 The Dexent Media Enterprises. All Rights Reserved.' },
+  en: { notice1: 'Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.', notice2: 'Copyright belongs to The Dexent Media Enterprises or respective rights holders.', copyright: '© 2026 The Dexent Media Enterprises. All Rights Reserved.' },
+  'zh-cn': { notice1: '未经授权，禁止转载或使用24Watchin.com上的任何文章、照片、图像、图表或其他内容。', notice2: '版权归The Dexent Media Enterprises或相关权利持有人所有。', copyright: '© 2026 The Dexent Media Enterprises. 保留所有权利。' },
+  'zh-tw': { notice1: '未經授權，禁止轉載或使用24Watchin.com上的任何文章、照片、圖像、圖表或其他內容。', notice2: '版權歸The Dexent Media Enterprises或相關權利持有人所有。', copyright: '© 2026 The Dexent Media Enterprises. 保留所有權利。' },
+  es: { notice1: 'Queda prohibida la reproducción o el uso no autorizado de artículos, fotos, imágenes, gráficos u otros contenidos de 24Watchin.com.', notice2: 'Los derechos de autor pertenecen a The Dexent Media Enterprises o a los respectivos titulares de derechos.', copyright: '© 2026 The Dexent Media Enterprises. Todos los derechos reservados.' },
+  fr: { notice1: 'Toute reproduction ou utilisation non autorisée des articles, photos, images, graphiques ou autres contenus de 24Watchin.com est interdite.', notice2: 'Les droits d\'auteur appartiennent à The Dexent Media Enterprises ou aux détenteurs de droits respectifs.', copyright: '© 2026 The Dexent Media Enterprises. Tous droits réservés.' },
+  de: { notice1: 'Die unerlaubte Vervielfältigung oder Nutzung von Artikeln, Fotos, Bildern, Grafiken oder anderen Inhalten auf 24Watchin.com ist untersagt.', notice2: 'Das Urheberrecht liegt bei The Dexent Media Enterprises oder den jeweiligen Rechteinhabern.', copyright: '© 2026 The Dexent Media Enterprises. Alle Rechte vorbehalten.' },
+  ru: { notice1: 'Несанкционированное воспроизведение или использование статей, фотографий, изображений, графиков или другого контента на 24Watchin.com запрещено.', notice2: 'Авторские права принадлежат The Dexent Media Enterprises или соответствующим правообладателям.', copyright: '© 2026 The Dexent Media Enterprises. Все права защищены.' },
+};
+const footerText = footerTextMap[lang] || footerTextMap['en'];
 ---
 
 <footer class="site-footer" style={`--theme-color:${themeColor};`}>
@@ -66,35 +131,46 @@ const currentMenu = infoMenus[lang] || infoMenus['en'];
       <a href={`/${lang}/${country}/`} class="footer-logo"><img src="/images/logo-24watchin-white.png" alt="24Watchin" /></a>
     </div>
     <hr class="divider" />
-    {globalRegions.length > 0 && (
-      <div class="accordion-list">
-        {globalRegions.map((region, i) => (
-          <div class="region-group">
-            <button class="region-header" data-index={i}><span class="region-name">{region.name}</span><span>▼</span></button>
-            <div class="region-body" id={'footer-region-' + i}>
-              {region.countries.map(c => <a href={`/${lang}/${c.code}/`} class="country-link">{c.label}</a>)}
-            </div>
+    <div class="accordion-list">
+      {globalRegions.map((region, i) => (
+        <div class="region-group">
+          <button class="region-header" data-index={i}><span class="region-name">{region.name}</span><span>▼</span></button>
+          <div class="region-body" id={'footer-region-' + i}>
+            {region.countries.map(c => <a href={`/${lang}/${c.code}/`} class="country-link">{c.label}</a>)}
           </div>
-        ))}
-      </div>
-    )}
+        </div>
+      ))}
+    </div>
     <div class="info-section">
       <div class="info-links">{currentMenu.map(item => <a href={item.href} class="info-link">{item.label}</a>)}</div>
     </div>
   </div>
+  <div class="footer-bottom">
+    <p>{footerText.notice1}</p>
+    <p>{footerText.notice2}</p>
+    <p class="copyright-year">{footerText.copyright}</p>
+  </div>
 </footer>
+
 <style>
-  /* スタイルは source 59 以降をそのまま継承 */
-  .site-footer { background-color: #393737; color: #f3f4f6; padding-top: 60px; }
+  .site-footer { background-color: #393737; color: #f3f4f6; margin-top: 60px; }
   .footer-inner { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
+  .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .footer-logo img { height: 48px; width: auto; filter: brightness(0) invert(1); }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin-bottom: 24px; }
   .accordion-list { display: flex; flex-direction: column; gap: 6px; }
-  .region-header { width: 100%; display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.07); border: none; color: #fff; cursor: pointer; }
+  .region-group { border-radius: 8px; overflow: hidden; }
+  .region-header { width: 100%; display: flex; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.07); border: none; color: #fff; cursor: pointer; }
   .region-body { display: none; flex-wrap: wrap; gap: 8px; padding: 14px; background: rgba(255,255,255,0.05); }
   .region-body.open { display: flex; }
   .country-link { font-size: 11px; color: #d1d5db; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); text-decoration: none; }
-  .info-links { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 24px; }
+  .info-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12); }
+  .info-links { display: flex; flex-wrap: wrap; gap: 12px 28px; }
   .info-link { font-size: 12px; color: #d1d5db; text-decoration: none; }
+  .footer-bottom { background-color: #2b2a2a; padding: 32px 20px; text-align: center; }
+  .footer-bottom p { margin: 0 0 8px; font-size: 12px; color: #9ca3af; }
 </style>
+
 <script is:inline>
   document.querySelectorAll('.region-header').forEach(btn => btn.addEventListener('click', () => {
     const body = document.getElementById('footer-region-' + btn.dataset.index);
