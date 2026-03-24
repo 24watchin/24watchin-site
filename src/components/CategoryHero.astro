@@ -1,18 +1,26 @@
 ---
-const { posts, categoryName, getImageUrl } = Astro.props;
+const { posts, categoryName, getImageUrl, lang = 'ja', country = 'jp' } = Astro.props;
 
 const mainPost = posts[0];
 const subPosts = posts.slice(1, 5);
+
+// ▼ 日付の表示形式（年/月/日 など）も各言語の標準に合わせます
+const localeMap: Record<string, string> = {
+  ja: 'ja-JP', en: 'en-US', 'zh-cn': 'zh-CN', 'zh-tw': 'zh-TW',
+  es: 'es-ES', fr: 'fr-FR', de: 'de-DE', ru: 'ru-RU',
+};
+const locale = localeMap[lang] || 'en-US';
 ---
 
 <header class="category-header">
-  <h1 class="category-title">{categoryName}ニュース</h1>
+  {/* ▼ 余計な「ニュース」の文字を削除し、純粋なカテゴリ名だけにしました！ */}
+  <h1 class="category-title">{categoryName}</h1>
 </header>
 
 <div class="hero-grid">
   {mainPost && (
     <article class="main-featured">
-      <a href={`/ja/jp/news/${mainPost.id}/`} class="hero-link">
+      <a href={`/${lang}/${country}/news/${mainPost.id}/`} class="hero-link">
         <div class="main-image-wrapper">
           <img
             src={getImageUrl(mainPost.content)}
@@ -23,7 +31,7 @@ const subPosts = posts.slice(1, 5);
         <div class="main-info">
           <h2 class="main-title">{mainPost.title}</h2>
           <time datetime={mainPost.published} class="hero-date">
-            {new Date(mainPost.published).toLocaleDateString('ja-JP')}
+            {new Date(mainPost.published).toLocaleDateString(locale)}
           </time>
         </div>
       </a>
@@ -33,14 +41,14 @@ const subPosts = posts.slice(1, 5);
   <div class="sub-featured-list">
     {subPosts.map((post) => (
       <article class="sub-item">
-        <a href={`/ja/jp/news/${post.id}/`} class="hero-link sub-link">
+        <a href={`/${lang}/${country}/news/${post.id}/`} class="hero-link sub-link">
           <div class="sub-image-wrapper">
             <img src={getImageUrl(post.content)} alt={post.title} class="hero-image" />
           </div>
           <div class="sub-info">
             <h3 class="sub-title">{post.title}</h3>
             <time datetime={post.published} class="hero-date">
-              {new Date(post.published).toLocaleDateString('ja-JP')}
+              {new Date(post.published).toLocaleDateString(locale)}
             </time>
           </div>
         </a>
@@ -50,8 +58,12 @@ const subPosts = posts.slice(1, 5);
 </div>
 
 <style>
-  .category-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #1e3a8a; margin-bottom: 2rem; padding-bottom: 0.5rem; }
-  .category-title { font-size: 1.8rem; margin: 0; color: #1a1a1a; font-weight: 800; }
+  /* ▼ ここの下線の色を、テーマカラー（var(--theme-color)）で自動で変わるように設定しています */
+  .category-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid var(--theme-color, #1e3a8a); margin-bottom: 2rem; padding-bottom: 0.5rem; }
+  
+  /* ▼ font-weight を normal にして、太文字を解除しました！ */
+  .category-title { font-size: 1.8rem; margin: 0; color: #1a1a1a; font-weight: normal; }
+  
   .hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 0; }
   .hero-link { text-decoration: none; color: inherit; display: block; transition: opacity 0.2s; }
   .hero-link:hover { opacity: 0.8; }
