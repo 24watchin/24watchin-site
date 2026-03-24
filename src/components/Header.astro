@@ -59,7 +59,15 @@ const languageOptions = [
   { code: 'ru', key: 'ru', label: 'Русский', barStyle: 'background:#500d80' },
 ].filter(opt => allowedLangs.includes(opt.code)).map(opt => ({ ...opt, href: '/' + opt.code + '/' + country + '/', linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option' }));
 
-const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
+const moreSlugsMap: Record<string, string[]> = { 
+  jp: ['health-life', 'weather', 'traffic'], 
+  en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  'zh-cn': [], 'zh-tw': [] 
+};
 const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
@@ -166,25 +174,34 @@ const moreText = moreTextMap[localeKey] || 'More';
   .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; }
   .lang-bar { width: 4px; height: 14px; border-radius: 2px; }
   .category-bar { background: #393737; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; }
-  .pc-category-group { display: flex; align-items: center; flex: 1; }
-  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
+  .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; }
   .category-scroll::-webkit-scrollbar { display: none; }
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; }
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
-  .more-wrapper { position: relative; }
+  .more-wrapper { position: relative; flex-shrink: 0; }
   .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .more-chevron { width: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
-  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 200px; z-index: 999; }
+  .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
+  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 200px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .more-wrapper:hover .more-dropdown { display: block; }
   .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
-  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; }
+  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .more-link:last-child { border-bottom: none; }
   .header-word-bar { background: #fff; border-bottom: 1px solid #eee; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px; display: flex; gap: 15px; overflow-x: auto; }
   .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
   .bottom-line { height: 10px; }
-  .scroll-arrow { display: none; color: #fff; background: rgba(255,255,255,0.1); border: none; height: 54px; width: 30px; cursor: pointer; }
-  @media (max-width: 768px) { .brand-area .logo-image { width: 140px; } .pc-category-group { display: none; } .sp-scroll { display: flex; } }
+  .scroll-arrow { display: none; color: #fff; background: rgba(255,255,255,0.1); border: none; height: 54px; width: 30px; cursor: pointer; font-size: 22px; justify-content: center; align-items: center; }
+  .sp-scroll { display: none; }
+
+  @media (max-width: 768px) { 
+    .header-top { padding: 8px 10px 6px; }
+    .brand-area .logo-image { width: 140px; } 
+    .pc-category-group { display: none; } 
+    .sp-scroll { display: flex; flex: 1; }
+    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
+  }
 </style>
 
 <script is:inline>
@@ -194,8 +211,10 @@ const moreText = moreTextMap[localeKey] || 'More';
     var btnRight = document.getElementById('arrow-right');
     if (!scroll || !btnLeft || !btnRight) return;
     function updateArrows() {
-      btnLeft.style.display = scroll.scrollLeft > 5 ? 'block' : 'none';
-      btnRight.style.display = scroll.scrollLeft < (scroll.scrollWidth - scroll.clientWidth - 5) ? 'block' : 'none';
+      var isWide = window.innerWidth > 1000;
+      if (isWide) { btnLeft.style.display = 'none'; btnRight.style.display = 'none'; return; }
+      btnLeft.style.display = scroll.scrollLeft > 5 ? 'flex' : 'none';
+      btnRight.style.display = scroll.scrollLeft < (scroll.scrollWidth - scroll.clientWidth - 5) ? 'flex' : 'none';
     }
     btnLeft.addEventListener('click', function() { scroll.scrollBy({ left: -200, behavior: 'smooth' }); });
     btnRight.addEventListener('click', function() { scroll.scrollBy({ left: 200, behavior: 'smooth' }); });
