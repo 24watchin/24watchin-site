@@ -4,36 +4,17 @@ import Layout from '../../../../layouts/Layout.astro';
 import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
 import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels.ts';
+// ▼ 追加：作成した大元のカンペを読み込みます
+import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
-  const langCountryPairs = [
-    { lang: 'ja',    country: 'jp' },
-    { lang: 'en',    country: 'jp' },
-    { lang: 'en',    country: 'us' },
-    { lang: 'en',    country: 'ae' },
-    { lang: 'en',    country: 'au' },
-    { lang: 'en',    country: 'gb' },
-    { lang: 'en',    country: 'sg' },
-    { lang: 'en',    country: 'ca' },
-    { lang: 'zh-cn', country: 'jp' },
-    { lang: 'zh-cn', country: 'cn' },
-    { lang: 'zh-tw', country: 'jp' },
-    { lang: 'zh-tw', country: 'tw' },
-    { lang: 'es',    country: 'jp' },
-    { lang: 'es',    country: 'es' },
-    { lang: 'fr',    country: 'jp' },
-    { lang: 'fr',    country: 'fr' },
-    { lang: 'de',    country: 'jp' },
-    { lang: 'de',    country: 'de' },
-    { lang: 'ru',    country: 'jp' },
-  ];
-
   const localeKeyMap: Record<string, string> = {
     ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
     es: 'es', fr: 'fr', de: 'de', ru: 'ru',
   };
 
   const paths = [];
+  // ▼ 変更：長いリストを消し、カンペ（langCountryPairs）から自動でページを作ります！
   for (const { lang, country } of langCountryPairs) {
     const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
     const slugs = categoryLabelMap[localeKey].allCategories.map(cat => cat.slug);
@@ -54,18 +35,8 @@ const localeKeyMap: Record<string, string> = {
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
-const blogIdMap: Record<string, string> = {
-  ja:      import.meta.env.BLOG_ID_JA,
-  en:      import.meta.env.BLOG_ID_EN,
-  'zh-cn': import.meta.env.BLOG_ID_ZH_CN,
-  'zh-tw': import.meta.env.BLOG_ID_ZH_TW,
-  es:      import.meta.env.BLOG_ID_ES,
-  fr:      import.meta.env.BLOG_ID_FR,
-  de:      import.meta.env.BLOG_ID_DE,
-  ru:      import.meta.env.BLOG_ID_RU,
-};
-
-const BLOG_ID = blogIdMap[lang] || import.meta.env.BLOG_ID_JA;
+// ▼ 変更：BLOG_IDもカンペから1行で呼び出します！
+const BLOG_ID = getBlogId(lang);
 const API_KEY = import.meta.env.API_KEY;
 
 // ▼ 共有メモ（キャッシュ強制無視＆待ち合わせ機能付き）
@@ -99,7 +70,6 @@ const mainSitePosts = allPosts.filter(post => {
 
 const categoryPosts = mainSitePosts.filter(post => {
   if (!post.labels) return false;
-  // ▼ ここを「含む（includes）」から「完全一致（===）」に変更しました！
   return post.labels.some(label => keywords.some(key => label.toLowerCase() === key.toLowerCase()));
 });
 
