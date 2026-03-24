@@ -3,22 +3,11 @@ import Layout from '../../../../layouts/Layout.astro';
 import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import { categoryLabelMap } from '../../../../lib/categoryLabels.ts';
 import { copyrightData } from '../../../../lib/info/copyrightData.ts';
+// ▼ カンペ（siteRoutes）を読み込む
+import { langCountryPairs } from '../../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
-  return [
-    { params: { lang: 'ja',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'jp' } },
-    { params: { lang: 'en',    country: 'us' } },
-    { params: { lang: 'en',    country: 'ae' } },
-    { params: { lang: 'zh-cn', country: 'jp' } },
-    { params: { lang: 'zh-tw', country: 'jp' } },
-    { params: { lang: 'es',    country: 'jp' } },
-    { params: { lang: 'fr',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'jp' } },
-    { params: { lang: 'ru',    country: 'jp' } },
-    { params: { lang: 'de',    country: 'de' } },
-    { params: { lang: 'fr',    country: 'fr' } },
-  ];
+  return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
 const { lang, country } = Astro.params;
