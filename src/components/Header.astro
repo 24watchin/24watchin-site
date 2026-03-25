@@ -17,23 +17,19 @@ const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
-// 言語ごとのメニュータイトル
-const configLabels = { ja: '言語・地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域', es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Регион' };
-const configTitle = configLabels[lang] || configLabels['en'];
+// 言語ごとのメニューボタン用ラベル
+const configLabels = { ja: '言語 / 地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域', es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Регион' };
+const configLabel = configLabels[lang] || configLabels['en'];
 
 const langNames = { ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文', es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский' };
 
-// 有効なペアを「言語順」に並び替え
 const allActivePairs = langCountryPairs.filter(p => p.active).sort((a, b) => {
   const nameA = langNames[a.lang] || a.lang;
   const nameB = langNames[b.lang] || b.lang;
   return nameA.localeCompare(nameB, lang === 'ja' ? 'ja' : 'en');
 });
 
-// 「関連する24Watchinサイト」：今と同じ言語の別地域を最大5つ
-const suggestedPairs = allActivePairs
-  .filter(p => p.lang === lang && p.country !== country)
-  .slice(0, 5);
+const suggestedPairs = allActivePairs.filter(p => p.lang === lang && p.country !== country).slice(0, 5);
 
 const categoryItems = (labels.headerCategories || []).map((item) => ({
   href: basePath + '/category/' + item.slug + '/',
@@ -54,19 +50,19 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
     </div>
 
     <div class="right-area">
-      <div class="search-and-menu">
-        <form action={searchAction} method="get" class="search-form">
-          <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
-          <button type="submit" class="search-button">
-            <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
-          </button>
-        </form>
-        <button id="menu-open-btn" class="menu-trigger" type="button">
-          <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      <form action={searchAction} method="get" class="search-form">
+        <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
+        <button type="submit" class="search-button">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
         </button>
-      </div>
+      </form>
+      
       <div class="header-status-row">
         <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
+        <button id="menu-open-btn" class="menu-trigger-with-label" type="button">
+          <span class="menu-btn-text">{configLabel}</span>
+          <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -78,25 +74,23 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
       ))}
     </div>
   </nav>
+  <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
 </header>
 
 <div id="menu-overlay" class="menu-overlay"></div>
 <div id="side-menu" class="side-menu dark-theme">
   <div class="menu-header">
     <button id="menu-close-btn" class="close-btn" type="button">&times;</button>
-    <div class="menu-title">{configTitle}</div>
+    <div class="menu-title">{configLabel}</div>
   </div>
-  
   <div class="menu-content">
     <div class="menu-search-box">
-      <input type="text" id="menu-search-input" placeholder="Search country or language..." />
+      <input type="text" id="menu-search-input" placeholder="Search..." />
     </div>
-
     <div class="current-selection-box">
       <p class="small-title">Current Setting</p>
       <div class="current-value">{labels.languageName} / {countryLabel}</div>
     </div>
-
     {suggestedPairs.length > 0 && (
       <div class="suggested-section">
         <p class="section-title">関連する24Watchinサイト</p>
@@ -109,7 +103,6 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
         </div>
       </div>
     )}
-
     <div class="all-list-section">
       <p class="section-title">すべての言語と地域</p>
       <div id="full-lang-list">
@@ -140,7 +133,6 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
       closeBtn.onclick = close;
       overlay.onclick = close;
 
-      // 検索機能
       searchInput?.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         langItems.forEach(item => {
@@ -155,66 +147,46 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
 </script>
 
 <style>
-  /* 基本ヘッダー */
-  .site-header { background: #fff; border-bottom: 1px solid #eee; }
+  .site-header { background: #fff; width: 100%; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px; display: flex; justify-content: space-between; align-items: flex-start; }
   .brand-area { width: 200px; }
   .logo-image { width: 100%; height: auto; }
   .country-name-right { text-align: right; font-size: 16px; font-weight: 700; color: #000; margin-top: 2px; }
+
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-  .search-and-menu { display: flex; align-items: center; gap: 15px; }
   .search-form { display: flex; align-items: center; background: #d8d3cc; border-radius: 8px; padding: 0 8px; }
   .search-input { border: none; background: transparent; height: 34px; width: 180px; font-size: 14px; outline: none; }
   .search-button { background: none; border: none; cursor: pointer; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.5; fill: none; }
-  .menu-trigger { background: none; border: none; cursor: pointer; }
-  .hamburger-icon { width: 32px; height: 32px; stroke: #333; stroke-width: 2; }
-  .header-status-row { margin-right: 45px; }
-  .current-setting-label { font-size: 16px; font-weight: 700; color: #000; }
 
-  /* カテゴリーバー */
+  /* 言語・地域ラベル付きボタン */
+  .header-status-row { display: flex; align-items: center; gap: 15px; }
+  .current-setting-label { font-size: 16px; font-weight: 700; color: #000; }
+  .menu-trigger-with-label { display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; padding: 0; }
+  .menu-btn-text { font-size: 14px; font-weight: 700; color: #333; }
+  .hamburger-icon { width: 26px; height: 26px; stroke: #333; stroke-width: 2.5; }
+
   .category-bar { background: #393737; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
-  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; white-space: nowrap; }
   .category-link.active { background: #872732; }
+  .bottom-line { height: 10px; width: 100%; }
 
-  /* 右サイドメニュー（おしゃれダークテーマ） */
+  /* ドロワー（背景グレー・文字白・0.5秒） */
   .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; transition: 0.5s; z-index: 9998; }
   .menu-overlay.visible { visibility: visible; opacity: 1; }
-  
-  .side-menu.dark-theme { 
-    position: fixed; top: 0; right: -350px; width: 350px; height: 100%; 
-    background: #2c2c2c; color: #fff; transition: 0.5s; z-index: 9999; 
-    box-shadow: -5px 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column;
-  }
+  .side-menu.dark-theme { position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: #2c2c2c; color: #fff; transition: 0.5s; z-index: 9999; box-shadow: -5px 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
   .side-menu.open { right: 0; }
-  
   .menu-header { padding: 25px 20px; border-bottom: 1px solid #444; display: flex; align-items: center; gap: 15px; }
   .close-btn { background: none; border: none; font-size: 35px; color: #fff; cursor: pointer; line-height: 1; }
   .menu-title { font-size: 20px; font-weight: 700; }
-  
   .menu-content { padding: 20px; overflow-y: auto; flex: 1; }
-  
-  /* 検索窓 */
-  .menu-search-box { margin-bottom: 20px; }
-  .menu-search-box input { 
-    width: 100%; padding: 12px; background: #444; border: 1px solid #555; 
-    border-radius: 25px; color: #fff; outline: none; font-size: 14px;
-  }
-
-  /* セクションタイトル */
+  .menu-search-box input { width: 100%; padding: 12px; background: #444; border: 1px solid #555; border-radius: 25px; color: #fff; outline: none; font-size: 14px; }
   .section-title { font-size: 13px; color: #aaa; margin: 25px 0 10px; font-weight: 600; text-transform: uppercase; }
-
-  /* Current Setting (カッコなし) */
-  .current-selection-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 10px; }
+  .current-selection-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; }
   .small-title { font-size: 11px; color: #aaa; margin-bottom: 8px; letter-spacing: 1px; }
   .current-value { font-size: 18px; font-weight: 700; color: #fff; }
-
-  /* リストアイテム */
-  .lang-item { 
-    display: block; padding: 14px 10px; border-bottom: 1px solid #3d3d3d; 
-    text-decoration: none; color: #ccc; font-size: 15px; transition: 0.3s;
-  }
+  .lang-item { display: block; padding: 14px 10px; border-bottom: 1px solid #3d3d3d; text-decoration: none; color: #ccc; font-size: 15px; transition: 0.3s; }
   .lang-item:hover { color: #fff; background: rgba(255,255,255,0.1); padding-left: 15px; }
   .lang-item.suggested { color: #fff; font-weight: 600; border-left: 3px solid #872732; padding-left: 12px; margin-bottom: 5px; background: rgba(135, 39, 50, 0.1); }
 
