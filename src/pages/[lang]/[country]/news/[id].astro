@@ -63,10 +63,10 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
       <Breadcrumb countryLabel={countryLabel} countryHref={countryHref} categoryLabel={categoryLabel} categoryHref={categoryHref} />
     </div>
 
-    <div class="text-size-selector">
-      <button onclick="changeTextSize('small')" class="size-btn">小</button>
-      <button onclick="changeTextSize('medium')" class="size-btn active">中</button>
-      <button onclick="changeTextSize('large')" class="size-btn">大</button>
+    <div class="text-size-selector-mobile">
+      <button data-size="small" class="size-btn">小</button>
+      <button data-size="medium" class="size-btn active">中</button>
+      <button data-size="large" class="size-btn">大</button>
     </div>
   </div>
 
@@ -90,29 +90,34 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
 </Layout>
 
 <script is:inline>
-  function changeTextSize(size) {
+  // ページが読み込まれた時に実行
+  document.addEventListener('DOMContentLoaded', () => {
     const article = document.getElementById('article-body');
     const buttons = document.querySelectorAll('.size-btn');
-    
-    // 全てのボタンから「active（選択中）」の色を消す
-    buttons.forEach(btn => btn.classList.remove('active'));
-    
-    // クリックされたボタンに色をつける
-    event.target.classList.add('active');
 
-    // サイズに合わせて文字の大きさを変える
-    if (size === 'small') {
-      article.style.fontSize = '16px';
-    } else if (size === 'medium') {
-      article.style.fontSize = '20px';
-    } else if (size === 'large') {
-      article.style.fontSize = '24px';
-    }
-  }
+    buttons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const size = e.target.getAttribute('data-size');
+        
+        // 全ボタンからactiveを消す
+        buttons.forEach(btn => btn.classList.remove('active'));
+        // 押されたボタンにactiveをつける
+        e.target.classList.add('active');
+
+        // サイズ変更
+        if (size === 'small') {
+          article.style.fontSize = '16px';
+        } else if (size === 'medium') {
+          article.style.fontSize = '20px';
+        } else if (size === 'large') {
+          article.style.fontSize = '24px';
+        }
+      });
+    });
+  });
 </script>
 
 <style>
-  /* パンくずとボタンを横並びにする設定 */
   .article-breadcrumb-container {
     display: flex;
     justify-content: space-between;
@@ -120,55 +125,68 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
     margin: -10px 0 10px;
     gap: 10px;
   }
-  .article-breadcrumb-wrap { margin: 0; }
 
-  /* 文字サイズボタンのデザイン */
-  .text-size-selector { display: flex; gap: 5px; }
-  .size-btn {
-    padding: 4px 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    background: #fff;
-    cursor: pointer;
-    border-radius: 4px;
-    color: #333;
-  }
-  .size-btn.active {
-    background: #872732; /* サイトのテーマカラー */
-    color: #fff;
-    border-color: #872732;
-  }
+  /* PCではボタンを隠す */
+  .text-size-selector-mobile { display: none; }
 
-  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: font-size 0.2s; }
+  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
   
-  /* 記事本文の基準サイズを20px（中）に設定 */
-  .post-content { font-size: 20px; line-height: 1.8; color: #1a1a1a; }
+  /* 基本の行間を少し狭く設定 (1.6) */
+  .post-content { font-size: 18px; line-height: 1.6; color: #1a1a1a; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 
-  /* Bloggerの画像説明（キャプション）の設定 */
+  /* 画像説明（キャプション）の設定 */
   .post-content :global(.tr-caption) {
-    font-size: 18px !important; /* 18pxで固定 */
+    font-size: 18px !important;
     line-height: 1.4;
     color: #666;
     display: block;
     margin-top: 8px;
   }
 
-  /* スマホ用の余白設定 */
+  /* スマホ用の設定 (768px以下) */
   @media (max-width: 768px) {
     .article-breadcrumb-container {
-      flex-direction: column; /* スマホではパンくずとボタンを上下に並べる */
+      flex-direction: column;
       align-items: flex-start;
     }
-    .text-size-selector { align-self: flex-end; } /* ボタンだけ右側に寄せる */
     
-    .post-container {
-      padding: 20px 10px; /* 左右余白を10pxに */
-      border-radius: 0;
+    /* スマホでのみボタンを表示 */
+    .text-size-selector-mobile { 
+      display: flex; 
+      gap: 5px; 
+      align-self: flex-end; 
     }
-    .post-title { font-size: 22px; } /* タイトルも少しスマホ向けに調整 */
+    
+    .size-btn {
+      padding: 6px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .size-btn.active {
+      background: #872732;
+      color: #fff;
+      border-color: #872732;
+    }
+
+    .post-container {
+      padding: 20px 10px; /* 左右余白10px */
+      border-radius: 0;
+      /* スマホでの基準サイズを20pxに */
+      font-size: 20px;
+    }
+    
+    .post-content {
+      font-size: 20px;
+      line-height: 1.5; /* スマホでは行間をさらに少し詰め気味に */
+    }
+
+    .post-title { font-size: 22px; }
   }
 </style>
