@@ -17,14 +17,13 @@ const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
-// 「言語・地域」ボタンの多言語ラベル
+// 多言語ラベル
 const configButtonLabels: Record<string, string> = {
   ja: '言語・地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域',
   es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Регион'
 };
 const configLabel = configButtonLabels[lang] || configButtonLabels['en'];
 
-// 有効な国と言語のペアを抽出（active: true のみ）
 const activePairs = langCountryPairs.filter(p => p.active);
 
 const categoryItems = (labels.headerCategories || []).map((item) => ({
@@ -36,7 +35,6 @@ const categoryItems = (labels.headerCategories || []).map((item) => ({
 
 const moreSlugs = ['health-life', 'weather', 'traffic', 'environment-energy', 'sports'];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
-const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 ---
 
 <header class="site-header">
@@ -57,7 +55,7 @@ const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
           </button>
         </form>
         
-        <button class="menu-trigger" id="menu-open-btn">
+        <button class="menu-trigger" id="menu-open-btn" type="button">
           <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
       </div>
@@ -84,7 +82,7 @@ const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 <div class="menu-overlay" id="menu-overlay"></div>
 <div class="side-menu" id="side-menu">
   <div class="menu-header">
-    <button class="close-btn" id="menu-close-btn">&times;</button>
+    <button class="close-btn" id="menu-close-btn" type="button">&times;</button>
     <div class="menu-title">{configLabel}</div>
   </div>
   
@@ -97,7 +95,6 @@ const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
     <div class="language-list">
       {activePairs.map((pair) => {
         const pairCountryLabel = getCountryLabel(pair.country, lang);
-        // 各言語ごとの言語名を表示する簡易的なマップ
         const langNames: Record<string, string> = { ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文', es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский' };
         return (
           <a href={`/${pair.lang}/${pair.country}/`} class="lang-item">
@@ -110,26 +107,33 @@ const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 </div>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    const openBtn = document.getElementById('menu-open-btn');
-    const closeBtn = document.getElementById('menu-close-btn');
-    const overlay = document.getElementById('menu-overlay');
-    const menu = document.getElementById('side-menu');
+  (function() {
+    function setupMenu() {
+      const openBtn = document.getElementById('menu-open-btn');
+      const closeBtn = document.getElementById('menu-close-btn');
+      const overlay = document.getElementById('menu-overlay');
+      const menu = document.getElementById('side-menu');
 
-    function toggleMenu() {
-      menu.classList.toggle('open');
-      overlay.classList.toggle('visible');
-      document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+      if (!openBtn || !closeBtn || !overlay || !menu) return;
+
+      function toggleMenu() {
+        menu.classList.toggle('open');
+        overlay.classList.toggle('visible');
+        document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+      }
+
+      openBtn.onclick = toggleMenu;
+      closeBtn.onclick = toggleMenu;
+      overlay.onclick = toggleMenu;
     }
 
-    openBtn?.addEventListener('click', toggleMenu);
-    closeBtn?.addEventListener('click', toggleMenu);
-    overlay?.addEventListener('click', toggleMenu);
-  });
+    setupMenu();
+    document.addEventListener('astro:page-load', setupMenu);
+  })();
 </script>
 
 <style>
-  .site-header { background: #fff; width: 100%; }
+  .site-header { background: #fff; width: 100%; border-bottom: 1px solid #eee; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px; display: flex; justify-content: space-between; align-items: flex-start; }
   
   .brand-area { display: flex; flex-direction: column; width: 200px; }
@@ -139,17 +143,16 @@ const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
   .search-and-menu { display: flex; align-items: center; gap: 15px; }
   .search-form { display: flex; align-items: center; background: #d8d3cc; border-radius: 8px; padding: 0 8px; }
-  .search-input { border: none; background: transparent; height: 34px; width: 180px; outline: none; font-size: 14px; }
+  .search-input { border: none; background: transparent; height: 34px; width: 180px; outline: none; font-size: 14px; color: #333; }
   .search-button { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.5; fill: none; }
 
-  .menu-trigger { background: none; border: none; cursor: pointer; padding: 5px; }
+  .menu-trigger { background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; }
   .hamburger-icon { width: 30px; height: 30px; stroke: #333; stroke-width: 2; fill: none; }
   
-  .header-status-row { margin-right: 45px; } /* 三本線との位置調整 */
+  .header-status-row { margin-right: 45px; margin-top: 2px; }
   .current-setting-label { font-size: 16px; font-weight: 700; color: #000; }
 
-  /* ドロワーメニュー */
   .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); visibility: hidden; opacity: 0; transition: 0.3s; z-index: 9998; }
   .menu-overlay.visible { visibility: visible; opacity: 1; }
   
@@ -157,24 +160,26 @@ const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
   .side-menu.open { right: 0; }
   
   .menu-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
-  .close-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: #666; }
-  .menu-title { font-size: 18px; font-weight: 700; }
+  .close-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: #666; line-height: 1; }
+  .menu-title { font-size: 18px; font-weight: 700; color: #333; }
   
   .menu-content { flex: 1; overflow-y: auto; padding: 20px; }
   .current-selection-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #872732; }
-  .small-title { font-size: 12px; color: #666; margin-bottom: 5px; }
+  .small-title { font-size: 12px; color: #666; margin-bottom: 5px; text-transform: uppercase; }
   .current-value { font-size: 16px; font-weight: 700; color: #000; }
 
-  .lang-item { display: block; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333; transition: 0.2s; }
-  .lang-item:hover { background: #f0f0f0; }
+  .lang-item { display: block; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333; transition: 0.2s; font-size: 14px; }
+  .lang-item:hover { background: #f0f0f0; color: #872732; }
 
   .category-bar { background: #393737; width: 100%; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; }
-  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .category-nav-inner::-webkit-scrollbar { display: none; }
+  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
   .category-link.active { background: #872732; }
   
   @media (max-width: 768px) {
-    .side-menu { width: 85%; right: -85%; }
-    .search-input { width: 120px; }
+    .side-menu { width: 80%; right: -80%; }
+    .search-input { width: 100px; }
+    .header-status-row { display: none; } /* スマホでは三本線だけでスッキリさせる */
   }
 </style>
