@@ -8,25 +8,37 @@ import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
 import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels';
 import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
-// ▼ マスターリスト読み込み
 import { getCountryLabel } from '../../../../lib/countryData.ts';
 
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
   const paths = [];
-  for (const { lang, country } of langCountryPairs) {
+
+  // ▼ 言語ごとに1回だけAPIを呼ぶ！（重複リクエストを防ぐ）
+  const postsByLang: Record<string, any[]> = {};
+  const langs = [...new Set(langCountryPairs.map(p => p.lang))];
+
+  await Promise.all(langs.map(async (lang) => {
     const blogId = getBlogId(lang);
     try {
       const url = `https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts?key=${API_KEY}&maxResults=500`;
       const res = await fetch(url);
       const data = await res.json();
-      const posts = data.items || [];
-      const targetTag = lang + '-' + country;
-      posts.filter(p => p.labels?.includes(targetTag)).forEach(post => {
-        paths.push({ params: { lang, country, id: post.id }, props: { post, allPosts: posts } });
-      });
-    } catch (e) {}
+      postsByLang[lang] = data.items || [];
+    } catch (e) {
+      postsByLang[lang] = [];
+    }
+  }));
+
+  // ▼ 言語×国の組み合わせでパスを生成
+  for (const { lang, country } of langCountryPairs) {
+    const posts = postsByLang[lang] || [];
+    const targetTag = lang + '-' + country;
+    posts.filter(p => p.labels?.includes(targetTag)).forEach(post => {
+      paths.push({ params: { lang, country, id: post.id }, props: { post, allPosts: posts } });
+    });
   }
+
   return paths;
 }
 
@@ -40,7 +52,6 @@ const currentCategory = labels.allCategories.find(cat => post.labels?.some(label
 const categoryLabel = currentCategory ? currentCategory.label : '';
 const categoryHref = currentCategory ? `/${lang}/${country}/category/${currentCategory.slug}/` : '';
 
-// ▼ マスターリストから国名を取得
 const countryLabel = getCountryLabel(country, lang);
 const countryHref = `/${lang}/${country}/`;
 
