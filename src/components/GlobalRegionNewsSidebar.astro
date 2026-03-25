@@ -1,5 +1,6 @@
 ---
 import RegionNewsBlockSidebar from './RegionNewsBlockSidebar.astro';
+import { getCountryLabel } from '../lib/countryData.ts';
 
 const { lang = 'ja', country = '', allPosts = [] } = Astro.props;
 
@@ -27,12 +28,42 @@ const regionNameTable = {
   oceania: { ja: 'オセアニア', en: 'Oceania', fr: 'Océanie', de: 'Ozeanien', es: 'Oceanía', ru: 'Океания', 'zh-tw': '大洋洲', 'zh-cn': '大洋洲' }
 };
 
+// ▼ countryData.tsを使って8言語対応の国名を取得！
 const regionsTemplate = [
-  { key: 'asia', cities: [{ name: lang === 'ja' ? '日本' : 'Japan', code: 'jp' }, { name: lang === 'ja' ? '台湾' : 'Taiwan', code: 'tw' }, { name: lang === 'ja' ? '韓国' : 'South Korea', code: 'kr' }, { name: lang === 'ja' ? 'シンガポール' : 'Singapore', code: 'sg' }] },
-  { key: 'europe', cities: [{ name: lang === 'ja' ? 'ドイツ' : 'Germany', code: 'de' }, { name: lang === 'ja' ? 'フランス' : 'France', code: 'fr' }] },
-  { key: 'americas', cities: [{ name: lang === 'ja' ? 'アメリカ' : 'USA', code: 'us' }] },
-  { key: 'middleEastAfrica', cities: [{ name: lang === 'ja' ? 'アラブ首長国連邦' : 'UAE', code: 'ae' }] },
-  { key: 'oceania', cities: [{ name: lang === 'ja' ? 'オーストラリア' : 'Australia', code: 'au' }] }
+  { key: 'asia', cities: [
+    { name: getCountryLabel('jp', lang), code: 'jp' },
+    { name: getCountryLabel('tw', lang), code: 'tw' },
+    { name: getCountryLabel('kr', lang), code: 'kr' },
+    { name: getCountryLabel('sg', lang), code: 'sg' },
+    { name: getCountryLabel('my', lang), code: 'my' },
+    { name: getCountryLabel('vn', lang), code: 'vn' },
+    { name: getCountryLabel('hk', lang), code: 'hk' },
+    { name: getCountryLabel('cn', lang), code: 'cn' },
+    { name: getCountryLabel('th', lang), code: 'th' },
+  ]},
+  { key: 'europe', cities: [
+    { name: getCountryLabel('de', lang), code: 'de' },
+    { name: getCountryLabel('fr', lang), code: 'fr' },
+    { name: getCountryLabel('gb', lang), code: 'gb' },
+    { name: getCountryLabel('it', lang), code: 'it' },
+    { name: getCountryLabel('es', lang), code: 'es' },
+    { name: getCountryLabel('nl', lang), code: 'nl' },
+  ]},
+  { key: 'americas', cities: [
+    { name: getCountryLabel('us', lang), code: 'us' },
+    { name: getCountryLabel('ca', lang), code: 'ca' },
+    { name: getCountryLabel('mx', lang), code: 'mx' },
+    { name: getCountryLabel('ar', lang), code: 'ar' },
+  ]},
+  { key: 'middleEastAfrica', cities: [
+    { name: getCountryLabel('ae', lang), code: 'ae' },
+    { name: getCountryLabel('sa', lang), code: 'sa' },
+    { name: getCountryLabel('eg', lang), code: 'eg' },
+  ]},
+  { key: 'oceania', cities: [
+    { name: getCountryLabel('au', lang), code: 'au' },
+    { name: getCountryLabel('nz', lang), code: 'nz' },
+  ]},
 ];
 
 const activeRegions = regionsTemplate.map(region => {
@@ -72,13 +103,11 @@ const activeRegions = regionsTemplate.map(region => {
     width: 100%;
     box-sizing: border-box;
   }
-
   .widget-header {
-    border-bottom: 4px solid #872732;
+    border-bottom: 4px solid var(--theme-color, #872732);
     padding-bottom: 6px;
     margin-bottom: 12px;
   }
-
   .widget-title {
     font-size: 1.1rem;
     font-weight: bold;
