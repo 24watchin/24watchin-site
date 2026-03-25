@@ -54,6 +54,19 @@ function formatDateTime(dateString: string) {
   return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
+// ▼ 多言語用ラベル設定
+const sizeLabels: Record<string, {s:string, m:string, l:string}> = {
+  ja: { s: '小', m: '中', l: '大' },
+  en: { s: 'S', m: 'M', l: 'L' },
+  'zh-cn': { s: '小', m: '中', l: '大' },
+  'zh-tw': { s: '小', m: '中', l: '大' },
+  es: { s: 'P', m: 'M', l: 'G' },
+  fr: { s: 'P', m: 'M', l: 'G' },
+  de: { s: 'K', m: 'M', l: 'G' },
+  ru: { s: 'М', m: 'С', l: 'Б' }
+};
+const t = sizeLabels[lang] || sizeLabels['en'];
+
 const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
 ---
 
@@ -64,9 +77,9 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
     </div>
 
     <div class="text-size-selector-mobile">
-      <button data-size="small" class="size-btn">小</button>
-      <button data-size="medium" class="size-btn active">中</button>
-      <button data-size="large" class="size-btn">大</button>
+      <button class="size-btn" data-size="small">{t.s}</button>
+      <button class="size-btn active" data-size="medium">{t.m}</button>
+      <button class="size-btn" data-size="large">{t.l}</button>
     </div>
   </div>
 
@@ -78,7 +91,7 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
         <ShareButtons articleUrl={articleUrl} articleTitle={post.title} />
       </div>
     </header>
-    <div class="post-content" set:html={post.content} />
+    <div class="post-content" id="post-content-area" set:html={post.content} />
     <ReactionBar articleId={post.id} />
   </article>
 
@@ -90,103 +103,57 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
 </Layout>
 
 <script is:inline>
-  // ページが読み込まれた時に実行
-  document.addEventListener('DOMContentLoaded', () => {
-    const article = document.getElementById('article-body');
-    const buttons = document.querySelectorAll('.size-btn');
+  (function() {
+    function initSizeSelector() {
+      const contentArea = document.getElementById('post-content-area');
+      const buttons = document.querySelectorAll('.size-btn');
+      if (!contentArea || buttons.length === 0) return;
 
-    buttons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const size = e.target.getAttribute('data-size');
-        
-        // 全ボタンからactiveを消す
-        buttons.forEach(btn => btn.classList.remove('active'));
-        // 押されたボタンにactiveをつける
-        e.target.classList.add('active');
+      buttons.forEach(btn => {
+        btn.onclick = function() {
+          const size = this.getAttribute('data-size');
+          
+          buttons.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
 
-        // サイズ変更
-        if (size === 'small') {
-          article.style.fontSize = '16px';
-        } else if (size === 'medium') {
-          article.style.fontSize = '20px';
-        } else if (size === 'large') {
-          article.style.fontSize = '24px';
-        }
+          if (size === 'small') contentArea.style.fontSize = '16px';
+          else if (size === 'medium') contentArea.style.fontSize = '20px';
+          else if (size === 'large') contentArea.style.fontSize = '24px';
+        };
       });
-    });
-  });
+    }
+    // 読み込み時とページ切り替え時に実行
+    initSizeSelector();
+    document.addEventListener('astro:page-load', initSizeSelector);
+  })();
 </script>
 
 <style>
-  .article-breadcrumb-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: -10px 0 10px;
-    gap: 10px;
-  }
-
-  /* PCではボタンを隠す */
-  .text-size-selector-mobile { display: none; }
+  .article-breadcrumb-container { display: flex; justify-content: space-between; align-items: center; margin: -10px 0 10px; gap: 10px; }
+  .text-size-selector-mobile { display: none; } /* 基本は隠す */
 
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
   
-  /* 基本の行間を少し狭く設定 (1.6) */
-  .post-content { font-size: 18px; line-height: 1.6; color: #1a1a1a; }
+  /* PCの本文サイズ (18px) と行間 */
+  .post-content { font-size: 18px; line-height: 1.7; color: #1a1a1a; }
+  .post-content :global(h4) { font-size: 20px; margin: 1.5em 0 0.5em; font-weight: bold; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 
-  /* 画像説明（キャプション）の設定 */
-  .post-content :global(.tr-caption) {
-    font-size: 18px !important;
-    line-height: 1.4;
-    color: #666;
-    display: block;
-    margin-top: 8px;
-  }
+  /* 画像説明（キャプション）は全デバイスで18px固定 */
+  .post-content :global(.tr-caption) { font-size: 18px !important; line-height: 1.4; color: #666; display: block; margin-top: 8px; }
 
-  /* スマホ用の設定 (768px以下) */
   @media (max-width: 768px) {
-    .article-breadcrumb-container {
-      flex-direction: column;
-      align-items: flex-start;
-    }
+    .article-breadcrumb-container { flex-direction: column; align-items: flex-start; }
+    .text-size-selector-mobile { display: flex; gap: 5px; align-self: flex-end; }
     
-    /* スマホでのみボタンを表示 */
-    .text-size-selector-mobile { 
-      display: flex; 
-      gap: 5px; 
-      align-self: flex-end; 
-    }
-    
-    .size-btn {
-      padding: 6px 12px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      background: #fff;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    .size-btn.active {
-      background: #872732;
-      color: #fff;
-      border-color: #872732;
-    }
+    .size-btn { padding: 6px 12px; font-size: 14px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 4px; }
+    .size-btn.active { background: #872732; color: #fff; border-color: #872732; }
 
-    .post-container {
-      padding: 20px 10px; /* 左右余白10px */
-      border-radius: 0;
-      /* スマホでの基準サイズを20pxに */
-      font-size: 20px;
-    }
-    
-    .post-content {
-      font-size: 20px;
-      line-height: 1.5; /* スマホでは行間をさらに少し詰め気味に */
-    }
-
+    .post-container { padding: 20px 10px; border-radius: 0; }
+    .post-content { font-size: 20px; line-height: 1.5; } /* スマホ基準は20px */
     .post-title { font-size: 22px; }
   }
 </style>
