@@ -8,34 +8,46 @@ const getImageUrl = (content) => {
   return match ? match[1] : 'https://placehold.co/124x83/eeeeee/999999?text=No+Image';
 };
 
+// ▼ 日付フォーマットを言語対応に
+const localeMap = {
+  ja: 'ja-JP', en: 'en-US', 'zh-cn': 'zh-CN', 'zh-tw': 'zh-TW',
+  es: 'es-ES', fr: 'fr-FR', de: 'de-DE', ru: 'ru-RU',
+};
 const formatPostTime = (dateString) => {
   if (!dateString) return '';
   try {
-    return new Date(dateString).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+    return new Date(dateString).toLocaleString(localeMap[lang] || 'en-US', {
       month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
     });
   } catch { return ''; }
 };
 
+// ▼ カテゴリ名のみを表示する（記事タグは表示しない）
+const localeKeyMap = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
+  es: 'es', fr: 'fr', de: 'de', ru: 'ru',
+};
+
+// ▼ デフォルトカテゴリ名（カテゴリが見つからないときの表示）
+const defaultCategoryLabel = {
+  ja: 'ニュース', en: 'News', 'zh-cn': '新闻', 'zh-tw': '新聞',
+  es: 'Noticias', fr: 'Actualités', de: 'Nachrichten', ru: 'Новости',
+};
+
 const getDisplayCategory = (post) => {
   const labels = post?.labels || [];
-  
-  const mapKey = lang === 'ja' ? 'jp' : lang;
-  
+  const mapKey = localeKeyMap[lang] || 'en';
   const langConfig = categoryLabelMap[mapKey] || categoryLabelMap['en'];
+
+  // ▼ カテゴリ名の一覧を取得
   const validCategoryNames = langConfig.allCategories.map(cat => cat.label);
 
+  // ▼ ラベルの中からカテゴリ名に一致するものだけを返す
   const categoryLabel = labels.find(label => validCategoryNames.includes(label));
-  
   if (categoryLabel) return categoryLabel;
 
-  const fallbackLabel = labels.find(label => {
-    if (!label) return false;
-    if (/^[a-z]{2}-[a-z]{2}$/i.test(label)) return false; 
-    return true;
-  });
-
-  return fallbackLabel || (lang === 'ja' ? 'ニュース' : 'News');
+  // ▼ 見つからない場合はデフォルト表示（記事タグは表示しない！）
+  return defaultCategoryLabel[lang] || defaultCategoryLabel['en'];
 };
 ---
 
@@ -56,11 +68,9 @@ const getDisplayCategory = (post) => {
                 <div class="thumbnail">
                   <img src={getImageUrl(post.content)} alt={post.title} />
                 </div>
-                {/* ▼ ここにあった日付を削除しました */}
               </div>
               <div class="info">
                 <h4 class="news-title">{post.title}</h4>
-                {/* ▼ ここに「カテゴリ」と「日付」を横並びに配置しました */}
                 <div class="meta-row">
                   <span class="category-badge">{getDisplayCategory(post)}</span>
                   {post.published && (
@@ -80,7 +90,7 @@ const getDisplayCategory = (post) => {
   .region-section { width: 100%; margin-bottom: 10px; }
   .region-header { margin-bottom: 12px; }
   .region-title { margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #111111; }
-  .region-line { width: 100%; height: 3px; background: #872732; }
+  .region-line { width: 100%; height: 3px; background: var(--theme-color, #872732); }
   .city-groups { display: flex; flex-direction: column; gap: 8px; }
   .city-block { width: 100%; padding: 4px 0; }
   .city-name { font-size: 15px; font-weight: bold; color: #333333; margin: 0 0 8px 0; padding-left: 8px; border-left: 4px solid #d9d9d9; }
@@ -89,26 +99,11 @@ const getDisplayCategory = (post) => {
   .media-column { width: 116px; flex-shrink: 0; }
   .thumbnail { width: 116px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eeeeee; }
   .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-  
-  /* .image-date-row を削除しました */
-  
   .info { min-width: 0; flex: 1; display: flex; flex-direction: column; }
-  
   .news-title { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 700; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
-  
-  /* ▼ ここが新しい横並びルールです */
-  .meta-row { 
-    margin-top: 6px; 
-    display: flex; 
-    justify-content: space-between; /* 両端に引き離す */
-    align-items: center; /* 縦のズレを揃える */
-  }
-  
+  .meta-row { margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
   .category-badge { padding: 1px 6px; background: #4d4d4d; color: #ffffff; font-size: 13px; border-radius: 2px; }
-  
-  /* ▼ 日付の文字サイズを少し調整し、色を揃えました */
   .post-time { font-size: 12px; color: #8a8a8a; }
-
   @media (max-width: 1024px) { .article-3-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 700px) { .article-3-grid { grid-template-columns: 1fr; } .media-column, .thumbnail { width: 112px; } }
 </style>
