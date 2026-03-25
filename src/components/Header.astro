@@ -17,6 +17,7 @@ const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
+// 多言語ラベル
 const configLabels = { 
   ja: '言語 / 地域', 
   en: 'Language / Region', 
@@ -55,7 +56,7 @@ const headerWords = [];
       <a href={homeHref} class="logo-link">
         <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
       </a>
-      <div class="country-name-right">{countryLabel}</div>
+      <div class="country-name-aligned">{countryLabel}</div>
     </div>
 
     <div class="right-area">
@@ -69,11 +70,11 @@ const headerWords = [];
       </div>
 
       <div class="lower-row">
+        <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
         <button id="menu-open-btn" class="menu-combo-btn" type="button">
           <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
           <span class="menu-btn-text">{configLabelText}</span>
         </button>
-        <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
       </div>
     </div>
   </div>
@@ -84,7 +85,7 @@ const headerWords = [];
         <div class="category-scroll" id="pc-scroll">
           {mainItems.map((item) => (
             <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-              <span class="category-link-text">{item.label}</span>
+              <span class="category-text-with-underline">{item.label}</span>
             </a>
           ))}
         </div>
@@ -117,18 +118,6 @@ const headerWords = [];
       <p class="small-title">Current Setting</p>
       <div class="current-value">{labels.languageName} / {countryLabel}</div>
     </div>
-    {suggestedPairs.length > 0 && (
-      <div class="suggested-section">
-        <p class="section-title">関連する24Watchinサイト</p>
-        <div class="suggested-list">
-          {suggestedPairs.map(p => (
-            <a href={`/${p.lang}/${p.country}/`} class="lang-item suggested">
-              {langNames[p.lang]} ({getCountryLabel(p.country, lang)})
-            </a>
-          ))}
-        </div>
-      </div>
-    )}
     <div class="all-list-section">
       <p class="section-title">すべての言語と地域</p>
       <div id="full-lang-list">
@@ -193,42 +182,52 @@ const headerWords = [];
   
   .brand-area { width: 200px; display: flex; flex-direction: column; }
   .logo-image { width: 100%; height: auto; }
-  .country-name-right { text-align: right; font-size: 16px; font-weight: 700; color: #000; margin-top: 4px; }
+  /* ②国名の高さを34pxにして他と揃える */
+  .country-name-aligned { text-align: right; font-size: 16px; font-weight: 700; color: #000; height: 34px; line-height: 34px; margin-top: 4px; }
 
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
   
-  /* 上段・下段のレイアウト */
   .upper-row { width: 100%; display: flex; justify-content: flex-end; }
-  .lower-row { width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 15px; }
+  /* ②下段の配置：日本語/JAPAN(左) + ボタン(右) */
+  .lower-row { width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
 
-  /* 検索窓（三本線ボタンと同じ高さ34pxに固定） */
+  /* 検索ボタンの枠（高さを34pxで統一） */
   .search-form-expandable { display: flex; align-items: center; border: 2px solid #666; border-radius: 8px; background: #fff; overflow: hidden; transition: width 0.3s; width: 34px; height: 34px; }
   .search-form-expandable.expanded { width: 220px; }
   .search-input-hidden { width: 0; padding: 0; border: none; outline: none; transition: width 0.3s, padding 0.3s; font-size: 14px; background: transparent; }
   .search-form-expandable.expanded .search-input-hidden { width: 100%; padding: 0 10px; }
   .search-toggle-btn { width: 34px; height: 34px; background: #fff; border: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-  /* アイコン自体を少し大きく調整 */
   .search-icon-large { width: 22px; height: 22px; stroke: #666; stroke-width: 2.5; fill: none; }
 
-  /* 言語・地域ボタン（下段・左側） */
-  .menu-combo-btn { display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; order: 1; }
+  /* 言語・地域ボタン（右側） */
+  .menu-combo-btn { display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; }
   .menu-btn-text { font-size: 14px; font-weight: 700; color: #333; }
   .hamburger-icon { width: 20px; height: 20px; stroke: #333; stroke-width: 2.5; fill: none; }
 
-  /* 日本語/JAPAN（下段・右側） */
-  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; display: flex; align-items: center; order: 2; }
+  /* 日本語/JAPAN（左側・高さを34pxに） */
+  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; line-height: 34px; display: flex; align-items: center; }
 
+  /* カテゴリーバー */
   .category-bar { background: #393737; width: 100%; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
-  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
-  .category-scroll::-webkit-scrollbar { display: none; }
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; }
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; position: relative; }
   .category-link.active { background: var(--theme-color); }
+  
+  /* ③マウスホバー時の白い下線 */
+  .category-text-with-underline { position: relative; padding-bottom: 2px; }
+  .category-link:hover .category-text-with-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 2px;
+    background-color: #fff;
+  }
 
   .header-word-bar { background: #fff; min-height: 36px; display: flex; align-items: center; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
   .spacer-text { font-size: 16px; visibility: hidden; }
-
   .bottom-line { height: 10px; width: 100%; }
 
   /* ドロワー設定 */
@@ -241,14 +240,11 @@ const headerWords = [];
   .menu-title { font-size: 20px; font-weight: 700; }
   .menu-content { padding: 20px; overflow-y: auto; flex: 1; }
   .menu-search-box input { width: 100%; padding: 12px; background: #444; border: 1px solid #555; border-radius: 25px; color: #fff; outline: none; font-size: 14px; }
-  .current-selection-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; }
   .lang-item { display: block; padding: 14px 10px; border-bottom: 1px solid #3d3d3d; text-decoration: none; color: #ccc; font-size: 15px; transition: 0.3s; }
   .lang-item:hover { color: #fff; background: rgba(255,255,255,0.1); padding-left: 15px; }
-  .lang-item.suggested { color: #fff; font-weight: 600; border-left: 3px solid #872732; padding-left: 12px; margin-bottom: 5px; background: rgba(135, 39, 50, 0.1); }
 
   @media (max-width: 768px) {
     .side-menu.dark-theme { width: 85%; right: -85%; }
-    .header-top { flex-direction: row; align-items: center; }
     .lower-row { display: none; }
   }
 </style>
