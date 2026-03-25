@@ -54,7 +54,7 @@ function formatDateTime(dateString: string) {
   return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-// ▼ 多言語用ラベル設定
+// 多言語用ラベル
 const sizeLabels: Record<string, {s:string, m:string, l:string}> = {
   ja: { s: '小', m: '中', l: '大' },
   en: { s: 'S', m: 'M', l: 'L' },
@@ -116,13 +116,17 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
           buttons.forEach(b => b.classList.remove('active'));
           this.classList.add('active');
 
-          if (size === 'small') contentArea.style.fontSize = '16px';
-          else if (size === 'medium') contentArea.style.fontSize = '20px';
-          else if (size === 'large') contentArea.style.fontSize = '24px';
+          // 記事エリア全体のフォントサイズを変える（見出しも連動するようになります）
+          if (size === 'small') {
+            contentArea.style.fontSize = '16px';
+          } else if (size === 'medium') {
+            contentArea.style.fontSize = '20px';
+          } else if (size === 'large') {
+            contentArea.style.fontSize = '26px'; // 大は少し目立つように26pxにしました
+          }
         };
       });
     }
-    // 読み込み時とページ切り替え時に実行
     initSizeSelector();
     document.addEventListener('astro:page-load', initSizeSelector);
   })();
@@ -130,30 +134,38 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
 
 <style>
   .article-breadcrumb-container { display: flex; justify-content: space-between; align-items: center; margin: -10px 0 10px; gap: 10px; }
-  .text-size-selector-mobile { display: none; } /* 基本は隠す */
+  .text-size-selector-mobile { display: none; }
 
   .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
   
-  /* PCの本文サイズ (18px) と行間 */
-  .post-content { font-size: 18px; line-height: 1.7; color: #1a1a1a; }
-  .post-content :global(h4) { font-size: 20px; margin: 1.5em 0 0.5em; font-weight: bold; }
+  /* PCの基本設定 */
+  .post-content { font-size: 18px; line-height: 1.65; color: #1a1a1a; }
+  /* PCの見出し(h4)サイズ固定 */
+  .post-content :global(h4) { font-size: 1.1em; margin: 1.5em 0 0.5em; font-weight: bold; line-height: 1.3; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 
-  /* 画像説明（キャプション）は全デバイスで18px固定 */
+  /* 画像説明：全デバイスで18pxに固定 */
   .post-content :global(.tr-caption) { font-size: 18px !important; line-height: 1.4; color: #666; display: block; margin-top: 8px; }
 
+  /* スマホ用の設定 */
   @media (max-width: 768px) {
     .article-breadcrumb-container { flex-direction: column; align-items: flex-start; }
     .text-size-selector-mobile { display: flex; gap: 5px; align-self: flex-end; }
     
     .size-btn { padding: 6px 12px; font-size: 14px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 4px; }
+    /* ボタンのテーマカラー化 (#872732) */
     .size-btn.active { background: #872732; color: #fff; border-color: #872732; }
 
     .post-container { padding: 20px 10px; border-radius: 0; }
-    .post-content { font-size: 20px; line-height: 1.5; } /* スマホ基準は20px */
+    
+    /* スマホ記事エリア：基準を20px、行間を少し詰め気味に */
+    .post-content { font-size: 20px; line-height: 1.5; }
+    /* 見出しも本文のサイズに連動（emを使うことで連動させます） */
+    .post-content :global(h4) { font-size: 1.15em; }
+
     .post-title { font-size: 22px; }
   }
 </style>
