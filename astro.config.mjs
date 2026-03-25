@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
 import { defineConfig } from 'astro/config';
 
-const siteUrl = process.env.SITE_URL || 'https://example.com';
+const siteUrl = process.env.SITE_URL || 'https://24watchin.com';
 
 export default defineConfig({
   site: siteUrl,
