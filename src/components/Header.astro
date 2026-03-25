@@ -17,7 +17,7 @@ const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
-// 言語ごとのメニューボタン用ラベル
+// 多言語ラベル
 const configLabels = { ja: '言語 / 地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域', es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Регион' };
 const configLabel = configLabels[lang] || configLabels['en'];
 
@@ -37,7 +37,8 @@ const categoryItems = (labels.headerCategories || []).map((item) => ({
   isActive: currentPath === (basePath + '/category/' + item.slug),
   slug: item.slug
 }));
-const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traffic'].includes(item.slug));
+const moreSlugs = ['health-life', 'weather', 'traffic'];
+const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 ---
 
 <header class="site-header">
@@ -59,9 +60,10 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
       
       <div class="header-status-row">
         <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
-        <button id="menu-open-btn" class="menu-trigger-with-label" type="button">
-          <span class="menu-btn-text">{configLabel}</span>
+        
+        <button id="menu-open-btn" class="menu-combo-btn" type="button">
           <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <span class="menu-btn-text">{configLabel}</span>
         </button>
       </div>
     </div>
@@ -69,11 +71,18 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
 
   <nav class="category-bar">
     <div class="category-nav-inner">
-      {mainItems.map((item) => (
-        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>{item.label}</a>
-      ))}
+      <div class="pc-category-group">
+        <div class="category-scroll" id="pc-scroll">
+          {mainItems.map((item) => (
+            <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+              <span class="category-link-text">{item.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   </nav>
+
   <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
 </header>
 
@@ -81,7 +90,7 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
 <div id="side-menu" class="side-menu dark-theme">
   <div class="menu-header">
     <button id="menu-close-btn" class="close-btn" type="button">&times;</button>
-    <div class="menu-title">{configLabel}</div>
+    <div class="menu-title">{configTitle}</div>
   </div>
   <div class="menu-content">
     <div class="menu-search-box">
@@ -128,8 +137,16 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
 
       if (!openBtn || !closeBtn || !overlay || !menu) return;
 
-      openBtn.onclick = () => { menu.classList.add('open'); overlay.classList.add('visible'); document.body.style.overflow = 'hidden'; };
-      const close = () => { menu.classList.remove('open'); overlay.classList.remove('visible'); document.body.style.overflow = ''; };
+      openBtn.onclick = () => { 
+        menu.classList.add('open'); 
+        overlay.classList.add('visible'); 
+        document.body.style.overflow = 'hidden'; 
+      };
+      const close = () => { 
+        menu.classList.remove('open'); 
+        overlay.classList.remove('visible'); 
+        document.body.style.overflow = ''; 
+      };
       closeBtn.onclick = close;
       overlay.onclick = close;
 
@@ -148,31 +165,39 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
 
 <style>
   .site-header { background: #fff; width: 100%; }
-  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px; display: flex; justify-content: space-between; align-items: flex-start; }
-  .brand-area { width: 200px; }
+  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
+  
+  .brand-area { width: 200px; display: flex; flex-direction: column; }
   .logo-image { width: 100%; height: auto; }
-  .country-name-right { text-align: right; font-size: 16px; font-weight: 700; color: #000; margin-top: 2px; }
+  .country-name-right { text-align: right; font-size: 16px; font-weight: 700; color: #000; margin-top: 4px; }
 
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
   .search-form { display: flex; align-items: center; background: #d8d3cc; border-radius: 8px; padding: 0 8px; }
-  .search-input { border: none; background: transparent; height: 34px; width: 180px; font-size: 14px; outline: none; }
-  .search-button { background: none; border: none; cursor: pointer; }
-  .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.5; fill: none; }
+  .search-input { border: none; background: transparent; height: 34px; width: 180px; font-size: 15px; outline: none; }
+  .search-button { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
+  .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.2; fill: none; }
 
-  /* 言語・地域ラベル付きボタン */
-  .header-status-row { display: flex; align-items: center; gap: 15px; }
-  .current-setting-label { font-size: 16px; font-weight: 700; color: #000; }
-  .menu-trigger-with-label { display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; padding: 0; }
+  /* グレーの一体型ボタン */
+  .header-status-row { display: flex; align-items: center; gap: 12px; }
+  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; display: flex; align-items: center; }
+  .menu-combo-btn { 
+    display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; 
+    border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; 
+  }
   .menu-btn-text { font-size: 14px; font-weight: 700; color: #333; }
-  .hamburger-icon { width: 26px; height: 26px; stroke: #333; stroke-width: 2.5; }
+  .hamburger-icon { width: 20px; height: 20px; stroke: #333; stroke-width: 2.5; fill: none; }
 
-  .category-bar { background: #393737; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
-  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; white-space: nowrap; }
-  .category-link.active { background: #872732; }
+  /* カテゴリーバー設定（BK準拠） */
+  .category-bar { background: #393737; width: 100%; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
+  .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+  .category-scroll::-webkit-scrollbar { display: none; }
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; }
+  .category-link.active { background: var(--theme-color); }
   .bottom-line { height: 10px; width: 100%; }
 
-  /* ドロワー（背景グレー・文字白・0.5秒） */
+  /* ドロワーメニュー（0.5秒 / ダークグレー） */
   .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; transition: 0.5s; z-index: 9998; }
   .menu-overlay.visible { visibility: visible; opacity: 1; }
   .side-menu.dark-theme { position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: #2c2c2c; color: #fff; transition: 0.5s; z-index: 9999; box-shadow: -5px 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
@@ -193,5 +218,6 @@ const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traf
   @media (max-width: 768px) {
     .side-menu.dark-theme { width: 85%; right: -85%; }
     .header-status-row { display: none; }
+    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
 </style>
