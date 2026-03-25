@@ -17,24 +17,26 @@ const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
-// ▼ 「言語・地域」ボタンの多言語ラベル
+// 「言語・地域」ボタンの多言語ラベル
 const configButtonLabels: Record<string, string> = {
   ja: '言語・地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域',
   es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Регион'
 };
 const configLabel = configButtonLabels[lang] || configButtonLabels['en'];
 
-// 現在のカテゴリーナビなどの設定（既存のものを維持）
-const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
-const categoryItems = (labels.headerCategories || []).map((item) => {
-  const href = basePath + '/category/' + item.slug + '/';
-  return { href, label: item.label, isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), slug: item.slug };
-});
-const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'] };
-const moreSlugs = moreSlugsMap[localeKey] || [];
+// 有効な国と言語のペアを抽出（active: true のみ）
+const activePairs = langCountryPairs.filter(p => p.active);
+
+const categoryItems = (labels.headerCategories || []).map((item) => ({
+  href: basePath + '/category/' + item.slug + '/',
+  label: item.label,
+  isActive: currentPath === (basePath + '/category/' + item.slug),
+  slug: item.slug
+}));
+
+const moreSlugs = ['health-life', 'weather', 'traffic', 'environment-energy', 'sports'];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
-const moreHasActive = moreItems.some(item => item.isActive);
 ---
 
 <header class="site-header">
@@ -43,115 +45,136 @@ const moreHasActive = moreItems.some(item => item.isActive);
       <a href={homeHref} class="logo-link">
         <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
       </a>
-      <div class="country-name">{countryLabel}</div>
+      <div class="country-name-right">{countryLabel}</div>
     </div>
 
     <div class="right-area">
-      <form action={searchAction} method="get" class="search-form">
-        <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
-        <button type="submit" class="search-button">
-          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+      <div class="search-and-menu">
+        <form action={searchAction} method="get" class="search-form">
+          <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
+          <button type="submit" class="search-button">
+            <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+          </button>
+        </form>
+        
+        <button class="menu-trigger" id="menu-open-btn">
+          <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
-      </form>
+      </div>
 
-      <div class="header-config-row">
-        <span class="current-setting-text">{labels.languageName} / {countryLabel}</span>
-        <button class="open-region-modal-btn" id="open-region-modal">
-          <img src="/images/LanguageRegion_Button.png" alt="" class="globe-icon" />
-          <span class="config-label">{configLabel}</span>
-        </button>
+      <div class="header-status-row">
+        <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
       </div>
     </div>
   </div>
 
   <nav class="category-bar">
     <div class="category-nav-inner">
-      <button class="scroll-arrow arrow-left" id="arrow-left" type="button">&#8249;</button>
       <div class="pc-category-group">
-        <div class="category-scroll pc-scroll" id="pc-scroll">
+        <div class="category-scroll" id="pc-scroll">
           {mainItems.map((item) => (
-            <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-              <span class="category-link-text">{item.label}</span>
-            </a>
+            <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>{item.label}</a>
           ))}
         </div>
-        {moreItems.length > 0 && (
-          <div class="more-wrapper">
-            <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
-              {lang === 'ja' ? 'さらに見る' : 'More'}
-              <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-            <div class="more-dropdown">
-              {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>{item.label}</a>)}
-            </div>
-          </div>
-        )}
       </div>
-      <div class="category-scroll sp-scroll" id="sp-scroll">
-        {categoryItems.map((item) => (
-          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-            <span class="category-link-text">{item.label}</span>
-          </a>
-        ))}
-      </div>
-      <button class="scroll-arrow arrow-right" id="arrow-right" type="button">&#8250;</button>
     </div>
   </nav>
-
-  <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
 </header>
 
-<style>
-  .site-header { width: 100%; background: #ffffff; }
-  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .brand-area { display: flex; flex-direction: column; align-items: flex-start; } /* 国名をロゴの下に左寄せ */
-  .logo-image { width: 200px; height: auto; }
-  .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
+<div class="menu-overlay" id="menu-overlay"></div>
+<div class="side-menu" id="side-menu">
+  <div class="menu-header">
+    <button class="close-btn" id="menu-close-btn">&times;</button>
+    <div class="menu-title">{configLabel}</div>
+  </div>
   
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .search-form { display: flex; align-items: center; gap: 6px; }
-  .search-input { width: 220px; height: 34px; padding: 0 10px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; font-size: 15px; outline: none; }
-  .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
+  <div class="menu-content">
+    <div class="current-selection-box">
+      <p class="small-title">Current Setting</p>
+      <div class="current-value">{labels.languageName} / {countryLabel}</div>
+    </div>
 
-  /* 検索窓の下の新しい行 */
-  .header-config-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
-  .current-setting-text { font-size: 15px; font-weight: 700; color: #000000; } /* 文字を黒く、一回り大きく */
+    <div class="language-list">
+      {activePairs.map((pair) => {
+        const pairCountryLabel = getCountryLabel(pair.country, lang);
+        // 各言語ごとの言語名を表示する簡易的なマップ
+        const langNames: Record<string, string> = { ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文', es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский' };
+        return (
+          <a href={`/${pair.lang}/${pair.country}/`} class="lang-item">
+            <span class="lang-text">{langNames[pair.lang] || pair.lang} ({pairCountryLabel})</span>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const openBtn = document.getElementById('menu-open-btn');
+    const closeBtn = document.getElementById('menu-close-btn');
+    const overlay = document.getElementById('menu-overlay');
+    const menu = document.getElementById('side-menu');
+
+    function toggleMenu() {
+      menu.classList.toggle('open');
+      overlay.classList.toggle('visible');
+      document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+    }
+
+    openBtn?.addEventListener('click', toggleMenu);
+    closeBtn?.addEventListener('click', toggleMenu);
+    overlay?.addEventListener('click', toggleMenu);
+  });
+</script>
+
+<style>
+  .site-header { background: #fff; width: 100%; }
+  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px; display: flex; justify-content: space-between; align-items: flex-start; }
   
-  .open-region-modal-btn { 
-    display: flex; align-items: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;
-  }
-  .open-region-modal-btn:hover { background: #f0f0f0; }
-  .globe-icon { width: 20px; height: 20px; object-fit: contain; }
-  .config-label { font-size: 13px; color: #666; font-weight: 600; }
+  .brand-area { display: flex; flex-direction: column; width: 200px; }
+  .logo-image { width: 100%; height: auto; }
+  .country-name-right { text-align: right; font-size: 16px; font-weight: 700; color: #000; margin-top: 2px; }
+
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .search-and-menu { display: flex; align-items: center; gap: 15px; }
+  .search-form { display: flex; align-items: center; background: #d8d3cc; border-radius: 8px; padding: 0 8px; }
+  .search-input { border: none; background: transparent; height: 34px; width: 180px; outline: none; font-size: 14px; }
+  .search-button { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
+  .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.5; fill: none; }
+
+  .menu-trigger { background: none; border: none; cursor: pointer; padding: 5px; }
+  .hamburger-icon { width: 30px; height: 30px; stroke: #333; stroke-width: 2; fill: none; }
+  
+  .header-status-row { margin-right: 45px; } /* 三本線との位置調整 */
+  .current-setting-label { font-size: 16px; font-weight: 700; color: #000; }
+
+  /* ドロワーメニュー */
+  .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); visibility: hidden; opacity: 0; transition: 0.3s; z-index: 9998; }
+  .menu-overlay.visible { visibility: visible; opacity: 1; }
+  
+  .side-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #fff; transition: 0.3s; z-index: 9999; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+  .side-menu.open { right: 0; }
+  
+  .menu-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
+  .close-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: #666; }
+  .menu-title { font-size: 18px; font-weight: 700; }
+  
+  .menu-content { flex: 1; overflow-y: auto; padding: 20px; }
+  .current-selection-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #872732; }
+  .small-title { font-size: 12px; color: #666; margin-bottom: 5px; }
+  .current-value { font-size: 16px; font-weight: 700; color: #000; }
+
+  .lang-item { display: block; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333; transition: 0.2s; }
+  .lang-item:hover { background: #f0f0f0; }
 
   .category-bar { background: #393737; width: 100%; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
-  .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
-  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; }
-  .category-scroll::-webkit-scrollbar { display: none; }
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
-  .category-link.active { background: var(--theme-color); }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; }
+  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .category-link.active { background: #872732; }
   
-  .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .more-btn.active { background: var(--theme-color); }
-  .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
-  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-  .more-wrapper:hover { background: rgba(255,255,255,0.1); }
-  .more-wrapper:hover .more-dropdown { display: block; }
-  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
-  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
-
-  .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
-  .scroll-arrow.active { display: flex; }
-  .bottom-line { height: 10px; }
-
-  @media (max-width: 768px) { 
-    .pc-category-group { display: none; } 
-    .sp-scroll { display: flex; }
-    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
-    /* スマホでは「言語・地域」ボタンを隠す（または別の場所に置く） */
-    .header-config-row { display: none; }
+  @media (max-width: 768px) {
+    .side-menu { width: 85%; right: -85%; }
+    .search-input { width: 120px; }
   }
 </style>
