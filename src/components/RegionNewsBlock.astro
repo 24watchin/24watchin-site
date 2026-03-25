@@ -22,13 +22,12 @@ const formatPostTime = (dateString) => {
   } catch { return ''; }
 };
 
-// ▼ カテゴリ名のみを表示する（記事タグは表示しない）
 const localeKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw',
   es: 'es', fr: 'fr', de: 'de', ru: 'ru',
 };
 
-// ▼ デフォルトカテゴリ名（カテゴリが見つからないときの表示）
+// ▼ デフォルトカテゴリ名
 const defaultCategoryLabel = {
   ja: 'ニュース', en: 'News', 'zh-cn': '新闻', 'zh-tw': '新聞',
   es: 'Noticias', fr: 'Actualités', de: 'Nachrichten', ru: 'Новости',
@@ -39,14 +38,20 @@ const getDisplayCategory = (post) => {
   const mapKey = localeKeyMap[lang] || 'en';
   const langConfig = categoryLabelMap[mapKey] || categoryLabelMap['en'];
 
-  // ▼ カテゴリ名の一覧を取得
+  // ▼ まずラベル名と完全一致するか確認
   const validCategoryNames = langConfig.allCategories.map(cat => cat.label);
+  const exactMatch = labels.find(label => validCategoryNames.includes(label));
+  if (exactMatch) return exactMatch;
 
-  // ▼ ラベルの中からカテゴリ名に一致するものだけを返す
-  const categoryLabel = labels.find(label => validCategoryNames.includes(label));
-  if (categoryLabel) return categoryLabel;
+  // ▼ 次にkeywordsで部分一致を確認（例：タグ「エンタメ」→ keyword「エンタメ」→ label「文化・エンタメ」）
+  for (const cat of langConfig.allCategories) {
+    const keywordMatch = labels.some(label =>
+      cat.keywords.some(key => label.includes(key))
+    );
+    if (keywordMatch) return cat.label;
+  }
 
-  // ▼ 見つからない場合はデフォルト表示（記事タグは表示しない！）
+  // ▼ どちらも見つからなければデフォルト表示（記事タグは表示しない！）
   return defaultCategoryLabel[lang] || defaultCategoryLabel['en'];
 };
 ---
