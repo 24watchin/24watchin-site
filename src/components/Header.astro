@@ -45,10 +45,7 @@ const categoryItems = (labels.headerCategories || []).map((item) => ({
   isActive: currentPath === (basePath + '/category/' + item.slug),
   slug: item.slug
 }));
-const moreSlugs = ['health-life', 'weather', 'traffic'];
-const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
-
-// 以前のBKにあったheaderWords（空でもスペース確保のため定義）
+const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traffic'].includes(item.slug));
 const headerWords = []; 
 ---
 
@@ -62,21 +59,20 @@ const headerWords = [];
     </div>
 
     <div class="right-area">
-      <div class="search-and-menu">
+      <div class="upper-row">
         <form action={searchAction} method="get" class="search-form-expandable" id="search-form">
           <input type="text" name="q" class="search-input-hidden" id="search-input" placeholder={labels.searchPlaceholder} />
           <button type="button" class="search-toggle-btn" id="search-trigger">
-            <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+            <svg class="search-icon-large" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
           </button>
         </form>
-        
+      </div>
+
+      <div class="lower-row">
         <button id="menu-open-btn" class="menu-combo-btn" type="button">
           <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
           <span class="menu-btn-text">{configLabelText}</span>
         </button>
-      </div>
-
-      <div class="header-status-row">
         <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
       </div>
     </div>
@@ -149,7 +145,6 @@ const headerWords = [];
 <script is:inline>
   (function() {
     function setupHeader() {
-      // 検索窓の伸縮ギミック
       const searchTrigger = document.getElementById('search-trigger');
       const searchInput = document.getElementById('search-input');
       const searchForm = document.getElementById('search-form');
@@ -167,7 +162,6 @@ const headerWords = [];
         }
       });
 
-      // メニューの開閉
       const openBtn = document.getElementById('menu-open-btn');
       const closeBtn = document.getElementById('menu-close-btn');
       const overlay = document.getElementById('menu-overlay');
@@ -201,23 +195,28 @@ const headerWords = [];
   .logo-image { width: 100%; height: auto; }
   .country-name-right { text-align: right; font-size: 16px; font-weight: 700; color: #000; margin-top: 4px; }
 
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-  .search-and-menu { display: flex; align-items: center; gap: 12px; }
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  
+  /* 上段・下段のレイアウト */
+  .upper-row { width: 100%; display: flex; justify-content: flex-end; }
+  .lower-row { width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 15px; }
 
-  /* 伸縮する検索窓のデザイン */
-  .search-form-expandable { display: flex; align-items: center; border: 2px solid #666; border-radius: 8px; background: #fff; overflow: hidden; transition: width 0.3s; width: 38px; height: 38px; }
+  /* 検索窓（三本線ボタンと同じ高さ34pxに固定） */
+  .search-form-expandable { display: flex; align-items: center; border: 2px solid #666; border-radius: 8px; background: #fff; overflow: hidden; transition: width 0.3s; width: 34px; height: 34px; }
   .search-form-expandable.expanded { width: 220px; }
   .search-input-hidden { width: 0; padding: 0; border: none; outline: none; transition: width 0.3s, padding 0.3s; font-size: 14px; background: transparent; }
   .search-form-expandable.expanded .search-input-hidden { width: 100%; padding: 0 10px; }
-  .search-toggle-btn { width: 38px; height: 38px; background: #fff; border: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-  .search-icon { width: 18px; height: 18px; stroke: #666; stroke-width: 2.5; fill: none; }
+  .search-toggle-btn { width: 34px; height: 34px; background: #fff; border: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  /* アイコン自体を少し大きく調整 */
+  .search-icon-large { width: 22px; height: 22px; stroke: #666; stroke-width: 2.5; fill: none; }
 
-  /* 言語・地域ボタン */
-  .header-status-row { display: flex; align-items: center; gap: 12px; }
-  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; display: flex; align-items: center; }
-  .menu-combo-btn { display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; }
+  /* 言語・地域ボタン（下段・左側） */
+  .menu-combo-btn { display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; order: 1; }
   .menu-btn-text { font-size: 14px; font-weight: 700; color: #333; }
   .hamburger-icon { width: 20px; height: 20px; stroke: #333; stroke-width: 2.5; fill: none; }
+
+  /* 日本語/JAPAN（下段・右側） */
+  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; display: flex; align-items: center; order: 2; }
 
   .category-bar { background: #393737; width: 100%; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
@@ -226,14 +225,13 @@ const headerWords = [];
   .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; }
   .category-link.active { background: var(--theme-color); }
 
-  /* ②空白スペースの復元設定 */
   .header-word-bar { background: #fff; min-height: 36px; display: flex; align-items: center; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
-  .spacer-text { font-size: 16px; visibility: hidden; } /* 16pxの文字が入る高さを確保 */
+  .spacer-text { font-size: 16px; visibility: hidden; }
 
   .bottom-line { height: 10px; width: 100%; }
 
-  /* ドロワーメニューデザイン */
+  /* ドロワー設定 */
   .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; transition: 0.5s; z-index: 9998; }
   .menu-overlay.visible { visibility: visible; opacity: 1; }
   .side-menu.dark-theme { position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: #2c2c2c; color: #fff; transition: 0.5s; z-index: 9999; box-shadow: -5px 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
@@ -250,7 +248,7 @@ const headerWords = [];
 
   @media (max-width: 768px) {
     .side-menu.dark-theme { width: 85%; right: -85%; }
-    .header-status-row { display: none; }
-    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
+    .header-top { flex-direction: row; align-items: center; }
+    .lower-row { display: none; }
   }
 </style>
