@@ -13,8 +13,6 @@ import { getCountryLabel } from '../../../../lib/countryData.ts';
 export async function getStaticPaths() {
   const API_KEY = import.meta.env.API_KEY;
   const paths = [];
-
-  // ▼ 言語ごとに1回だけAPIを呼ぶ！（重複リクエストを防ぐ）
   const postsByLang: Record<string, any[]> = {};
   const langs = [...new Set(langCountryPairs.map(p => p.lang))];
 
@@ -30,7 +28,6 @@ export async function getStaticPaths() {
     }
   }));
 
-  // ▼ 言語×国の組み合わせでパスを生成
   for (const { lang, country } of langCountryPairs) {
     const posts = postsByLang[lang] || [];
     const targetTag = lang + '-' + country;
@@ -38,20 +35,17 @@ export async function getStaticPaths() {
       paths.push({ params: { lang, country, id: post.id }, props: { post, allPosts: posts } });
     });
   }
-
   return paths;
 }
 
 const { post, allPosts = [] } = Astro.props;
 const { lang, country } = Astro.params;
-
 const localeKeyMap = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', fr: 'fr', de: 'de', ru: 'ru' };
 const labels = categoryLabelMap[(localeKeyMap[lang] || 'jp') as SiteLanguageKey] || categoryLabelMap.jp;
 
 const currentCategory = labels.allCategories.find(cat => post.labels?.some(label => cat.keywords.some(key => label.includes(key))));
 const categoryLabel = currentCategory ? currentCategory.label : '';
 const categoryHref = currentCategory ? `/${lang}/${country}/category/${currentCategory.slug}/` : '';
-
 const countryLabel = getCountryLabel(country, lang);
 const countryHref = `/${lang}/${country}/`;
 
@@ -64,10 +58,19 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
 ---
 
 <Layout title={post.title} sidebarType="article">
-  <div class="article-breadcrumb-wrap">
-    <Breadcrumb countryLabel={countryLabel} countryHref={countryHref} categoryLabel={categoryLabel} categoryHref={categoryHref} />
+  <div class="article-breadcrumb-container">
+    <div class="article-breadcrumb-wrap">
+      <Breadcrumb countryLabel={countryLabel} countryHref={countryHref} categoryLabel={categoryLabel} categoryHref={categoryHref} />
+    </div>
+
+    <div class="text-size-selector">
+      <button onclick="changeTextSize('small')" class="size-btn">小</button>
+      <button onclick="changeTextSize('medium')" class="size-btn active">中</button>
+      <button onclick="changeTextSize('large')" class="size-btn">大</button>
+    </div>
   </div>
-  <article class="post-container">
+
+  <article class="post-container" id="article-body">
     <header class="post-header">
       <h1 class="post-title">{post.title}</h1>
       <div class="post-submeta">
@@ -78,6 +81,7 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
     <div class="post-content" set:html={post.content} />
     <ReactionBar articleId={post.id} />
   </article>
+
   <div slot="bottom-wide">
     <RelatedNews relatedPosts={allPosts.filter(p => p.id !== post.id && p.labels?.includes(lang + '-' + country)).slice(0, 6)} lang={lang} country={country} />
     <RecommendedLinks lang={lang} />
@@ -85,12 +89,86 @@ const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
   </div>
 </Layout>
 
+<script is:inline>
+  function changeTextSize(size) {
+    const article = document.getElementById('article-body');
+    const buttons = document.querySelectorAll('.size-btn');
+    
+    // 全てのボタンから「active（選択中）」の色を消す
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // クリックされたボタンに色をつける
+    event.target.classList.add('active');
+
+    // サイズに合わせて文字の大きさを変える
+    if (size === 'small') {
+      article.style.fontSize = '16px';
+    } else if (size === 'medium') {
+      article.style.fontSize = '20px';
+    } else if (size === 'large') {
+      article.style.fontSize = '24px';
+    }
+  }
+</script>
+
 <style>
-  .article-breadcrumb-wrap { margin: -10px 0 6px; }
-  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  /* パンくずとボタンを横並びにする設定 */
+  .article-breadcrumb-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: -10px 0 10px;
+    gap: 10px;
+  }
+  .article-breadcrumb-wrap { margin: 0; }
+
+  /* 文字サイズボタンのデザイン */
+  .text-size-selector { display: flex; gap: 5px; }
+  .size-btn {
+    padding: 4px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #333;
+  }
+  .size-btn.active {
+    background: #872732; /* サイトのテーマカラー */
+    color: #fff;
+    border-color: #872732;
+  }
+
+  .post-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: font-size 0.2s; }
   .post-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
-  .post-content { font-size: 16px; line-height: 1.8; color: #1a1a1a; }
+  
+  /* 記事本文の基準サイズを20px（中）に設定 */
+  .post-content { font-size: 20px; line-height: 1.8; color: #1a1a1a; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
+
+  /* Bloggerの画像説明（キャプション）の設定 */
+  .post-content :global(.tr-caption) {
+    font-size: 18px !important; /* 18pxで固定 */
+    line-height: 1.4;
+    color: #666;
+    display: block;
+    margin-top: 8px;
+  }
+
+  /* スマホ用の余白設定 */
+  @media (max-width: 768px) {
+    .article-breadcrumb-container {
+      flex-direction: column; /* スマホではパンくずとボタンを上下に並べる */
+      align-items: flex-start;
+    }
+    .text-size-selector { align-self: flex-end; } /* ボタンだけ右側に寄せる */
+    
+    .post-container {
+      padding: 20px 10px; /* 左右余白を10pxに */
+      border-radius: 0;
+    }
+    .post-title { font-size: 22px; } /* タイトルも少しスマホ向けに調整 */
+  }
 </style>
