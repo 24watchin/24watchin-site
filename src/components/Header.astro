@@ -1,5 +1,5 @@
 ---
-import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
+import { categoryLabelMap } from '../lib/categoryLabels';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
 import { getCountryLabel } from '../lib/countryData.ts';
 
@@ -8,8 +8,9 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
-const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
+// 読み込み設定
+const localeKeyMap = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
+const localeKey = localeKeyMap[lang] || 'jp';
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 const basePath = '/' + lang + '/' + country;
 
@@ -17,12 +18,15 @@ const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
-// 多言語ラベル
-const configButtonLabels: Record<string, string> = {
-  ja: '言語・地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域',
-  es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Регион'
-};
-const configLabel = configButtonLabels[lang] || configButtonLabels['en'];
+// メニューのタイトルを言語ごとに用意
+let configLabel = 'Language / Region';
+if (lang === 'ja') configLabel = '言語・地域';
+if (lang === 'zh-cn') configLabel = '语言 / 地域';
+if (lang === 'zh-tw') configLabel = '語言 / 地域';
+if (lang === 'es') configLabel = 'Idioma / Región';
+if (lang === 'fr') configLabel = 'Langue / Région';
+if (lang === 'de') configLabel = 'Sprache / Region';
+if (lang === 'ru') configLabel = 'Язык / Регион';
 
 const activePairs = langCountryPairs.filter(p => p.active);
 
@@ -33,8 +37,7 @@ const categoryItems = (labels.headerCategories || []).map((item) => ({
   slug: item.slug
 }));
 
-const moreSlugs = ['health-life', 'weather', 'traffic', 'environment-energy', 'sports'];
-const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
+const mainItems = categoryItems.filter(item => !['health-life', 'weather', 'traffic'].includes(item.slug));
 ---
 
 <header class="site-header">
@@ -55,7 +58,7 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
           </button>
         </form>
         
-        <button class="menu-trigger" id="menu-open-btn" type="button">
+        <button id="menu-open-btn" class="menu-trigger" type="button">
           <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
       </div>
@@ -68,21 +71,17 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 
   <nav class="category-bar">
     <div class="category-nav-inner">
-      <div class="pc-category-group">
-        <div class="category-scroll" id="pc-scroll">
-          {mainItems.map((item) => (
-            <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>{item.label}</a>
-          ))}
-        </div>
-      </div>
+      {mainItems.map((item) => (
+        <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>{item.label}</a>
+      ))}
     </div>
   </nav>
 </header>
 
-<div class="menu-overlay" id="menu-overlay"></div>
-<div class="side-menu" id="side-menu">
+<div id="menu-overlay" class="menu-overlay"></div>
+<div id="side-menu" class="side-menu">
   <div class="menu-header">
-    <button class="close-btn" id="menu-close-btn" type="button">&times;</button>
+    <button id="menu-close-btn" class="close-btn" type="button">&times;</button>
     <div class="menu-title">{configLabel}</div>
   </div>
   
@@ -95,10 +94,20 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
     <div class="language-list">
       {activePairs.map((pair) => {
         const pairCountryLabel = getCountryLabel(pair.country, lang);
-        const langNames: Record<string, string> = { ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文', es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский' };
+        // 言語名の表示
+        let langName = pair.lang;
+        if (pair.lang === 'ja') langName = '日本語';
+        else if (pair.lang === 'en') langName = 'English';
+        else if (pair.lang === 'zh-cn') langName = '简体中文';
+        else if (pair.lang === 'zh-tw') langName = '繁體中文';
+        else if (pair.lang === 'es') langName = 'Español';
+        else if (pair.lang === 'fr') langName = 'Français';
+        else if (pair.lang === 'de') langName = 'Deutsch';
+        else if (pair.lang === 'ru') langName = 'Русский';
+
         return (
           <a href={`/${pair.lang}/${pair.country}/`} class="lang-item">
-            <span class="lang-text">{langNames[pair.lang] || pair.lang} ({pairCountryLabel})</span>
+            {langName} ({pairCountryLabel})
           </a>
         );
       })}
@@ -108,7 +117,7 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 
 <script is:inline>
   (function() {
-    function setupMenu() {
+    function setupDrawer() {
       const openBtn = document.getElementById('menu-open-btn');
       const closeBtn = document.getElementById('menu-close-btn');
       const overlay = document.getElementById('menu-overlay');
@@ -116,19 +125,24 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 
       if (!openBtn || !closeBtn || !overlay || !menu) return;
 
-      function toggleMenu() {
-        menu.classList.toggle('open');
-        overlay.classList.toggle('visible');
-        document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+      function openMenu() {
+        menu.classList.add('open');
+        overlay.classList.add('visible');
+        document.body.style.overflow = 'hidden';
       }
 
-      openBtn.onclick = toggleMenu;
-      closeBtn.onclick = toggleMenu;
-      overlay.onclick = toggleMenu;
-    }
+      function closeMenu() {
+        menu.classList.remove('open');
+        overlay.classList.remove('visible');
+        document.body.style.overflow = '';
+      }
 
-    setupMenu();
-    document.addEventListener('astro:page-load', setupMenu);
+      openBtn.onclick = openMenu;
+      closeBtn.onclick = closeMenu;
+      overlay.onclick = closeMenu;
+    }
+    setupDrawer();
+    document.addEventListener('astro:page-load', setupDrawer);
   })();
 </script>
 
@@ -138,6 +152,7 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
   
   .brand-area { display: flex; flex-direction: column; width: 200px; }
   .logo-image { width: 100%; height: auto; }
+  /* ここで右揃えを設定 */
   .country-name-right { text-align: right; font-size: 16px; font-weight: 700; color: #000; margin-top: 2px; }
 
   .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
@@ -147,39 +162,40 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
   .search-button { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
   .search-icon { width: 18px; height: 18px; stroke: #393737; stroke-width: 2.5; fill: none; }
 
-  .menu-trigger { background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; }
+  .menu-trigger { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
   .hamburger-icon { width: 30px; height: 30px; stroke: #333; stroke-width: 2; fill: none; }
   
-  .header-status-row { margin-right: 45px; margin-top: 2px; }
+  .header-status-row { margin-right: 45px; }
   .current-setting-label { font-size: 16px; font-weight: 700; color: #000; }
 
+  /* メニューの見た目 */
   .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); visibility: hidden; opacity: 0; transition: 0.3s; z-index: 9998; }
   .menu-overlay.visible { visibility: visible; opacity: 1; }
   
-  .side-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #fff; transition: 0.3s; z-index: 9999; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+  .side-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #fff; transition: 0.3s; z-index: 9999; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
   .side-menu.open { right: 0; }
   
   .menu-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
-  .close-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: #666; line-height: 1; }
-  .menu-title { font-size: 18px; font-weight: 700; color: #333; }
+  .close-btn { background: none; border: none; font-size: 30px; cursor: pointer; color: #666; }
+  .menu-title { font-size: 18px; font-weight: 700; }
   
-  .menu-content { flex: 1; overflow-y: auto; padding: 20px; }
+  .menu-content { padding: 20px; height: calc(100% - 70px); overflow-y: auto; }
   .current-selection-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #872732; }
-  .small-title { font-size: 12px; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-  .current-value { font-size: 16px; font-weight: 700; color: #000; }
+  .small-title { font-size: 11px; color: #666; margin-bottom: 4px; text-transform: uppercase; }
+  .current-value { font-size: 15px; font-weight: 700; }
 
-  .lang-item { display: block; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333; transition: 0.2s; font-size: 14px; }
+  .lang-item { display: block; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333; font-size: 14px; }
   .lang-item:hover { background: #f0f0f0; color: #872732; }
 
   .category-bar { background: #393737; width: 100%; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
   .category-nav-inner::-webkit-scrollbar { display: none; }
-  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
+  .category-link { padding: 15px 20px; color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; white-space: nowrap; }
   .category-link.active { background: #872732; }
   
   @media (max-width: 768px) {
-    .side-menu { width: 80%; right: -80%; }
-    .search-input { width: 100px; }
-    .header-status-row { display: none; } /* スマホでは三本線だけでスッキリさせる */
+    .side-menu { width: 280px; }
+    .search-input { width: 120px; }
+    .header-status-row { display: none; }
   }
 </style>
