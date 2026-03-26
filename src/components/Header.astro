@@ -1,215 +1,235 @@
 ---
-import { categoryLabelMap } from '../lib/categoryLabels';
+import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
 import { getCountryLabel } from '../lib/countryData.ts';
+
+const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
+const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-const localeKeyMap = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
-const localeKey = localeKeyMap[lang] || 'jp';
+const SITE_ID = 'jp-ja'; 
+const SLOT = 'header_words';
+type HeaderWord = { label: string; url: string; displayOrder: number; };
+let headerWords: HeaderWord[] = [];
+
+if (SPACE_ID && DELIVERY_TOKEN) {
+  try {
+    const params = new URLSearchParams({ content_type: 'headerWord', 'fields.siteId': SITE_ID, 'fields.slot': SLOT, 'fields.enabled': 'true', order: 'fields.displayOrder', limit: '20' });
+    const res = await fetch(`https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`, { headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` } });
+    if (res.ok) {
+      const data = await res.json();
+      headerWords = (data.items ?? []).map((item: any) => ({ label: item?.fields?.label ?? '', url: item?.fields?.url ?? '#', displayOrder: Number(item?.fields?.displayOrder ?? 9999), enabled: item?.fields?.enabled ?? false, siteId: item?.fields?.siteId ?? '', slot: item?.fields?.slot ?? '' }))
+        .filter((item: any) => item.enabled === true && item.siteId === SITE_ID && item.slot === SLOT && item.label)
+        .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+        .map((item: any) => ({ label: item.label, url: item.url, displayOrder: item.displayOrder }));
+    }
+  } catch (e) { headerWords = []; }
+}
+
+const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
+const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 const basePath = '/' + lang + '/' + country;
+const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
+
+const categoryItems = (labels.headerCategories || []).map((item) => {
+  const href = basePath + '/category/' + item.slug + '/';
+  return { href, label: item.label, isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), slug: item.slug };
+});
 
 const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
-const configLabels = { 
-  ja: '言語 / 地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域',
-  es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Региオン' 
-};
-const configLabelText = configLabels[lang] || configLabels['en'];
-const langNames = { ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文', es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский' };
+const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
+const languageOptions = [
+  { code: 'ja', key: 'jp', label: '日本語', barStyle: 'background:#872732' },
+  { code: 'en', key: 'en', label: 'English', barStyle: 'background:#001580' },
+  { code: 'zh-cn', key: 'zh-cn', label: '简体中文', barStyle: 'background:#0e7c7b' },
+  { code: 'zh-tw', key: 'zh-tw', label: '繁體中文', barStyle: 'background:#b33224' },
+  { code: 'es', key: 'es', label: 'Español', barStyle: 'background:#b38000' },
+  { code: 'fr', key: 'fr', label: 'Français', barStyle: 'background:#3d3d99' },
+  { code: 'de', key: 'de', label: 'Deutsch', barStyle: 'background:#006600' },
+  { code: 'ru', key: 'ru', label: 'Русский', barStyle: 'background:#500d80' },
+].filter(opt => allowedLangs.includes(opt.code)).map(opt => ({ ...opt, href: '/' + opt.code + '/' + country + '/', linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option' }));
 
-const allActivePairs = langCountryPairs.filter(p => p.active).sort((a, b) => {
-  const nameA = langNames[a.lang] || a.lang;
-  const nameB = langNames[b.lang] || b.lang;
-  return nameA.localeCompare(nameB, lang === 'ja' ? 'ja' : 'en');
-});
-
-const categoryItems = (labels.headerCategories || []).map((item) => ({
-  href: basePath + '/category/' + item.slug + '/',
-  label: item.label,
-  isActive: currentPath === (basePath + '/category/' + item.slug),
-  slug: item.slug
-}));
-const moreSlugs = ['health-life', 'weather', 'traffic'];
+const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
+const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
+const moreHasActive = moreItems.some(item => item.isActive);
 ---
 
 <header class="site-header">
   <div class="header-top">
     <div class="brand-area">
-      <a href={homeHref} class="logo-link">
-        <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
-      </a>
-      <div class="country-name-aligned">{countryLabel}</div>
+      <a href={homeHref} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" /></a>
+      <div class="country-name">{countryLabel}</div>
     </div>
-
     <div class="right-area">
-      <div class="upper-row">
-        <form action={searchAction} method="get" class="search-form-expandable" id="search-form">
-          <input type="text" name="q" class="search-input-hidden" id="search-input" placeholder={labels.searchPlaceholder} />
-          <button type="button" class="search-toggle-btn" id="search-trigger">
-            <svg class="search-icon-large" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
-          </button>
-        </form>
-      </div>
-      <div class="lower-row">
-        <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
-        <button id="menu-open-btn" class="menu-combo-btn" type="button">
-          <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-          <span class="menu-btn-text">{configLabelText}</span>
+      <form action={searchAction} method="get" class="search-form">
+        <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
+        <button type="submit" class="search-button">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
         </button>
+      </form>
+      <div class="lang-switcher">
+        <div class="lang-current">{labels.languageName} ▾</div>
+        <div class="lang-dropdown">
+          {languageOptions.map((opt) => (
+            <a href={opt.href} class={opt.linkClass}><span class="lang-bar" style={opt.barStyle}></span>{opt.label}</a>
+          ))}
+        </div>
       </div>
     </div>
   </div>
 
   <nav class="category-bar">
     <div class="category-nav-inner">
+      <button class="scroll-arrow arrow-left" id="arrow-left" type="button">&#8249;</button>
+      
       <div class="pc-category-group">
-        {mainItems.map((item) => (
-          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-            <span class="category-text-with-underline">{item.label}</span>
-          </a>
-        ))}
+        <div class="category-scroll pc-scroll" id="pc-scroll">
+          {mainItems.map((item) => (
+            <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+              <span class="category-link-text">{item.label}</span>
+            </a>
+          ))}
+        </div>
         {moreItems.length > 0 && (
-          <div class="more-dropdown">
-            <button class="more-btn">
-              <span class="category-text-with-underline">More</span>
-              <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"></path></svg>
-            </button>
-            <div class="dropdown-content">
-              {moreItems.map((item) => (
-                <a href={item.href} class="dropdown-link">{item.label}</a>
-              ))}
+          <div class="more-wrapper">
+            <div class={moreHasActive ? 'more-btn active' : 'more-btn'}>
+              {lang === 'ja' ? 'さらに見る' : 'More'}
+              <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="more-dropdown">
+              {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>{item.label}</a>)}
             </div>
           </div>
         )}
       </div>
+
+      <div class="category-scroll sp-scroll" id="sp-scroll">
+        {categoryItems.map((item) => (
+          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+            <span class="category-link-text">{item.label}</span>
+          </a>
+        ))}
+      </div>
+
+      <button class="scroll-arrow arrow-right" id="arrow-right" type="button">&#8250;</button>
     </div>
   </nav>
 
   <div class="header-word-bar">
-    <div class="header-word-inner"><span class="spacer-text">&nbsp;</span></div>
+    <div class="header-word-inner">
+      {headerWords.map((item, index) => (
+        <a href={item.url} class="header-word-link">{item.label}</a>
+      ))}
+    </div>
   </div>
   <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
 </header>
 
-<div id="menu-overlay" class="menu-overlay"></div>
-<div id="side-menu" class="side-menu dark-theme">
-  <div class="menu-header">
-    <button id="menu-close-btn" class="close-btn" type="button">&times;</button>
-    <div class="menu-title">{configLabelText}</div>
-  </div>
-  <div class="menu-content">
-    <div class="current-selection-box">
-      <p class="small-title">Current Setting</p>
-      <div class="current-value">{labels.languageName} / {countryLabel}</div>
-    </div>
-    <div id="full-lang-list">
-      {allActivePairs.map((pair) => (
-        <a href={`/${pair.lang}/${pair.country}/`} class="lang-item">
-          {langNames[pair.lang] || pair.lang} ({getCountryLabel(pair.country, lang)})
-        </a>
-      ))}
-    </div>
-  </div>
-</div>
-
-<script is:inline>
-  (function() {
-    function setupHeader() {
-      const searchTrigger = document.getElementById('search-trigger');
-      const searchInput = document.getElementById('search-input');
-      const searchForm = document.getElementById('search-form');
-      searchTrigger?.addEventListener('click', () => {
-        if (!searchForm.classList.contains('expanded')) {
-          searchForm.classList.add('expanded');
-          searchInput.focus();
-        } else if (searchInput.value.trim() !== "") {
-          searchForm.submit();
-        } else {
-          searchForm.classList.remove('expanded');
-        }
-      });
-
-      const openBtn = document.getElementById('menu-open-btn');
-      const closeBtn = document.getElementById('menu-close-btn');
-      const overlay = document.getElementById('menu-overlay');
-      const menu = document.getElementById('side-menu');
-      if (openBtn && closeBtn && overlay && menu) {
-        const toggle = (open) => {
-          menu.classList.toggle('open', open);
-          overlay.classList.toggle('visible', open);
-          document.body.style.overflow = open ? 'hidden' : '';
-        };
-        openBtn.onclick = () => toggle(true);
-        closeBtn.onclick = () => toggle(false);
-        overlay.onclick = () => toggle(false);
-      }
-    }
-    setupHeader();
-    document.addEventListener('astro:page-load', setupHeader);
-  })();
-</script>
-
 <style>
-  .site-header { background: #fff; width: 100%; position: relative; z-index: 1000; }
-  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
-  .brand-area { width: 220px; display: flex; flex-direction: column; }
-  .logo-image { width: 100%; height: auto; }
-  .country-name-aligned { text-align: right; font-size: 16px; font-weight: 700; color: #000; height: 34px; line-height: 34px; margin-top: 4px; }
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-  .upper-row { width: 100%; display: flex; justify-content: flex-end; }
-  .lower-row { width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 12px; height: 34px; }
-  .search-form-expandable { display: flex; align-items: center; border: 2px solid #666; border-radius: 8px; background: #fff; overflow: hidden; transition: width 0.3s; width: 34px; height: 34px; }
-  .search-form-expandable.expanded { width: 220px; }
-  .search-input-hidden { width: 0; padding: 0; border: none; outline: none; font-size: 14px; background: transparent; }
-  .search-form-expandable.expanded .search-input-hidden { width: 100%; padding: 0 10px; }
-  .search-toggle-btn { width: 34px; height: 34px; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .search-icon-large { width: 22px; height: 22px; stroke: #666; stroke-width: 2.5; fill: none; }
-  .menu-combo-btn { display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; }
-  .menu-btn-text { font-size: 14px; font-weight: 700; color: #333; }
-  .hamburger-icon { width: 20px; height: 20px; stroke: #333; stroke-width: 2.5; fill: none; }
-  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; line-height: 34px; }
+  .site-header { width: 100%; background: #ffffff; }
+  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .brand-area { display: flex; flex-direction: column; align-items: flex-end; }
+  .logo-image { width: 200px; height: auto; }
+  .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .search-form { display: flex; align-items: center; gap: 6px; }
+  .search-input { width: 180px; height: 34px; padding: 0 10px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; font-size: 15px; outline: none; }
+  .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
+  .lang-switcher { position: relative; }
+  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; }
+  .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e0e0e0; min-width: 150px; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+  .lang-switcher:hover .lang-dropdown { display: block; }
+  .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+  .lang-bar { width: 4px; height: 14px; border-radius: 2px; }
+  
   .category-bar { background: #393737; width: 100%; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; }
-  .pc-category-group { display: flex; align-items: center; }
-  .category-link, .more-btn { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; background: transparent; border: none; cursor: pointer; position: relative; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
+  .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; }
+  .category-scroll::-webkit-scrollbar { display: none; }
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
-  .category-text-with-underline { position: relative; }
-  .category-link:hover .category-text-with-underline::after, .more-btn:hover .category-text-with-underline::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 100%; height: 2px; background-color: #fff; }
-  .more-dropdown { position: relative; }
-  .dropdown-content { display: none; position: absolute; top: 100%; left: 0; background: #393737; min-width: 160px; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-  .more-dropdown:hover .dropdown-content { display: block; }
-  .dropdown-link { color: #fff; padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; }
-  .dropdown-link:hover { background: rgba(255,255,255,0.1); }
-  .arrow-icon { width: 16px; height: 16px; fill: #fff; margin-left: 4px; }
-  .header-word-bar { background: #fff; height: 36px; display: flex; align-items: center; }
-  .spacer-text { font-size: 16px; visibility: hidden; }
-  .bottom-line { height: 10px; width: 100%; }
+  
+  .more-wrapper { position: relative; flex-shrink: 0; }
+  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .more-btn.active { background: var(--theme-color); }
+  .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
+  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .more-wrapper:hover .more-dropdown { display: block; }
+  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
+  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
 
-  .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; z-index: 9998; transition: 0.5s; }
-  .menu-overlay.visible { visibility: visible; opacity: 1; }
-  .side-menu { position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: #2c2c2c; color: #fff; z-index: 9999; transition: 0.5s; box-shadow: -5px 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; visibility: hidden; }
-  .side-menu.open { right: 0; visibility: visible; }
-  .menu-header { padding: 25px 20px; border-bottom: 1px solid #444; display: flex; align-items: center; gap: 15px; }
-  .close-btn { background: none; border: none; font-size: 35px; color: #fff; cursor: pointer; line-height: 1; }
-  .menu-title { font-size: 20px; font-weight: 700; }
-  .menu-content { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
-  .current-selection-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-  .lang-item { display: block; padding: 14px 10px; border-bottom: 1px solid #3d3d3d; text-decoration: none; color: #ccc; font-size: 15px; transition: 0.3s; }
-  .lang-item:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  .scroll-arrow { 
+    display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10;
+  }
+  .scroll-arrow.active { display: flex; }
 
-  @media (max-width: 768px) {
-    .lower-row, .country-name-aligned { display: none; }
-    .pc-category-group { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-    .more-dropdown { display: none; }
-    .side-menu { width: 85%; right: -85%; }
+  .header-word-bar { background: #fff; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; }
+  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
+  .bottom-line { height: 10px; }
+
+  .sp-scroll { display: none; }
+  @media (max-width: 768px) { 
+    .pc-category-group { display: none; } 
+    .sp-scroll { display: flex; }
+    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
   }
 </style>
+
+<script is:inline>
+  window.addEventListener('load', function() {
+    var pcScroll = document.getElementById('pc-scroll');
+    var spScroll = document.getElementById('sp-scroll');
+    var btnLeft = document.getElementById('arrow-left');
+    var btnRight = document.getElementById('arrow-right');
+    if (!btnLeft || !btnRight) return;
+
+    function updateArrows() {
+      var width = window.innerWidth;
+      // 1000pxより大きい、または450px以下の時は矢印を隠す
+      if (width > 1000 || width <= 450) {
+        btnLeft.classList.remove('active');
+        btnRight.classList.remove('active');
+        return;
+      }
+
+      // 現在表示されている方のスクロールエリアを選択
+      var activeScroll = (width > 768) ? pcScroll : spScroll;
+      if (!activeScroll) return;
+
+      var atLeft = activeScroll.scrollLeft <= 5;
+      var atRight = activeScroll.scrollLeft >= (activeScroll.scrollWidth - activeScroll.clientWidth - 5);
+
+      if (!atLeft) { btnLeft.classList.add('active'); } else { btnLeft.classList.remove('active'); }
+      if (!atRight) { btnRight.classList.add('active'); } else { btnRight.classList.remove('active'); }
+    }
+
+    btnLeft.addEventListener('click', function() {
+      var width = window.innerWidth;
+      var activeScroll = (width > 768) ? pcScroll : spScroll;
+      activeScroll.scrollBy({ left: -200, behavior: 'smooth' });
+    });
+    btnRight.addEventListener('click', function() {
+      var width = window.innerWidth;
+      var activeScroll = (width > 768) ? pcScroll : spScroll;
+      activeScroll.scrollBy({ left: 200, behavior: 'smooth' });
+    });
+    
+    if (pcScroll) pcScroll.addEventListener('scroll', updateArrows);
+    if (spScroll) spScroll.addEventListener('scroll', updateArrows);
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
+  });
+</script>
