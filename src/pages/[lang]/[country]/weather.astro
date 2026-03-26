@@ -4,7 +4,6 @@ import RelatedNews from '../../../components/RelatedNews.astro';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
 import { getWeatherCondition, getUnitSystem, convertTemp, convertWind } from '../../../lib/weatherConditions';
 import { countryCityMap } from '../../../lib/cityConfig';
-// ▼ siteRoutes（大元のカンペ）を読み込む
 import { langCountryPairs, getBlogId } from '../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
@@ -41,7 +40,6 @@ const relatedNews = allPosts.filter((post: any) =>
   post.labels.includes(targetTag) &&
   post.labels.some((label: string) => ['天気', '気象', '災害', 'weather', 'Weather'].includes(label))
 ).slice(0, 3);
-
 const cities = countryCityMap[country] || countryCityMap['jp'];
 
 const tzMap: Record<string, string> = {
@@ -60,7 +58,6 @@ const tzMap: Record<string, string> = {
   pt: 'Europe/Lisbon',       gr: 'Europe/Athens',       it: 'Europe/Rome',
   bd: 'Asia/Dhaka',          np: 'Asia/Kathmandu',
 };
-
 const allForecastData: Record<string, any> = {};
 for (const city of cities) {
   if (!WEATHER_API_KEY) break;
@@ -122,7 +119,6 @@ const weatherPageLabels: Record<string, string> = {
 };
 const weatherPageLabel = weatherPageLabels[lang] || weatherPageLabels['en'];
 
-// ▼ 国名マップ（UAEを修正）
 const countryLabelMap: Record<string, Record<string, string>> = {
   jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
   us: { ja: 'アメリカ', en: 'USA', 'zh-cn': '美国', 'zh-tw': '美國', es: 'EE.UU.', fr: 'États-Unis', de: 'USA', ru: 'США' },
@@ -140,7 +136,7 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   hk: { ja: '香港', en: 'Hong Kong', 'zh-cn': '香港', 'zh-tw': '香港', es: 'Hong Kong', fr: 'Hong Kong', de: 'Hongkong', ru: 'ホンコン' },
   in: { ja: 'インド',   en: 'India',     'zh-cn': 'インド',   'zh-tw': 'インド',   es: 'India',     fr: 'Inde',     de: 'Indien',     ru: 'インド'      },
   my: { ja: 'マレーシア', en: 'Malaysia',  'zh-cn': 'マレーシア', 'zh-tw': '馬來西亞', es: 'Malasia',   fr: 'Malaisie',  de: 'Malaysia',   ru: 'マレーシア'     },
-  ph: { ja: 'フィリピン', en: 'Philippines', 'zh-cn': 'フィリピン', 'zh-tw': 'フィリピン', es: 'Filipinas',  fr: 'Philippines', de: 'Philippinen', ru: 'フィリピン'     },
+  ph: { ja: 'フィリピン', en: 'Philippines', 'zh-cn': 'フィリピン', 'zh-tw': 'フィリピン', es: 'Filipinas',  fr: 'Philippines', de: 'Philippinen', ru: 'フィリピン'   },
   th: { ja: 'タイ',     en: 'Thailand',    'zh-cn': 'タイ',     'zh-tw': '泰國',     es: 'Tailandia',  fr: 'Thaïlande',  de: 'Thailand',   ru: 'タイ'       },
   vn: { ja: 'ベトナム',   en: 'Vietnam',     'zh-cn': 'ベトナム',   'zh-tw': '越南',     es: 'Vietnam',    fr: 'Vietnam',    de: 'Vietnam',    ru: 'ベトナム'     },
   id: { ja: 'インドネシア', en: 'Indonesia',   'zh-cn': 'インドネシア', 'zh-tw': '印尼',     es: 'Indonesia',  fr: 'Indonésie',  de: 'Indonesien', ru: 'インドネシア'   },
@@ -196,7 +192,8 @@ for (const city of cities) {
 
     <section class="forecast-section">
       <h2 class="section-title" id="forecast-title">{defaultCityName} {labels.title}</h2>
-      <div class="forecast-container" id="forecast-container"></div>
+      <div class="forecast-container" id="forecast-container">
+        </div>
     </section>
 
     {relatedNews.length > 0 && (
@@ -206,7 +203,8 @@ for (const city of cities) {
 </Layout>
 
 <script is:inline>
-(function() {
+/* ▼ エラー修正：画面の準備が完全に終わるまで待ってからプログラムを動かします */
+window.addEventListener('DOMContentLoaded', function() {
   var page = document.querySelector('.weather-page');
   if (!page) return;
 
@@ -242,50 +240,47 @@ for (const city of cities) {
   var dayNames = dayNamesMap[dayLang] || dayNamesMap['en'];
   function getDayName(dateStr) { return dayNames[new Date(dateStr).getDay()]; }
 
+  /* ▼ 新デザイン：スマホ向けのカード形式で1時間予報を作るように変更しました */
   function buildForecastHTML(forecastDays) {
     if (!forecastDays || forecastDays.length === 0) return '<p style="padding:20px;color:#666">--</p>';
     var html = '';
     forecastDays.forEach(function(day, index) {
       var isMoonOnly = day.conditionIcon.includes('night/113.png');
       var iconClass = 'summary-icon' + (isMoonOnly ? ' moon-only' : '');
+      
       html += '<div class="day-group" data-date="' + day.date + '">';
       html += '<button class="day-summary-btn" aria-expanded="false" data-target="hourly-' + index + '">';
-      html += '<div class="date-info"><span class="date-text">' + formatDate(day.date) + '(' + getDayName(day.date) + ')</span></div>';
+      html += '<div class="date-info"><span class="date-text">' + formatDate(day.date) + '<br class="sp-only"><span class="day-name">(' + getDayName(day.date) + ')</span></span></div>';
       html += '<div class="weather-info">';
       html += '<img src="https:' + day.conditionIcon + '" alt="" class="' + iconClass + '" />';
       html += '<span class="condition-text">' + day.conditionText + '</span>';
       html += '</div>';
       html += '<div class="temp-info">';
-      html += '<div class="temp-item"><span class="temp-label">' + (labels.max||'Max') + '</span><span class="value-text temp-max">' + day.maxtemp + tempUnit + '</span></div>';
+      html += '<div class="temp-item"><span class="temp-label sp-hide">' + (labels.max||'Max') + '</span><span class="value-text temp-max">' + day.maxtemp + tempUnit + '</span></div>';
       html += '<span class="temp-sep">/</span>';
-      html += '<div class="temp-item"><span class="temp-label">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + day.mintemp + tempUnit + '</span></div>';
+      html += '<div class="temp-item"><span class="temp-label sp-hide">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + day.mintemp + tempUnit + '</span></div>';
       html += '</div>';
-      html += '<div class="rain-info"><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
-      html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '</span></div>';
+      html += '<div class="rain-info"><span class="rain-label sp-only">' + (labels.rain||'Rain') + ': </span><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
+      html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '<span class="sp-chevron"> ▼</span></span></div>';
       html += '</button>';
+
+      // 時間ごとの詳細（横スクロール可能なカード形式）
       html += '<div id="hourly-' + index + '" class="hourly-details" hidden>';
-      html += '<div class="hourly-scroll-wrapper"><table class="hourly-table"><thead><tr>';
-      html += '<th>' + (labels.time||'Time') + '</th>';
-      html += '<th>' + (labels.weather||'Weather') + '</th>';
-      html += '<th>' + (labels.temp||'Temp') + '(' + tempUnit + ')</th>';
-      html += '<th>' + (labels.humidity||'Humid') + '(%)</th>';
-      html += '<th>' + (labels.wind||'Wind') + '(' + windUnit + ')</th>';
-      html += '<th>' + (labels.rain||'Rain') + '(%)</th>';
-      html += '</tr></thead><tbody>';
+      html += '<div class="hourly-scroll-wrapper"><div class="hourly-flex-container">';
       day.hour.forEach(function(h) {
         var hHour = parseInt(h.time.split(':')[0]);
         var hMoon = h.conditionIcon.includes('night/113.png');
-        html += '<tr class="hourly-row" data-hour="' + hHour + '">';
-        html += '<td class="h-time value-text">' + h.time + '</td>';
-        html += '<td class="h-icon"><img src="https:' + h.conditionIcon + '" alt="" class="' + (hMoon ? 'moon-only' : '') + '" />';
-        html += '<div class="h-condition-text">' + h.conditionText + '</div></td>';
-        <td class="h-temp value-text">' + h.temp + '</td>';
-        html += '<td class="h-humidity value-text">' + h.humidity + '</td>';
-        html += '<td class="h-wind value-text">' + h.wind + '</td>';
-        html += '<td class="h-rain value-text">' + h.rainChance + '</td>';
-        html += '</tr>';
+        html += '<div class="hourly-card" data-hour="' + hHour + '">';
+        html += '<div class="h-time">' + h.time + '</div>';
+        html += '<div class="h-icon"><img src="https:' + h.conditionIcon + '" alt="" class="' + (hMoon ? 'moon-only' : '') + '" /></div>';
+        html += '<div class="h-condition-text">' + h.conditionText + '</div>';
+        html += '<div class="h-temp">' + h.temp + tempUnit + '</div>';
+        html += '<div class="h-detail-item"><i class="fa-solid fa-droplet" style="color:#2196f3;"></i> ' + h.humidity + '%</div>';
+        html += '<div class="h-detail-item"><i class="fa-solid fa-wind" style="color:#78909c;"></i> ' + h.wind + ' ' + windUnit + '</div>';
+        html += '<div class="h-detail-item"><i class="fa-solid fa-umbrella" style="color:#0288d1;"></i> ' + h.rainChance + '%</div>';
+        html += '</div>';
       });
-      html += '</tbody></table></div></div></div>';
+      html += '</div></div></div></div>';
     });
     return html;
   }
@@ -338,6 +333,7 @@ for (const city of cities) {
       + nowInCity.find(function(p){return p.type==='month';}).value + '-'
       + nowInCity.find(function(p){return p.type==='day';}).value;
     var cityHour = parseInt(nowInCity.find(function(p){return p.type==='hour';}).value);
+    
     var visibleCount = 0;
     document.querySelectorAll('.day-group').forEach(function(group) {
       var groupDate = group.getAttribute('data-date');
@@ -347,8 +343,8 @@ for (const city of cities) {
         group.style.display = 'block';
         visibleCount++;
         if (groupDate === cityFullDate) {
-          group.querySelectorAll('.hourly-row').forEach(function(row) {
-            if (parseInt(row.getAttribute('data-hour')) < cityHour) row.style.display = 'none';
+          group.querySelectorAll('.hourly-card').forEach(function(card) {
+            if (parseInt(card.getAttribute('data-hour')) < cityHour) card.style.display = 'none';
           });
         }
       } else {
@@ -369,35 +365,98 @@ for (const city of cities) {
   }
 
   init();
-})();
+});
 </script>
 
 <style is:global>
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 12px; font-weight: bold; }
+  
+  /* PC版・共通のボタンスタイル */
+  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
+  .weather-page .day-summary-btn { 
+    width: 100%; display: grid; grid-template-columns: 0.8fr 1.8fr 1.8fr 0.6fr 0.8fr; align-items: center; 
+    padding: 12px 16px; background: none; border: none; cursor: pointer; transition: background 0.2s;
+  }
+  .weather-page .day-summary-btn:hover { background: #f8f9fa; }
+  
+  .weather-page .date-info { text-align: left; font-size: 1.1rem; font-weight: bold; color: #333; }
   .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
   .weather-page .summary-icon { width: 72px; height: 72px; display: block; margin: 0 auto; }
-  .weather-page .summary-icon.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
-  .weather-page .h-icon img.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
-  .weather-page .temp-info { display: flex; gap: 12px; white-space: nowrap; }
+  .weather-page .summary-icon.moon-only, .weather-page .h-icon img.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
+  .weather-page .condition-text { font-size: 0.95rem; font-weight: bold; color: #1a1a1a; }
+  
+  .weather-page .temp-info { display: flex; gap: 12px; white-space: nowrap; justify-content: center; align-items: center; }
   .weather-page .temp-item { display: flex; align-items: baseline; gap: 4px; }
-  .weather-page .day-summary-btn { width: 100%; display: grid; grid-template-columns: 0.8fr 1.8fr 1.8fr 0.6fr 0.8fr; align-items: center; padding: 12px 16px; background: none; border: none; cursor: pointer; }
-  .weather-page .h-icon { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; font-size: 1.2rem; }
+  .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; font-size: 1.2rem; }
+  .weather-page .temp-sep { color: #ccc; font-weight: bold; }
+  
+  .weather-page .rain-info { font-weight: bold; color: #0288d1; font-size: 1.1rem; }
+  .weather-page .hourly-badge { background-color: var(--theme-color, #872732); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; }
+  .weather-page .sp-only { display: none; } /* スマホ用要素はPCでは隠す */
+  
+  /* 1時間ごとの横スクロール（モダンなカード形式） */
+  .weather-page .hourly-details { background: #f8f9fa; padding: 16px; border-top: 1px solid #eee; }
+  .weather-page .hourly-scroll-wrapper { width: 100%; overflow-x: auto; scrollbar-width: thin; }
+  .weather-page .hourly-flex-container { display: flex; gap: 10px; padding-bottom: 8px; }
+  
+  .weather-page .hourly-card { 
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; 
+    min-width: 100px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+  .weather-page .h-time { font-weight: bold; font-size: 0.95rem; color: #333; border-bottom: 1px solid #eee; width: 100%; padding-bottom: 4px; }
   .weather-page .h-icon img { width: 48px; height: 48px; }
-  .weather-page .h-condition-text { font-size: 0.8rem; color: #1a1a1a; font-weight: bold; }
-  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
-  .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; }
-  .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; }
-  .weather-page .condition-text { font-size: 0.95rem; font-weight: bold; }
-  .weather-page .hourly-badge { background-color: var(--theme-color, #872732); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
-  .weather-page .hourly-details { background: #f8f9fa; padding: 0 16px 16px 16px; border-top: 1px solid #eee; overflow-x: auto; }
-  .weather-page .hourly-table { width: 100%; min-width: 600px; border-collapse: collapse; }
-  .weather-page .hourly-table th { padding: 12px 6px; font-size: 0.85rem; color: #666; border-bottom: 1px solid #ccc; text-align: center; }
-  .weather-page .hourly-table td { padding: 12px 6px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; }
+  .weather-page .h-condition-text { font-size: 0.8rem; color: #555; font-weight: bold; height: 2.4em; display: flex; align-items: center; }
+  .weather-page .h-temp { font-size: 1.1rem; font-weight: bold; color: #1a1a1a; margin: 4px 0; }
+  .weather-page .h-detail-item { font-size: 0.85rem; color: #666; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+
+  /* 気象アラートのスタイル（変更なし） */
   .alert-ticker-container { background: #f0f7ff; border: 1.5px solid #1fa7db; border-radius: 8px; padding: 6px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; overflow: hidden; }
   .alert-ticker-label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #0068b7; font-weight: bold; }
   .alert-ticker-window { flex-grow: 1; background: #fff; border: 1px solid #1fa7db; border-radius: 4px; height: 32px; display: flex; align-items: center; overflow: hidden; position: relative; }
   .alert-ticker-text { white-space: nowrap; position: absolute; padding-left: 100%; animation: ticker 30s linear infinite; font-size: 0.9rem; color: #c53030; font-weight: bold; }
   .alert-ticker-empty { width: 100%; }
   @keyframes ticker { 0% { transform: translate(0,0); } 100% { transform: translate(-100%,0); } }
+
+
+  /* ================================================= */
+  /* ▼▼▼ スマホ版のレスポンシブ（見た目切り替え）設定 ▼▼▼ */
+  /* ================================================= */
+  @media (max-width: 768px) {
+    .weather-page { padding: 12px; }
+    .weather-page .sp-only { display: inline; }
+    .weather-page .sp-hide { display: none; }
+    
+    /* ボタンのレイアウトを縦・横のブロックに組み直す */
+    .weather-page .day-summary-btn { 
+      display: flex; flex-wrap: wrap; justify-content: space-between; padding: 12px 10px; gap: 10px;
+    }
+    
+    /* 日付を左上に */
+    .weather-page .date-info { width: 45%; text-align: left; }
+    .weather-page .date-text { font-size: 1.2rem; }
+    .weather-page .day-name { font-size: 0.9rem; color: #666; }
+    
+    /* 天気アイコンを右上に */
+    .weather-page .weather-info { width: 45%; align-items: flex-end; }
+    .weather-page .summary-icon { margin: 0; width: 64px; height: 64px; }
+    
+    /* 温度と降水確率を左下に並べる */
+    .weather-page .temp-info { width: 45%; justify-content: flex-start; margin-top: 5px; }
+    .weather-page .temp-max { font-size: 1.3rem; }
+    .weather-page .temp-min { font-size: 1.3rem; }
+    
+    .weather-page .rain-info { width: 45%; text-align: left; font-size: 1rem; margin-top: 5px; display: flex; align-items: center; }
+    
+    /* 「1時間ごと」ボタンを一番下にドカンと広げる */
+    .weather-page .badge-wrapper { width: 100%; display: flex; justify-content: center; margin-top: 8px; }
+    .weather-page .hourly-badge { width: 100%; justify-content: center; padding: 10px; font-size: 1rem; border-radius: 8px; }
+    
+    /* 1時間カードを少し小さめにして画面に入りやすくする */
+    .weather-page .hourly-card { min-width: 85px; padding: 10px 6px; }
+    .weather-page .h-icon img { width: 40px; height: 40px; }
+  }
 </style>
