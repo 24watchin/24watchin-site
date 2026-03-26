@@ -2,7 +2,7 @@
 import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
 import { getCountryLabel } from '../lib/countryData.ts';
-import RegionLangPanel from './RegionLangPanel.astro'; // ★ステップ1で作ったパネル部品を読み込みます
+import RegionLangPanel from './RegionLangPanel.astro'; // ★パネル部品を読み込みます
 
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
@@ -114,7 +114,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
                 <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </div>
               <div class="more-dropdown">
-                {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}>{item.label}</a>)}
+                {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}><span class="more-link-text">{item.label}</span></a>)}
               </div>
             </div>
           )}
@@ -258,15 +258,31 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
   
-  /* ▼▼▼ 修正：カテゴリ名にマウスを当てた時の白い下線（太さと隙間を調整） ▼▼▼ */
-  .category-link:hover .category-link-text,
-  .more-btn:hover {
-    text-decoration: underline;
-    text-decoration-color: #ffffff;
-    text-decoration-thickness: 3px; /* 線の太さ */
-    text-underline-offset: 8px;     /* 文字と線の隙間 */
+  /* ▼▼▼ 追加：左からスッと伸びるアニメーション下線 ▼▼▼ */
+  /* 文字の基準点を作る */
+  .category-link-text,
+  .more-link-text {
+    position: relative;
+    display: inline-block;
   }
-  /* ▲▲▲ 修正ここまで ▲▲▲ */
+  /* 下線のデザインと、ゆっくり動く設定（最初は幅0%で隠しておく） */
+  .category-link-text::after,
+  .more-link-text::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px; /* 文字と線の隙間 */
+    width: 0;     /* 最初は幅0で見えない状態 */
+    height: 3px;  /* 線の太さ */
+    background-color: #ffffff;
+    transition: width 0.3s ease; /* 0.3秒かけて左から右へ広がる */
+  }
+  /* マウスが乗った時に、下線の幅を100%にする */
+  .category-link:hover .category-link-text::after,
+  .more-link:hover .more-link-text::after {
+    width: 100%;
+  }
+  /* ▲▲▲ 追加ここまで ▲▲▲ */
   
   .more-wrapper { position: relative; flex-shrink: 0; }
   .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
