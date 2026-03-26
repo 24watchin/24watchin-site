@@ -4,13 +4,11 @@ import { langCountryPairs } from '../lib/siteRoutes.ts';
 import { getCountryLabel } from '../lib/countryData.ts';
 import RegionLangPanel from './RegionLangPanel.astro';
 
-// ▼ 追加：天気用のプログラムを読み込みます
 import { getWeatherCondition, getUnitSystem, convertTemp } from '../lib/weatherConditions';
 import { countryCityMap } from '../lib/cityConfig';
 
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
-// ▼ 追加：天気APIのキーを取得します
 const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -71,11 +69,9 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 const moreHasActive = moreItems.some(item => item.isActive);
 
-// 天気用のリンク
-const weatherHref = basePath + '/category/weather/';
+// ▼ 修正①：天気の正しいリンク先
+const weatherHref = basePath + '/weather/';
 
-
-// ▼▼▼ 追加：スマホ版の天気データ取得ロジック（WeatherWidget.astroから移植） ▼▼▼
 const cities = countryCityMap[country] || countryCityMap['jp'];
 const { isImperial, tempUnit } = getUnitSystem(lang);
 
@@ -115,10 +111,7 @@ const cityDataForJs = cities.map((city: any) => {
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
-// 最初の都市の天気をデフォルトとして表示します
 const defaultWeatherData = cityDataForJs[0] || null;
-// ▲▲▲ 追加ここまで ▲▲▲
-
 ---
 
 <div class="header-pc-wrapper">
@@ -236,7 +229,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
             </>
           )}
         </a>
-        </div>
+
+      </div>
     </div>
 
     <nav class="category-bar sp-category-bar">
@@ -249,6 +243,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
         <div class="sp-scroll-padding"></div>
       </div>
     </nav>
+
+    <div style="height: 10px; background-color: #ffffff; width: 100%;"></div>
 
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
@@ -293,10 +289,29 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
   .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; }
 
-  .sp-category-bar { width: 100%; overflow: hidden; }
-  .sp-scroll { padding-right: 20px; scrollbar-width: none; }
+  /* ▼ 修正②：チラ見せ（グラデーションフェード）の設定 ▼ */
+  .sp-category-bar { 
+    width: 100%; 
+    overflow: hidden; 
+    position: relative; /* グラデーションの基準点にする */
+  }
+  /* 右端に同色のグラデーションを重ねて「続きがある」ことを直感的に伝えます */
+  .sp-category-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 35px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%);
+    pointer-events: none; /* メニューのタップを邪魔しない設定 */
+  }
+  .sp-scroll { 
+    padding-left: 6px; /* 最初の文字を少しズラすことで、偶然ピッタリ収まるのを防ぎます */
+    scrollbar-width: none; 
+  }
   .sp-scroll::-webkit-scrollbar { display: none; }
-  .sp-scroll-padding { width: 20px; flex-shrink: 0; }
+  .sp-scroll-padding { width: 45px; flex-shrink: 0; } /* グラデーションの下に最後の文字が隠れないように余白を広げました */
 
   /* ================================================= */
   /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
@@ -370,7 +385,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .bottom-line { height: 10px; }
 
   @media (max-width: 768px) { 
-    .category-link { font-size: 14px; padding: 0 12px; height: 46px; }
+    .category-link { font-size: 14px; padding: 0 14px; height: 46px; }
   }
 </style>
 
