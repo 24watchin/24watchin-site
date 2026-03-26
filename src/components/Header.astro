@@ -134,6 +134,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
+
 <div class="header-sp-wrapper">
   <header class="site-header">
     <div class="header-top">
@@ -190,8 +191,8 @@ const moreHasActive = moreItems.some(item => item.isActive);
 
 <style>
   /* === PC版とスマホ版の表示切り替えスイッチ === */
-  .header-pc-wrapper { display: block; }
-  .header-sp-wrapper { display: none; }
+  .header-pc-wrapper { display: block; margin: 0; padding: 0; border-radius: 0; }
+  .header-sp-wrapper { display: none; margin: 0; padding: 0; border-radius: 0; }
 
   @media (max-width: 768px) { 
     .header-pc-wrapper { display: none; } 
@@ -199,7 +200,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
   }
 
   /* === 新しいPC版のレイアウト用スタイル === */
-  .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; }
+  .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
   .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
   .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
   
@@ -229,7 +230,7 @@ const moreHasActive = moreItems.some(item => item.isActive);
   /* ======================================= */
 
   /* 共通・既存のスタイル */
-  .site-header { width: 100%; background: #ffffff; }
+  .site-header { width: 100%; background: #ffffff; border-radius: 0 !important; }
   .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .brand-area { display: flex; flex-direction: column; align-items: flex-end; }
   .logo-image { width: 200px; height: auto; }
@@ -256,6 +257,16 @@ const moreHasActive = moreItems.some(item => item.isActive);
 
   .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
+  
+  /* ▼▼▼ 追加：カテゴリ名にマウスを当てた時の白い下線 ▼▼▼ */
+  .category-link:hover .category-link-text,
+  .more-btn:hover {
+    text-decoration: underline;
+    text-decoration-color: #ffffff;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  /* ▲▲▲ 追加ここまで ▲▲▲ */
   
   .more-wrapper { position: relative; flex-shrink: 0; }
   .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
