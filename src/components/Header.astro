@@ -69,7 +69,6 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 const moreHasActive = moreItems.some(item => item.isActive);
 
-// ▼ 修正①：天気の正しいリンク先
 const weatherHref = basePath + '/weather/';
 
 const cities = countryCityMap[country] || countryCityMap['jp'];
@@ -279,8 +278,10 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-logo-image { width: 160px; }
   .sp-right-area { gap: 6px; position: relative; }
   
+  /* ▼修正：スマホ版の検索窓の高さを固定 */
+  .sp-search-input { height: 32px; box-sizing: border-box; }
   .sp-search-input.active { width: 140px; }
-  .sp-search-btn { width: 32px; height: 32px; }
+  .sp-search-btn { width: 32px; height: 32px; box-sizing: border-box; }
 
   /* 天気ウィジェットのスタイル */
   .sp-weather-widget { display: flex; align-items: center; gap: 6px; text-decoration: none; margin-top: 4px; }
@@ -289,13 +290,11 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
   .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; }
 
-  /* ▼ 修正②：チラ見せ（グラデーションフェード）の設定 ▼ */
   .sp-category-bar { 
     width: 100%; 
     overflow: hidden; 
-    position: relative; /* グラデーションの基準点にする */
+    position: relative;
   }
-  /* 右端に同色のグラデーションを重ねて「続きがある」ことを直感的に伝えます */
   .sp-category-bar::after {
     content: '';
     position: absolute;
@@ -304,14 +303,11 @@ const defaultWeatherData = cityDataForJs[0] || null;
     width: 35px;
     height: 100%;
     background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%);
-    pointer-events: none; /* メニューのタップを邪魔しない設定 */
+    pointer-events: none;
   }
-  .sp-scroll { 
-    padding-left: 6px; /* 最初の文字を少しズラすことで、偶然ピッタリ収まるのを防ぎます */
-    scrollbar-width: none; 
-  }
+  .sp-scroll { padding-left: 6px; scrollbar-width: none; }
   .sp-scroll::-webkit-scrollbar { display: none; }
-  .sp-scroll-padding { width: 45px; flex-shrink: 0; } /* グラデーションの下に最後の文字が隠れないように余白を広げました */
+  .sp-scroll-padding { width: 45px; flex-shrink: 0; }
 
   /* ================================================= */
   /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
@@ -325,16 +321,22 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .pc-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
 
   .search-form-animated { display: flex; align-items: center; }
+  
+  /* ▼修正：PC版・スマホ共通の検索窓ベースで高さを完全固定 */
   .search-input-animated {
     width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
     transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0;
+    height: 34px; /* 閉じていても常に34px */
+    box-sizing: border-box; /* 枠線を含めて計算 */
   }
   .search-input-animated.active {
-    width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; height: 34px;
+    width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; 
+    /* heightは上で固定したため削除 */
   }
   .search-icon-btn {
     width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff;
     cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0;
+    box-sizing: border-box; /* ここも枠線を含めて計算 */
   }
 
   .region-lang-open-btn {
