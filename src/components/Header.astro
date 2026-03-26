@@ -275,13 +275,16 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
 
   .sp-header-top { padding: 12px 14px; align-items: center; }
-  .sp-logo-image { width: 160px; }
+  
+  /* ▼修正：ロゴを少し小さくして、横幅に余裕を持たせました */
+  .sp-logo-image { width: 145px; }
+  
   .sp-right-area { gap: 6px; position: relative; }
   
-  /* ▼修正：スマホ版の検索窓の高さを固定 */
-  .sp-search-input { height: 32px; box-sizing: border-box; }
-  .sp-search-input.active { width: 140px; }
-  .sp-search-btn { width: 32px; height: 32px; box-sizing: border-box; }
+  /* ▼修正：スマホ版の検索窓の高さを「開いても閉じても絶対に32px」に固定 */
+  .sp-search-input { height: 32px !important; box-sizing: border-box; }
+  .sp-search-input.active { width: 140px; height: 32px !important; }
+  .sp-search-btn { width: 32px !important; height: 32px !important; box-sizing: border-box; }
 
   /* 天気ウィジェットのスタイル */
   .sp-weather-widget { display: flex; align-items: center; gap: 6px; text-decoration: none; margin-top: 4px; }
@@ -322,21 +325,19 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
   .search-form-animated { display: flex; align-items: center; }
   
-  /* ▼修正：PC版・スマホ共通の検索窓ベースで高さを完全固定 */
   .search-input-animated {
     width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
     transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0;
-    height: 34px; /* 閉じていても常に34px */
-    box-sizing: border-box; /* 枠線を含めて計算 */
+    height: 34px; 
+    box-sizing: border-box; 
   }
   .search-input-animated.active {
     width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; 
-    /* heightは上で固定したため削除 */
   }
   .search-icon-btn {
     width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff;
     cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0;
-    box-sizing: border-box; /* ここも枠線を含めて計算 */
+    box-sizing: border-box; 
   }
 
   .region-lang-open-btn {
