@@ -181,10 +181,20 @@ const defaultWeatherData = cityDataForJs[0] || null;
 <div class="header-sp-wrapper">
   <div class="sp-top-gray-bar">
     <div class="sp-top-country">{countryLabel}</div>
+    
     <div class="sp-top-actions">
+      
+      <form action={searchAction} method="get" class="search-form-animated sp-search-form" id="sp-search-form">
+        <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
+        <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn" aria-label="検索">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+        </button>
+      </form>
+
       <button type="button" class="sp-reload-btn" onclick="window.location.reload();" aria-label="ページを更新">
         <svg viewBox="0 0 24 24" class="reload-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.32-9.83l5.67 5.67" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+      
       <button type="button" class="region-lang-open-btn sp-region-lang-btn" id="sp-region-lang-btn" data-current-lang={lang}>
         地域 / 言語 <span class="hamburger-icon">&#8803;</span>
       </button>
@@ -198,13 +208,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
       </div>
       
       <div class="right-area sp-right-area">
-        <form action={searchAction} method="get" class="search-form-animated" id="sp-search-form">
-          <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
-          <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn">
-            <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
-          </button>
-        </form>
-
         <a href={weatherHref} class="sp-weather-widget">
           {defaultWeatherData && defaultWeatherData.temp !== null ? (
             <>
@@ -348,23 +351,74 @@ const defaultWeatherData = cityDataForJs[0] || null;
   /* ▼▼▼ スマホ版専用のスタイル ▼▼▼ */
   /* ================================================= */
   
-  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; }
+  .sp-top-gray-bar { 
+    background-color: #e6e6e6; 
+    width: 100%; 
+    height: 38px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 14px; 
+    box-sizing: border-box; 
+    position: relative; /* 検索窓がはみ出しても大丈夫なように追加 */
+  }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
-  .sp-top-actions { display: flex; align-items: center; gap: 12px; }
+  .sp-top-actions { display: flex; align-items: center; gap: 10px; } /* 少し詰めました */
   
-  .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+  .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
   .reload-icon { width: 14px; height: 14px; color: #333; }
   
   .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
   .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
 
+  /* ▼修正：検索窓のデザイン（グレー帯に合わせたスタイル） */
+  .sp-search-form { position: relative; display: flex; align-items: center; }
+  .sp-search-input { 
+    position: absolute; 
+    right: 34px; /* 検索ボタンのすぐ左からスタート */
+    top: 50%; 
+    transform: translateY(-50%); 
+    width: 0; 
+    height: 30px !important; 
+    padding: 0 !important; 
+    background: #fff; 
+    border: 1px solid transparent; 
+    border-radius: 8px; 
+    opacity: 0; 
+    transition: all 0.3s ease; 
+    box-sizing: border-box; 
+    z-index: 10;
+  }
+  .sp-search-input.active { 
+    width: calc(100vw - 180px) !important; /* 左の国名を覆い隠すように広く展開 */
+    padding: 0 10px !important; 
+    border: 1px solid #ccc; 
+    opacity: 1; 
+  }
+  .sp-search-btn { 
+    width: 28px !important; 
+    height: 28px !important; 
+    border-radius: 50%; /* 更新ボタンに合わせて丸くしました */
+    box-sizing: border-box; 
+    flex-shrink: 0; 
+    background: #fff; 
+    border: 1px solid #ccc; 
+    padding: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 11;
+  }
+  .sp-search-btn .search-icon { width: 14px; height: 14px; }
+
+
+  /* ▼修正：白い背景エリアの上下の余白を削ってスリムにしました (12px -> 6px) */
   .sp-header-top { 
-    padding: 12px 14px; 
+    padding: 6px 14px; 
     align-items: center; 
     overflow: hidden; 
   }
   
-  /* ▼修正：ロゴのサイズを大きく（150px）戻しました！ */
   .sp-logo-image { width: 150px; }
   
   .sp-right-area { 
@@ -375,22 +429,13 @@ const defaultWeatherData = cityDataForJs[0] || null;
     align-items: flex-end !important; 
   }
   
-  .sp-search-input { height: 32px !important; box-sizing: border-box; }
-  .sp-search-input.active { 
-    width: 140px !important; 
-    height: 32px !important; 
-    padding: 0 10px !important; 
-    margin-right: 6px !important; 
-  }
-  .sp-search-btn { width: 32px !important; height: 32px !important; box-sizing: border-box; flex-shrink: 0; }
-
   .sp-weather-widget { 
     display: flex; 
     align-items: center; 
     justify-content: flex-end; 
     gap: 4px; 
     text-decoration: none; 
-    margin-top: 4px; 
+    margin-top: 0; /* 検索窓がなくなったので余分なマージンを削除 */
     overflow: hidden; 
     max-width: 140px; 
   }
