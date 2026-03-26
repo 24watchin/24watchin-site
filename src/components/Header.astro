@@ -1,87 +1,129 @@
-<style>
-  /* --- PC版レイアウト設定 --- */
-  .site-header { background: #fff; width: 100%; }
-  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
-  
-  .brand-area { width: 220px; display: flex; flex-direction: column; }
-  .logo-image { width: 100%; height: auto; }
-  /* 国名の高さを34pxにして他と揃える */
-  .country-name-aligned { text-align: right; font-size: 16px; font-weight: 700; color: #000; height: 34px; line-height: 34px; margin-top: 4px; }
+---
+import { categoryLabelMap } from '../lib/categoryLabels';
+import { langCountryPairs } from '../lib/siteRoutes.ts';
+import { getCountryLabel } from '../lib/countryData.ts';
 
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-  .upper-row { width: 100%; display: flex; justify-content: flex-end; }
-  .lower-row { width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 12px; height: 34px; }
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || 'jp';
 
-  /* 検索窓 */
-  .search-form-expandable { display: flex; align-items: center; border: 2px solid #666; border-radius: 8px; background: #fff; overflow: hidden; transition: width 0.3s; width: 34px; height: 34px; }
-  .search-form-expandable.expanded { width: 220px; }
-  .search-input-hidden { width: 0; padding: 0; border: none; outline: none; font-size: 14px; background: transparent; }
-  .search-form-expandable.expanded .search-input-hidden { width: 100%; padding: 0 10px; }
-  .search-toggle-btn { width: 34px; height: 34px; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .search-icon-large { width: 22px; height: 22px; stroke: #666; stroke-width: 2.5; fill: none; }
+const localeKeyMap = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
+const localeKey = localeKeyMap[lang] || 'jp';
+const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+const basePath = '/' + lang + '/' + country;
 
-  /* 設定ボタン（グレー枠） */
-  .menu-combo-btn { display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; }
-  .menu-btn-text { font-size: 14px; font-weight: 700; color: #333; }
-  .hamburger-icon { width: 20px; height: 20px; stroke: #333; stroke-width: 2.5; fill: none; }
-  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; line-height: 34px; }
+const homeHref = basePath + '/';
+const searchAction = basePath + '/search/';
+const countryLabel = getCountryLabel(country, lang);
 
-  /* カテゴリーバー（BK復元） */
-  .category-bar { background: #393737; width: 100%; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; }
-  .pc-category-group { display: flex; align-items: center; }
-  .category-link, .more-btn { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; background: transparent; border: none; cursor: pointer; position: relative; }
-  .category-link.active { background: var(--theme-color); }
-  .category-text-with-underline { position: relative; }
-  .category-link:hover .category-text-with-underline::after, .more-btn:hover .category-text-with-underline::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 100%; height: 2px; background-color: #fff; }
+const configLabels = { 
+  ja: '言語 / 地域', en: 'Language / Region', 'zh-cn': '语言 / 地域', 'zh-tw': '語言 / 地域',
+  es: 'Idioma / Región', fr: 'Langue / Région', de: 'Sprache / Region', ru: 'Язык / Региオン' 
+};
+const configLabelText = configLabels[lang] || configLabels['en'];
+const langNames = { ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文', es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский' };
 
-  .more-dropdown { position: relative; }
-  .dropdown-content { display: none; position: absolute; top: 100%; left: 0; background: #393737; min-width: 160px; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-  .more-dropdown:hover .dropdown-content { display: block; }
-  .dropdown-link { color: #fff; padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; }
-  .dropdown-link:hover { background: rgba(255,255,255,0.1); }
-  .arrow-icon { width: 16px; height: 16px; fill: #fff; margin-left: 4px; }
+const allActivePairs = langCountryPairs.filter(p => p.active).sort((a, b) => {
+  const nameA = langNames[a.lang] || a.lang;
+  const nameB = langNames[b.lang] || b.lang;
+  return nameA.localeCompare(nameB, lang === 'ja' ? 'ja' : 'en');
+});
 
-  /* 下部の余白と線 */
-  .header-word-bar { background: #fff; height: 36px; display: flex; align-items: center; }
-  .spacer-text { font-size: 16px; visibility: hidden; }
-  .bottom-line { height: 10px; width: 100%; }
+const categoryItems = (labels.headerCategories || []).map((item) => ({
+  href: basePath + '/category/' + item.slug + '/',
+  label: item.label,
+  isActive: currentPath === (basePath + '/category/' + item.slug),
+  slug: item.slug
+}));
+const moreSlugs = ['health-life', 'weather', 'traffic'];
+const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
+const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
+---
 
-  /* --- ドロワーメニュー設定（修正箇所） --- */
-  .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; z-index: 9998; transition: 0.5s; }
-  .menu-overlay.visible { visibility: visible; opacity: 1; }
-  
-  .side-menu { 
-    position: fixed; top: 0; right: -350px; width: 350px; height: 100%; 
-    background: #2c2c2c; color: #fff; z-index: 9999; 
-    transition: 0.5s; box-shadow: -5px 0 20px rgba(0,0,0,0.5); 
-    display: flex; flex-direction: column; 
-    visibility: hidden; /* 最初は完全に消す */
-  }
-  .side-menu.open { right: 0; visibility: visible; }
-  
-  .menu-header { padding: 25px 20px; border-bottom: 1px solid #444; display: flex; align-items: center; gap: 15px; }
-  .close-btn { background: none; border: none; font-size: 35px; color: #fff; cursor: pointer; line-height: 1; }
-  .menu-title { font-size: 20px; font-weight: 700; }
-  
-  /* スクロール可能にするための修正 */
-  .menu-content { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
-  .current-selection-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-  .lang-item { display: block; padding: 14px 10px; border-bottom: 1px solid #3d3d3d; text-decoration: none; color: #ccc; font-size: 15px; transition: 0.3s; }
-  .lang-item:hover { color: #fff; background: rgba(255,255,255,0.1); }
+<header class="site-header">
+  <div class="header-top">
+    <div class="brand-area">
+      <a href={homeHref} class="logo-link">
+        <img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" />
+      </a>
+      <div class="country-name-aligned">{countryLabel}</div>
+    </div>
 
-  @media (max-width: 768px) {
-    .side-menu { width: 85%; right: -85%; }
-    .lower-row, .country-name-aligned { display: none; }
-    .pc-category-group { overflow-x: auto; white-space: nowrap; }
-    .more-dropdown { display: none; }
-  }
-</style>
+    <div class="right-area">
+      <div class="upper-row">
+        <form action={searchAction} method="get" class="search-form-expandable" id="search-form">
+          <input type="text" name="q" class="search-input-hidden" id="search-input" placeholder={labels.searchPlaceholder} />
+          <button type="button" class="search-toggle-btn" id="search-trigger">
+            <svg class="search-icon-large" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+          </button>
+        </form>
+      </div>
+      <div class="lower-row">
+        <span class="current-setting-label">{labels.languageName} / {countryLabel}</span>
+        <button id="menu-open-btn" class="menu-combo-btn" type="button">
+          <svg viewBox="0 0 24 24" class="hamburger-icon"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <span class="menu-btn-text">{configLabelText}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="category-bar">
+    <div class="category-nav-inner">
+      <div class="pc-category-group">
+        {mainItems.map((item) => (
+          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+            <span class="category-text-with-underline">{item.label}</span>
+          </a>
+        ))}
+        {moreItems.length > 0 && (
+          <div class="more-dropdown">
+            <button class="more-btn">
+              <span class="category-text-with-underline">More</span>
+              <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"></path></svg>
+            </button>
+            <div class="dropdown-content">
+              {moreItems.map((item) => (
+                <a href={item.href} class="dropdown-link">{item.label}</a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </nav>
+
+  <div class="header-word-bar">
+    <div class="header-word-inner"><span class="spacer-text">&nbsp;</span></div>
+  </div>
+  <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
+</header>
+
+<div id="menu-overlay" class="menu-overlay"></div>
+<div id="side-menu" class="side-menu dark-theme">
+  <div class="menu-header">
+    <button id="menu-close-btn" class="close-btn" type="button">&times;</button>
+    <div class="menu-title">{configLabelText}</div>
+  </div>
+  <div class="menu-content">
+    <div class="current-selection-box">
+      <p class="small-title">Current Setting</p>
+      <div class="current-value">{labels.languageName} / {countryLabel}</div>
+    </div>
+    <div id="full-lang-list">
+      {allActivePairs.map((pair) => (
+        <a href={`/${pair.lang}/${pair.country}/`} class="lang-item">
+          {langNames[pair.lang] || pair.lang} ({getCountryLabel(pair.country, lang)})
+        </a>
+      ))}
+    </div>
+  </div>
+</div>
 
 <script is:inline>
   (function() {
     function setupHeader() {
-      // 検索窓
       const searchTrigger = document.getElementById('search-trigger');
       const searchInput = document.getElementById('search-input');
       const searchForm = document.getElementById('search-form');
@@ -96,7 +138,6 @@
         }
       });
 
-      // ドロワーメニュー
       const openBtn = document.getElementById('menu-open-btn');
       const closeBtn = document.getElementById('menu-close-btn');
       const overlay = document.getElementById('menu-overlay');
@@ -116,3 +157,59 @@
     document.addEventListener('astro:page-load', setupHeader);
   })();
 </script>
+
+<style>
+  .site-header { background: #fff; width: 100%; position: relative; z-index: 1000; }
+  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .brand-area { width: 220px; display: flex; flex-direction: column; }
+  .logo-image { width: 100%; height: auto; }
+  .country-name-aligned { text-align: right; font-size: 16px; font-weight: 700; color: #000; height: 34px; line-height: 34px; margin-top: 4px; }
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .upper-row { width: 100%; display: flex; justify-content: flex-end; }
+  .lower-row { width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 12px; height: 34px; }
+  .search-form-expandable { display: flex; align-items: center; border: 2px solid #666; border-radius: 8px; background: #fff; overflow: hidden; transition: width 0.3s; width: 34px; height: 34px; }
+  .search-form-expandable.expanded { width: 220px; }
+  .search-input-hidden { width: 0; padding: 0; border: none; outline: none; font-size: 14px; background: transparent; }
+  .search-form-expandable.expanded .search-input-hidden { width: 100%; padding: 0 10px; }
+  .search-toggle-btn { width: 34px; height: 34px; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .search-icon-large { width: 22px; height: 22px; stroke: #666; stroke-width: 2.5; fill: none; }
+  .menu-combo-btn { display: flex; align-items: center; gap: 8px; background: #d8d3cc; border: none; border-radius: 8px; cursor: pointer; height: 34px; padding: 0 12px; }
+  .menu-btn-text { font-size: 14px; font-weight: 700; color: #333; }
+  .hamburger-icon { width: 20px; height: 20px; stroke: #333; stroke-width: 2.5; fill: none; }
+  .current-setting-label { font-size: 15px; font-weight: 700; color: #000; height: 34px; line-height: 34px; }
+  .category-bar { background: #393737; width: 100%; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; }
+  .pc-category-group { display: flex; align-items: center; }
+  .category-link, .more-btn { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; background: transparent; border: none; cursor: pointer; position: relative; }
+  .category-link.active { background: var(--theme-color); }
+  .category-text-with-underline { position: relative; }
+  .category-link:hover .category-text-with-underline::after, .more-btn:hover .category-text-with-underline::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 100%; height: 2px; background-color: #fff; }
+  .more-dropdown { position: relative; }
+  .dropdown-content { display: none; position: absolute; top: 100%; left: 0; background: #393737; min-width: 160px; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+  .more-dropdown:hover .dropdown-content { display: block; }
+  .dropdown-link { color: #fff; padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; }
+  .dropdown-link:hover { background: rgba(255,255,255,0.1); }
+  .arrow-icon { width: 16px; height: 16px; fill: #fff; margin-left: 4px; }
+  .header-word-bar { background: #fff; height: 36px; display: flex; align-items: center; }
+  .spacer-text { font-size: 16px; visibility: hidden; }
+  .bottom-line { height: 10px; width: 100%; }
+
+  .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; z-index: 9998; transition: 0.5s; }
+  .menu-overlay.visible { visibility: visible; opacity: 1; }
+  .side-menu { position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: #2c2c2c; color: #fff; z-index: 9999; transition: 0.5s; box-shadow: -5px 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; visibility: hidden; }
+  .side-menu.open { right: 0; visibility: visible; }
+  .menu-header { padding: 25px 20px; border-bottom: 1px solid #444; display: flex; align-items: center; gap: 15px; }
+  .close-btn { background: none; border: none; font-size: 35px; color: #fff; cursor: pointer; line-height: 1; }
+  .menu-title { font-size: 20px; font-weight: 700; }
+  .menu-content { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+  .current-selection-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+  .lang-item { display: block; padding: 14px 10px; border-bottom: 1px solid #3d3d3d; text-decoration: none; color: #ccc; font-size: 15px; transition: 0.3s; }
+  .lang-item:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+  @media (max-width: 768px) {
+    .lower-row, .country-name-aligned { display: none; }
+    .pc-category-group { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+    .more-dropdown { display: none; }
+    .side-menu { width: 85%; right: -85%; }
+  }
+</style>
