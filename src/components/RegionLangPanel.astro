@@ -1,15 +1,78 @@
 ---
 // RegionLangPanel.astro
+import { langCountryPairs } from '../lib/siteRoutes.ts';
+import { getCountryLabel } from '../lib/countryData.ts';
+
 export interface Props {
   currentLang?: string;
   currentCountry?: string;
   themeColor?: string;
 }
 const { currentLang = 'ja', currentCountry = 'jp', themeColor = '#872732' } = Astro.props;
+
+// フッターと同じ「地域グループ」のルールを定義します
+const globalRegionsRaw = [
+  { key: 'asia',     countries: ['jp','tw','kr','cn','th','sg','in','hk','vn','my'] },
+  { key: 'europe',   countries: ['de','fr','gb','it','es','nl'] },
+  { key: 'americas', countries: ['us','ca','br','mx','ar'] },
+  { key: 'mideast',  countries: ['ae','sa','za','eg'] },
+  { key: 'oceania',  countries: ['au','nz'] },
+];
+
+const regionNamesMap: Record<string, Record<string, string>> = {
+  asia:     { ja: 'アジア', en: 'Asia', 'zh-cn': '亚洲', 'zh-tw': '亞洲', es: 'Asia', fr: 'Asie', de: 'Asien', ru: 'Азия' },
+  europe:   { ja: 'ヨーロッパ', en: 'Europe', 'zh-cn': '欧洲', 'zh-tw': '歐洲', es: 'Europa', fr: 'Europe', de: 'Europa', ru: 'Европа' },
+  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Америка' },
+  mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中东与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
+  oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'Океания' },
+};
+
+// 1. マスターデータ（siteRoutes.ts）から、各国が「どの言語に対応しているか」を自動で整理します
+const countrySupportedLangs: Record<string, string[]> = {};
+langCountryPairs.forEach(pair => {
+  if (!countrySupportedLangs[pair.country]) {
+    countrySupportedLangs[pair.country] = [];
+  }
+  if (!countrySupportedLangs[pair.country].includes(pair.lang)) {
+    countrySupportedLangs[pair.country].push(pair.lang);
+  }
+});
+
+// 2. パネルに表示する「地域」と「国」のデータを自動で組み立てます
+const panelRegions = globalRegionsRaw.map(region => {
+  // True設定されている（langCountryPairsに存在する）国だけを抽出します
+  const activeCountries = region.countries
+    .filter(code => countrySupportedLangs[code] && countrySupportedLangs[code].length > 0)
+    .map(code => {
+      return {
+        code: code,
+        supportedLangs: countrySupportedLangs[code].join(',') // 例: "ja,en,zh-tw"
+      };
+    });
+
+  return {
+    key: region.key,
+    countries: activeCountries
+  };
+}).filter(region => region.countries.length > 0);
+
+// 3. クリックした時に一瞬で翻訳できるよう、すべての国の翻訳辞書を裏側で生成しておきます
+const allLangs = ['ja', 'en', 'zh-cn', 'zh-tw', 'es', 'fr', 'de', 'ru'];
+const countryTranslations: Record<string, Record<string, string>> = {};
+
+globalRegionsRaw.forEach(region => {
+  region.countries.forEach(code => {
+    countryTranslations[code] = {};
+    allLangs.forEach(l => {
+      let label = getCountryLabel(code, l);
+      if (l === 'ja' && code === 'jp') label = '日本'; // フッターの特別ルールを適用
+      countryTranslations[code][l] = label;
+    });
+  });
+});
 ---
 
 <div id="rl-overlay" class="rl-overlay"></div>
-
 <div id="rl-panel" class="rl-panel" data-current-country={currentCountry}>
   
   <button id="rl-close-btn" class="rl-close" type="button">&#10005;</button>
@@ -34,48 +97,24 @@ const { currentLang = 'ja', currentCountry = 'jp', themeColor = '#872732' } = As
   </div>
 
   <div class="rl-country-area">
-    <div class="rl-region-group">
-      <div class="rl-region-title">アジア</div>
-      <div class="rl-country-grid">
-        <a href={`/${currentLang}/jp/`} class="rl-country-btn" data-country="jp" data-langs="ja,en,zh-cn,zh-tw" style={currentCountry === 'jp' ? `background-color: ${themeColor}; color: white;` : ''}>日本</a>
-        <a href={`/${currentLang}/tw/`} class="rl-country-btn" data-country="tw" data-langs="zh-tw,en,ja" style={currentCountry === 'tw' ? `background-color: ${themeColor}; color: white;` : ''}>台湾</a>
-        <a href={`/${currentLang}/sg/`} class="rl-country-btn" data-country="sg" data-langs="en,zh-cn" style={currentCountry === 'sg' ? `background-color: ${themeColor}; color: white;` : ''}>シンガポール</a>
-        <a href={`/${currentLang}/my/`} class="rl-country-btn" data-country="my" data-langs="en,zh-cn" style={currentCountry === 'my' ? `background-color: ${themeColor}; color: white;` : ''}>マレーシア</a>
+    {panelRegions.map((region) => (
+      <div class="rl-region-group">
+        <div class="rl-region-title" data-region-key={region.key}>
+          {regionNamesMap[region.key]?.[currentLang] || regionNamesMap[region.key]?.['ja']}
+        </div>
+        <div class="rl-country-grid">
+          {region.countries.map((c) => (
+            <a href={`/${currentLang}/${c.code}/`} 
+               class="rl-country-btn" 
+               data-country={c.code} 
+               data-langs={c.supportedLangs} 
+               style={currentCountry === c.code ? `background-color: ${themeColor}; color: white;` : ''}>
+              {countryTranslations[c.code]?.[currentLang] || c.code}
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
-
-    <div class="rl-region-group">
-      <div class="rl-region-title">ヨーロッパ</div>
-      <div class="rl-country-grid">
-        <a href={`/${currentLang}/de/`} class="rl-country-btn" data-country="de" data-langs="de,en" style={currentCountry === 'de' ? `background-color: ${themeColor}; color: white;` : ''}>ドイツ</a>
-        <a href={`/${currentLang}/fr/`} class="rl-country-btn" data-country="fr" data-langs="fr,en" style={currentCountry === 'fr' ? `background-color: ${themeColor}; color: white;` : ''}>フランス</a>
-        <a href={`/${currentLang}/it/`} class="rl-country-btn" data-country="it" data-langs="en" style={currentCountry === 'it' ? `background-color: ${themeColor}; color: white;` : ''}>イタリア</a>
-      </div>
-    </div>
-
-    <div class="rl-region-group">
-      <div class="rl-region-title">南北アメリカ</div>
-      <div class="rl-country-grid">
-        <a href={`/${currentLang}/us/`} class="rl-country-btn" data-country="us" data-langs="en,es" style={currentCountry === 'us' ? `background-color: ${themeColor}; color: white;` : ''}>アメリカ</a>
-        <a href={`/${currentLang}/ca/`} class="rl-country-btn" data-country="ca" data-langs="en,fr" style={currentCountry === 'ca' ? `background-color: ${themeColor}; color: white;` : ''}>カナダ</a>
-      </div>
-    </div>
-
-    <div class="rl-region-group">
-      <div class="rl-region-title">中東・アフリカ</div>
-      <div class="rl-country-grid">
-        <a href={`/${currentLang}/ae/`} class="rl-country-btn" data-country="ae" data-langs="en,ar" style={currentCountry === 'ae' ? `background-color: ${themeColor}; color: white;` : ''}>UAE</a>
-        <a href={`/${currentLang}/eg/`} class="rl-country-btn" data-country="eg" data-langs="en,ar" style={currentCountry === 'eg' ? `background-color: ${themeColor}; color: white;` : ''}>エジプト</a>
-      </div>
-    </div>
-
-    <div class="rl-region-group">
-      <div class="rl-region-title">オセアニア</div>
-      <div class="rl-country-grid">
-        <a href={`/${currentLang}/au/`} class="rl-country-btn" data-country="au" data-langs="en" style={currentCountry === 'au' ? `background-color: ${themeColor}; color: white;` : ''}>オーストラリア</a>
-        <a href={`/${currentLang}/nz/`} class="rl-country-btn" data-country="nz" data-langs="en" style={currentCountry === 'nz' ? `background-color: ${themeColor}; color: white;` : ''}>ニュージーランド</a>
-      </div>
-    </div>
+    ))}
   </div>
 </div>
 
@@ -97,7 +136,7 @@ const { currentLang = 'ja', currentCountry = 'jp', themeColor = '#872732' } = As
   .rl-country-btn { background: #b0b0b0; color: #000; text-decoration: none; padding: 6px 16px; border-radius: 20px; font-size: 14px; transition: background 0.2s; }
 </style>
 
-<script is:inline define:vars={{ themeColor }}>
+<script is:inline define:vars={{ themeColor, countryTranslations, regionNamesMap }}>
   window.addEventListener('load', function() {
     var overlay = document.getElementById('rl-overlay');
     var panel = document.getElementById('rl-panel');
@@ -108,22 +147,6 @@ const { currentLang = 'ja', currentCountry = 'jp', themeColor = '#872732' } = As
     var currentDisplay = document.getElementById('rl-current-display');
     var currentCountryCode = panel.getAttribute('data-current-country');
 
-    // 修正ポイント②：プログラム内に「翻訳辞書」を持たせました
-    var countryNames = {
-      jp: { ja: '日本', en: 'Japan', 'zh-cn': '日本', 'zh-tw': '日本', es: 'Japón', fr: 'Japon', de: 'Japan', ru: 'Япония' },
-      tw: { ja: '台湾', en: 'Taiwan', 'zh-cn': '台湾', 'zh-tw': '台灣', es: 'Taiwán', fr: 'Taïwan', de: 'Taiwan', ru: 'Тайвань' },
-      sg: { ja: 'シンガポール', en: 'Singapore', 'zh-cn': '新加坡', 'zh-tw': '新加坡', es: 'Singapur', fr: 'Singapour', de: 'Singapur', ru: 'Сингапур' },
-      my: { ja: 'マレーシア', en: 'Malaysia', 'zh-cn': '马来西亚', 'zh-tw': '馬來西亞', es: 'Malasia', fr: 'Malaisie', de: 'Malaysia', ru: 'Малайзия' },
-      de: { ja: 'ドイツ', en: 'Germany', 'zh-cn': '德国', 'zh-tw': '德國', es: 'Alemania', fr: 'Allemagne', de: 'Deutschland', ru: 'Германия' },
-      fr: { ja: 'フランス', en: 'France', 'zh-cn': '法国', 'zh-tw': '法國', es: 'Francia', fr: 'France', de: 'Frankreich', ru: 'Франция' },
-      it: { ja: 'イタリア', en: 'Italy', 'zh-cn': '意大利', 'zh-tw': '義大利', es: 'Italia', fr: 'Italie', de: 'Italien', ru: 'Италия' },
-      us: { ja: 'アメリカ', en: 'United States', 'zh-cn': '美国', 'zh-tw': '美國', es: 'Estados Unidos', fr: 'États-Unis', de: 'USA', ru: 'США' },
-      ca: { ja: 'カナダ', en: 'Canada', 'zh-cn': '加拿大', 'zh-tw': '加拿大', es: 'Canadá', fr: 'Canada', de: 'Kanada', ru: 'Канада' },
-      ae: { ja: 'UAE', en: 'UAE', 'zh-cn': '阿联酋', 'zh-tw': '阿聯', es: 'EAU', fr: 'Émirats', de: 'VAE', ru: 'ОАЭ' },
-      eg: { ja: 'エジプト', en: 'Egypt', 'zh-cn': '埃及', 'zh-tw': '埃及', es: 'Egipto', fr: 'Égypte', de: 'Ägypten', ru: 'Египет' },
-      au: { ja: 'オーストラリア', en: 'Australia', 'zh-cn': '澳大利亚', 'zh-tw': '澳洲', es: 'Australia', fr: 'Australie', de: 'Australien', ru: 'Австралия' },
-      nz: { ja: 'ニュージーランド', en: 'New Zealand', 'zh-cn': '新西兰', 'zh-tw': '紐西蘭', es: 'Nueva Zelanda', fr: 'Nouvelle', de: 'Neuseeland', ru: 'Новая Зеландия' }
-    };
     var langNames = { ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文', es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский' };
 
     function closePanel() { panel.classList.remove('open'); overlay.classList.remove('open'); }
@@ -139,27 +162,37 @@ const { currentLang = 'ja', currentCountry = 'jp', themeColor = '#872732' } = As
         this.style.backgroundColor = themeColor;
         this.style.color = 'white';
 
-        // 修正ポイント③：上部の表示を「現在の国 / 選択した言語」に書き換える
-        var currentCountryName = countryNames[currentCountryCode] ? (countryNames[currentCountryCode][selectedLang] || countryNames[currentCountryCode]['ja']) : '';
+        // 上部の表示を書き換える
+        var currentCountryName = countryTranslations[currentCountryCode] ? (countryTranslations[currentCountryCode][selectedLang] || countryTranslations[currentCountryCode]['ja']) : '';
         var selectedLangName = langNames[selectedLang] || '';
         if (currentDisplay) currentDisplay.textContent = currentCountryName + ' / ' + selectedLangName;
 
-        // 修正ポイント④：国ボタンのリンクと名前を書き換える
+        // 地域の名前（アジアなど）を言語に合わせて書き換える
+        var regionTitles = document.querySelectorAll('.rl-region-title');
+        regionTitles.forEach(function(titleEl) {
+          var rKey = titleEl.getAttribute('data-region-key');
+          if (rKey && regionNamesMap[rKey]) {
+            titleEl.textContent = regionNamesMap[rKey][selectedLang] || regionNamesMap[rKey]['ja'];
+          }
+        });
+
+        // 国ボタンのリンクと名前を書き換える
         countryBtns.forEach(function(cBtn) {
           var countryCode = cBtn.getAttribute('data-country');
           var supportedLangs = cBtn.getAttribute('data-langs');
           
           if (supportedLangs && supportedLangs.includes(selectedLang)) {
             cBtn.style.display = 'inline-block';
-            cBtn.href = '/' + selectedLang + '/' + countryCode + '/'; // リンクを変更（例: /en/tw/）
-            if (countryNames[countryCode] && countryNames[countryCode][selectedLang]) {
-              cBtn.textContent = countryNames[countryCode][selectedLang]; // 翻訳辞書から国名を変更
+            cBtn.href = '/' + selectedLang + '/' + countryCode + '/';
+            if (countryTranslations[countryCode] && countryTranslations[countryCode][selectedLang]) {
+              cBtn.textContent = countryTranslations[countryCode][selectedLang];
             }
           } else {
             cBtn.style.display = 'none';
           }
         });
 
+        // 国が一つもない地域枠を隠す
         regionGroups.forEach(function(group) {
           var visibleCountries = group.querySelectorAll('.rl-country-btn[style*="display: inline-block"]');
           if (visibleCountries.length === 0) { group.style.display = 'none'; } else { group.style.display = 'block'; }
