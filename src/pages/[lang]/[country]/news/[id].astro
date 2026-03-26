@@ -68,9 +68,49 @@ const sizeLabels: Record<string, {s:string, m:string, l:string}> = {
 const t = sizeLabels[lang] || sizeLabels['en'];
 
 const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
+
+// 記事サムネイル画像を本文から取得（なければデフォルトロゴ）
+const DEFAULT_OG_IMAGE = 'https://24watchin.com/images/logo-24watchin.png';
+const imageMatch = (post.content || '').match(/<img[^>]+src="([^">]+)"/);
+const articleOgImage = imageMatch ? imageMatch[1] : DEFAULT_OG_IMAGE;
+
+// NewsArticle 構造化データ
+const newsArticleJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": post.title,
+  "url": articleUrl,
+  "datePublished": post.published,
+  "dateModified": post.updated || post.published,
+  "image": [articleOgImage],
+  "author": {
+    "@type": "Organization",
+    "name": "24Watchin",
+    "url": "https://24watchin.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "24Watchin",
+    "url": "https://24watchin.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://24watchin.com/images/logo-24watchin.png"
+    }
+  },
+  "inLanguage": lang,
+  "description": post.title,
+};
 ---
 
-<Layout title={post.title} sidebarType="article">
+<Layout
+  title={post.title}
+  sidebarType="article"
+  ogImage={articleOgImage}
+  ogType="article"
+>
+  <!-- NewsArticle 構造化データを <head> に差し込む -->
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(newsArticleJsonLd)} />
+
   <div class="article-breadcrumb-container">
     <div class="article-breadcrumb-wrap">
       <Breadcrumb countryLabel={countryLabel} countryHref={countryHref} categoryLabel={categoryLabel} categoryHref={categoryHref} />
