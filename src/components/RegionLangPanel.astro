@@ -1,0 +1,194 @@
+---
+// RegionLangPanel.astro
+// ヘッダー本体から現在の言語、国、テーマカラーの情報を受け取るための設定です
+export interface Props {
+  currentLang?: string;
+  currentCountry?: string;
+  themeColor?: string;
+}
+const { currentLang = 'ja', currentCountry = 'jp', themeColor = '#872732' } = Astro.props;
+---
+
+<div id="rl-overlay" class="rl-overlay"></div>
+
+<div id="rl-panel" class="rl-panel">
+  
+  <button id="rl-close-btn" class="rl-close" type="button">&#10005;</button>
+
+  <div class="rl-header-text">地域 / 言語</div>
+
+  <div class="rl-current-box">
+    <span id="rl-current-display">日本 / 日本語</span>
+  </div>
+
+  <div class="rl-section">
+    <div class="rl-section-title">言語</div>
+    <div class="rl-lang-grid">
+      <button class="rl-lang-btn" data-lang="ja" style={currentLang === 'ja' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>日本語</button>
+      <button class="rl-lang-btn" data-lang="en" style={currentLang === 'en' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>English</button>
+      <button class="rl-lang-btn" data-lang="zh-cn" style={currentLang === 'zh-cn' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>简体中文</button>
+      <button class="rl-lang-btn" data-lang="zh-tw" style={currentLang === 'zh-tw' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>繁體中文</button>
+      <button class="rl-lang-btn" data-lang="es" style={currentLang === 'es' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>Español</button>
+      <button class="rl-lang-btn" data-lang="fr" style={currentLang === 'fr' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>Français</button>
+      <button class="rl-lang-btn" data-lang="de" style={currentLang === 'de' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>Deutsch</button>
+      <button class="rl-lang-btn" data-lang="ru" style={currentLang === 'ru' ? `background-color: ${themeColor}; color: white; border-color: ${themeColor};` : ''}>Русский</button>
+    </div>
+  </div>
+
+  <div class="rl-country-area">
+    
+    <div class="rl-region-group">
+      <div class="rl-region-title">アジア</div>
+      <div class="rl-country-grid">
+        <a href="/ja/jp/" class="rl-country-btn" data-country="jp" data-langs="ja,en,zh-cn,zh-tw" style={currentCountry === 'jp' ? `background-color: ${themeColor}; color: white;` : ''}>日本</a>
+        <a href="/zh-tw/tw/" class="rl-country-btn" data-country="tw" data-langs="zh-tw,en,ja" style={currentCountry === 'tw' ? `background-color: ${themeColor}; color: white;` : ''}>台湾</a>
+        <a href="/en/sg/" class="rl-country-btn" data-country="sg" data-langs="en,zh-cn" style={currentCountry === 'sg' ? `background-color: ${themeColor}; color: white;` : ''}>シンガポール</a>
+        <a href="/en/my/" class="rl-country-btn" data-country="my" data-langs="en,zh-cn" style={currentCountry === 'my' ? `background-color: ${themeColor}; color: white;` : ''}>マレーシア</a>
+      </div>
+    </div>
+
+    <div class="rl-region-group">
+      <div class="rl-region-title">ヨーロッパ</div>
+      <div class="rl-country-grid">
+        <a href="/de/de/" class="rl-country-btn" data-country="de" data-langs="de,en" style={currentCountry === 'de' ? `background-color: ${themeColor}; color: white;` : ''}>ドイツ</a>
+        <a href="/fr/fr/" class="rl-country-btn" data-country="fr" data-langs="fr,en" style={currentCountry === 'fr' ? `background-color: ${themeColor}; color: white;` : ''}>フランス</a>
+        <a href="/it/it/" class="rl-country-btn" data-country="it" data-langs="en" style={currentCountry === 'it' ? `background-color: ${themeColor}; color: white;` : ''}>イタリア</a>
+      </div>
+    </div>
+
+    <div class="rl-region-group">
+      <div class="rl-region-title">南北アメリカ</div>
+      <div class="rl-country-grid">
+        <a href="/en/us/" class="rl-country-btn" data-country="us" data-langs="en,es" style={currentCountry === 'us' ? `background-color: ${themeColor}; color: white;` : ''}>アメリカ</a>
+        <a href="/en/ca/" class="rl-country-btn" data-country="ca" data-langs="en,fr" style={currentCountry === 'ca' ? `background-color: ${themeColor}; color: white;` : ''}>カナダ</a>
+      </div>
+    </div>
+
+    <div class="rl-region-group">
+      <div class="rl-region-title">中東・アフリカ</div>
+      <div class="rl-country-grid">
+        <a href="/en/ae/" class="rl-country-btn" data-country="ae" data-langs="en,ar" style={currentCountry === 'ae' ? `background-color: ${themeColor}; color: white;` : ''}>UAE（アラブ首長国連邦）</a>
+        <a href="/en/eg/" class="rl-country-btn" data-country="eg" data-langs="en,ar" style={currentCountry === 'eg' ? `background-color: ${themeColor}; color: white;` : ''}>エジプト</a>
+      </div>
+    </div>
+
+    <div class="rl-region-group">
+      <div class="rl-region-title">オセアニア</div>
+      <div class="rl-country-grid">
+        <a href="/en/au/" class="rl-country-btn" data-country="au" data-langs="en" style={currentCountry === 'au' ? `background-color: ${themeColor}; color: white;` : ''}>オーストラリア</a>
+        <a href="/en/nz/" class="rl-country-btn" data-country="nz" data-langs="en" style={currentCountry === 'nz' ? `background-color: ${themeColor}; color: white;` : ''}>ニュージーランド</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* 全体の背景（暗くなる部分） */
+  .rl-overlay {
+    display: none; /* 最初は隠しておく */
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); z-index: 9998;
+  }
+  .rl-overlay.open { display: block; }
+
+  /* 右から出てくるパネル本体のデザイン */
+  .rl-panel {
+    position: fixed; top: 0; right: -400px; /* 最初は画面の右外に隠しておく */
+    width: 100%; max-width: 380px; height: 100%;
+    background: #403e3e; /* デザインに合わせた濃いグレー */
+    color: #ffffff; z-index: 9999;
+    transition: right 0.4s ease; /* ゆっくりスライドする設定 */
+    overflow-y: auto; padding: 20px 24px; box-sizing: border-box;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.3);
+  }
+  .rl-panel.open { right: 0; /* クラスが付いたら画面内に入る */ }
+
+  /* 閉じるボタン */
+  .rl-close {
+    background: none; border: none; color: #ffffff; font-size: 28px;
+    cursor: pointer; position: absolute; top: 15px; left: 15px;
+  }
+
+  /* テキスト・見出しのデザイン */
+  .rl-header-text { margin-top: 50px; font-size: 14px; color: #e0e0e0; margin-bottom: 8px; }
+  
+  .rl-current-box {
+    background: #e8e8e8; color: #000; padding: 12px 16px; border-radius: 6px;
+    font-size: 20px; font-weight: bold; margin-bottom: 24px;
+  }
+
+  /* 言語エリアのデザイン */
+  .rl-section { background: #e8e8e8; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+  .rl-section-title { background: #d0d0d0; color: #000; padding: 8px 12px; font-size: 14px; font-weight: bold; }
+  .rl-lang-grid { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px; background: #f5f5f5; }
+  .rl-lang-btn {
+    background: none; border: none; color: #333; font-size: 15px;
+    text-decoration: underline; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+  }
+
+  /* 地域エリアのデザイン */
+  .rl-region-group { background: #e8e8e8; border-radius: 6px; overflow: hidden; margin-bottom: 16px; }
+  .rl-region-title { background: #9e9e9e; color: #000; padding: 8px 12px; font-size: 14px; font-weight: bold; }
+  .rl-country-grid { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; background: #e8e8e8; }
+  .rl-country-btn {
+    background: #b0b0b0; color: #000; text-decoration: none; padding: 6px 16px;
+    border-radius: 20px; font-size: 14px; transition: background 0.2s;
+  }
+</style>
+
+<script is:inline define:vars={{ themeColor }}>
+  // パネルの動きや、言語を押したときの連動を制御するプログラムです
+  window.addEventListener('load', function() {
+    var overlay = document.getElementById('rl-overlay');
+    var panel = document.getElementById('rl-panel');
+    var closeBtn = document.getElementById('rl-close-btn');
+    var langBtns = document.querySelectorAll('.rl-lang-btn');
+    var countryBtns = document.querySelectorAll('.rl-country-btn');
+    var regionGroups = document.querySelectorAll('.rl-region-group');
+
+    // パネルを閉じる動き
+    function closePanel() {
+      panel.classList.remove('open');
+      overlay.classList.remove('open');
+    }
+    if (closeBtn) closeBtn.addEventListener('click', closePanel);
+    if (overlay) overlay.addEventListener('click', closePanel);
+
+    // 言語ボタンを押したときの動き
+    langBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var selectedLang = this.getAttribute('data-lang');
+
+        // 1. すべての言語ボタンから色（テーマカラー）を消し、押されたボタンにだけ色を付ける
+        langBtns.forEach(function(b) {
+          b.style.backgroundColor = '';
+          b.style.color = '#333';
+        });
+        this.style.backgroundColor = themeColor;
+        this.style.color = 'white';
+
+        // 2. 選んだ言語に対応している国だけを表示し、関係ない国は隠す
+        countryBtns.forEach(function(cBtn) {
+          var supportedLangs = cBtn.getAttribute('data-langs');
+          // その国が選んだ言語を含んでいるかチェック
+          if (supportedLangs && supportedLangs.includes(selectedLang)) {
+            cBtn.style.display = 'inline-block'; // 表示する
+          } else {
+            cBtn.style.display = 'none'; // 隠す
+          }
+        });
+
+        // 3. 国が1つも表示されていない地域（例：ヨーロッパなど）の枠組みごと隠す
+        regionGroups.forEach(function(group) {
+          var visibleCountries = group.querySelectorAll('.rl-country-btn[style*="display: inline-block"]');
+          if (visibleCountries.length === 0) {
+            group.style.display = 'none';
+          } else {
+            group.style.display = 'block';
+          }
+        });
+      });
+    });
+  });
+</script>
