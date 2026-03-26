@@ -360,10 +360,10 @@ const defaultWeatherData = cityDataForJs[0] || null;
     justify-content: space-between; 
     padding: 0 14px; 
     box-sizing: border-box; 
-    position: relative; /* 検索窓がはみ出しても大丈夫なように追加 */
+    position: relative; 
   }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
-  .sp-top-actions { display: flex; align-items: center; gap: 10px; } /* 少し詰めました */
+  .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
   
   .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
   .reload-icon { width: 14px; height: 14px; color: #333; }
@@ -371,11 +371,10 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
   .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
 
-  /* ▼修正：検索窓のデザイン（グレー帯に合わせたスタイル） */
   .sp-search-form { position: relative; display: flex; align-items: center; }
   .sp-search-input { 
     position: absolute; 
-    right: 34px; /* 検索ボタンのすぐ左からスタート */
+    right: 34px; 
     top: 50%; 
     transform: translateY(-50%); 
     width: 0; 
@@ -390,7 +389,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
     z-index: 10;
   }
   .sp-search-input.active { 
-    width: calc(100vw - 180px) !important; /* 左の国名を覆い隠すように広く展開 */
+    /* ▼修正：左側に余白を作るため、180px -> 195px に変更しました */
+    width: calc(100vw - 195px) !important; 
     padding: 0 10px !important; 
     border: 1px solid #ccc; 
     opacity: 1; 
@@ -398,7 +398,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-search-btn { 
     width: 28px !important; 
     height: 28px !important; 
-    border-radius: 50%; /* 更新ボタンに合わせて丸くしました */
+    border-radius: 50%; 
     box-sizing: border-box; 
     flex-shrink: 0; 
     background: #fff; 
@@ -412,7 +412,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-search-btn .search-icon { width: 14px; height: 14px; }
 
 
-  /* ▼修正：白い背景エリアの上下の余白を削ってスリムにしました (12px -> 6px) */
   .sp-header-top { 
     padding: 6px 14px; 
     align-items: center; 
@@ -435,7 +434,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
     justify-content: flex-end; 
     gap: 4px; 
     text-decoration: none; 
-    margin-top: 0; /* 検索窓がなくなったので余分なマージンを削除 */
+    margin-top: 0; 
     overflow: hidden; 
     max-width: 140px; 
   }
