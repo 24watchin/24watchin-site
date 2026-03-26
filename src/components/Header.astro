@@ -4,8 +4,14 @@ import { langCountryPairs } from '../lib/siteRoutes.ts';
 import { getCountryLabel } from '../lib/countryData.ts';
 import RegionLangPanel from './RegionLangPanel.astro';
 
+// ▼ 追加：天気用のプログラムを読み込みます
+import { getWeatherCondition, getUnitSystem, convertTemp } from '../lib/weatherConditions';
+import { countryCityMap } from '../lib/cityConfig';
+
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
+// ▼ 追加：天気APIのキーを取得します
+const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
@@ -65,8 +71,54 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 const moreHasActive = moreItems.some(item => item.isActive);
 
-// 天気用のリンク（どの言語でも「weather」というslugに飛びます）
+// 天気用のリンク
 const weatherHref = basePath + '/category/weather/';
+
+
+// ▼▼▼ 追加：スマホ版の天気データ取得ロジック（WeatherWidget.astroから移植） ▼▼▼
+const cities = countryCityMap[country] || countryCityMap['jp'];
+const { isImperial, tempUnit } = getUnitSystem(lang);
+
+if (!globalThis.weatherCache) globalThis.weatherCache = {};
+const allCityWeather: Record<string, any> = {};
+
+for (const city of cities) {
+  const cityKey = city.key;
+  const now = Date.now();
+  const CACHE = 30 * 60 * 1000;
+  if (globalThis.weatherCache[cityKey] && (now - globalThis.weatherCache[cityKey].time < CACHE)) {
+    allCityWeather[cityKey] = globalThis.weatherCache[cityKey].data;
+  } else if (WEATHER_API_KEY) {
+    try {
+      const url = 'https://api.weatherapi.com/v1/current.json?key=' + WEATHER_API_KEY + '&q=' + cityKey + '&aqi=no';
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        allCityWeather[cityKey] = data;
+        globalThis.weatherCache[cityKey] = { data, time: now };
+      }
+    } catch (e) {}
+  }
+}
+
+const cityDataForJs = cities.map((city: any) => {
+  const wd = allCityWeather[city.key];
+  const current = wd?.current;
+  const conditionCode = current?.condition?.code;
+  const iconUrl = current?.condition?.icon ? 'https:' + current.condition.icon : '';
+  return {
+    key: city.key,
+    displayName: city.display[lang] || city.display['en'] || city.key,
+    temp: current ? convertTemp(current.temp_c, isImperial) : null,
+    feelsLike: current ? convertTemp(current.feelslike_c, isImperial) : null,
+    iconUrl,
+    conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
+  };
+});
+// 最初の都市の天気をデフォルトとして表示します
+const defaultWeatherData = cityDataForJs[0] || null;
+// ▲▲▲ 追加ここまで ▲▲▲
+
 ---
 
 <div class="header-pc-wrapper">
@@ -132,8 +184,9 @@ const weatherHref = basePath + '/category/weather/';
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
+
+
 <div class="header-sp-wrapper">
-  
   <div class="sp-top-gray-bar">
     <div class="sp-top-country">{countryLabel}</div>
     <div class="sp-top-actions">
@@ -161,12 +214,29 @@ const weatherHref = basePath + '/category/weather/';
         </form>
 
         <a href={weatherHref} class="sp-weather-widget">
-          <div class="sp-weather-icon">☁️☔</div> <div class="sp-weather-info">
-            <span class="sp-weather-loc">25日 東京 &gt;</span>
-            <span class="sp-weather-temp">16℃ / 10℃</span>
-          </div>
+          {defaultWeatherData && defaultWeatherData.temp !== null ? (
+            <>
+              <div class="sp-weather-icon">
+                <img src={defaultWeatherData.iconUrl} alt={defaultWeatherData.conditionText} style="width: 28px; height: 28px; object-fit: contain;" />
+              </div>
+              <div class="sp-weather-info">
+                <span class="sp-weather-loc">{defaultWeatherData.displayName} &gt;</span>
+                <span class="sp-weather-temp">{defaultWeatherData.temp}{tempUnit} / {defaultWeatherData.feelsLike}{tempUnit}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div class="sp-weather-icon">
+                <i class="fa-solid fa-cloud-sun" style="color: #6b7280; font-size: 20px; margin-top: 4px;"></i>
+              </div>
+              <div class="sp-weather-info">
+                <span class="sp-weather-loc">読込中... &gt;</span>
+                <span class="sp-weather-temp">-- / --</span>
+              </div>
+            </>
+          )}
         </a>
-      </div>
+        </div>
     </div>
 
     <nav class="category-bar sp-category-bar">
@@ -199,47 +269,37 @@ const weatherHref = basePath + '/category/weather/';
   /* ▼▼▼ スマホ版専用のスタイル ▼▼▼ */
   /* ================================================= */
   
-  /* 上部のグレーの帯 */
   .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
   .sp-top-actions { display: flex; align-items: center; gap: 12px; }
   
-  /* 更新ボタン */
   .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
   .reload-icon { width: 14px; height: 14px; color: #333; }
   
-  /* 地域/言語ボタン（スマホ版） */
   .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
   .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
 
-  /* ロゴと右側のエリア */
   .sp-header-top { padding: 12px 14px; align-items: center; }
-  .sp-logo-image { width: 160px; /* 検索窓が伸びるスペースを確保するため少し小さめ */ }
+  .sp-logo-image { width: 160px; }
   .sp-right-area { gap: 6px; position: relative; }
   
-  /* アニメーション検索窓（スマホ用調整） */
-  .sp-search-input.active { width: 140px; /* 画面からはみ出さないように長さを調整 */ }
+  .sp-search-input.active { width: 140px; }
   .sp-search-btn { width: 32px; height: 32px; }
 
-  /* 天気ウィジェットのダミーデザイン */
-  .sp-weather-widget { display: flex; align-items: center; gap: 4px; text-decoration: none; margin-top: 4px; }
-  .sp-weather-icon { font-size: 18px; line-height: 1; }
+  /* 天気ウィジェットのスタイル */
+  .sp-weather-widget { display: flex; align-items: center; gap: 6px; text-decoration: none; margin-top: 4px; }
+  .sp-weather-icon { display: flex; align-items: center; justify-content: center; width: 28px; }
   .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
   .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
   .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; }
 
-  /* カテゴリのチラ見せ設定 */
   .sp-category-bar { width: 100%; overflow: hidden; }
-  .sp-scroll { 
-    padding-right: 20px; /* 右側に余白を作ることで、最後の文字が画面端にくっつかず「続きがある感」を出します */
-    scrollbar-width: none; /* Firefox用スクロールバー非表示 */
-  }
-  .sp-scroll::-webkit-scrollbar { display: none; /* Chrome用スクロールバー非表示 */ }
-  .sp-scroll-padding { width: 20px; flex-shrink: 0; } /* チラ見せの最後の余白押し出し用 */
-
+  .sp-scroll { padding-right: 20px; scrollbar-width: none; }
+  .sp-scroll::-webkit-scrollbar { display: none; }
+  .sp-scroll-padding { width: 20px; flex-shrink: 0; }
 
   /* ================================================= */
-  /* ▼▼▼ PC版・共通のスタイル（前回から変更なし） ▼▼▼ */
+  /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
   /* ================================================= */
 
   .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
@@ -316,13 +376,10 @@ const weatherHref = basePath + '/category/weather/';
 
 <script is:inline>
   window.addEventListener('load', function() {
-    
-    // --- 検索窓の共通アニメーション処理 ---
     function setupSearch(btnId, inputId, formId) {
       var btn = document.getElementById(btnId);
       var input = document.getElementById(inputId);
       var form = document.getElementById(formId);
-
       if (btn && input && form) {
         btn.addEventListener('click', function(e) {
           if (!input.classList.contains('active')) {
@@ -340,38 +397,29 @@ const weatherHref = basePath + '/category/weather/';
         });
       }
     }
-    // PC版とスマホ版の両方に検索アニメーションを設定
     setupSearch('pc-search-icon-btn', 'pc-search-input', 'pc-search-form');
     setupSearch('sp-search-icon-btn', 'sp-search-input', 'sp-search-form');
 
-
-    // --- 地域/言語パネルの共通処理 ---
     function setupRegionPanel(btnId) {
       var btn = document.getElementById(btnId);
       var rlPanel = document.getElementById('rl-panel');
       var rlOverlay = document.getElementById('rl-overlay');
-
       if (btn && rlPanel && rlOverlay) {
         btn.addEventListener('click', function() {
           rlPanel.classList.add('open');
           rlOverlay.classList.add('open');
-          
           var currentLang = btn.getAttribute('data-current-lang');
           var activeLangBtn = document.querySelector('.rl-lang-btn[data-lang="' + currentLang + '"]');
           if (activeLangBtn) { activeLangBtn.click(); }
         });
       }
     }
-    // PC版とスマホ版の両方のボタンに設定
     setupRegionPanel('pc-region-lang-btn');
     setupRegionPanel('sp-region-lang-btn');
 
-
-    // --- PC版の横スクロール矢印の処理 ---
     var pcScroll = document.getElementById('pc-scroll');
     var pcBtnLeft = document.getElementById('pc-arrow-left');
     var pcBtnRight = document.getElementById('pc-arrow-right');
-
     function updateArrows() {
       var width = window.innerWidth;
       if (pcScroll && pcBtnLeft && pcBtnRight) {
@@ -386,10 +434,8 @@ const weatherHref = basePath + '/category/weather/';
         }
       }
     }
-
     if(pcBtnLeft) pcBtnLeft.addEventListener('click', function() { pcScroll.scrollBy({ left: -200, behavior: 'smooth' }); });
     if(pcBtnRight) pcBtnRight.addEventListener('click', function() { pcScroll.scrollBy({ left: 200, behavior: 'smooth' }); });
-
     if (pcScroll) pcScroll.addEventListener('scroll', updateArrows);
     window.addEventListener('resize', updateArrows);
     updateArrows();
