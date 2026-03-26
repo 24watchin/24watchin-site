@@ -1,11 +1,17 @@
 User-agent: *
+Allow: /
 Disallow: /images/
 
+# ▼ Googleの画像クロールを許可（SEOに重要！）
 User-agent: Googlebot-Image
-Disallow: /
+Allow: /
 
+# ▼ SNSのクローラーを許可
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
+
+# ▼ サイトマップの場所を明示
+Sitemap: https://24watchin.com/sitemap-index.xml
