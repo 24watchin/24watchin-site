@@ -1,5 +1,6 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
+import { langCountryPairs } from '../lib/siteRoutes.ts';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -12,12 +13,21 @@ const {
   title,
   sidebarType = 'top',
   description,
-  allPosts = []
+  allPosts = [],
+  ogImage,
+  ogType = 'website',
 } = Astro.props;
+
+const SITE_URL = 'https://24watchin.com';
+const DEFAULT_OG_IMAGE = `${SITE_URL}/images/logo-24watchin.png`;
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || '';
+
+const canonicalUrl = `${SITE_URL}${currentPath}`;
+const ogImageUrl = ogImage || DEFAULT_OG_IMAGE;
 
 const localeKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
@@ -25,6 +35,19 @@ const localeKeyMap = {
 };
 const localeKey = (localeKeyMap[lang as keyof typeof localeKeyMap] || 'jp') as keyof typeof categoryLabelMap;
 const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
+
+// og:locale マッピング
+const ogLocaleMap: Record<string, string> = {
+  ja: 'ja_JP',
+  en: 'en_US',
+  'zh-cn': 'zh_CN',
+  'zh-tw': 'zh_TW',
+  es: 'es_ES',
+  fr: 'fr_FR',
+  de: 'de_DE',
+  ru: 'ru_RU',
+};
+const ogLocale = ogLocaleMap[lang] || 'ja_JP';
 
 const defaultDescriptions: Record<string, string> = {
   ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
@@ -38,16 +61,64 @@ const defaultDescriptions: Record<string, string> = {
 };
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
+const metaTitle = title ? `${title} | 24Watchin` : '24Watchin';
 const bodyStyle = '--theme-color: ' + themeColor + ';';
+
+// hreflang タグ生成（同じ country の他言語ページへのリンク）
+const restPath = pathParts.slice(2).join('/');
+const restPathStr = restPath ? '/' + restPath + '/' : '/';
+
+const hreflangLinks = country
+  ? langCountryPairs
+      .filter(pair => pair.country === country)
+      .map(pair => ({
+        lang: pair.lang,
+        url: `${SITE_URL}/${pair.lang}/${country}${restPathStr}`,
+      }))
+  : [];
+
+// x-default は日本語版
+const xDefaultUrl = country
+  ? `${SITE_URL}/ja/${country}${restPathStr}`
+  : `${SITE_URL}/ja/`;
 ---
 <!DOCTYPE html>
 <html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title ? `${title} | 24Watchin` : '24Watchin'}</title>
+    <title>{metaTitle}</title>
     <meta name="description" content={metaDescription} />
     <meta name="google-site-verification" content="rCdn1xS0NRhpAQ2jHt2RMGu7wvh1FvF2ePGznFolTZU" />
+
+    <!-- canonical -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- hreflang（多言語SEO） -->
+    {hreflangLinks.map(link => (
+      <link rel="alternate" hreflang={link.lang} href={link.url} />
+    ))}
+    {hreflangLinks.length > 0 && (
+      <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+    )}
+
+    <!-- OGP -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={metaTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:site_name" content="24Watchin" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={metaTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
     <!-- Google Analytics -->
