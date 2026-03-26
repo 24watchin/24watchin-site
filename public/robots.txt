@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /images/
+Disallow: /api/
 
 # ▼ Googleの画像クロールを許可（SEOに重要！）
 User-agent: Googlebot-Image
