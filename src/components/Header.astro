@@ -2,7 +2,7 @@
 import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
 import { getCountryLabel } from '../lib/countryData.ts';
-import RegionLangPanel from './RegionLangPanel.astro'; // ★パネル部品を読み込みます
+import RegionLangPanel from './RegionLangPanel.astro';
 
 const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
 const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
@@ -64,10 +64,12 @@ const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 const moreHasActive = moreItems.some(item => item.isActive);
+
+// 天気用のリンク（どの言語でも「weather」というslugに飛びます）
+const weatherHref = basePath + '/category/weather/';
 ---
 
 <div class="header-pc-wrapper">
-  
   <div class="pc-top-gray-bar">
     <div class="pc-top-gray-inner">
       <span class="pc-top-country">{countryLabel}</span>
@@ -80,7 +82,6 @@ const moreHasActive = moreItems.some(item => item.isActive);
         <a href={homeHref} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" /></a>
       </div>
       <div class="right-area pc-right-area">
-        
         <form action={searchAction} method="get" class="search-form-animated" id="pc-search-form">
           <input type="text" name="q" class="search-input-animated" placeholder={labels.searchPlaceholder} id="pc-search-input" />
           <button type="button" class="search-icon-btn" id="pc-search-icon-btn">
@@ -91,14 +92,12 @@ const moreHasActive = moreItems.some(item => item.isActive);
         <button type="button" class="region-lang-open-btn" id="pc-region-lang-btn" data-current-lang={lang}>
           地域 / 言語 <span class="hamburger-icon">&#8803;</span>
         </button>
-        
       </div>
     </div>
 
     <nav class="category-bar">
       <div class="category-nav-inner">
         <button class="scroll-arrow arrow-left" id="pc-arrow-left" type="button">&#8249;</button>
-        
         <div class="pc-category-group">
           <div class="category-scroll pc-scroll" id="pc-scroll">
             {mainItems.map((item) => (
@@ -119,7 +118,6 @@ const moreHasActive = moreItems.some(item => item.isActive);
             </div>
           )}
         </div>
-
         <button class="scroll-arrow arrow-right" id="pc-arrow-right" type="button">&#8250;</button>
       </div>
     </nav>
@@ -134,60 +132,58 @@ const moreHasActive = moreItems.some(item => item.isActive);
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
-
 <div class="header-sp-wrapper">
+  
+  <div class="sp-top-gray-bar">
+    <div class="sp-top-country">{countryLabel}</div>
+    <div class="sp-top-actions">
+      <button type="button" class="sp-reload-btn" onclick="window.location.reload();" aria-label="ページを更新">
+        <svg viewBox="0 0 24 24" class="reload-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.32-9.83l5.67 5.67" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="region-lang-open-btn sp-region-lang-btn" id="sp-region-lang-btn" data-current-lang={lang}>
+        地域 / 言語 <span class="hamburger-icon">&#8803;</span>
+      </button>
+    </div>
+  </div>
+
   <header class="site-header">
-    <div class="header-top">
-      <div class="brand-area">
-        <a href={homeHref} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" /></a>
-        <div class="country-name">{countryLabel}</div>
+    <div class="header-top sp-header-top">
+      <div class="brand-area sp-brand-area">
+        <a href={homeHref} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image sp-logo-image" /></a>
       </div>
-      <div class="right-area">
-        <form action={searchAction} method="get" class="search-form">
-          <input type="text" name="q" class="search-input" placeholder={labels.searchPlaceholder} />
-          <button type="submit" class="search-button">
+      
+      <div class="right-area sp-right-area">
+        <form action={searchAction} method="get" class="search-form-animated" id="sp-search-form">
+          <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
+          <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn">
             <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
           </button>
         </form>
-        <div class="lang-switcher">
-          <div class="lang-current">{labels.languageName} ▾</div>
-          <div class="lang-dropdown">
-            {languageOptions.map((opt) => (
-              <a href={opt.href} class={opt.linkClass}><span class="lang-bar" style={opt.barStyle}></span>{opt.label}</a>
-            ))}
+
+        <a href={weatherHref} class="sp-weather-widget">
+          <div class="sp-weather-icon">☁️☔</div> <div class="sp-weather-info">
+            <span class="sp-weather-loc">25日 東京 &gt;</span>
+            <span class="sp-weather-temp">16℃ / 10℃</span>
           </div>
-        </div>
+        </a>
       </div>
     </div>
 
-    <nav class="category-bar">
-      <div class="category-nav-inner">
-        <button class="scroll-arrow arrow-left" id="sp-arrow-left" type="button">&#8249;</button>
-        
-        <div class="category-scroll sp-scroll" id="sp-scroll">
-          {categoryItems.map((item) => (
-            <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
-              <span class="category-link-text">{item.label}</span>
-            </a>
-          ))}
-        </div>
-
-        <button class="scroll-arrow arrow-right" id="sp-arrow-right" type="button">&#8250;</button>
+    <nav class="category-bar sp-category-bar">
+      <div class="category-scroll sp-scroll" id="sp-scroll">
+        {categoryItems.map((item) => (
+          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+            <span class="category-link-text">{item.label}</span>
+          </a>
+        ))}
+        <div class="sp-scroll-padding"></div>
       </div>
     </nav>
 
-    <div class="header-word-bar">
-      <div class="header-word-inner">
-        {headerWords.map((item, index) => (
-          <a href={item.url} class="header-word-link">{item.label}</a>
-        ))}
-      </div>
-    </div>
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
 <RegionLangPanel currentLang={lang} currentCountry={country} themeColor={labels.themeColor || '#872732'} />
-
 
 <style>
   /* === PC版とスマホ版の表示切り替えスイッチ === */
@@ -199,7 +195,53 @@ const moreHasActive = moreItems.some(item => item.isActive);
     .header-sp-wrapper { display: block; }
   }
 
-  /* === 新しいPC版のレイアウト用スタイル === */
+  /* ================================================= */
+  /* ▼▼▼ スマホ版専用のスタイル ▼▼▼ */
+  /* ================================================= */
+  
+  /* 上部のグレーの帯 */
+  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; }
+  .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
+  .sp-top-actions { display: flex; align-items: center; gap: 12px; }
+  
+  /* 更新ボタン */
+  .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+  .reload-icon { width: 14px; height: 14px; color: #333; }
+  
+  /* 地域/言語ボタン（スマホ版） */
+  .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
+  .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
+
+  /* ロゴと右側のエリア */
+  .sp-header-top { padding: 12px 14px; align-items: center; }
+  .sp-logo-image { width: 160px; /* 検索窓が伸びるスペースを確保するため少し小さめ */ }
+  .sp-right-area { gap: 6px; position: relative; }
+  
+  /* アニメーション検索窓（スマホ用調整） */
+  .sp-search-input.active { width: 140px; /* 画面からはみ出さないように長さを調整 */ }
+  .sp-search-btn { width: 32px; height: 32px; }
+
+  /* 天気ウィジェットのダミーデザイン */
+  .sp-weather-widget { display: flex; align-items: center; gap: 4px; text-decoration: none; margin-top: 4px; }
+  .sp-weather-icon { font-size: 18px; line-height: 1; }
+  .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
+  .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
+  .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; }
+
+  /* カテゴリのチラ見せ設定 */
+  .sp-category-bar { width: 100%; overflow: hidden; }
+  .sp-scroll { 
+    padding-right: 20px; /* 右側に余白を作ることで、最後の文字が画面端にくっつかず「続きがある感」を出します */
+    scrollbar-width: none; /* Firefox用スクロールバー非表示 */
+  }
+  .sp-scroll::-webkit-scrollbar { display: none; /* Chrome用スクロールバー非表示 */ }
+  .sp-scroll-padding { width: 20px; flex-shrink: 0; } /* チラ見せの最後の余白押し出し用 */
+
+
+  /* ================================================= */
+  /* ▼▼▼ PC版・共通のスタイル（前回から変更なし） ▼▼▼ */
+  /* ================================================= */
+
   .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
   .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
   .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
@@ -207,7 +249,6 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .pc-header-top { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 14px 15px; }
   .pc-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
 
-  /* アニメーション検索窓のスタイル */
   .search-form-animated { display: flex; align-items: center; }
   .search-input-animated {
     width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
@@ -221,68 +262,34 @@ const moreHasActive = moreItems.some(item => item.isActive);
     cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0;
   }
 
-  /* 地域/言語ボタンのスタイル */
   .region-lang-open-btn {
     background: none; border: none; color: #000; font-size: 15px; font-weight: bold;
     cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0;
   }
   .hamburger-icon { font-size: 22px; font-weight: bold; }
-  /* ======================================= */
 
-  /* 共通・既存のスタイル */
   .site-header { width: 100%; background: #ffffff; border-radius: 0 !important; }
-  .header-top { max-width: 1280px; margin: 0 auto; padding: 10px 14px 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .brand-area { display: flex; flex-direction: column; align-items: flex-end; }
+  .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; }
+  .brand-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
   .logo-image { width: 200px; height: auto; }
-  .country-name { margin-top: 4px; font-size: 16px; font-weight: 700; color: #000000; }
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-  .search-form { display: flex; align-items: center; gap: 6px; }
-  .search-input { width: 180px; height: 34px; padding: 0 10px; border: 1px solid #c7c1ba; border-radius: 8px; background: #d8d3cc; font-size: 15px; outline: none; }
-  .search-button { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; }
   .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
-  .lang-switcher { position: relative; }
-  .lang-current { font-size: 13px; color: #333; cursor: pointer; padding: 3px 6px; }
-  .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e0e0e0; min-width: 150px; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
-  .lang-switcher:hover .lang-dropdown { display: block; }
-  .lang-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; text-decoration: none; color: #333; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
-  .lang-bar { width: 4px; height: 14px; border-radius: 2px; }
   
   .category-bar { background: #393737; width: 100%; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
   
   .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
-  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; -webkit-overflow-scrolling: touch; }
   .category-scroll::-webkit-scrollbar { display: none; }
-  .sp-scroll { display: flex; }
 
   .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
   
-  /* ▼▼▼ 追加：左からスッと伸びるアニメーション下線 ▼▼▼ */
-  /* 文字の基準点を作る */
-  .category-link-text,
-  .more-link-text {
-    position: relative;
-    display: inline-block;
+  .category-link-text, .more-link-text { position: relative; display: inline-block; }
+  .category-link-text::after, .more-link-text::after {
+    content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease;
   }
-  /* 下線のデザインと、ゆっくり動く設定（最初は幅0%で隠しておく） */
-  .category-link-text::after,
-  .more-link-text::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -6px; /* 文字と線の隙間 */
-    width: 0;     /* 最初は幅0で見えない状態 */
-    height: 3px;  /* 線の太さ */
-    background-color: #ffffff;
-    transition: width 0.3s ease; /* 0.3秒かけて左から右へ広がる */
-  }
-  /* マウスが乗った時に、下線の幅を100%にする */
-  .category-link:hover .category-link-text::after,
-  .more-link:hover .more-link-text::after {
-    width: 100%;
-  }
-  /* ▲▲▲ 追加ここまで ▲▲▲ */
+  .category-link:hover .category-link-text::after, .more-link:hover .more-link-text::after { width: 100%; }
   
   .more-wrapper { position: relative; flex-shrink: 0; }
   .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
@@ -297,7 +304,8 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .scroll-arrow.active { display: flex; }
 
   .header-word-bar { background: #fff; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
+  .header-word-inner::-webkit-scrollbar { display: none; }
   .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
   .bottom-line { height: 10px; }
 
@@ -309,60 +317,63 @@ const moreHasActive = moreItems.some(item => item.isActive);
 <script is:inline>
   window.addEventListener('load', function() {
     
-    // ▼▼▼ 新しいPC版の動き（検索窓とパネル） ▼▼▼
-    var searchBtn = document.getElementById('pc-search-icon-btn');
-    var searchInput = document.getElementById('pc-search-input');
-    var searchForm = document.getElementById('pc-search-form');
+    // --- 検索窓の共通アニメーション処理 ---
+    function setupSearch(btnId, inputId, formId) {
+      var btn = document.getElementById(btnId);
+      var input = document.getElementById(inputId);
+      var form = document.getElementById(formId);
 
-    // 検索アイコンを押した時の動き
-    if (searchBtn && searchInput && searchForm) {
-      searchBtn.addEventListener('click', function(e) {
-        if (!searchInput.classList.contains('active')) {
-          e.preventDefault(); // すぐに検索されないように止める
-          searchInput.classList.add('active'); // 枠を広げる
-          searchInput.focus(); // 入力できる状態にする
-        } else {
-          // すでに開いている場合
-          if (searchInput.value.trim() === '') {
+      if (btn && input && form) {
+        btn.addEventListener('click', function(e) {
+          if (!input.classList.contains('active')) {
             e.preventDefault();
-            searchInput.classList.remove('active'); // 空欄なら閉じる
+            input.classList.add('active');
+            input.focus();
           } else {
-            searchForm.submit(); // 文字が入っていれば検索を実行する
+            if (input.value.trim() === '') {
+              e.preventDefault();
+              input.classList.remove('active');
+            } else {
+              form.submit();
+            }
           }
-        }
-      });
+        });
+      }
     }
+    // PC版とスマホ版の両方に検索アニメーションを設定
+    setupSearch('pc-search-icon-btn', 'pc-search-input', 'pc-search-form');
+    setupSearch('sp-search-icon-btn', 'sp-search-input', 'sp-search-form');
 
-    // 地域/言語ボタンを押した時の動き
-    var regionLangBtn = document.getElementById('pc-region-lang-btn');
-    var rlPanel = document.getElementById('rl-panel');
-    var rlOverlay = document.getElementById('rl-overlay');
 
-    if (regionLangBtn && rlPanel && rlOverlay) {
-      regionLangBtn.addEventListener('click', function() {
-        rlPanel.classList.add('open');
-        rlOverlay.classList.add('open');
-        
-        // パネルが開いた瞬間に、現在の言語に対応する国を自動的に表示させるための処理
-        var currentLang = regionLangBtn.getAttribute('data-current-lang');
-        var activeLangBtn = document.querySelector('.rl-lang-btn[data-lang="' + currentLang + '"]');
-        if (activeLangBtn) {
-          activeLangBtn.click();
-        }
-      });
+    // --- 地域/言語パネルの共通処理 ---
+    function setupRegionPanel(btnId) {
+      var btn = document.getElementById(btnId);
+      var rlPanel = document.getElementById('rl-panel');
+      var rlOverlay = document.getElementById('rl-overlay');
+
+      if (btn && rlPanel && rlOverlay) {
+        btn.addEventListener('click', function() {
+          rlPanel.classList.add('open');
+          rlOverlay.classList.add('open');
+          
+          var currentLang = btn.getAttribute('data-current-lang');
+          var activeLangBtn = document.querySelector('.rl-lang-btn[data-lang="' + currentLang + '"]');
+          if (activeLangBtn) { activeLangBtn.click(); }
+        });
+      }
     }
-    // ▲▲▲ 新しい動きのコードここまで ▲▲▲
+    // PC版とスマホ版の両方のボタンに設定
+    setupRegionPanel('pc-region-lang-btn');
+    setupRegionPanel('sp-region-lang-btn');
 
+
+    // --- PC版の横スクロール矢印の処理 ---
     var pcScroll = document.getElementById('pc-scroll');
-    var spScroll = document.getElementById('sp-scroll');
     var pcBtnLeft = document.getElementById('pc-arrow-left');
     var pcBtnRight = document.getElementById('pc-arrow-right');
-    var spBtnLeft = document.getElementById('sp-arrow-left');
-    var spBtnRight = document.getElementById('sp-arrow-right');
 
     function updateArrows() {
       var width = window.innerWidth;
-      
       if (pcScroll && pcBtnLeft && pcBtnRight) {
         if (width > 1000 || width <= 768) {
           pcBtnLeft.classList.remove('active');
@@ -374,27 +385,12 @@ const moreHasActive = moreItems.some(item => item.isActive);
           if (!atRightPC) { pcBtnRight.classList.add('active'); } else { pcBtnRight.classList.remove('active'); }
         }
       }
-
-      if (spScroll && spBtnLeft && spBtnRight) {
-        if (width > 768 || width <= 450) {
-          spBtnLeft.classList.remove('active');
-          spBtnRight.classList.remove('active');
-        } else {
-          var atLeftSP = spScroll.scrollLeft <= 5;
-          var atRightSP = spScroll.scrollLeft >= (spScroll.scrollWidth - spScroll.clientWidth - 5);
-          if (!atLeftSP) { spBtnLeft.classList.add('active'); } else { spBtnLeft.classList.remove('active'); }
-          if (!atRightSP) { spBtnRight.classList.add('active'); } else { spBtnRight.classList.remove('active'); }
-        }
-      }
     }
 
     if(pcBtnLeft) pcBtnLeft.addEventListener('click', function() { pcScroll.scrollBy({ left: -200, behavior: 'smooth' }); });
     if(pcBtnRight) pcBtnRight.addEventListener('click', function() { pcScroll.scrollBy({ left: 200, behavior: 'smooth' }); });
-    if(spBtnLeft) spBtnLeft.addEventListener('click', function() { spScroll.scrollBy({ left: -200, behavior: 'smooth' }); });
-    if(spBtnRight) spBtnRight.addEventListener('click', function() { spScroll.scrollBy({ left: 200, behavior: 'smooth' }); });
 
     if (pcScroll) pcScroll.addEventListener('scroll', updateArrows);
-    if (spScroll) spScroll.addEventListener('scroll', updateArrows);
     window.addEventListener('resize', updateArrows);
     updateArrows();
   });
