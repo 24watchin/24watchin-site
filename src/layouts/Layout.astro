@@ -64,7 +64,7 @@ const metaDescription = description || defaultDescriptions[lang] || defaultDescr
 const metaTitle = title ? `${title} | 24Watchin` : '24Watchin';
 const bodyStyle = '--theme-color: ' + themeColor + ';';
 
-// hreflang タグ生成（同じ country の他言語ページへのリンク）
+// hreflang タグ生成
 const restPath = pathParts.slice(2).join('/');
 const restPathStr = restPath ? '/' + restPath + '/' : '/';
 
@@ -77,10 +77,27 @@ const hreflangLinks = country
       }))
   : [];
 
-// x-default は日本語版
 const xDefaultUrl = country
   ? `${SITE_URL}/ja/${country}${restPathStr}`
   : `${SITE_URL}/ja/`;
+
+// WebSite 構造化データ（全ページ共通）
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "24Watchin",
+  "url": SITE_URL,
+  "description": defaultDescriptions[lang] || defaultDescriptions['en'],
+  "inLanguage": lang,
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${SITE_URL}/${lang}/search?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
 ---
 <!DOCTYPE html>
 <html lang={lang}>
@@ -129,6 +146,12 @@ const xDefaultUrl = country
       gtag('js', new Date());
       gtag('config', 'G-D9WC22D3LC');
     </script>
+
+    <!-- WebSite 構造化データ（全ページ共通） -->
+    <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
+
+    <!-- 各ページ固有の構造化データ（記事ページなど）をここに差し込む -->
+    <slot name="head" />
 
     <style>
       /* ▼▼▼ 追加：画面全体をぴったりくっつけて角を四角にする強力なリセット ▼▼▼ */
