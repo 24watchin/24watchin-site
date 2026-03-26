@@ -258,15 +258,15 @@ const moreHasActive = moreItems.some(item => item.isActive);
   .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
   .category-link.active { background: var(--theme-color); }
   
-  /* ▼▼▼ 追加：カテゴリ名にマウスを当てた時の白い下線 ▼▼▼ */
+  /* ▼▼▼ 修正：カテゴリ名にマウスを当てた時の白い下線（太さと隙間を調整） ▼▼▼ */
   .category-link:hover .category-link-text,
   .more-btn:hover {
     text-decoration: underline;
     text-decoration-color: #ffffff;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
+    text-decoration-thickness: 3px; /* 線の太さ */
+    text-underline-offset: 8px;     /* 文字と線の隙間 */
   }
-  /* ▲▲▲ 追加ここまで ▲▲▲ */
+  /* ▲▲▲ 修正ここまで ▲▲▲ */
   
   .more-wrapper { position: relative; flex-shrink: 0; }
   .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
