@@ -198,7 +198,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
       </div>
       
       <div class="right-area sp-right-area">
-        <form action={searchAction} method="get" class="search-form-animated sp-search-form" id="sp-search-form">
+        <form action={searchAction} method="get" class="search-form-animated" id="sp-search-form">
           <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
           <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn">
             <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
@@ -261,7 +261,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   }
 
   /* ================================================= */
-  /* ▼▼▼ PC版・共通のスタイル（順番を上に移動しました）▼▼▼ */
+  /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
   /* ================================================= */
 
   .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
@@ -271,11 +271,10 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .pc-header-top { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 14px 15px; }
   .pc-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
 
-  /* 検索窓の共通アニメーション */
   .search-form-animated { 
     display: flex; 
     align-items: center; 
-    justify-content: flex-end; /* 右寄せをベースにする */
+    justify-content: flex-end; 
   }
   .search-input-animated {
     width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
@@ -346,7 +345,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
 
   /* ================================================= */
-  /* ▼▼▼ スマホ版専用のスタイル（一番下に移動しました）▼▼▼ */
+  /* ▼▼▼ スマホ版専用のスタイル ▼▼▼ */
   /* ================================================= */
   
   .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; }
@@ -362,20 +361,20 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-header-top { 
     padding: 12px 14px; 
     align-items: center; 
-    overflow: hidden; /* 右への突き抜けを完全に防止 */
+    overflow: hidden; 
   }
-  .sp-logo-image { width: 120px; }
   
-  /* ▼修正：絶対に右端に固定する強力な設定 */
+  /* ▼修正：ロゴのサイズを大きく（150px）戻しました！ */
+  .sp-logo-image { width: 150px; }
+  
   .sp-right-area { 
     gap: 8px; 
     position: relative; 
     flex: 1; 
     min-width: 0; 
-    align-items: flex-end !important; /* 絶対に右揃えにする */
+    align-items: flex-end !important; 
   }
   
-  /* ▼修正：スマホ版の検索窓が PC版の「200px」に上書きされないよう !important で守る */
   .sp-search-input { height: 32px !important; box-sizing: border-box; }
   .sp-search-input.active { 
     width: 140px !important; 
@@ -388,7 +387,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-weather-widget { 
     display: flex; 
     align-items: center; 
-    justify-content: flex-end; /* 天気も右揃え */
+    justify-content: flex-end; 
     gap: 4px; 
     text-decoration: none; 
     margin-top: 4px; 
