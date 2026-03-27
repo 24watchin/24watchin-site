@@ -1,0 +1,216 @@
+---
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+import { langCountryPairs } from '../lib/siteRoutes.ts';
+import '../styles/global.css';
+
+// 今は通常のHeaderを読み込みます（次のステップで専用ヘッダーに差し替えます！）
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CookieBanner from '../components/CookieBanner.astro';
+
+const {
+  title,
+  description,
+  allPosts = [],
+  ogImage,
+  ogType = 'website',
+} = Astro.props;
+
+const SITE_URL = 'https://24watchin.com';
+const DEFAULT_OG_IMAGE = `${SITE_URL}/images/ogp.png`;
+
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || '';
+
+const canonicalUrl = `${SITE_URL}${currentPath}`;
+const ogImageUrl = ogImage || DEFAULT_OG_IMAGE;
+
+const localeKeyMap = {
+  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
+  'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
+};
+const localeKey = (localeKeyMap[lang as keyof typeof localeKeyMap] || 'jp') as keyof typeof categoryLabelMap;
+const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
+
+const ogLocaleMap: Record<string, string> = {
+  ja: 'ja_JP', en: 'en_US', 'zh-cn': 'zh_CN', 'zh-tw': 'zh_TW',
+  es: 'es_ES', fr: 'fr_FR', de: 'de_DE', ru: 'ru_RU',
+};
+const ogLocale = ogLocaleMap[lang] || 'ja_JP';
+
+const defaultDescriptions: Record<string, string> = {
+  ja: '海外で暮らす方々に、現地のニュースを母国語で。世界各地の最新情報をわかりやすく解説するグローバルニュースメディア、24Watchinです。',
+  en: 'News from around the world, in your language. 24Watchin delivers the latest local news and stories, clearly explained for international residents.',
+  de: 'Nachrichten aus aller Welt in Ihrer Sprache. 24Watchin liefert aktuelle lokale Nachrichten und Berichte, verständlich erklärt.',
+  fr: "L'actualité du monde entier dans votre langue. 24Watchin vous propose les dernières informations locales, expliquées clairement.",
+  es: 'Noticias de todo el mundo en tu idioma. 24Watchin ofrece las últimas noticias locales explicadas de forma clara y sencilla.',
+  ru: 'Новости со всего мира на вашем языке. 24Watchin доставляет актуальные местные новости, понятно объяснённые для иностранцев.',
+  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂的本地新闻与深度解说。',
+  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂的本地新聞與深度解說。',
+};
+
+const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
+const metaTitle = title ? `${title} | 24Watchin` : '24Watchin';
+const bodyStyle = '--theme-color: ' + themeColor + ';';
+
+const restPath = pathParts.slice(2).join('/');
+const restPathStr = restPath ? '/' + restPath + '/' : '/';
+
+const hreflangLinks = country
+  ? langCountryPairs
+      .filter(pair => pair.country === country)
+      .map(pair => ({
+        lang: pair.lang,
+        url: `${SITE_URL}/${pair.lang}/${country}${restPathStr}`,
+      }))
+  : [];
+
+const xDefaultUrl = country
+  ? `${SITE_URL}/ja/${country}${restPathStr}`
+  : `${SITE_URL}/ja/`;
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "24Watchin",
+  "url": SITE_URL,
+  "description": defaultDescriptions[lang] || defaultDescriptions['en'],
+  "inLanguage": lang,
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${SITE_URL}/${lang}/search?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsMediaOrganization",
+  "name": "24Watchin",
+  "legalName": "The Dexent Media Enterprises",
+  "url": SITE_URL,
+  "logo": {
+    "@type": "ImageObject",
+    "url": `${SITE_URL}/images/logo-24watchin.png`,
+    "width": 701,
+    "height": 200
+  },
+  "image": `${SITE_URL}/images/ogp.png`,
+  "description": defaultDescriptions['en'],
+  "email": "24watchin.info@gmail.com",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "24watchin.info@gmail.com",
+    "contactType": "customer support",
+    "availableLanguage": ["Japanese", "English", "Chinese", "German", "French", "Spanish", "Russian"]
+  },
+  "sameAs": [
+    "https://x.com/24watchin_ja",
+    "https://www.facebook.com/24watchin.ja/"
+  ],
+  "foundingDate": "2024",
+  "publishingPrinciples": `${SITE_URL}/ja/jp/info/corrections/`,
+  "actionableFeedbackPolicy": `${SITE_URL}/ja/jp/info/contact/`,
+};
+---
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{metaTitle}</title>
+    <meta name="description" content={metaDescription} />
+    <meta name="google-site-verification" content="rCdn1xS0NRhpAQ2jHt2RMGu7wvh1FvF2ePGznFolTZU" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <link rel="canonical" href={canonicalUrl} />
+
+    {hreflangLinks.map(link => (
+      <link rel="alternate" hreflang={link.lang} href={link.url} />
+    ))}
+    {hreflangLinks.length > 0 && (
+      <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+    )}
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={metaTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:site_name" content="24Watchin" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={metaTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D9WC22D3LC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-D9WC22D3LC');
+    </script>
+
+    <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+
+    <slot name="head" />
+
+    <style>
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        width: 100%;
+        overflow-x: hidden;
+      }
+      body { font-family: sans-serif; background-color: #f8f9fa; color: #333; }
+      .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+      .page-shell { margin-top: 30px; }
+      
+      /* ▼ 言語ページ専用：サイドバーを完全に消して、100%幅の1カラムにします ▼ */
+      .main-layout { display: block; width: 100%; }
+      .content-area { display: block; width: 100%; min-width: 0; margin: 0; padding: 0; }
+      
+      .bottom-wide { margin-top: 20px; width: 100%; }
+      @media (max-width: 640px) { .container { padding: 0 14px; } }
+    </style>
+  </head>
+  <body style={bodyStyle}>
+    <Header />
+    
+    <div class="container page-shell">
+      <slot name="top-full" />
+      <div class="main-layout">
+        <main class="content-area">
+          <slot />
+        </main>
+      </div>
+      <div class="bottom-wide">
+        <slot name="bottom-wide" />
+      </div>
+    </div>
+    
+    <Footer allPosts={allPosts} />
+    <CookieBanner />
+    
+    <script is:inline>
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      document.querySelectorAll('img').forEach(img => { img.setAttribute('loading', 'lazy'); });
+    </script>
+  </body>
+</html>
