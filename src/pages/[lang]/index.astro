@@ -14,14 +14,22 @@ const { lang } = Astro.params;
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId(lang);
 
-let allPosts = globalThis.bloggerPostsCache || [];
+// ▼ 【修正】「一時保存の箱」を言語ごとに分けました！
+if (!globalThis.bloggerPostsCache) {
+  globalThis.bloggerPostsCache = {};
+}
+
+// 今見ている言語の箱から記事を取り出します
+let allPosts = globalThis.bloggerPostsCache[lang] || [];
+
+// もしその言語の箱が空っぽだったら、Bloggerから取得して箱に入れます
 if (allPosts.length === 0 && API_KEY && BLOG_ID) {
   const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
   const response = await fetch(url).catch(() => null);
   if (response && response.ok) {
     const data = await response.json();
     allPosts = data.items || [];
-    globalThis.bloggerPostsCache = allPosts;
+    globalThis.bloggerPostsCache[lang] = allPosts; // 取ってきた記事をその言語の箱にしまいます
   }
 }
 
@@ -56,8 +64,6 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
 
 <style>
   .lang-top-page { max-width: 1200px; margin: 0 auto; padding: 0 0 40px 0; }
-  
-  /* ▼ 修正1：30pxから15pxに縮めて、全体の隙間を狭くしました */
   .lang-page-content { display: flex; flex-direction: column; gap: 15px; }
   
   .ad-space-horizontal {
@@ -70,7 +76,6 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
     justify-content: center;
     color: #999999;
     font-size: 14px;
-    /* ▼ 修正2：広告が持っていた独自の余白をゼロにしました */
     margin: 0;
     overflow: hidden;
   }
@@ -78,7 +83,6 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
 
   @media (max-width: 768px) {
     .lang-top-page { padding: 0 0 20px 0; }
-    /* ▼ 修正3：スマホの時はさらに狭くします */
     .lang-page-content { gap: 10px; }
     .ad-space-horizontal { min-height: 50px; }
   }
