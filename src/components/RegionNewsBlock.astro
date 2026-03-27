@@ -43,7 +43,7 @@ const getDisplayCategory = (post) => {
   const exactMatch = labels.find(label => validCategoryNames.includes(label));
   if (exactMatch) return exactMatch;
 
-  // ▼ 次にkeywordsで部分一致を確認（例：タグ「エンタメ」→ keyword「エンタメ」→ label「文化・エンタメ」）
+  // ▼ 次にkeywordsで部分一致を確認
   for (const cat of langConfig.allCategories) {
     const keywordMatch = labels.some(label =>
       cat.keywords.some(key => label.includes(key))
@@ -51,7 +51,7 @@ const getDisplayCategory = (post) => {
     if (keywordMatch) return cat.label;
   }
 
-  // ▼ どちらも見つからなければデフォルト表示（記事タグは表示しない！）
+  // ▼ どちらも見つからなければデフォルト表示
   return defaultCategoryLabel[lang] || defaultCategoryLabel['en'];
 };
 ---
@@ -65,7 +65,10 @@ const getDisplayCategory = (post) => {
   <div class="city-groups">
     {cityData.map((city) => (
       <div class="city-block">
-        <h3 class="city-name">{city.name}</h3>
+        {/* ▼ 【修正1】 国名をリンク化し、その言語のトップページへ飛ぶようにしました */}
+        <h3 class="city-name">
+          <a href={`/${lang}/${city.code}/`}>{city.name} <span class="link-arrow">&gt;</span></a>
+        </h3>
         <div class="article-3-grid">
           {city.posts.slice(0, 3).map((post) => (
             <a href={`/${lang}/${city.code}/news/${post.id}/`} class="news-item">
@@ -98,9 +101,17 @@ const getDisplayCategory = (post) => {
   .region-line { width: 100%; height: 3px; background: var(--theme-color, #872732); }
   .city-groups { display: flex; flex-direction: column; gap: 8px; }
   .city-block { width: 100%; padding: 4px 0; }
+  
+  /* ▼ 国名リンクのデザイン設定 */
   .city-name { font-size: 15px; font-weight: bold; color: #333333; margin: 0 0 8px 0; padding-left: 8px; border-left: 4px solid #d9d9d9; }
+  .city-name a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .city-name a:hover { color: var(--theme-color, #872732); }
+  .link-arrow { font-size: 13px; font-weight: bold; color: #999; transition: transform 0.2s; }
+  .city-name a:hover .link-arrow { transform: translateX(3px); color: var(--theme-color, #872732); }
+
   .article-3-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
   .news-item { display: flex; align-items: flex-start; gap: 12px; text-decoration: none; color: #111111; }
+  .news-item:hover .news-title { text-decoration: underline; text-decoration-color: #111; text-underline-offset: 3px; }
   .media-column { width: 116px; flex-shrink: 0; }
   .thumbnail { width: 116px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 4px; background: #eeeeee; }
   .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
@@ -109,6 +120,13 @@ const getDisplayCategory = (post) => {
   .meta-row { margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
   .category-badge { padding: 1px 6px; background: #4d4d4d; color: #ffffff; font-size: 13px; border-radius: 2px; }
   .post-time { font-size: 12px; color: #8a8a8a; }
+  
   @media (max-width: 1024px) { .article-3-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 700px) { .article-3-grid { grid-template-columns: 1fr; } .media-column, .thumbnail { width: 112px; } }
+  
+  @media (max-width: 700px) { 
+    .article-3-grid { grid-template-columns: 1fr; } 
+    .media-column, .thumbnail { width: 112px; }
+    /* ▼ 【修正2】 スマホの時だけ、国名と記事の間の余白を広げて誤タップを防止します */
+    .city-name { margin-bottom: 20px; }
+  }
 </style>
