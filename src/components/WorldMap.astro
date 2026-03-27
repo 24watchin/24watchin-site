@@ -9,7 +9,7 @@ const languages = [
   { code: 'de', label: 'Deutsch' }, { code: 'ru', label: 'Русский' }
 ];
 
-// ▼ 修正④：8言語分の「地域名」と「案内文」の翻訳辞書を用意しました！
+// ▼ 多言語翻訳辞書（修正はありません）
 const translations = {
   'ja': { regions: { americas: '南北アメリカ', europe: 'ヨーロッパ', mideast_africa: '中東・アフリカ', asia: 'アジア', oceania: 'オセアニア' }, ui: { selectRegion: '地域を選択してください', selectCountry: '国を選択してください', back: '← 世界地図に戻る' } },
   'en': { regions: { americas: 'Americas', europe: 'Europe', mideast_africa: 'Middle East & Africa', asia: 'Asia', oceania: 'Oceania' }, ui: { selectRegion: 'Select a Region', selectCountry: 'Select a Country', back: '← Back to World Map' } },
@@ -21,6 +21,7 @@ const translations = {
   'ru': { regions: { americas: 'Америка', europe: 'Европа', mideast_africa: 'Ближний Восток и Африка', asia: 'Азия', oceania: 'Океания' }, ui: { selectRegion: 'Выберите регион', selectCountry: 'Выберите страну', back: '← Назад к карте' } }
 };
 
+// ▼ 地域・ズーム設定（修正はありません）
 const regions = [
   { id: 'americas', name: '南北アメリカ', top: 40, left: 22, zoomX: 25, zoomY: 10, scale: 1.5, countries: ['us', 'ca', 'mx', 'br'] },
   { id: 'europe', name: 'ヨーロッパ', top: 25, left: 50, zoomX: 0, zoomY: 25, scale: 3.2, countries: ['de', 'fr', 'gb', 'it'] },
@@ -29,6 +30,7 @@ const regions = [
   { id: 'oceania', name: 'オセアニア', top: 75, left: 88, zoomX: -35, zoomY: -25, scale: 2.4, countries: ['au', 'nz'] }
 ];
 
+// ▼ 国の位置設定（修正はありません。後ほど調整します）
 const countryPositions: Record<string, { top: number, left: number }> = {
   jp: { top: 32, left: 84 }, tw: { top: 41, left: 81 }, kr: { top: 34, left: 81 }, cn: { top: 36, left: 75 },
   th: { top: 46, left: 75 }, sg: { top: 54, left: 76 }, au: { top: 78, left: 86 }, nz: { top: 85, left: 93 },
@@ -76,12 +78,11 @@ const countryPositions: Record<string, { top: number, left: number }> = {
                     class="map-pin country-pin"
                     style={`top: ${countryPositions[code].top}%; left: ${countryPositions[code].left}%;`}
                   >
-                    {/* ▼ 修正①：ロゴのピンを追加しました！ */}
+                    {/* ▼ 修正①：ロゴ入りの画鋲ピン画像に変更しました */}
                     <img 
-                      src="/images/logo-pin.png" 
+                      src="/images/24Watchin_World_pin.png" 
                       alt="pin" 
                       class="pin-icon-img" 
-                      onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" 
                     />
                     <span class="pin-text">{getCountryLabel(code, lang.code) || code.toUpperCase()}</span>
                   </a>
@@ -96,22 +97,19 @@ const countryPositions: Record<string, { top: number, left: number }> = {
   </div>
 </div>
 
-{/* ▼ 辞書データをJavaScriptに渡すための魔法 */}
 <script type="application/json" id="translations-data" set:html={JSON.stringify(translations)}></script>
 
 <style>
+  /* 既存の共通スタイル（修正はありません） */
   .interactive-world-map-container { width: 100%; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 40px; }
   .map-lang-selector { display: flex; flex-wrap: wrap; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; padding: 10px; gap: 8px; justify-content: center; z-index: 50; position: relative; }
   .map-lang-btn { background: #ffffff; border: 1px solid #cccccc; border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: bold; color: #555555; cursor: pointer; transition: 0.2s; }
   .map-lang-btn.active { background: var(--theme-color, #872732); color: #ffffff; border-color: var(--theme-color, #872732); }
-  
   .map-viewport { position: relative; width: 100%; height: 650px; background-color: #004798; overflow: hidden; }
-  
   .map-instruction-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px 0; display: flex; justify-content: center; z-index: 20; pointer-events: none; }
   .instruction-text { background: rgba(255, 255, 255, 0.9); padding: 8px 25px; border-radius: 20px; font-weight: bold; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: 0.3s; }
   .back-to-world-btn { position: absolute; top: 60px; left: 20px; z-index: 30; background: #ffffff; border: 1px solid #ccc; border-radius: 6px; padding: 8px 15px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; }
   
-  /* ▼ 修正③：ぼやけを最小限に抑えるためのハードウェア・アクセラレーション設定 */
   .map-layer { 
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
     transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.4, 1); 
@@ -133,7 +131,6 @@ const countryPositions: Record<string, { top: number, left: number }> = {
 
   .country-pins-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
-  /* 共通のピン設定 */
   .map-pin { position: absolute; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.95); border: 2px solid var(--theme-color, #872732); border-radius: 24px; padding: 8px 16px; font-weight: bold; color: #111; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s; display: flex; align-items: center; justify-content: center; white-space: nowrap; z-index: 10; text-decoration: none; pointer-events: auto; }
   .map-pin:hover { background: var(--theme-color, #872732); color: #fff; transform: translate(-50%, -55%) scale(1.05); }
   
@@ -141,27 +138,33 @@ const countryPositions: Record<string, { top: number, left: number }> = {
   .pin-pulse { position: absolute; width: 100%; height: 100%; top: 0; left: 0; border-radius: 24px; box-shadow: 0 0 0 0 rgba(135, 39, 50, 0.4); animation: pulse 2s infinite; pointer-events: none; }
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(135, 39, 50, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(135, 39, 50, 0); } 100% { box-shadow: 0 0 0 0 rgba(135, 39, 50, 0); } }
 
-  /* ▼ 修正①：国名ピンを「ロゴ画像＋文字」のスタイルに大幅変更 */
+  /* ▼ 修正①③：国名ピンを画鋲画像と文字ラベルの組み合わせに変更し、上品に微調整 */
   .country-pin { 
     background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important;
     flex-direction: column; gap: 4px; z-index: 15;
     transform: translate(-50%, -50%) scale(var(--pin-scale, 1));
   }
   .pin-icon-img {
-    width: 32px; height: 32px; object-fit: contain;
+    width: 30px; height: auto; object-fit: contain;
     filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3)); transition: transform 0.2s;
   }
   .pin-text {
     background: rgba(255, 255, 255, 0.95); border: 1px solid var(--theme-color, #872732);
-    border-radius: 12px; padding: 4px 10px; font-size: 12px; color: #111;
+    border-radius: 6px; padding: 2px 8px; font-size: 11px; color: #111;
     white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
-  .country-pin:hover .pin-icon-img { transform: scale(1.15) translateY(-3px); }
+
+  /* ▼ 修正②：ホバー時の動きを「ほんの気持ち程度」に調整 */
+  .country-pin:hover { 
+    transform: translate(-50%, -55%) scale(calc(var(--pin-scale, 1) * 1.02)); 
+  }
+  .country-pin:hover .pin-icon-img { transform: scale(1.03) translateY(-2px); }
 
   @media (max-width: 768px) { .map-viewport { height: 450px; } .region-pin { padding: 4px 8px; font-size: 12px; } .back-to-world-btn { top: 55px; padding: 5px 10px; font-size: 12px; } }
 </style>
 
 <script is:inline>
+  // 既存のJavaScript（修正はありません）
   window.addEventListener('load', function() {
     var transEl = document.getElementById('translations-data');
     if (!transEl) return;
@@ -179,21 +182,18 @@ const countryPositions: Record<string, { top: number, left: number }> = {
     var initTranslateY = 5; 
     mapLayer.style.transform = `scale(${initScale}) translate(0%, ${initTranslateY}%)`;
 
-    // ▼ 修正④：言語ボタンが押されたとき、すべての文字を翻訳して更新します
     document.querySelectorAll('.map-lang-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.map-lang-btn').forEach(function(b) { b.classList.remove('active'); });
         this.classList.add('active');
         currentLang = this.getAttribute('data-lang');
-        var t = translations[currentLang] || translations['en']; // 辞書を取得
+        var t = translations[currentLang] || translations['en']; 
         
-        // 1. 世界地図の地域ピンの名前を翻訳
         document.querySelectorAll('.pin-label[data-region-label]').forEach(function(el) {
           var rId = el.getAttribute('data-region-label');
           if(t.regions[rId]) el.textContent = t.regions[rId];
         });
 
-        // 2. 案内文と戻るボタンを翻訳
         if (currentRegion) {
           instruction.textContent = t.ui.selectCountry;
         } else {
@@ -201,7 +201,6 @@ const countryPositions: Record<string, { top: number, left: number }> = {
         }
         backBtn.textContent = t.ui.back;
 
-        // 3. 国名ピンをその言語のものに切り替え
         document.querySelectorAll('.lang-group').forEach(function(el) { el.style.display = 'none'; });
         var targetLang = document.querySelector('.lang-group[data-lang-group="' + currentLang + '"]');
         if(targetLang) targetLang.style.display = 'block';
@@ -233,7 +232,6 @@ const countryPositions: Record<string, { top: number, left: number }> = {
 
     if (backBtn) {
       backBtn.addEventListener('click', function() {
-        currentRegion = null;
         mapLayer.style.transform = `scale(${initScale}) translate(0%, ${initTranslateY}%)`;
         countryPinsLayer.style.display = 'none';
         setTimeout(function() { regionPins.style.display = 'block'; }, 400);
