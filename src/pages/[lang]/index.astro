@@ -1,5 +1,4 @@
 ---
-// ▼ 専用のレイアウトと、新しく作った「言語トップ専用のメインニュース」を読み込みます
 import LanguageTopLayout from '../../layouts/LanguageTopLayout.astro';
 import LanguageTopMainNews from '../../components/LanguageTopMainNews.astro';
 import GlobalRegionNews from '../../components/GlobalRegionNews.astro';
@@ -12,7 +11,6 @@ export async function getStaticPaths() {
 
 const { lang } = Astro.params;
 
-// ▼ 記事データをBloggerから取得する処理
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId(lang);
 
@@ -44,16 +42,12 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
   <main class="lang-top-page" style={`--theme-color: ${themeColor};`}>
     
     <div class="lang-page-content">
-      {/* 1. 一番上のメインニュース（専用部品に切り替えました！） */}
       <LanguageTopMainNews lang={lang} posts={allPosts} />
       
-      {/* 2. 横長の広告スペース */}
       <div class="ad-space-horizontal">
         <span class="ad-label">Advertisement</span>
-        {/* ※後ほど、この中にGoogle AdSenseのコードを貼り付けます */}
       </div>
 
-      {/* 3. 各国のニュース一覧（24Watchin Global News） */}
       <GlobalRegionNews lang={lang} allPosts={allPosts} />
     </div>
 
@@ -61,11 +55,11 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
 </LanguageTopLayout>
 
 <style>
-  /* ページの余白設定 */
   .lang-top-page { max-width: 1200px; margin: 0 auto; padding: 0 0 40px 0; }
-  .lang-page-content { display: flex; flex-direction: column; gap: 30px; }
   
-  /* ▼ 広告スペースの仮デザイン（グレーの枠線） */
+  /* ▼ 修正1：30pxから15pxに縮めて、全体の隙間を狭くしました */
+  .lang-page-content { display: flex; flex-direction: column; gap: 15px; }
+  
   .ad-space-horizontal {
     width: 100%;
     min-height: 90px;
@@ -76,15 +70,16 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
     justify-content: center;
     color: #999999;
     font-size: 14px;
-    margin: 10px 0;
+    /* ▼ 修正2：広告が持っていた独自の余白をゼロにしました */
+    margin: 0;
     overflow: hidden;
   }
   .ad-label { letter-spacing: 1px; }
 
-  /* スマホ版の調整 */
   @media (max-width: 768px) {
     .lang-top-page { padding: 0 0 20px 0; }
-    .lang-page-content { gap: 20px; }
+    /* ▼ 修正3：スマホの時はさらに狭くします */
+    .lang-page-content { gap: 10px; }
     .ad-space-horizontal { min-height: 50px; }
   }
 </style>
