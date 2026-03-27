@@ -1,8 +1,5 @@
 ---
-// ▼ 【変更点】 新しく作った専用のレイアウト（LanguageTopLayout）を読み込みます
 import LanguageTopLayout from '../../layouts/LanguageTopLayout.astro';
-
-// まだ古い部品を読み込んでいます（後で専用のものに差し替えます！）
 import MainNewsLayout from '../../components/MainNewsLayout.astro';
 import GlobalRegionNews from '../../components/GlobalRegionNews.astro';
 import { langCountryPairs, getBlogId } from '../../lib/siteRoutes.ts';
@@ -14,7 +11,6 @@ export async function getStaticPaths() {
 
 const { lang } = Astro.params;
 
-// ▼ 記事データをBloggerから取得する処理
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId(lang);
 
@@ -42,17 +38,20 @@ const langLabels: Record<string, string> = {
 const pageTitle = langLabels[lang] || 'Latest Global News';
 ---
 
-{/* ▼ Layout ではなく LanguageTopLayout を使って画面を作ります */}
 <LanguageTopLayout title={pageTitle}>
   <main class="lang-top-page" style={`--theme-color: ${themeColor};`}>
     
-    <header class="lang-page-header">
-      <h1 class="lang-page-title">{pageTitle}</h1>
-    </header>
-
     <div class="lang-page-content">
-      {/* 取得した記事（allPosts）を渡すことで、とりあえずニュースが表示されます */}
+      {/* 1. 一番上のメインニュース */}
       <MainNewsLayout lang={lang} posts={allPosts} />
+      
+      {/* 2. ▼ ここに横長の広告スペースを追加しました ▼ */}
+      <div class="ad-space-horizontal">
+        <span class="ad-label">Advertisement</span>
+        {/* ※後ほど、この中にGoogle AdSenseのコードを貼り付けます */}
+      </div>
+
+      {/* 3. 各国のニュース一覧（24Watchin Global News） */}
       <GlobalRegionNews lang={lang} allPosts={allPosts} />
     </div>
 
@@ -60,15 +59,30 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
 </LanguageTopLayout>
 
 <style>
-  .lang-top-page { max-width: 1200px; margin: 0 auto; padding: 20px; }
-  .lang-page-header { background-color: var(--theme-color); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 30px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  .lang-page-title { margin: 0; font-size: 1.5rem; font-weight: bold; letter-spacing: 1px; }
-  .lang-page-content { display: flex; flex-direction: column; gap: 40px; }
+  /* ページの余白を少しスッキリさせました */
+  .lang-top-page { max-width: 1200px; margin: 0 auto; padding: 0 0 40px 0; }
+  .lang-page-content { display: flex; flex-direction: column; gap: 30px; }
   
+  /* ▼ 広告スペースの仮デザイン（グレーの枠線） */
+  .ad-space-horizontal {
+    width: 100%;
+    min-height: 90px; /* パソコンでよくある横長広告の高さ */
+    background-color: #f8f9fa;
+    border: 1px dashed #cccccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999999;
+    font-size: 14px;
+    margin: 10px 0;
+    overflow: hidden;
+  }
+  .ad-label { letter-spacing: 1px; }
+
+  /* スマホ版の調整 */
   @media (max-width: 768px) {
-    .lang-top-page { padding: 10px; }
-    .lang-page-header { padding: 10px 15px; margin-bottom: 20px; }
-    .lang-page-title { font-size: 1.2rem; }
+    .lang-top-page { padding: 0 0 20px 0; }
     .lang-page-content { gap: 20px; }
+    .ad-space-horizontal { min-height: 50px; } /* スマホ向けに高さを小さく */
   }
 </style>
