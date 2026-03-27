@@ -9,13 +9,13 @@ const languages = [
   { code: 'de', label: 'Deutsch' }, { code: 'ru', label: 'Русский' }
 ];
 
-// ▼ 修正①：倍率（scale）を少し下げて「引きの絵」にし、上下がしっかり入るようにしました！
+// ▼ ヨーロッパの拡大と、各地域の上下（zoomY）を少しずつ調整しました
 const regions = [
   { id: 'americas', name: '南北アメリカ', top: 40, left: 22, zoomX: 25, zoomY: 5, scale: 1.5, countries: ['us', 'ca', 'mx', 'br'] },
-  { id: 'europe', name: 'ヨーロッパ', top: 25, left: 50, zoomX: 0, zoomY: 15, scale: 2.6, countries: ['de', 'fr', 'gb', 'it'] },
-  { id: 'mideast_africa', name: '中東・アフリカ', top: 55, left: 55, zoomX: -5, zoomY: -5, scale: 1.8, countries: ['ae', 'tr', 'eg', 'za'] },
+  { id: 'europe', name: 'ヨーロッパ', top: 25, left: 50, zoomX: 0, zoomY: 25, scale: 3.2, countries: ['de', 'fr', 'gb', 'it'] },
+  { id: 'mideast_africa', name: '中東・アフリカ', top: 55, left: 55, zoomX: -5, zoomY: -15, scale: 1.8, countries: ['ae', 'tr', 'eg', 'za'] },
   { id: 'asia', name: 'アジア', top: 35, left: 78, zoomX: -25, zoomY: 10, scale: 1.9, countries: ['jp', 'tw', 'kr', 'cn', 'th', 'sg'] },
-  { id: 'oceania', name: 'オセアニア', top: 75, left: 88, zoomX: -35, zoomY: -15, scale: 2.4, countries: ['au', 'nz'] }
+  { id: 'oceania', name: 'オセアニア', top: 75, left: 88, zoomX: -35, zoomY: -25, scale: 2.4, countries: ['au', 'nz'] }
 ];
 
 const countryPositions: Record<string, { top: number, left: number }> = {
@@ -26,7 +26,6 @@ const countryPositions: Record<string, { top: number, left: number }> = {
   us: { top: 32, left: 18 }, ca: { top: 20, left: 20 }, mx: { top: 45, left: 18 }, br: { top: 65, left: 32 }
 };
 
-// ▼ 修正②：国名ピンのデータが確実に作られるように安全対策を強化しました
 const mapData: any = {};
 languages.forEach(lang => {
   mapData[lang.code] = {};
@@ -71,7 +70,6 @@ languages.forEach(lang => {
         ))}
       </div>
       
-      {/* ▼ 国名ピンを載せるための透明なシートです */}
       <div class="country-pins-layer" id="country-pins" style="display: none;"></div>
     </div>
   </div>
@@ -143,7 +141,6 @@ languages.forEach(lang => {
     var instruction = document.getElementById('map-instruction');
     var currentScale = 1;
 
-    // ▼ 修正③：初期状態で地図を「少し拡大して下にずらす」ことで、北極に余白を作り南極をカットします
     var initScale = 1.15;
     var initTranslateY = 5; 
     mapLayer.style.transform = `scale(${initScale}) translate(0%, ${initTranslateY}%)`;
@@ -179,7 +176,6 @@ languages.forEach(lang => {
       backBtn.addEventListener('click', function() {
         currentRegion = null;
         currentScale = initScale;
-        // 戻る時も「少し拡大して下にずらした初期位置」に戻します
         mapLayer.style.transform = `scale(${initScale}) translate(0%, ${initTranslateY}%)`;
         countryPinsLayer.style.display = 'none';
         setTimeout(function() { regionPins.style.display = 'block'; }, 400);
