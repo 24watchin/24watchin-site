@@ -15,3 +15,4 @@ Allow: /
 
 # ▼ サイトマップの場所を明示
 Sitemap: https://24watchin.com/sitemap-index.xml
+Sitemap: https://24watchin.com/news-sitemap.xml
