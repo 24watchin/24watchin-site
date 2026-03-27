@@ -1,0 +1,117 @@
+---
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+
+const { lang = 'ja', title, cityData = [] } = Astro.props;
+
+const getImageUrl = (content) => {
+  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
+};
+
+const localeMap = { ja: 'ja-JP', en: 'en-US', 'zh-cn': 'zh-CN', 'zh-tw': 'zh-TW', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', ru: 'ru-RU' };
+const formatPostTime = (dateString) => {
+  if (!dateString) return '';
+  try {
+    return new Date(dateString).toLocaleString(localeMap[lang] || 'en-US', {
+      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
+  } catch { return ''; }
+};
+---
+
+<section class="root-region-section">
+  <div class="region-header">
+    <h2 class="region-title">{title}</h2>
+    <div class="region-line"></div>
+  </div>
+
+  <div class="city-groups">
+    {cityData.map((city) => (
+      <div class="city-block">
+        <h3 class="city-name">
+          <a href={`/${lang}/${city.code}/`}>{city.name} <span class="link-arrow">&gt;</span></a>
+        </h3>
+        
+        <div class="news-1-plus-2-layout">
+          {/* ▼ 左側：大きな記事（1記事目） */}
+          {city.posts[0] && (
+            <a href={`/${lang}/${city.code}/news/${city.posts[0].id}/`} class="hero-post">
+              <div class="hero-image">
+                <img src={getImageUrl(city.posts[0].content)} alt={city.posts[0].title} />
+              </div>
+              <div class="hero-info">
+                <h4 class="hero-title">{city.posts[0].title}</h4>
+                <span class="post-time">{formatPostTime(city.posts[0].published)}</span>
+              </div>
+            </a>
+          )}
+
+          {/* ▼ 右側：小さな記事の縦並び（2・3記事目） */}
+          <div class="side-posts">
+            {city.posts.slice(1, 3).map((post) => (
+              <a href={`/${lang}/${city.code}/news/${post.id}/`} class="side-post">
+                <div class="side-image">
+                  <img src={getImageUrl(post.content)} alt={post.title} />
+                </div>
+                <div class="side-info">
+                  <h5 class="side-title">{post.title}</h5>
+                  <span class="post-time">{formatPostTime(post.published)}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .root-region-section { width: 100%; margin-bottom: 30px; }
+  .region-header { margin-bottom: 16px; }
+  .region-title { margin: 0 0 6px; font-size: 22px; font-weight: 800; color: #111111; border-left: 6px solid var(--theme-color, #872732); padding-left: 14px; line-height: 1.1; }
+  .region-line { width: 100%; height: 2px; background: #e5e5e5; margin-top: 10px; }
+  
+  .city-groups { display: flex; flex-direction: column; gap: 24px; }
+  .city-block { width: 100%; padding: 4px 0; }
+  
+  .city-name { font-size: 16px; font-weight: bold; color: #333333; margin: 0 0 12px 0; padding-left: 10px; border-left: 4px solid #cccccc; }
+  .city-name a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .city-name a:hover { color: var(--theme-color, #872732); }
+  .link-arrow { font-size: 14px; color: #999; transition: transform 0.2s; }
+  .city-name a:hover .link-arrow { transform: translateX(3px); color: var(--theme-color, #872732); }
+
+  /* ▼ 「1大＋2小」の黄金レイアウト設定 */
+  .news-1-plus-2-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  /* 左側の大きな記事 */
+  .hero-post { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: #111; }
+  .hero-image { aspect-ratio: 16 / 9; overflow: hidden; border-radius: 6px; background: #eee; }
+  .hero-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+  .hero-post:hover .hero-image img { transform: scale(1.03); }
+  .hero-title { margin: 0; font-size: 18px; line-height: 1.4; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .hero-post:hover .hero-title { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* 右側の小さな記事たち */
+  .side-posts { display: flex; flex-direction: column; gap: 16px; justify-content: flex-start; }
+  .side-post { display: flex; gap: 12px; text-decoration: none; color: #111; align-items: flex-start; }
+  .side-image { width: 120px; aspect-ratio: 16 / 10; flex-shrink: 0; overflow: hidden; border-radius: 4px; background: #eee; }
+  .side-image img { width: 100%; height: 100%; object-fit: cover; }
+  .side-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  .side-title { margin: 0 0 4px 0; font-size: 14px; line-height: 1.4; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .side-post:hover .side-title { text-decoration: underline; text-underline-offset: 3px; }
+
+  .post-time { font-size: 13px; color: #8a8a8a; font-family: "Helvetica Neue", Arial, sans-serif; font-variant-numeric: normal; font-feature-settings: "zero" 0; }
+
+  /* スマホ版では縦1列に並べ替えます */
+  @media (max-width: 768px) {
+    .news-1-plus-2-layout { grid-template-columns: 1fr; gap: 16px; }
+    .side-image { width: 100px; }
+    .hero-title { font-size: 16px; }
+  }
+</style>
