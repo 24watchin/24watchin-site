@@ -1,0 +1,549 @@
+---
+import { categoryLabelMap, type SiteLanguageKey } from '../lib/categoryLabels';
+import { langCountryPairs } from '../lib/siteRoutes.ts';
+import { getCountryLabel } from '../lib/countryData.ts';
+import RegionLangPanel from './RegionLangPanel.astro';
+
+import { getWeatherCondition, getUnitSystem, convertTemp } from '../lib/weatherConditions';
+import { countryCityMap } from '../lib/cityConfig';
+
+const SPACE_ID = import.meta.env.CONTENTFUL_SPACE_ID;
+const DELIVERY_TOKEN = import.meta.env.CONTENTFUL_DELIVERY_TOKEN;
+const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+
+// ▼ 【修正1】左上に表示する「言語名」の設定
+const langNameMap: Record<string, string> = {
+  ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文',
+  es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский'
+};
+const topLangLabel = langNameMap[lang] || 'English';
+
+const SITE_ID = 'jp-ja'; 
+const SLOT = 'header_words';
+
+type HeaderWord = { label: string; url: string; displayOrder: number; };
+let headerWords: HeaderWord[] = [];
+
+if (SPACE_ID && DELIVERY_TOKEN) {
+  try {
+    const params = new URLSearchParams({ content_type: 'headerWord', 'fields.siteId': SITE_ID, 'fields.slot': SLOT, 'fields.enabled': 'true', order: 'fields.displayOrder', limit: '20' });
+    const res = await fetch(`https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`, { headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` } });
+    if (res.ok) {
+      const data = await res.json();
+      headerWords = (data.items ?? []).map((item: any) => ({ label: item?.fields?.label ?? '', url: item?.fields?.url ?? '#', displayOrder: Number(item?.fields?.displayOrder ?? 9999), enabled: item?.fields?.enabled ?? false, siteId: item?.fields?.siteId ?? '', slot: item?.fields?.slot ?? '' }))
+        .filter((item: any) => item.enabled === true && item.siteId === SITE_ID && item.slot === SLOT && item.label)
+        .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+        .map((item: any) => ({ label: item.label, url: item.url, displayOrder: item.displayOrder }));
+    }
+  } catch (e) { headerWords = []; }
+}
+
+const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
+const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
+const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+
+const searchAction = '/' + lang + '/search/';
+
+// ▼ 【修正2】この言語に対応している国のリストを取得（ドロップダウン用）
+const availableCountries = langCountryPairs
+  .filter(pair => pair.lang === lang)
+  .map(pair => ({
+    code: pair.country,
+    name: getCountryLabel(pair.country, lang)
+  }));
+
+const categoryItems = (labels.headerCategories || []).map((item) => {
+  return { label: item.label, slug: item.slug };
+});
+
+const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
+const moreSlugs = moreSlugsMap[localeKey] || [];
+const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
+const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
+
+// ▼ スマホ用の天気のデフォルト設定（利用可能な最初の国を表示）
+const defaultCountryForWeather = availableCountries.length > 0 ? availableCountries[0].code : 'jp';
+const cities = countryCityMap[defaultCountryForWeather] || countryCityMap['jp'];
+const { isImperial, tempUnit } = getUnitSystem(lang);
+
+if (!globalThis.weatherCache) globalThis.weatherCache = {};
+const allCityWeather: Record<string, any> = {};
+for (const city of cities) {
+  const cityKey = city.key;
+  const now = Date.now();
+  const CACHE = 30 * 60 * 1000;
+  if (globalThis.weatherCache[cityKey] && (now - globalThis.weatherCache[cityKey].time < CACHE)) {
+    allCityWeather[cityKey] = globalThis.weatherCache[cityKey].data;
+  } else if (WEATHER_API_KEY) {
+    try {
+      const url = 'https://api.weatherapi.com/v1/current.json?key=' + WEATHER_API_KEY + '&q=' + cityKey + '&aqi=no';
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        allCityWeather[cityKey] = data;
+        globalThis.weatherCache[cityKey] = { data, time: now };
+      }
+    } catch (e) {}
+  }
+}
+
+const cityDataForJs = cities.map((city: any) => {
+  const wd = allCityWeather[city.key];
+  const current = wd?.current;
+  const conditionCode = current?.condition?.code;
+  const iconUrl = current?.condition?.icon ? 'https:' + current.condition.icon : '';
+  return {
+    key: city.key,
+    displayName: city.display[lang] || city.display['en'] || city.key,
+    temp: current ? convertTemp(current.temp_c, isImperial) : null,
+    feelsLike: current ? convertTemp(current.feelslike_c, isImperial) : null,
+    iconUrl,
+    conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
+  };
+});
+const defaultWeatherData = cityDataForJs[0] || null;
+---
+
+<div class="header-pc-wrapper">
+  <div class="pc-top-gray-bar">
+    <div class="pc-top-gray-inner">
+      {/* ▼ 【修正1】 国名ではなく言語名を表示します */}
+      <span class="pc-top-country">{topLangLabel}</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-top pc-header-top">
+      <div class="brand-area">
+        <a href={`/${lang}/`} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image" /></a>
+      </div>
+      <div class="right-area pc-right-area">
+        <form action={searchAction} method="get" class="search-form-animated" id="pc-search-form">
+          <input type="text" name="q" class="search-input-animated" placeholder={labels.searchPlaceholder} id="pc-search-input" />
+          <button type="button" class="search-icon-btn" id="pc-search-icon-btn">
+            <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+          </button>
+        </form>
+
+        <button type="button" class="region-lang-open-btn" id="pc-region-lang-btn" data-current-lang={lang}>
+          地域 / 言語 <span class="hamburger-icon">&#8803;</span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="category-bar">
+      <div class="category-nav-inner">
+        <button class="scroll-arrow arrow-left" id="pc-arrow-left" type="button">&#8249;</button>
+        <div class="pc-category-group">
+          <div class="category-scroll pc-scroll" id="pc-scroll">
+            {mainItems.map((item) => (
+              {/* ▼ 【修正3】 クリックでドロップダウンが出るようにボタン化 */}
+              <button class="category-link cat-dropdown-trigger" data-slug={item.slug}>
+                <span class="category-link-text">{item.label}</span>
+              </button>
+            ))}
+          </div>
+          {moreItems.length > 0 && (
+            <div class="more-wrapper">
+              <div class="more-btn">
+                {lang === 'ja' ? 'さらに見る' : 'More'}
+                <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+              <div class="more-dropdown">
+                {moreItems.map((item) => (
+                  <button class="more-link cat-dropdown-trigger" data-slug={item.slug}>
+                    <span class="more-link-text">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <button class="scroll-arrow arrow-right" id="pc-arrow-right" type="button">&#8250;</button>
+      </div>
+    </nav>
+
+    <div class="header-word-bar">
+      <div class="header-word-inner">
+        {headerWords.map((item) => (
+          <a href={item.url} class="header-word-link">{item.label}</a>
+        ))}
+      </div>
+    </div>
+    <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
+  </header>
+</div>
+
+
+<div class="header-sp-wrapper">
+  <div class="sp-top-gray-bar">
+    {/* ▼ 【修正1】 国名ではなく言語名を表示します */}
+    <div class="sp-top-country">{topLangLabel}</div>
+    
+    <div class="sp-top-actions">
+      <form action={searchAction} method="get" class="search-form-animated sp-search-form" id="sp-search-form">
+        <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
+        <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn" aria-label="検索">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+        </button>
+      </form>
+
+      <button type="button" class="sp-reload-btn" onclick="window.location.reload();" aria-label="ページを更新">
+        <svg viewBox="0 0 24 24" class="reload-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.32-9.83l5.67 5.67" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      
+      <button type="button" class="region-lang-open-btn sp-region-lang-btn" id="sp-region-lang-btn" data-current-lang={lang}>
+        地域 / 言語 <span class="hamburger-icon">&#8803;</span>
+      </button>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-top sp-header-top">
+      <div class="brand-area sp-brand-area">
+        <a href={`/${lang}/`} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image sp-logo-image" /></a>
+      </div>
+      
+      <div class="right-area sp-right-area">
+        <a href={`/${lang}/${defaultCountryForWeather}/weather/`} class="sp-weather-widget">
+          {defaultWeatherData && defaultWeatherData.temp !== null ? (
+            <>
+              <div class="sp-weather-icon">
+                <img src={defaultWeatherData.iconUrl} alt={defaultWeatherData.conditionText} style="width: 28px; height: 28px; object-fit: contain;" />
+              </div>
+              <div class="sp-weather-info">
+                <span class="sp-weather-loc no-wrap-text">{defaultWeatherData.displayName} &gt;</span>
+                <span class="sp-weather-temp">{defaultWeatherData.temp}{tempUnit} / {defaultWeatherData.feelsLike}{tempUnit}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div class="sp-weather-icon">
+                <i class="fa-solid fa-cloud-sun" style="color: #6b7280; font-size: 20px; margin-top: 4px;"></i>
+              </div>
+              <div class="sp-weather-info">
+                <span class="sp-weather-loc">読込中... &gt;</span>
+                <span class="sp-weather-temp">-- / --</span>
+              </div>
+            </>
+          )}
+        </a>
+      </div>
+    </div>
+
+    <nav class="category-bar sp-category-bar">
+      <div class="category-scroll sp-scroll" id="sp-scroll">
+        {categoryItems.map((item) => (
+          {/* ▼ 【修正3】 クリックでドロップダウンが出るようにボタン化 */}
+          <button class="category-link cat-dropdown-trigger" data-slug={item.slug}>
+            <span class="category-link-text">{item.label}</span>
+          </button>
+        ))}
+        <div class="sp-scroll-padding"></div>
+      </div>
+    </nav>
+
+    <div style="height: 10px; background-color: #ffffff; width: 100%;"></div>
+
+    <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
+  </header>
+</div>
+
+<RegionLangPanel currentLang={lang} currentCountry={defaultCountryForWeather} themeColor={labels.themeColor || '#872732'} />
+
+{/* ▼ 【追加】 クリックしたときに出現する「国名ドロップダウン」の部品です */}
+<div id="cat-country-panel" class="cat-country-panel">
+  <div class="cat-country-panel-inner" id="cat-country-panel-inner"></div>
+</div>
+
+{/* ▼ JSで使えるように国の一覧データを隠しておきます */}
+<script type="application/json" id="lang-top-countries-data" set:html={JSON.stringify(availableCountries)}></script>
+
+<style>
+  /* === PC版とスマホ版の表示切り替えスイッチ === */
+  .header-pc-wrapper { display: block; margin: 0; padding: 0; border-radius: 0; }
+  .header-sp-wrapper { display: none; margin: 0; padding: 0; border-radius: 0; }
+
+  @media (max-width: 768px) { 
+    .header-pc-wrapper { display: none; } 
+    .header-sp-wrapper { display: block; }
+  }
+
+  /* ▼▼▼ 追加：国名ドロップダウンのデザイン ▼▼▼ */
+  .cat-country-panel {
+    display: none;
+    position: absolute;
+    background: #ffffff;
+    border: 2px solid var(--theme-color, #872732);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    z-index: 99999;
+    min-width: 150px;
+    overflow: hidden;
+  }
+  .cat-country-panel.show { display: block; animation: fadeIn 0.2s ease; }
+  .cat-country-link {
+    display: block; padding: 12px 16px; color: #333; text-decoration: none; font-size: 14px; font-weight: bold; border-bottom: 1px solid #eee;
+  }
+  .cat-country-link:last-child { border-bottom: none; }
+  .cat-country-link:hover { background: #f8f9fa; color: var(--theme-color, #872732); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ================================================= */
+  /* PC版・共通のスタイル */
+  /* ================================================= */
+
+  .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
+  .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
+  .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
+  
+  .pc-header-top { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 14px 15px; }
+  .pc-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
+
+  .search-form-animated { display: flex; align-items: center; justify-content: flex-end; }
+  .search-input-animated {
+    width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent; transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0; height: 34px; box-sizing: border-box;
+  }
+  .search-input-animated.active { width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; }
+  .search-icon-btn {
+    width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0; box-sizing: border-box;
+  }
+
+  .region-lang-open-btn { background: none; border: none; color: #000; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0; }
+  .hamburger-icon { font-size: 22px; font-weight: bold; }
+
+  .site-header { width: 100%; background: #ffffff; border-radius: 0 !important; }
+  .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; }
+  .brand-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+  .logo-image { width: 200px; height: auto; }
+  
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; }
+  .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
+  
+  .category-bar { background: #393737; width: 100%; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
+  
+  .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; -webkit-overflow-scrolling: touch; }
+  .category-scroll::-webkit-scrollbar { display: none; }
+
+  /* ▼ リンクからボタンに変更したため、デザインを調整しています */
+  .category-link { 
+    height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; 
+    background: transparent; border: none; cursor: pointer; font-family: inherit; box-sizing: border-box;
+  }
+  
+  .category-link-text, .more-link-text { position: relative; display: inline-block; }
+  .category-link-text::after, .more-link-text::after {
+    content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease;
+  }
+  .category-link:hover .category-link-text::after, .more-link:hover .more-link-text::after { width: 100%; }
+  
+  .more-wrapper { position: relative; flex-shrink: 0; }
+  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
+  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .more-wrapper:hover .more-dropdown { display: block; }
+  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
+  
+  /* ▼ こちらもボタン用に調整 */
+  .more-link { 
+    display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); 
+    background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; font-family: inherit; box-sizing: border-box;
+  }
+
+  .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
+  .scroll-arrow.active { display: flex; }
+
+  .header-word-bar { background: #fff; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
+  .header-word-inner::-webkit-scrollbar { display: none; }
+  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
+  .bottom-line { height: 10px; }
+
+  /* ================================================= */
+  /* スマホ版専用のスタイル */
+  /* ================================================= */
+  
+  .sp-top-gray-bar { 
+    background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative;
+  }
+  .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
+  .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
+  
+  .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+  .reload-icon { width: 14px; height: 14px; color: #333; }
+  
+  .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
+  .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
+
+  .sp-search-form { position: relative; display: flex; align-items: center; }
+  .sp-search-input { 
+    position: absolute; right: 34px; top: 50%; transform: translateY(-50%); width: 0; height: 30px !important; padding: 0 !important; background: #fff; border: 1px solid transparent;
+    border-radius: 8px; opacity: 0; transition: all 0.3s ease; box-sizing: border-box; z-index: 10;
+  }
+  .sp-search-input.active { 
+    width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1;
+  }
+  .sp-search-btn { 
+    width: 28px !important; height: 28px !important; border-radius: 50%; box-sizing: border-box; flex-shrink: 0;
+    background: #fff; border: 1px solid #ccc; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 11;
+  }
+  .sp-search-btn .search-icon { width: 14px; height: 14px; }
+
+  .sp-header-top { padding: 6px 14px; align-items: center; overflow: hidden; }
+  .sp-logo-image { width: 150px; }
+  .sp-right-area { gap: 8px; position: relative; flex: 1; min-width: 0; align-items: flex-end !important; }
+  
+  .sp-weather-widget { display: flex; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; margin-top: 0; overflow: hidden; max-width: 140px; }
+  .sp-weather-icon { display: flex; align-items: center; justify-content: center; width: 28px; flex-shrink: 0; }
+  .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; min-width: 0; }
+  .no-wrap-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right; }
+  .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
+  .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; white-space: nowrap; }
+
+  .sp-category-bar { width: 100%; overflow: hidden; position: relative; }
+  .sp-category-bar::after { content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%; background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%); pointer-events: none; }
+  .sp-scroll { padding-left: 6px; scrollbar-width: none; }
+  .sp-scroll::-webkit-scrollbar { display: none; }
+  .sp-scroll-padding { width: 45px; flex-shrink: 0; }
+
+  @media (max-width: 768px) { 
+    .category-link { font-size: 14px; padding: 0 10px; height: 46px; }
+  }
+</style>
+
+<script is:inline>
+  window.addEventListener('load', function() {
+    // 検索ボタンの動き
+    function setupSearch(btnId, inputId, formId) {
+      var btn = document.getElementById(btnId);
+      var input = document.getElementById(inputId);
+      var form = document.getElementById(formId);
+      if (btn && input && form) {
+        btn.addEventListener('click', function(e) {
+          if (!input.classList.contains('active')) {
+            e.preventDefault();
+            input.classList.add('active');
+            input.focus();
+          } else {
+            if (input.value.trim() === '') {
+              e.preventDefault();
+              input.classList.remove('active');
+            } else {
+              form.submit();
+            }
+          }
+        });
+      }
+    }
+    setupSearch('pc-search-icon-btn', 'pc-search-input', 'pc-search-form');
+    setupSearch('sp-search-icon-btn', 'sp-search-input', 'sp-search-form');
+
+    // 地域/言語パネルの動き
+    function setupRegionPanel(btnId) {
+      var btn = document.getElementById(btnId);
+      var rlPanel = document.getElementById('rl-panel');
+      var rlOverlay = document.getElementById('rl-overlay');
+      if (btn && rlPanel && rlOverlay) {
+        btn.addEventListener('click', function() {
+          rlPanel.classList.add('open');
+          rlOverlay.classList.add('open');
+          var currentLang = btn.getAttribute('data-current-lang');
+          var activeLangBtn = document.querySelector('.rl-lang-btn[data-lang="' + currentLang + '"]');
+          if (activeLangBtn) { activeLangBtn.click(); }
+        });
+      }
+    }
+    setupRegionPanel('pc-region-lang-btn');
+    setupRegionPanel('sp-region-lang-btn');
+
+    // PC版カテゴリの横スクロール矢印
+    var pcScroll = document.getElementById('pc-scroll');
+    var pcBtnLeft = document.getElementById('pc-arrow-left');
+    var pcBtnRight = document.getElementById('pc-arrow-right');
+    function updateArrows() {
+      var width = window.innerWidth;
+      if (pcScroll && pcBtnLeft && pcBtnRight) {
+        if (width > 1000 || width <= 768) {
+          pcBtnLeft.classList.remove('active');
+          pcBtnRight.classList.remove('active');
+        } else {
+          var atLeftPC = pcScroll.scrollLeft <= 5;
+          var atRightPC = pcScroll.scrollLeft >= (pcScroll.scrollWidth - pcScroll.clientWidth - 5);
+          if (!atLeftPC) { pcBtnLeft.classList.add('active'); } else { pcBtnLeft.classList.remove('active'); }
+          if (!atRightPC) { pcBtnRight.classList.add('active'); } else { pcBtnRight.classList.remove('active'); }
+        }
+      }
+    }
+    if(pcBtnLeft) pcBtnLeft.addEventListener('click', function() { pcScroll.scrollBy({ left: -200, behavior: 'smooth' }); });
+    if(pcBtnRight) pcBtnRight.addEventListener('click', function() { pcScroll.scrollBy({ left: 200, behavior: 'smooth' }); });
+    if (pcScroll) pcScroll.addEventListener('scroll', updateArrows);
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
+
+    // ▼▼▼ 追加：ドロップダウンで国を選ぶ機能の動き ▼▼▼
+    var catCountryPanel = document.getElementById('cat-country-panel');
+    var catCountryInner = document.getElementById('cat-country-panel-inner');
+    var countriesDataEl = document.getElementById('lang-top-countries-data');
+    var currentPanelSlug = null;
+    
+    if (catCountryPanel && countriesDataEl) {
+      var availableCountries = JSON.parse(countriesDataEl.textContent);
+      var currentLang = document.documentElement.lang || 'ja';
+
+      document.querySelectorAll('.cat-dropdown-trigger').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var slug = btn.getAttribute('data-slug');
+
+          // 同じものをもう一度押したら閉じる
+          if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) {
+              catCountryPanel.classList.remove('show');
+              currentPanelSlug = null;
+              return;
+          }
+          currentPanelSlug = slug;
+
+          var rect = btn.getBoundingClientRect();
+          catCountryInner.innerHTML = ''; // 中身をリセット
+
+          // 国の数だけリンクを作る
+          availableCountries.forEach(function(c) {
+            var a = document.createElement('a');
+            a.className = 'cat-country-link';
+            a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
+            a.textContent = c.name + ' >';
+            catCountryInner.appendChild(a);
+          });
+
+          // パネルの位置を計算して表示
+          var top = rect.bottom + window.scrollY + 5;
+          var left = rect.left + window.scrollX;
+
+          // 画面の右端からはみ出さないように調整
+          if (left + 160 > window.innerWidth) {
+             left = window.innerWidth - 160;
+          }
+
+          catCountryPanel.style.top = top + 'px';
+          catCountryPanel.style.left = left + 'px';
+          catCountryPanel.classList.add('show');
+        });
+      });
+
+      // 関係ない場所をクリックしたら閉じる
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.cat-country-panel') && !e.target.closest('.cat-dropdown-trigger')) {
+           catCountryPanel.classList.remove('show');
+           currentPanelSlug = null;
+        }
+      });
+    }
+  });
+</script>
