@@ -129,7 +129,12 @@ languages.forEach(lang => {
     min-height: 380px;
     padding: 30px;
     box-sizing: border-box;
-    background: #f4f7f6; /* 地図の海のような薄い色 */
+    /* ▼ 背景色と、世界地図の画像を設定しています */
+    background-color: #f4f7f6;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
     overflow: hidden;
   }
   .map-instruction {
@@ -183,7 +188,6 @@ languages.forEach(lang => {
     background-color: #e0e0e0;
     border-radius: 50%;
     margin-bottom: 12px;
-    /* 本来はここに各地域の大まかな形の画像などを入れます */
   }
   .region-name { font-size: 18px; font-weight: bold; color: #111111; }
 
@@ -241,7 +245,7 @@ languages.forEach(lang => {
   @media (max-width: 768px) {
     .region-card-btn { width: 100%; height: 100px; flex-direction: row; gap: 20px; }
     .region-icon { margin-bottom: 0; width: 40px; height: 40px; }
-    .map-display-area { padding: 60px 20px 30px; } /* スマホの時は戻るボタンの分だけ上を空ける */
+    .map-display-area { padding: 60px 20px 30px; }
   }
 </style>
 
