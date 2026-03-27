@@ -178,15 +178,27 @@ for (const city of cities) {
     data-wind-unit={windUnit}
   >
 
-    <div class="alert-ticker-container">
+    <div class="alert-ticker-container pc-view">
       <div class="alert-ticker-label">
         <span class="alert-ticker-icon">ℹ️</span>
         <span class="alert-ticker-name">{labels.alertTitle}（</span>
-        <span id="alert-city-name">{defaultCityName}</span>
+        <span id="alert-city-name-pc">{defaultCityName}</span>
         <span>）：</span>
       </div>
       <div class="alert-ticker-window">
-        <div id="alert-ticker-content" class="alert-ticker-empty"></div>
+        <div id="alert-ticker-content-pc" class="alert-ticker-empty"></div>
+      </div>
+    </div>
+
+    <div class="alert-ticker-container sp-view">
+      <div class="alert-ticker-label">
+        <span class="alert-ticker-icon">ℹ️</span>
+        <span class="alert-ticker-name">{labels.alertTitle}（</span>
+        <span id="alert-city-name-sp">{defaultCityName}</span>
+        <span>）：</span>
+      </div>
+      <div class="alert-ticker-window">
+        <div id="alert-ticker-content-sp" class="alert-ticker-empty"></div>
       </div>
     </div>
 
@@ -215,8 +227,11 @@ window.addEventListener('DOMContentLoaded', function() {
   var tempUnit        = page.getAttribute('data-temp-unit') || '°C';
   var windUnit        = page.getAttribute('data-wind-unit') || 'km/h';
   
-  var alertCityName     = document.getElementById('alert-city-name');
-  var alertContent      = document.getElementById('alert-ticker-content');
+  var alertCityNamePC = document.getElementById('alert-city-name-pc');
+  var alertContentPC  = document.getElementById('alert-ticker-content-pc');
+  var alertCityNameSP = document.getElementById('alert-city-name-sp');
+  var alertContentSP  = document.getElementById('alert-ticker-content-sp');
+  
   var forecastTitle     = document.getElementById('forecast-title');
   var forecastContainer = document.getElementById('forecast-container');
 
@@ -247,29 +262,67 @@ window.addEventListener('DOMContentLoaded', function() {
       var iconClass = 'summary-icon' + (isMoonOnly ? ' moon-only' : '');
       
       html += '<div class="day-group" data-date="' + day.date + '">';
-      html += '<button class="day-summary-btn" aria-expanded="false" data-target="hourly-' + index + '">';
       
-      html += '<div class="date-info"><span class="date-text">' + formatDate(day.date) + '<br class="sp-only"><span class="day-name">(' + getDayName(day.date) + ')</span></span></div>';
-      
+      /* ========================================================= */
+      /* ▼▼▼ PC版専用のHTML（以前のままの「テーブル形式」完全復旧）▼▼▼ */
+      /* ========================================================= */
+      html += '<button class="day-summary-btn pc-view" aria-expanded="false" data-target="hourly-pc-' + index + '">';
+      html += '<div class="date-info"><span class="date-text">' + formatDate(day.date) + '(' + getDayName(day.date) + ')</span></div>';
       html += '<div class="weather-info">';
       html += '<img src="https:' + day.conditionIcon + '" alt="" class="' + iconClass + '" />';
-      html += '<span class="condition-text sp-hide">' + day.conditionText + '</span>'; /* PCでのみ天気テキストを表示 */
+      html += '<span class="condition-text">' + day.conditionText + '</span>';
       html += '</div>';
-      
       html += '<div class="temp-info">';
-      html += '<div class="temp-item"><span class="temp-label sp-hide">' + (labels.max||'Max') + '</span><span class="value-text temp-max">' + day.maxtemp + tempUnit + '</span></div>';
-      html += '<span class="temp-sep">/</span>'; 
-      html += '<div class="temp-item"><span class="temp-label sp-hide">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + day.mintemp + tempUnit + '</span></div>';
+      html += '<div class="temp-item"><span class="temp-label">' + (labels.max||'Max') + '</span><span class="value-text temp-max">' + day.maxtemp + tempUnit + '</span></div>';
+      html += '<span class="temp-sep">/</span>';
+      html += '<div class="temp-item"><span class="temp-label">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + day.mintemp + tempUnit + '</span></div>';
       html += '</div>';
-      
-      html += '<div class="rain-info"><span class="rain-label sp-only">' + (labels.rain||'Rain') + ': </span><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
-      
-      html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '<span class="sp-chevron"> ▼</span></span></div>';
-      
+      html += '<div class="rain-info"><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
+      html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '</span></div>';
       html += '</button>';
 
-      // 時間ごとの詳細
-      html += '<div id="hourly-' + index + '" class="hourly-details" hidden>';
+      html += '<div id="hourly-pc-' + index + '" class="hourly-details pc-view" hidden>';
+      html += '<div class="hourly-scroll-wrapper"><table class="hourly-table"><thead><tr>';
+      html += '<th>' + (labels.time||'Time') + '</th>';
+      html += '<th>' + (labels.weather||'Weather') + '</th>';
+      html += '<th>' + (labels.temp||'Temp') + '(' + tempUnit + ')</th>';
+      html += '<th>' + (labels.humidity||'Humid') + '(%)</th>';
+      html += '<th>' + (labels.wind||'Wind') + '(' + windUnit + ')</th>';
+      html += '<th>' + (labels.rain||'Rain') + '(%)</th>';
+      html += '</tr></thead><tbody>';
+      day.hour.forEach(function(h) {
+        var hHour = parseInt(h.time.split(':')[0]);
+        var hMoon = h.conditionIcon.includes('night/113.png');
+        html += '<tr class="hourly-row" data-hour="' + hHour + '">';
+        html += '<td class="h-time value-text">' + h.time + '</td>';
+        html += '<td class="h-icon"><img src="https:' + h.conditionIcon + '" alt="" class="' + (hMoon ? 'moon-only' : '') + '" />';
+        html += '<div class="h-condition-text">' + h.conditionText + '</div></td>';
+        html += '<td class="h-temp value-text">' + h.temp + '</td>';
+        html += '<td class="h-humidity value-text">' + h.humidity + '</td>';
+        html += '<td class="h-wind value-text">' + h.wind + '</td>';
+        html += '<td class="h-rain value-text">' + h.rainChance + '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div></div>';
+
+      /* ========================================================= */
+      /* ▼▼▼ スマホ版専用のHTML（新しい「カード形式」とレイアウト）▼▼▼ */
+      /* ========================================================= */
+      html += '<button class="day-summary-btn sp-view" aria-expanded="false" data-target="hourly-sp-' + index + '">';
+      html += '<div class="date-info"><span class="date-text">' + formatDate(day.date) + '<br><span class="day-name">(' + getDayName(day.date) + ')</span></span></div>';
+      html += '<div class="weather-info">';
+      html += '<img src="https:' + day.conditionIcon + '" alt="" class="' + iconClass + '" />';
+      html += '</div>';
+      html += '<div class="temp-info">';
+      html += '<span class="value-text temp-max">' + day.maxtemp + tempUnit + '</span>';
+      html += '<span class="temp-sep">/</span>'; 
+      html += '<span class="value-text temp-min">' + day.mintemp + tempUnit + '</span>';
+      html += '</div>';
+      html += '<div class="rain-info"><span class="rain-label">' + (labels.rain||'Rain') + ': </span><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
+      html += '<div class="badge-wrapper"><span class="hourly-badge sp-btn">' + (labels.hourly||'Hourly') + '<span class="sp-chevron"> ▼</span></span></div>';
+      html += '</button>';
+
+      html += '<div id="hourly-sp-' + index + '" class="hourly-details sp-view" hidden>';
       html += '<div class="hourly-scroll-wrapper"><div class="hourly-flex-container">';
       day.hour.forEach(function(h) {
         var hHour = parseInt(h.time.split(':')[0]);
@@ -284,7 +337,9 @@ window.addEventListener('DOMContentLoaded', function() {
         html += '<div class="h-detail-item"><i class="fa-solid fa-umbrella" style="color:#0288d1;"></i> ' + h.rainChance + '%</div>';
         html += '</div>';
       });
-      html += '</div></div></div></div>';
+      html += '</div></div></div>';
+
+      html += '</div>'; /* .day-group の終了 */
     });
     return html;
   }
@@ -295,16 +350,18 @@ window.addEventListener('DOMContentLoaded', function() {
     if (!data) return;
     var cityName = cityNames[cityKey] || cityKey;
 
-    if (alertCityName) alertCityName.textContent = cityName;
-    if (alertContent) {
-      if (data.alertText) {
-        alertContent.className = 'alert-ticker-text';
-        alertContent.innerHTML = '<span>' + data.alertText + '　　　' + data.alertText + '</span>';
-      } else {
-        alertContent.className = 'alert-ticker-empty';
-        alertContent.innerHTML = '';
-      }
+    if (alertCityNamePC) alertCityNamePC.textContent = cityName;
+    if (alertCityNameSP) alertCityNameSP.textContent = cityName;
+    
+    var alertHtml = '';
+    var alertClass = 'alert-ticker-empty';
+    if (data.alertText) {
+      alertClass = 'alert-ticker-text';
+      alertHtml = '<span>' + data.alertText + '　　　' + data.alertText + '</span>';
     }
+    if (alertContentPC) { alertContentPC.className = alertClass; alertContentPC.innerHTML = alertHtml; }
+    if (alertContentSP) { alertContentSP.className = alertClass; alertContentSP.innerHTML = alertHtml; }
+
     if (forecastTitle) forecastTitle.textContent = cityName + ' ' + (labels.title || '');
     if (forecastContainer) {
       forecastContainer.innerHTML = buildForecastHTML(data.forecastDays);
@@ -347,8 +404,8 @@ window.addEventListener('DOMContentLoaded', function() {
         group.style.display = 'block';
         visibleCount++;
         if (groupDate === cityFullDate) {
-          group.querySelectorAll('.hourly-card').forEach(function(card) {
-            if (parseInt(card.getAttribute('data-hour')) < cityHour) card.style.display = 'none';
+          group.querySelectorAll('.hourly-row, .hourly-card').forEach(function(el) {
+            if (parseInt(el.getAttribute('data-hour')) < cityHour) el.style.display = 'none';
           });
         }
       } else {
@@ -373,17 +430,23 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style is:global>
-  /* === PC版・共通のスタイル（ここは一切変更していません） === */
-  .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; box-sizing: border-box; }
+  /* ========================================================= */
+  /* ▼▼▼ PC版・共通のスタイル（以前のコードを1文字残らず復元！）▼▼▼ */
+  /* ========================================================= */
+  .pc-view { display: flex; } /* 必要な箇所で上書きします */
+  .sp-view { display: none !important; }
+
+  .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 12px; font-weight: bold; }
   
-  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; box-sizing: border-box; }
-  .weather-page .day-summary-btn { 
+  .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
+  
+  /* ▼PCの3日間天気ボタンのスタイル */
+  .weather-page .day-summary-btn.pc-view { 
     width: 100%; display: grid; grid-template-columns: 0.8fr 1.8fr 1.8fr 0.6fr 0.8fr; align-items: center; 
     padding: 12px 16px; background: none; border: none; cursor: pointer; transition: background 0.2s;
-    box-sizing: border-box;
   }
-  .weather-page .day-summary-btn:hover { background: #f8f9fa; }
+  .weather-page .day-summary-btn.pc-view:hover { background: #f8f9fa; }
   
   .weather-page .date-info { text-align: left; font-size: 1.1rem; font-weight: bold; color: #333; }
   .weather-page .weather-info { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
@@ -391,32 +454,27 @@ window.addEventListener('DOMContentLoaded', function() {
   .weather-page .summary-icon.moon-only, .weather-page .h-icon img.moon-only { transform: scale(1.5); transform-origin: center; filter: sepia(100%) saturate(400%) hue-rotate(15deg); }
   .weather-page .condition-text { font-size: 0.95rem; font-weight: bold; color: #1a1a1a; }
   
-  .weather-page .temp-info { display: flex; gap: 12px; white-space: nowrap; justify-content: center; align-items: center; }
+  .weather-page .temp-info { display: flex; gap: 12px; white-space: nowrap; align-items: center; }
   .weather-page .temp-item { display: flex; align-items: baseline; gap: 4px; }
-  .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; font-size: 1.2rem; }
-  .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; font-size: 1.2rem; }
-  .weather-page .temp-sep { color: #ccc; font-weight: bold; margin: 0 4px; }
+  .weather-page .temp-max { color: #d32f2f !important; font-weight: bold; }
+  .weather-page .temp-min { color: #1976d2 !important; font-weight: bold; }
+  .weather-page .temp-sep { color: #ccc; font-weight: bold; }
   
-  .weather-page .rain-info { font-weight: bold; color: #0288d1; font-size: 1.1rem; }
-  .weather-page .hourly-badge { background-color: var(--theme-color, #872732); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; }
-  .weather-page .sp-only { display: none; } 
+  .weather-page .rain-val { font-weight: bold; color: #0288d1; }
+  .weather-page .hourly-badge { background-color: var(--theme-color, #872732); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
   
-  .weather-page .hourly-details { background: #f8f9fa; padding: 16px; border-top: 1px solid #eee; }
-  .weather-page .hourly-scroll-wrapper { width: 100%; overflow-x: auto; scrollbar-width: thin; box-sizing: border-box; }
-  .weather-page .hourly-flex-container { display: flex; gap: 10px; padding-bottom: 8px; }
+  /* ▼PCの1時間ごとテーブルのスタイル */
+  .weather-page .hourly-details.pc-view { display: block; background: #f8f9fa; padding: 0 16px 16px 16px; border-top: 1px solid #eee; overflow-x: auto; }
+  .weather-page .hourly-table { width: 100%; min-width: 600px; border-collapse: collapse; }
+  .weather-page .hourly-table th { padding: 12px 6px; font-size: 0.85rem; color: #666; border-bottom: 1px solid #ccc; text-align: center; }
+  .weather-page .hourly-table td { padding: 12px 6px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; }
   
-  .weather-page .hourly-card { 
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; 
-    min-width: 100px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  }
-  .weather-page .h-time { font-weight: bold; font-size: 0.95rem; color: #333; border-bottom: 1px solid #eee; width: 100%; padding-bottom: 4px; }
+  .weather-page .h-icon { display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .weather-page .h-icon img { width: 48px; height: 48px; }
-  .weather-page .h-condition-text { font-size: 0.8rem; color: #555; font-weight: bold; height: 2.4em; display: flex; align-items: center; justify-content: center; }
-  .weather-page .h-temp { font-size: 1.1rem; font-weight: bold; color: #1a1a1a; margin: 4px 0; }
-  .weather-page .h-detail-item { font-size: 0.85rem; color: #666; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .weather-page .h-condition-text { font-size: 0.8rem; color: #1a1a1a; font-weight: bold; }
 
-  .alert-ticker-container { background: #f0f7ff; border: 1.5px solid #1fa7db; border-radius: 8px; padding: 6px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; overflow: hidden; box-sizing: border-box; }
+  /* 気象アラート（PC版） */
+  .alert-ticker-container.pc-view { background: #f0f7ff; border: 1.5px solid #1fa7db; border-radius: 8px; padding: 6px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; overflow: hidden; box-sizing: border-box; }
   .alert-ticker-label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #0068b7; font-weight: bold; }
   .alert-ticker-window { flex-grow: 1; background: #fff; border: 1px solid #1fa7db; border-radius: 4px; height: 32px; display: flex; align-items: center; overflow: hidden; position: relative; }
   .alert-ticker-text { white-space: nowrap; position: absolute; padding-left: 100%; animation: ticker 30s linear infinite; font-size: 0.9rem; color: #c53030; font-weight: bold; }
@@ -424,45 +482,48 @@ window.addEventListener('DOMContentLoaded', function() {
   @keyframes ticker { 0% { transform: translate(0,0); } 100% { transform: translate(-100%,0); } }
 
 
-  /* ================================================= */
+  /* ========================================================= */
   /* ▼▼▼ スマホ版のレスポンシブ（見た目切り替え）設定 ▼▼▼ */
-  /* ================================================= */
+  /* ========================================================= */
   @media (max-width: 768px) {
+    /* PC用を隠し、スマホ用を表示する絶対ルール */
+    .pc-view { display: none !important; }
+    .sp-view { display: block !important; }
+
     .weather-page { 
       padding: 12px 10px; 
       box-sizing: border-box; 
       width: 100%;
       overflow-x: hidden; 
     }
-    .weather-page * {
-      box-sizing: border-box; 
-    }
-    .weather-page .sp-only { display: inline; }
-    .weather-page .sp-hide { display: none; }
+    .weather-page * { box-sizing: border-box; }
     
-    /* ▼修正：気象・災害情報（PCと同じ配色で、縦に2行並べる） */
-    .alert-ticker-container { 
+    /* ① 気象・災害情報（PCと同じ配色で、縦に2行並べる） */
+    .alert-ticker-container.sp-view { 
+      display: flex !important;
       flex-direction: column; 
       align-items: stretch; 
-      background: #f0f7ff; /* PCと同じ水色背景 */
-      border: 1.5px solid #1fa7db; /* PCと同じ細い青枠線 */
+      background: #f0f7ff; 
+      border: 1.5px solid #1fa7db; 
       border-radius: 8px;
       padding: 10px 12px; 
+      margin-bottom: 24px;
       gap: 8px; 
     }
-    .alert-ticker-label { font-size: 1rem; color: #0068b7; }
-    .alert-ticker-window { 
-      background-color: #ffffff; /* 中に白い枠（ウィンドウ）を作る */
-      border: 1px solid #1fa7db; /* 白い枠にもPCと同じ縁取りを */
+    .sp-view .alert-ticker-label { font-size: 1rem; color: #0068b7; }
+    .sp-view .alert-ticker-window { 
+      background-color: #ffffff; 
+      border: 1px solid #1fa7db; 
       border-radius: 4px; 
       height: 38px; 
       width: 100%;
     }
-    .alert-ticker-text { color: #c53030; } /* 文字色は赤 */
+    .sp-view .alert-ticker-text { color: #c53030; } 
 
-    /* 3日間の天気表示 */
-    .weather-page .day-summary-btn { 
-      display: grid; 
+    /* ② 3日間の天気表示（最高/最低気温を横並びに） */
+    .weather-page .day-summary-btn.sp-view { 
+      width: 100%;
+      display: grid !important; 
       grid-template-columns: auto 1fr auto; 
       grid-template-areas: 
         "date icon temp"
@@ -470,17 +531,17 @@ window.addEventListener('DOMContentLoaded', function() {
         "badge badge badge";
       padding: 16px 10px; 
       gap: 8px 10px;
-      width: 100%;
+      background: none; border: none; cursor: pointer;
     }
     
-    .weather-page .date-info { grid-area: date; text-align: left; width: 100%; }
-    .weather-page .date-text { font-size: 1.1rem; }
-    .weather-page .day-name { font-size: 0.9rem; color: #666; }
+    .sp-view .date-info { grid-area: date; text-align: left; width: 100%; }
+    .sp-view .date-text { font-size: 1.1rem; }
+    .sp-view .day-name { font-size: 0.9rem; color: #666; }
     
-    .weather-page .weather-info { grid-area: icon; align-items: center; justify-content: center; width: 100%; min-width: auto; }
-    .weather-page .summary-icon { margin: 0; width: 64px; height: 64px; }
+    .sp-view .weather-info { grid-area: icon; display: flex; align-items: center; justify-content: center; width: 100%; min-width: auto; }
+    .sp-view .summary-icon { margin: 0; width: 64px; height: 64px; }
     
-    .weather-page .temp-info { 
+    .sp-view .temp-info { 
       grid-area: temp; 
       display: flex; 
       flex-direction: row; 
@@ -490,11 +551,11 @@ window.addEventListener('DOMContentLoaded', function() {
       margin: 0; 
       gap: 6px; 
     }
-    .weather-page .temp-sep { display: inline !important; font-size: 1.2rem; color: #ccc; margin: 0 2px; }
-    .weather-page .temp-max { font-size: 1.2rem; }
-    .weather-page .temp-min { font-size: 1.2rem; }
+    .sp-view .temp-sep { font-size: 1.2rem; color: #ccc; margin: 0 2px; }
+    .sp-view .temp-max { font-size: 1.2rem; color: #d32f2f; font-weight: bold; }
+    .sp-view .temp-min { font-size: 1.2rem; color: #1976d2; font-weight: bold; }
     
-    .weather-page .rain-info { 
+    .sp-view .rain-info { 
       grid-area: rain; 
       display: flex; 
       justify-content: flex-end; 
@@ -504,19 +565,34 @@ window.addEventListener('DOMContentLoaded', function() {
       font-size: 0.95rem; 
     }
     
-    .weather-page .badge-wrapper { grid-area: badge; width: 100%; margin-top: 10px; }
-    .weather-page .hourly-badge { 
+    /* ③ 1時間ごとボタンの白抜き化 */
+    .sp-view .badge-wrapper { grid-area: badge; width: 100%; margin-top: 10px; }
+    .sp-view .hourly-badge.sp-btn { 
       width: 100%; 
+      display: flex;
       justify-content: center; 
       padding: 10px; 
       font-size: 1rem; 
       border-radius: 8px; 
-      background-color: #ffffff !important; 
-      color: var(--theme-color, #872732) !important; 
-      border: 1.5px solid var(--theme-color, #872732) !important; 
+      background-color: #ffffff; 
+      color: var(--theme-color, #872732); 
+      border: 1.5px solid var(--theme-color, #872732); 
     }
     
-    .weather-page .hourly-card { min-width: 85px; padding: 10px 6px; }
-    .weather-page .h-icon img { width: 40px; height: 40px; }
+    /* 1時間カードのスタイル */
+    .weather-page .hourly-details.sp-view { background: #f8f9fa; padding: 16px; border-top: 1px solid #eee; }
+    .sp-view .hourly-scroll-wrapper { width: 100%; overflow-x: auto; scrollbar-width: thin; }
+    .sp-view .hourly-flex-container { display: flex; gap: 10px; padding-bottom: 8px; }
+    
+    .sp-view .hourly-card { 
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 6px; 
+      min-width: 85px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .sp-view .h-time { font-weight: bold; font-size: 0.95rem; color: #333; border-bottom: 1px solid #eee; width: 100%; padding-bottom: 4px; }
+    .sp-view .h-icon img { width: 40px; height: 40px; }
+    .sp-view .h-condition-text { font-size: 0.8rem; color: #555; font-weight: bold; height: 2.4em; display: flex; align-items: center; justify-content: center; }
+    .sp-view .h-temp { font-size: 1.1rem; font-weight: bold; color: #1a1a1a; margin: 4px 0; }
+    .sp-view .h-detail-item { font-size: 0.85rem; color: #666; display: flex; align-items: center; justify-content: center; gap: 4px; }
   }
 </style>
