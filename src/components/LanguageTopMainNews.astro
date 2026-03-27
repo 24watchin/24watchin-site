@@ -1,7 +1,21 @@
 ---
+import { getCountryLabel } from '../lib/countryData.ts';
+
 const { posts = [], lang = 'ja' } = Astro.props;
 
-// ▼ 言語ごとのトップ固定用タグの「頭文字」を設定します
+// ▼ 修正1：タイトルの多言語化設定
+const mainNewsTitles: Record<string, string> = {
+  ja: '各国版 最新ニュース',
+  en: 'Latest News by Country',
+  'zh-cn': '各国最新新闻',
+  'zh-tw': '各國最新新聞',
+  es: 'Últimas Noticias por País',
+  fr: 'Dernières Actualités par Pays',
+  de: 'Aktuelle Nachrichten nach Land',
+  ru: 'Последние новости по странам',
+};
+const sectionTitle = mainNewsTitles[lang] || mainNewsTitles['en'];
+
 const langPrefixMap: Record<string, string> = {
   ja: '日本語',
   en: '英語',
@@ -13,14 +27,11 @@ const langPrefixMap: Record<string, string> = {
   ru: 'ロシア語'
 };
 const prefix = langPrefixMap[lang] || '';
-
-// 例：「日本語①」のようなタグを探すための条件を作成
 const langTopRegex = new RegExp(`^${prefix}([①②③④⑤⑥⑦⑧⑨⑩])$`);
 
 const topPostsMap = new Map();
 const numMap: Record<string, number> = { '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10 };
 
-// ▼ 1. まずは「言語トップ専用の固定タグ」がついている記事を抽出して配置します
 posts.forEach((post: any) => {
   if (!post.labels) return;
   post.labels.forEach((label: string) => {
@@ -34,12 +45,10 @@ posts.forEach((post: any) => {
   });
 });
 
-// 番号順に並べて「空席詰め」を行う
 let finalPosts = Array.from(topPostsMap.entries())
   .sort((a, b) => a[0] - b[0])
   .map(entry => entry[1]);
 
-// ▼ 2. 足りない枠（10枠に満たない部分）は、固定タグがない最新記事で埋めます
 const usedIds = new Set(finalPosts.map(p => p.id));
 const normalPosts = posts.filter((p: any) => !usedIds.has(p.id));
 
@@ -49,7 +58,6 @@ while (finalPosts.length < 10 && normalPosts.length > 0) {
 
 const displayPosts = finalPosts.slice(0, 10);
 
-// --- 補助関数 ---
 const getImageUrl = (content: string) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
@@ -68,92 +76,150 @@ const formatPostTime = (dateString: string) => {
   } catch { return ''; }
 };
 
-// ▼ 【重要】記事のタグから「その記事がどの国のものか」を推測し、正しいリンクを作る関数
 const getCountryFromLabels = (labels: string[], currentLang: string) => {
-  if (!labels) return 'jp'; // デフォルトはjp
+  if (!labels) return 'jp';
   const searchPrefix = currentLang + '-';
   const targetLabel = labels.find((label: string) => label.startsWith(searchPrefix));
   if (targetLabel) {
-    return targetLabel.replace(searchPrefix, ''); // 例：「ja-tw」から「tw」を取り出す
+    return targetLabel.replace(searchPrefix, '');
   }
   return 'jp'; 
 };
 ---
 
-<div class="top-news-container">
-  <div class="main-column">
-    {displayPosts.length > 0 && (
-      <article class="hero-post">
-        {/* ▼ 推測した「国コード」を使って、正しいURLに飛ばします */}
-        <a href={`/${lang}/${getCountryFromLabels(displayPosts[0].labels, lang)}/news/${displayPosts[0].id}/`}>
-          <div class="hero-image">
-            <img src={getImageUrl(displayPosts[0].content)} alt={displayPosts[0].title} />
-          </div>
-          <div class="hero-text">
-            <h2 class="hero-title">{displayPosts[0].title}</h2>
-            {displayPosts[0].published && (
-              <div class="hero-time">{formatPostTime(displayPosts[0].published)}</div>
-            )}
-          </div>
-        </a>
-      </article>
-    )}
-
-    <div class="sub-grid">
-      {displayPosts.slice(1, 5).map((post) => (
-        <article class="grid-item">
-          <a href={`/${lang}/${getCountryFromLabels(post.labels, lang)}/news/${post.id}/`}>
-            <div class="grid-image">
-              <img src={getImageUrl(post.content)} alt={post.title} />
-            </div>
-            <div class="grid-text">
-              <h3 class="grid-title">{post.title}</h3>
-              {post.published && (
-                <div class="grid-time">{formatPostTime(post.published)}</div>
-              )}
-            </div>
-          </a>
-        </article>
-      ))}
-    </div>
+<div class="lang-main-news-section">
+  {/* ▼ 修正2：縦線付きのタイトルを表示します */}
+  <div class="section-header">
+    <h2 class="section-title">{sectionTitle}</h2>
   </div>
 
-  <div class="side-list-column">
-    {displayPosts.slice(5, 10).map((post) => (
-      <article class="list-item">
-        <a href={`/${lang}/${getCountryFromLabels(post.labels, lang)}/news/${post.id}/`}>
-          <h4 class="list-title">{post.title}</h4>
-          {post.published && (
-            <div class="list-time">{formatPostTime(post.published)}</div>
-          )}
-        </a>
-      </article>
-    ))}
+  <div class="top-news-container">
+    <div class="main-column">
+      {displayPosts.length > 0 && (
+        <article class="hero-post">
+          {(() => {
+            const cCode = getCountryFromLabels(displayPosts[0].labels, lang);
+            const cName = getCountryLabel(cCode, lang);
+            return (
+              <a href={`/${lang}/${cCode}/news/${displayPosts[0].id}/`}>
+                <div class="hero-image">
+                  <img src={getImageUrl(displayPosts[0].content)} alt={displayPosts[0].title} />
+                </div>
+                <div class="hero-text">
+                  <h2 class="hero-title">{displayPosts[0].title}</h2>
+                  {displayPosts[0].published && (
+                    <div class="time-country-row">
+                      <span class="post-time">{formatPostTime(displayPosts[0].published)}</span>
+                      {/* ▼ 修正3：国名バッジを追加しました */}
+                      <span class="country-badge">{cName}</span>
+                    </div>
+                  )}
+                </div>
+              </a>
+            );
+          })()}
+        </article>
+      )}
+
+      <div class="sub-grid">
+        {displayPosts.slice(1, 5).map((post) => {
+          const cCode = getCountryFromLabels(post.labels, lang);
+          const cName = getCountryLabel(cCode, lang);
+          return (
+            <article class="grid-item">
+              <a href={`/${lang}/${cCode}/news/${post.id}/`}>
+                <div class="grid-image">
+                  <img src={getImageUrl(post.content)} alt={post.title} />
+                </div>
+                <div class="grid-text">
+                  <h3 class="grid-title">{post.title}</h3>
+                  {post.published && (
+                    <div class="time-country-row">
+                      <span class="post-time">{formatPostTime(post.published)}</span>
+                      <span class="country-badge">{cName}</span>
+                    </div>
+                  )}
+                </div>
+              </a>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+
+    <div class="side-list-column">
+      {displayPosts.slice(5, 10).map((post) => {
+        const cCode = getCountryFromLabels(post.labels, lang);
+        const cName = getCountryLabel(cCode, lang);
+        return (
+          <article class="list-item">
+            <a href={`/${lang}/${cCode}/news/${post.id}/`}>
+              <h4 class="list-title">{post.title}</h4>
+              {post.published && (
+                <div class="time-country-row">
+                  <span class="post-time">{formatPostTime(post.published)}</span>
+                  <span class="country-badge">{cName}</span>
+                </div>
+              )}
+            </a>
+          </article>
+        );
+      })}
+    </div>
   </div>
 </div>
 
 <style>
-  /* 見た目は各国のメインニュース（MainNewsLayout）と完全に同じにしています */
+  /* ▼ 修正2：縦線タイトルのデザイン（下のニュースと同じスタイルです） */
+  .lang-main-news-section { width: 100%; }
+  .section-header { margin-bottom: 26px; border-bottom: 1px solid #ddd; padding-bottom: 12px; }
+  .section-title { font-size: 20px; font-weight: 800; color: #111111; margin: 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 14px; line-height: 1.1; }
+
   .top-news-container { display: grid; grid-template-columns: minmax(0, 1fr) 410px; gap: 24px; margin-bottom: 28px; align-items: start; }
   .main-column { min-width: 0; }
   .hero-post a { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.03fr); gap: 18px; text-decoration: none; color: #111111; margin-bottom: 24px; align-items: start; }
   .hero-image { aspect-ratio: 16 / 10; overflow: hidden; border-radius: 4px; }
   .hero-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .hero-title { font-size: 24px; line-height: 1.45; font-weight: 700; margin: 0; color: #111111; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-  .hero-time { margin-top: 6px; font-size: 16px; line-height: 1.45; font-weight: 400; color: #8a8a8a; }
+  
   .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 22px; border-top: 1px solid #e5e5e5; padding-top: 18px; }
   .grid-item a { display: flex; gap: 12px; text-decoration: none; color: #111111; align-items: flex-start; }
   .grid-image { width: 108px; height: 72px; flex-shrink: 0; overflow: hidden; border-radius: 4px; }
   .grid-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .grid-text { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
   .grid-title { font-size: 16px; line-height: 1.45; font-weight: 700; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .grid-time { margin-top: 4px; font-size: 16px; color: #8a8a8a; }
+  
   .side-list-column { border-left: 1px solid #e5e5e5; padding-left: 18px; min-width: 0; }
   .list-item { border-bottom: 1px solid #e5e5e5; padding: 8px 0; }
   .list-item:first-child { padding-top: 0; }
   .list-item a { text-decoration: none; color: #111111; display: block; }
   .list-title { font-size: 16px; line-height: 1.45; font-weight: 700; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .list-time { margin-top: 4px; font-size: 16px; color: #8a8a8a; }
+  
+  /* ▼ 時間と国名の並び設定 */
+  .time-country-row { margin-top: 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+  
+  /* ▼ 修正4：ゼロの斜線（スラッシュ）を解除する魔法の設定を追加しました */
+  .post-time { 
+    font-size: 14px; 
+    color: #8a8a8a; 
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    font-variant-numeric: normal;
+    font-feature-settings: "zero" 0;
+  }
+  
+  /* ▼ 修正3：薄いグレーで囲った国名バッジのデザイン */
+  .country-badge {
+    display: inline-block;
+    background-color: #f5f5f5;
+    color: #666666;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    white-space: nowrap;
+  }
+
   .hero-post a:hover .hero-title, .grid-item a:hover .grid-title, .list-item a:hover .list-title { text-decoration: underline; text-decoration-color: #000000; text-underline-offset: 3px; }
 
   @media (max-width: 900px) {
