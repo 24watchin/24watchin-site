@@ -3,7 +3,6 @@ import { getCountryLabel } from '../lib/countryData.ts';
 
 const { posts = [], lang = 'ja' } = Astro.props;
 
-// ▼ 修正1：タイトルの多言語化設定
 const mainNewsTitles: Record<string, string> = {
   ja: '各国版 最新ニュース',
   en: 'Latest News by Country',
@@ -16,15 +15,25 @@ const mainNewsTitles: Record<string, string> = {
 };
 const sectionTitle = mainNewsTitles[lang] || mainNewsTitles['en'];
 
+// ▼ 【修正1】存在しない国コードで404エラーになるのを防ぐため、本物の国コードだけを登録します
+const validCountries = ['jp', 'us', 'de', 'fr', 'gb', 'es', 'cn', 'tw', 'ae', 'au', 'sg', 'ca', 'nz', 'hk', 'in', 'my', 'ph', 'th', 'vn', 'id', 'kr', 'mx', 'br', 'za', 'eg', 'qa', 'om', 'sa', 'tr', 'ar', 'co'];
+const searchPrefix = lang + '-';
+
+// ▼ 【修正2】すべての記事の中から「現在の言語（例：en-us など）」のタグがついている記事だけに絞り込みます！
+const langPosts = posts.filter((post: any) => {
+  if (!post.labels) return false;
+  return post.labels.some((label: string) => {
+    if (label.startsWith(searchPrefix)) {
+      const code = label.replace(searchPrefix, '');
+      return validCountries.includes(code); // 本物の国コードかどうかもチェックします
+    }
+    return false;
+  });
+});
+
 const langPrefixMap: Record<string, string> = {
-  ja: '日本語',
-  en: '英語',
-  'zh-cn': '簡体字',
-  'zh-tw': '繁体字',
-  es: 'スペイン語',
-  fr: 'フランス語',
-  de: 'ドイツ語',
-  ru: 'ロシア語'
+  ja: '日本語', en: '英語', 'zh-cn': '簡体字', 'zh-tw': '繁体字',
+  es: 'スペイン語', fr: 'フランス語', de: 'ドイツ語', ru: 'ロシア語'
 };
 const prefix = langPrefixMap[lang] || '';
 const langTopRegex = new RegExp(`^${prefix}([①②③④⑤⑥⑦⑧⑨⑩])$`);
@@ -32,7 +41,8 @@ const langTopRegex = new RegExp(`^${prefix}([①②③④⑤⑥⑦⑧⑨⑩])$`)
 const topPostsMap = new Map();
 const numMap: Record<string, number> = { '①':1, '②':2, '③':3, '④':4, '⑤':5, '⑥':6, '⑦':7, '⑧':8, '⑨':9, '⑩':10 };
 
-posts.forEach((post: any) => {
+// ▼ 絞り込んだ後の記事（langPosts）を使ってトップ記事を探します
+langPosts.forEach((post: any) => {
   if (!post.labels) return;
   post.labels.forEach((label: string) => {
     const match = label.match(langTopRegex);
@@ -50,7 +60,8 @@ let finalPosts = Array.from(topPostsMap.entries())
   .map(entry => entry[1]);
 
 const usedIds = new Set(finalPosts.map(p => p.id));
-const normalPosts = posts.filter((p: any) => !usedIds.has(p.id));
+// ▼ ここも絞り込んだ後の記事（langPosts）を使って枠を埋めます
+const normalPosts = langPosts.filter((p: any) => !usedIds.has(p.id));
 
 while (finalPosts.length < 10 && normalPosts.length > 0) {
   finalPosts.push(normalPosts.shift());
@@ -76,19 +87,22 @@ const formatPostTime = (dateString: string) => {
   } catch { return ''; }
 };
 
+// ▼ 【修正3】URLを作るときも、厳格に国コードを判別します
 const getCountryFromLabels = (labels: string[], currentLang: string) => {
   if (!labels) return 'jp';
-  const searchPrefix = currentLang + '-';
-  const targetLabel = labels.find((label: string) => label.startsWith(searchPrefix));
-  if (targetLabel) {
-    return targetLabel.replace(searchPrefix, '');
-  }
-  return 'jp'; 
+  const prefix = currentLang + '-';
+  const targetLabel = labels.find((label: string) => {
+    if (label.startsWith(prefix)) {
+      const code = label.replace(prefix, '');
+      return validCountries.includes(code);
+    }
+    return false;
+  });
+  return targetLabel ? targetLabel.replace(prefix, '') : 'jp'; 
 };
 ---
 
 <div class="lang-main-news-section">
-  {/* ▼ 修正2：縦線付きのタイトルを表示します */}
   <div class="section-header">
     <h2 class="section-title">{sectionTitle}</h2>
   </div>
@@ -110,7 +124,6 @@ const getCountryFromLabels = (labels: string[], currentLang: string) => {
                   {displayPosts[0].published && (
                     <div class="time-country-row">
                       <span class="post-time">{formatPostTime(displayPosts[0].published)}</span>
-                      {/* ▼ 修正3：国名バッジを追加しました */}
                       <span class="country-badge">{cName}</span>
                     </div>
                   )}
@@ -170,7 +183,6 @@ const getCountryFromLabels = (labels: string[], currentLang: string) => {
 </div>
 
 <style>
-  /* ▼ 修正2：縦線タイトルのデザイン（下のニュースと同じスタイルです） */
   .lang-main-news-section { width: 100%; }
   .section-header { margin-bottom: 26px; border-bottom: 1px solid #ddd; padding-bottom: 12px; }
   .section-title { font-size: 20px; font-weight: 800; color: #111111; margin: 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 14px; line-height: 1.1; }
@@ -195,10 +207,8 @@ const getCountryFromLabels = (labels: string[], currentLang: string) => {
   .list-item a { text-decoration: none; color: #111111; display: block; }
   .list-title { font-size: 16px; line-height: 1.45; font-weight: 700; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   
-  /* ▼ 時間と国名の並び設定 */
   .time-country-row { margin-top: 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
   
-  /* ▼ 修正4：ゼロの斜線（スラッシュ）を解除する魔法の設定を追加しました */
   .post-time { 
     font-size: 14px; 
     color: #8a8a8a; 
@@ -207,7 +217,6 @@ const getCountryFromLabels = (labels: string[], currentLang: string) => {
     font-feature-settings: "zero" 0;
   }
   
-  /* ▼ 修正3：薄いグレーで囲った国名バッジのデザイン */
   .country-badge {
     display: inline-block;
     background-color: #f5f5f5;
