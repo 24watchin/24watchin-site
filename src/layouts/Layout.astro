@@ -37,9 +37,16 @@ const localeKeyMap = {
 const localeKey = (localeKeyMap[lang as keyof typeof localeKeyMap] || 'jp') as keyof typeof categoryLabelMap;
 const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
 
+// og:locale マッピング
 const ogLocaleMap: Record<string, string> = {
-  ja: 'ja_JP', en: 'en_US', 'zh-cn': 'zh_CN', 'zh-tw': 'zh_TW',
-  es: 'es_ES', fr: 'fr_FR', de: 'de_DE', ru: 'ru_RU',
+  ja: 'ja_JP',
+  en: 'en_US',
+  'zh-cn': 'zh_CN',
+  'zh-tw': 'zh_TW',
+  es: 'es_ES',
+  fr: 'fr_FR',
+  de: 'de_DE',
+  ru: 'ru_RU',
 };
 const ogLocale = ogLocaleMap[lang] || 'ja_JP';
 
@@ -58,6 +65,7 @@ const metaDescription = description || defaultDescriptions[lang] || defaultDescr
 const metaTitle = title ? `${title} | 24Watchin` : '24Watchin';
 const bodyStyle = '--theme-color: ' + themeColor + ';';
 
+// hreflang タグ生成
 const restPath = pathParts.slice(2).join('/');
 const restPathStr = restPath ? '/' + restPath + '/' : '/';
 
@@ -74,6 +82,7 @@ const xDefaultUrl = country
   ? `${SITE_URL}/ja/${country}${restPathStr}`
   : `${SITE_URL}/ja/`;
 
+// WebSite 構造化データ（全ページ共通）
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -89,6 +98,37 @@ const websiteJsonLd = {
     },
     "query-input": "required name=search_term_string"
   }
+};
+
+// Organization 構造化データ（全ページ共通）
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsMediaOrganization",
+  "name": "24Watchin",
+  "legalName": "The Dexent Media Enterprises",
+  "url": SITE_URL,
+  "logo": {
+    "@type": "ImageObject",
+    "url": `${SITE_URL}/images/logo-24watchin.png`,
+    "width": 701,
+    "height": 200
+  },
+  "image": `${SITE_URL}/images/ogp.png`,
+  "description": defaultDescriptions['en'],
+  "email": "24watchin.info@gmail.com",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "24watchin.info@gmail.com",
+    "contactType": "customer support",
+    "availableLanguage": ["Japanese", "English", "Chinese", "German", "French", "Spanish", "Russian"]
+  },
+  "sameAs": [
+    "https://x.com/24watchin_ja",
+    "https://www.facebook.com/24watchin.ja/"
+  ],
+  "foundingDate": "2024",
+  "publishingPrinciples": `${SITE_URL}/ja/jp/info/corrections/`,
+  "actionableFeedbackPolicy": `${SITE_URL}/ja/jp/info/contact/`,
 };
 ---
 <!DOCTYPE html>
@@ -147,10 +187,14 @@ const websiteJsonLd = {
     <!-- WebSite 構造化データ（全ページ共通） -->
     <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
 
-    <!-- 各ページ固有の構造化データ -->
+    <!-- Organization 構造化データ（全ページ共通） -->
+    <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+
+    <!-- 各ページ固有の構造化データ（記事ページなど）をここに差し込む -->
     <slot name="head" />
 
     <style>
+      /* ▼▼▼ 追加：画面全体をぴったりくっつけて角を四角にする強力なリセット ▼▼▼ */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
@@ -158,6 +202,8 @@ const websiteJsonLd = {
         width: 100%;
         overflow-x: hidden;
       }
+      /* ▲▲▲ 追加ここまで ▲▲▲ */
+
       body { font-family: sans-serif; background-color: #f8f9fa; color: #333; }
       .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
       .page-shell { margin-top: 30px; }
