@@ -9,11 +9,11 @@ const languages = [
   { code: 'de', label: 'Deutsch' }, { code: 'ru', label: 'Русский' }
 ];
 
-// ▼ 中東・アフリカの zoomY を 15 にして、地図を「下」に下げました
+// ▼ 中東・アフリカの zoomY を 5 にして、北も南もバランスよく見える位置に調整しました
 const regions = [
   { id: 'americas', name: '南北アメリカ', top: 40, left: 22, zoomX: 25, zoomY: 5, scale: 1.5, countries: ['us', 'ca', 'mx', 'br'] },
   { id: 'europe', name: 'ヨーロッパ', top: 25, left: 50, zoomX: 0, zoomY: 25, scale: 3.2, countries: ['de', 'fr', 'gb', 'it'] },
-  { id: 'mideast_africa', name: '中東・アフリカ', top: 55, left: 55, zoomX: -5, zoomY: 15, scale: 1.8, countries: ['ae', 'tr', 'eg', 'za'] },
+  { id: 'mideast_africa', name: '中東・アフリカ', top: 55, left: 55, zoomX: -5, zoomY: 5, scale: 1.8, countries: ['ae', 'tr', 'eg', 'za'] },
   { id: 'asia', name: 'アジア', top: 35, left: 78, zoomX: -25, zoomY: 10, scale: 1.9, countries: ['jp', 'tw', 'kr', 'cn', 'th', 'sg'] },
   { id: 'oceania', name: 'オセアニア', top: 75, left: 88, zoomX: -35, zoomY: -25, scale: 2.4, countries: ['au', 'nz'] }
 ];
