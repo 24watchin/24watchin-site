@@ -10,7 +10,6 @@ const lang = 'ja';
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId(lang);
 
-// ▼ APIパンク対策（エラー時は再挑戦するように改良）
 if (!globalThis.bloggerApiCache) {
   globalThis.bloggerApiCache = {};
 }
@@ -23,44 +22,47 @@ if (API_KEY && BLOG_ID) {
       .then(res => res.ok ? res.json() : null)
       .then(data => data && data.items ? data.items : [])
       .catch(() => {
-        delete globalThis.bloggerApiCache[BLOG_ID]; // 失敗したら履歴を消してやり直す
+        delete globalThis.bloggerApiCache[BLOG_ID];
         return [];
       });
   }
   allPosts = await globalThis.bloggerApiCache[BLOG_ID] || [];
 }
 
-// ▼ 国ごとの記事を絞り込む関数（優しく改良！）
 const filterByCountryTag = (countryCode, count = 3) => {
-  const tag = `${lang}-${countryCode}`.toLowerCase(); // ja-jp
-  
-  // 大文字小文字を気にせずラベルを探す
+  const tag = `${lang}-${countryCode}`.toLowerCase();
   const filtered = allPosts.filter(post => {
     if (!post.labels) return false;
     return post.labels.some(label => label.toLowerCase() === tag);
   });
-
-  // 【安心設定】もし国ラベルが付いた記事が1件もなければ、全記事の中から最新のものを仮表示する
   if (filtered.length === 0 && allPosts.length > 0) {
     const randomStart = Math.floor(Math.random() * Math.max(1, allPosts.length - count));
     return allPosts.slice(randomStart, randomStart + count);
   }
-
   return filtered.slice(0, count);
 };
 
+// ▼ 修正①：5つの地域に分けました
 const regionsTemplate = [
   { key: 'asia', title: 'アジア版', cities: [
     { name: getCountryLabel('jp', lang), code: 'jp' }, { name: getCountryLabel('tw', lang), code: 'tw' },
-    { name: getCountryLabel('kr', lang), code: 'kr' }, { name: getCountryLabel('sg', lang), code: 'sg' },
-    { name: getCountryLabel('cn', lang), code: 'cn' }, { name: getCountryLabel('th', lang), code: 'th' },
+    { name: getCountryLabel('kr', lang), code: 'kr' }, { name: getCountryLabel('cn', lang), code: 'cn' },
+    { name: getCountryLabel('th', lang), code: 'th' }, { name: getCountryLabel('sg', lang), code: 'sg' },
+  ]},
+  { key: 'oceania', title: 'オセアニア版', cities: [
+    { name: getCountryLabel('au', lang), code: 'au' }, { name: getCountryLabel('nz', lang), code: 'nz' },
   ]},
   { key: 'europe', title: 'ヨーロッパ版', cities: [
     { name: getCountryLabel('de', lang), code: 'de' }, { name: getCountryLabel('fr', lang), code: 'fr' },
     { name: getCountryLabel('gb', lang), code: 'gb' }, { name: getCountryLabel('it', lang), code: 'it' },
   ]},
+  { key: 'mideast_africa', title: '中東・アフリカ版', cities: [
+    { name: getCountryLabel('ae', lang), code: 'ae' }, { name: getCountryLabel('tr', lang), code: 'tr' },
+    { name: getCountryLabel('eg', lang), code: 'eg' }, { name: getCountryLabel('za', lang), code: 'za' },
+  ]},
   { key: 'americas', title: '南北アメリカ版', cities: [
     { name: getCountryLabel('us', lang), code: 'us' }, { name: getCountryLabel('ca', lang), code: 'ca' },
+    { name: getCountryLabel('mx', lang), code: 'mx' }, { name: getCountryLabel('br', lang), code: 'br' },
   ]}
 ];
 
@@ -76,41 +78,23 @@ const themeColor = '#872732';
 
 <RootLayout title="24Watchin Global News | 世界のニュースをあなたに">
   <main class="root-page-container" style={`--theme-color: ${themeColor};`}>
-    
     <section class="world-map-section">
       <WorldMap />
     </section>
-
     <section class="root-news-section">
       {activeRegions.length > 0 ? (
         activeRegions.map(region => (
-          <RootNewsBlock 
-            lang={lang}
-            title={region.title}
-            cityData={region.cities}
-          />
+          <RootNewsBlock lang={lang} title={region.title} cityData={region.cities} />
         ))
       ) : (
-        <p style="text-align: center; padding: 40px;">記事を取得できませんでした。Bloggerの記事があるか確認してください。</p>
+        <p style="text-align: center; padding: 40px;">記事を読み込み中です...</p>
       )}
     </section>
-
   </main>
 </RootLayout>
 
 <style>
-  .root-page-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 0 40px 0;
-  }
-  .world-map-section {
-    width: 100%;
-    margin-bottom: 40px;
-  }
-  .root-news-section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+  .root-page-container { max-width: 1200px; margin: 0 auto; padding: 0 0 40px 0; }
+  .world-map-section { width: 100%; margin-bottom: 40px; }
+  .root-news-section { display: flex; flex-direction: column; gap: 20px; }
 </style>
