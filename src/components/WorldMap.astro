@@ -9,13 +9,13 @@ const languages = [
   { code: 'de', label: 'Deutsch' }, { code: 'ru', label: 'Русский' }
 ];
 
-// ▼ ズーム座標（zoomYを大きくして北を表示、scaleを少し下げて全体を収めました）
+// ▼ 修正：ズーム座標と倍率を「南が見えるように」再調整しました
 const regions = [
-  { id: 'americas', name: '南北アメリカ', top: 40, left: 22, zoomX: 28, zoomY: 15, scale: 1.8, countries: ['us', 'ca', 'mx', 'br'] },
-  { id: 'europe', name: 'ヨーロッパ', top: 25, left: 50, zoomX: 0, zoomY: 30, scale: 3.2, countries: ['de', 'fr', 'gb', 'it'] },
-  { id: 'mideast_africa', name: '中東・アフリカ', top: 55, left: 55, zoomX: -5, zoomY: 10, scale: 2.2, countries: ['ae', 'tr', 'eg', 'za'] },
-  { id: 'asia', name: 'アジア', top: 35, left: 78, zoomX: -28, zoomY: 15, scale: 2.2, countries: ['jp', 'tw', 'kr', 'cn', 'th', 'sg'] },
-  { id: 'oceania', name: 'オセアニア', top: 75, left: 88, zoomX: -38, zoomY: -15, scale: 3.2, countries: ['au', 'nz'] }
+  { id: 'americas', name: '南北アメリカ', top: 40, left: 22, zoomX: 28, zoomY: 5, scale: 1.6, countries: ['us', 'ca', 'mx', 'br'] },
+  { id: 'europe', name: 'ヨーロッパ', top: 25, left: 50, zoomX: 0, zoomY: 55, scale: 3.5, countries: ['de', 'fr', 'gb', 'it'] },
+  { id: 'mideast_africa', name: '中東・アフリカ', top: 55, left: 55, zoomX: -5, zoomY: 20, scale: 2.0, countries: ['ae', 'tr', 'eg', 'za'] },
+  { id: 'asia', name: 'アジア', top: 35, left: 78, zoomX: -25, zoomY: 35, scale: 2.5, countries: ['jp', 'tw', 'kr', 'cn', 'th', 'sg'] },
+  { id: 'oceania', name: 'オセアニア', top: 75, left: 88, zoomX: -38, zoomY: 55, scale: 3.8, countries: ['au', 'nz'] }
 ];
 
 const countryPositions: Record<string, { top: number, left: number }> = {
@@ -51,7 +51,6 @@ languages.forEach(lang => {
   </div>
 
   <div class="map-viewport" id="map-viewport">
-    {/* ▼ 「地域を選択してください」を地図の邪魔にならない上部に固定 */}
     <div class="map-instruction-header">
        <div class="instruction-text" id="map-instruction">地域を選択してください</div>
     </div>
@@ -70,7 +69,6 @@ languages.forEach(lang => {
           </button>
         ))}
       </div>
-      {/* ▼ ここに国名ピンが生成されます */}
       <div class="country-pins-layer" id="country-pins" style="display: none;"></div>
     </div>
   </div>
@@ -84,7 +82,6 @@ languages.forEach(lang => {
   .map-lang-btn { background: #ffffff; border: 1px solid #cccccc; border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: bold; color: #555555; cursor: pointer; transition: 0.2s; }
   .map-lang-btn.active { background: var(--theme-color, #872732); color: #ffffff; border-color: var(--theme-color, #872732); }
   
-  /* ▼ 枠の高さを 650px に広げました */
   .map-viewport { position: relative; width: 100%; height: 650px; background-color: #004798; overflow: hidden; }
   
   .map-instruction-header {
@@ -98,7 +95,12 @@ languages.forEach(lang => {
 
   .back-to-world-btn { position: absolute; top: 60px; left: 20px; z-index: 30; background: #ffffff; border: 1px solid #ccc; border-radius: 6px; padding: 8px 15px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
   
-  .map-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center center; z-index: 1; }
+  /* ▼ 修正：transition を 1.5s にして「ふわっと」させました */
+  .map-layer { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.4, 1); 
+    transform-origin: center center; z-index: 1; 
+  }
   
   .map-background {
     position: absolute; width: 100%; height: 100%;
@@ -106,7 +108,8 @@ languages.forEach(lang => {
     -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
     mask-image: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
     -webkit-mask-size: cover; mask-size: cover;
-    -webkit-mask-position: center; mask-position: center;
+    /* ▼ 修正：初期位置を少し上げて南極をカット */
+    -webkit-mask-position: center 30%; mask-position: center 30%;
   }
 
   .map-pin { position: absolute; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.95); border: 2px solid var(--theme-color, #872732); border-radius: 24px; padding: 8px 16px; font-weight: bold; color: #111; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s; display: flex; align-items: center; justify-content: center; white-space: nowrap; z-index: 10; text-decoration: none; }
@@ -133,7 +136,8 @@ languages.forEach(lang => {
     var countryPinsLayer = document.getElementById('country-pins');
     var backBtn = document.getElementById('back-to-world');
     var instruction = document.getElementById('map-instruction');
-    
+    var currentScale = 1;
+
     document.querySelectorAll('.map-lang-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.map-lang-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -142,8 +146,6 @@ languages.forEach(lang => {
         if (currentRegion) renderCountryPins(currentRegion, currentScale);
       });
     });
-
-    var currentScale = 1;
 
     document.querySelectorAll('.region-pin').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -178,14 +180,12 @@ languages.forEach(lang => {
     function renderCountryPins(regionId, scale) {
       countryPinsLayer.innerHTML = ''; 
       var countries = mapData[currentLang][regionId] || [];
-      
       countries.forEach(function(c) {
         var a = document.createElement('a');
         a.href = c.url;
         a.className = 'map-pin country-pin';
         a.style.top = c.top + '%';
         a.style.left = c.left + '%';
-        // ズームに合わせてピンのサイズを調整
         a.style.transform = `translate(-50%, -50%) scale(${1 / scale})`;
         a.textContent = c.name;
         countryPinsLayer.appendChild(a);
