@@ -8,6 +8,7 @@ import Sidebar from '../components/Sidebar.astro';
 import CategorySidebar from '../components/CategorySidebar.astro';
 import ArticleSidebar from '../components/ArticleSidebar.astro';
 import WeatherSidebar from '../components/WeatherSidebar.astro';
+import CookieBanner from '../components/CookieBanner.astro';
 
 const {
   title,
@@ -19,7 +20,7 @@ const {
 } = Astro.props;
 
 const SITE_URL = 'https://24watchin.com';
-const DEFAULT_OG_IMAGE = `${SITE_URL}/images/ogp.png`; // ← ogp.png に変更！
+const DEFAULT_OG_IMAGE = `${SITE_URL}/images/ogp.png`;
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
@@ -36,16 +37,9 @@ const localeKeyMap = {
 const localeKey = (localeKeyMap[lang as keyof typeof localeKeyMap] || 'jp') as keyof typeof categoryLabelMap;
 const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
 
-// og:locale マッピング
 const ogLocaleMap: Record<string, string> = {
-  ja: 'ja_JP',
-  en: 'en_US',
-  'zh-cn': 'zh_CN',
-  'zh-tw': 'zh_TW',
-  es: 'es_ES',
-  fr: 'fr_FR',
-  de: 'de_DE',
-  ru: 'ru_RU',
+  ja: 'ja_JP', en: 'en_US', 'zh-cn': 'zh_CN', 'zh-tw': 'zh_TW',
+  es: 'es_ES', fr: 'fr_FR', de: 'de_DE', ru: 'ru_RU',
 };
 const ogLocale = ogLocaleMap[lang] || 'ja_JP';
 
@@ -64,7 +58,6 @@ const metaDescription = description || defaultDescriptions[lang] || defaultDescr
 const metaTitle = title ? `${title} | 24Watchin` : '24Watchin';
 const bodyStyle = '--theme-color: ' + themeColor + ';';
 
-// hreflang タグ生成
 const restPath = pathParts.slice(2).join('/');
 const restPathStr = restPath ? '/' + restPath + '/' : '/';
 
@@ -81,7 +74,6 @@ const xDefaultUrl = country
   ? `${SITE_URL}/ja/${country}${restPathStr}`
   : `${SITE_URL}/ja/`;
 
-// WebSite 構造化データ（全ページ共通）
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -155,11 +147,10 @@ const websiteJsonLd = {
     <!-- WebSite 構造化データ（全ページ共通） -->
     <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
 
-    <!-- 各ページ固有の構造化データ（記事ページなど）をここに差し込む -->
+    <!-- 各ページ固有の構造化データ -->
     <slot name="head" />
 
     <style>
-      /* ▼▼▼ 追加：画面全体をぴったりくっつけて角を四角にする強力なリセット ▼▼▼ */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
@@ -167,8 +158,6 @@ const websiteJsonLd = {
         width: 100%;
         overflow-x: hidden;
       }
-      /* ▲▲▲ 追加ここまで ▲▲▲ */
-
       body { font-family: sans-serif; background-color: #f8f9fa; color: #333; }
       .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
       .page-shell { margin-top: 30px; }
@@ -199,6 +188,8 @@ const websiteJsonLd = {
       </div>
     </div>
     <Footer allPosts={allPosts} />
+    <!-- クッキー同意バナー -->
+    <CookieBanner />
     <script is:inline>
       document.addEventListener('contextmenu', e => e.preventDefault());
       document.querySelectorAll('img').forEach(img => { img.setAttribute('loading', 'lazy'); });
