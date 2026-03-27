@@ -1,0 +1,118 @@
+---
+// 1. 必要な部品（コンポーネント）を読み込みます
+import Layout from '../../layouts/Layout.astro';
+import MainNewsLayout from '../../components/MainNewsLayout.astro';
+import GlobalRegionNews from '../../components/GlobalRegionNews.astro';
+
+// 2. 言語と国の設定（カンペ）を読み込みます
+import { langCountryPairs } from '../../lib/siteRoutes.ts';
+
+// 3. このページで作るべき「言語のURL（/ja/や/en/など）」の一覧を自動で準備します
+export async function getStaticPaths() {
+  // langCountryPairsの中から「言語(lang)」だけを取り出し、重複をなくして一覧にします
+  const langs = [...new Set(langCountryPairs.map(pair => pair.lang))];
+  return langs.map(lang => ({ params: { lang } }));
+}
+
+// 読者が今見ている言語（jaやen）を取得します
+const { lang } = Astro.params;
+
+// 4. 言語ごとのテーマカラーを設定します（ヘッダーなどで使っている色に合わせられます）
+// ※お好みの色があれば、ここのカラーコード（#以降の英数字）を自由に変更してください
+const themeColors: Record<string, string> = {
+  ja: '#872732',       // 日本語（赤茶系）
+  en: '#0033a0',       // 英語（ブルー系）
+  'zh-cn': '#e60012',  // 中国語・簡体字（赤系）
+  'zh-tw': '#000095',  // 中国語・繁体字（紺系）
+  es: '#aa151b',       // スペイン語
+  fr: '#002395',       // フランス語
+  de: '#000000',       // ドイツ語（黒系）
+  ru: '#d52b1e',       // ロシア語
+};
+// もし設定がない言語の場合は、デフォルトで #872732 を使います
+const themeColor = themeColors[lang] || '#872732';
+
+// 5. ページの一番上に出す「タイトル」を言語ごとに設定します
+const langLabels: Record<string, string> = {
+  ja: '最新ニュース一覧',
+  en: 'Latest Global News',
+  'zh-cn': '最新全球新闻',
+  'zh-tw': '最新全球新聞',
+  es: 'Últimas Noticias Globales',
+  fr: 'Dernières Actualités Globales',
+  de: 'Aktuelle Globale Nachrichten',
+  ru: 'Последние Глобальные Новости',
+};
+const pageTitle = langLabels[lang] || 'Latest Global News';
+---
+
+{/* 1カラムにするため、レイアウトのサイドバーを隠し（sidebarType="none"）、テーマカラーをページ全体に渡します */}
+<Layout title={`${pageTitle} | 24Watchin`} sidebarType="none">
+  <main class="lang-top-page" style={`--theme-color: ${themeColor};`}>
+    
+    {/* ページ上部のタイトル部分（テーマカラーで塗りつぶした帯になります） */}
+    <header class="lang-page-header">
+      <h1 class="lang-page-title">{pageTitle}</h1>
+    </header>
+
+    {/* メインのニュースエリア（MainとGlobalRegionを縦に1カラムで並べます） */}
+    <div class="lang-page-content">
+      <MainNewsLayout lang={lang} />
+      <GlobalRegionNews lang={lang} />
+    </div>
+
+  </main>
+</Layout>
+
+<style>
+  /* ▼ ページの見た目を整えるデザインの指示書です ▼ */
+  
+  .lang-top-page {
+    /* スマホでもPCでも見やすいように、最大幅を決めて画面の中央に配置します */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* タイトルの帯のデザイン */
+  .lang-page-header {
+    background-color: var(--theme-color); /* 言語のテーマカラーが自動で入ります */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .lang-page-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  /* 中身の配置（1カラムで縦に並べる） */
+  .lang-page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* パーツとパーツの間にしっかりとした余白（40px）を作ります */
+  }
+
+  /* ▼ スマホ用の微調整（画面が狭いときは余白や文字を少し小さくします） ▼ */
+  @media (max-width: 768px) {
+    .lang-top-page {
+      padding: 10px;
+    }
+    .lang-page-header {
+      padding: 10px 15px;
+      margin-bottom: 20px;
+    }
+    .lang-page-title {
+      font-size: 1.2rem;
+    }
+    .lang-page-content {
+      gap: 20px;
+    }
+  }
+</style>
