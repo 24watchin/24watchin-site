@@ -4,81 +4,102 @@ import { getCountryLabel } from '../lib/countryData.ts';
 
 // 8つの言語リスト
 const languages = [
-  { code: 'ja', label: '日本語' },
-  { code: 'en', label: 'English' },
-  { code: 'zh-cn', label: '简体中文' },
-  { code: 'zh-tw', label: '繁體中文' },
-  { code: 'es', label: 'Español' },
-  { code: 'fr', label: 'Français' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'ru', label: 'Русский' }
+  { code: 'ja', label: '日本語' }, { code: 'en', label: 'English' },
+  { code: 'zh-cn', label: '简体中文' }, { code: 'zh-tw', label: '繁體中文' },
+  { code: 'es', label: 'Español' }, { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' }, { code: 'ru', label: 'Русский' }
 ];
 
-// 対応している国と地域の設定
-const regions = {
-  asia: { id: 'asia', name: 'アジア・オセアニア', countries: ['jp', 'tw', 'kr', 'sg', 'cn', 'th', 'in', 'my', 'ph', 'vn', 'id', 'au', 'nz'] },
-  europe: { id: 'europe', name: 'ヨーロッパ・中東', countries: ['de', 'fr', 'gb', 'it', 'es', 'ae', 'za', 'eg', 'qa', 'om', 'sa', 'tr'] },
-  americas: { id: 'americas', name: '南北アメリカ', countries: ['us', 'ca', 'mx', 'br', 'ar', 'co'] }
+// ▼ 各地域と、地図上の大体の位置（top, left の ％）を設定します
+const regions = [
+  { id: 'asia', name: 'アジア・オセアニア', top: 40, left: 75, zoomX: 25, zoomY: 10, scale: 2.5, countries: ['jp', 'tw', 'kr', 'sg', 'cn', 'th'] },
+  { id: 'europe', name: 'ヨーロッパ・中東', top: 30, left: 52, zoomX: 0, zoomY: 20, scale: 3, countries: ['de', 'fr', 'gb', 'it'] },
+  { id: 'americas', name: '南北アメリカ', top: 40, left: 25, zoomX: -25, zoomY: 10, scale: 2.2, countries: ['us', 'ca'] }
+];
+
+// ▼ 各国と、地図上の大体の位置（top, left の ％）を設定します
+const countryPositions: Record<string, { top: number, left: number }> = {
+  jp: { top: 32, left: 84 },
+  tw: { top: 41, left: 81 },
+  kr: { top: 34, left: 81 },
+  cn: { top: 36, left: 75 },
+  th: { top: 46, left: 75 },
+  sg: { top: 54, left: 76 },
+  de: { top: 25, left: 51 },
+  fr: { top: 28, left: 49 },
+  gb: { top: 23, left: 47 },
+  it: { top: 31, left: 52 },
+  us: { top: 32, left: 20 },
+  ca: { top: 20, left: 22 }
 };
 
-// 全言語・全対応国のリンクデータを生成してJSに渡す準備
+// JSに渡すためのデータ作成
 const mapData: any = {};
 languages.forEach(lang => {
   mapData[lang.code] = {};
-  Object.values(regions).forEach(region => {
+  regions.forEach(region => {
     mapData[lang.code][region.id] = region.countries
-      .filter(countryCode => langCountryPairs.some(p => p.lang === lang.code && p.country === countryCode))
-      .map(countryCode => ({
-        code: countryCode,
-        name: getCountryLabel(countryCode, lang.code),
-        url: `/${lang.code}/${countryCode}/`
+      .filter(code => countryPositions[code]) // 位置情報がある国だけ
+      .map(code => ({
+        code: code,
+        name: getCountryLabel(code, lang.code),
+        url: `/${lang.code}/${code}/`,
+        top: countryPositions[code].top,
+        left: countryPositions[code].left
       }));
   });
 });
 ---
 
 <div class="interactive-world-map-container">
-  {/* ▼ 1. 上部の8言語切り替えボタン */}
+  {/* 言語切り替えボタン */}
   <div class="map-lang-selector">
     {languages.map((lang, index) => (
-      <button 
-        class={`map-lang-btn ${index === 0 ? 'active' : ''}`} 
-        data-lang={lang.code}
-      >
+      <button class={`map-lang-btn ${index === 0 ? 'active' : ''}`} data-lang={lang.code}>
         {lang.label}
       </button>
     ))}
   </div>
 
-  <div class="map-display-area" id="map-display-area">
+  <div class="map-viewport" id="map-viewport">
+    {/* 戻るボタン（ズーム時に表示） */}
+    <button class="back-to-world-btn" id="back-to-world" style="display: none;">
+      &larr; 世界地図に戻る
+    </button>
     
-    {/* ▼ 2. 最初の画面（世界全体：3つの地域から選ぶ） */}
-    <div class="map-view-global active" id="view-global">
-      <h3 class="map-instruction">地域を選択してください</h3>
-      <div class="region-cards">
-        {Object.values(regions).map(region => (
-          <button class="region-card-btn" data-region={region.id}>
-            <div class={`region-icon icon-${region.id}`}></div>
-            <span class="region-name">{region.name}</span>
+    <div class="map-instruction-overlay" id="map-instruction">
+      地域を選択してください
+    </div>
+
+    {/* 動く地図の本体 */}
+    <div class="map-layer" id="map-layer">
+      
+      {/* 1. 地域のボタン（最初はこれが表示される） */}
+      <div class="region-pins" id="region-pins">
+        {regions.map(region => (
+          <button 
+            class="map-pin region-pin" 
+            style={`top: ${region.top}%; left: ${region.left}%;`}
+            data-region={region.id}
+            data-zoom-x={region.zoomX}
+            data-zoom-y={region.zoomY}
+            data-scale={region.scale}
+          >
+            <span class="pin-pulse"></span>
+            <span class="pin-label">{region.name}</span>
           </button>
         ))}
       </div>
-    </div>
 
-    {/* ▼ 3. ズーム後の画面（選んだ地域の中の国リストが表示される） */}
-    <div class="map-view-regional" id="view-regional">
-      <button class="back-to-global-btn" id="back-to-global">&larr; 世界地図に戻る</button>
-      <h3 class="map-instruction" id="regional-instruction">国を選択してください</h3>
-      
-      <div class="country-grid" id="country-grid">
-        {/* ※ここはJavaScriptで選んだ言語・地域に合わせて自動で国ボタンが生成されます */}
+      {/* 2. 国のボタン（ズーム後にJavaScriptでここに生成される） */}
+      <div class="country-pins" id="country-pins" style="display: none;">
+        {/* JSで自動追加されます */}
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
 
-{/* ▼ JavaScriptにデータを渡すための隠しタグ */}
 <script type="application/json" id="world-map-data" set:html={JSON.stringify(mapData)}></script>
 
 <style>
@@ -90,162 +111,89 @@ languages.forEach(lang => {
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     overflow: hidden;
     margin-bottom: 40px;
-    display: flex;
-    flex-direction: column;
   }
 
-  /* --- 1. 言語切り替えボタンのデザイン --- */
+  /* --- 言語セレクター --- */
   .map-lang-selector {
-    display: flex;
-    flex-wrap: wrap;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 10px;
-    gap: 8px;
-    justify-content: center;
+    display: flex; flex-wrap: wrap; background: #f8f9fa; border-bottom: 1px solid #e0e0e0;
+    padding: 10px; gap: 8px; justify-content: center; z-index: 10; position: relative;
   }
   .map-lang-btn {
-    background: #ffffff;
-    border: 1px solid #cccccc;
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: bold;
-    color: #555555;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    background: #ffffff; border: 1px solid #cccccc; border-radius: 20px;
+    padding: 6px 14px; font-size: 13px; font-weight: bold; color: #555555; cursor: pointer; transition: 0.2s;
   }
   .map-lang-btn:hover { background: #eeeeee; }
-  .map-lang-btn.active {
-    background: var(--theme-color, #872732);
-    color: #ffffff;
-    border-color: var(--theme-color, #872732);
-  }
+  .map-lang-btn.active { background: var(--theme-color, #872732); color: #ffffff; border-color: var(--theme-color, #872732); }
 
-  /* --- 2. 地図表示エリア（共通） --- */
-  .map-display-area {
-    position: relative;
-    width: 100%;
-    min-height: 380px;
-    padding: 30px;
-    box-sizing: border-box;
-    /* ▼ 背景色と、世界地図の画像を設定しています */
-    background-color: #f4f7f6;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
-    background-size: cover;
-    background-position: center;
-    background-blend-mode: overlay;
+  /* --- 地図の表示窓（ビューポート） --- */
+  .map-viewport {
+    position: relative; width: 100%; height: 500px;
+    background-color: #e3f2fd; /* 海の色 */
     overflow: hidden;
   }
-  .map-instruction {
-    text-align: center;
-    font-size: 20px;
-    color: #333333;
-    margin: 0 0 24px 0;
+  .map-instruction-overlay {
+    position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9); padding: 8px 20px; border-radius: 20px;
+    font-weight: bold; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 5;
+    pointer-events: none; transition: opacity 0.3s;
+  }
+  .back-to-world-btn {
+    position: absolute; top: 15px; left: 15px; z-index: 10;
+    background: #ffffff; border: 1px solid #ccc; border-radius: 6px;
+    padding: 8px 15px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  .back-to-world-btn:hover { background: #f0f0f0; }
+
+  /* --- 地図本体とアニメーション --- */
+  .map-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    /* 世界地図の画像を背景に敷く */
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
+    background-size: cover; background-position: center;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); /* ズームの滑らかな動き */
+    transform-origin: center center;
   }
 
-  /* --- 画面の切り替えアニメーション設定 --- */
-  .map-view-global, .map-view-regional {
-    display: none;
-    animation: fadeInZoom 0.4s cubic-bezier(0.1, 0.8, 0.3, 1);
+  /* --- 地図の上のピン（ボタン）共通 --- */
+  .map-pin {
+    position: absolute; transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--theme-color, #872732); border-radius: 24px;
+    padding: 8px 16px; font-weight: bold; color: #111; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    white-space: nowrap; z-index: 2; text-decoration: none;
   }
-  .map-view-global.active, .map-view-regional.active {
-    display: block;
+  .map-pin:hover {
+    background: var(--theme-color, #872732); color: #fff; transform: translate(-50%, -55%) scale(1.05);
   }
-  @keyframes fadeInZoom {
-    0% { opacity: 0; transform: scale(0.95); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-
-  /* --- 3. グローバルビュー（地域選択） --- */
-  .region-cards {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  .region-card-btn {
-    background: #ffffff;
-    border: 2px solid #dddddd;
-    border-radius: 12px;
-    width: 220px;
-    height: 160px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  }
-  .region-card-btn:hover {
-    transform: translateY(-5px);
-    border-color: var(--theme-color, #872732);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  }
-  .region-icon {
-    width: 60px; height: 60px;
-    background-color: #e0e0e0;
-    border-radius: 50%;
-    margin-bottom: 12px;
-  }
-  .region-name { font-size: 18px; font-weight: bold; color: #111111; }
-
-  /* --- 4. リージョナルビュー（国選択） --- */
-  .back-to-global-btn {
-    position: absolute;
-    top: 20px; left: 20px;
-    background: #ffffff;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    padding: 6px 12px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #333333;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .back-to-global-btn:hover { background: #eeeeee; }
   
-  .country-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-    max-width: 900px;
-    margin: 0 auto;
+  /* 地域ピン専用の波紋エフェクト */
+  .region-pin { font-size: 15px; z-index: 3; }
+  .pin-pulse {
+    position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+    border-radius: 24px; box-shadow: 0 0 0 0 rgba(135, 39, 50, 0.4);
+    animation: pulse 2s infinite; pointer-events: none;
   }
-  /* JavaScriptで生成される国ボタンのデザイン */
-  .country-btn-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #ffffff;
-    border: 1px solid #cccccc;
-    border-radius: 8px;
-    padding: 12px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #111111;
-    text-decoration: none;
-    min-width: 120px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: all 0.2s ease;
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(135, 39, 50, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(135, 39, 50, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(135, 39, 50, 0); }
   }
-  .country-btn-link:hover {
-    background: var(--theme-color, #872732);
-    color: #ffffff;
-    border-color: var(--theme-color, #872732);
-    transform: translateY(-2px);
+
+  /* 国ピン専用（ズームした時に丁度いいサイズになるように調整） */
+  .country-pin {
+    font-size: 10px; padding: 4px 10px; border-width: 1px;
+    /* ズーム時に文字が大きくなりすぎないように縮小 */
+    transform: translate(-50%, -50%) scale(0.5);
   }
-  .no-country-msg {
-    color: #666666; font-size: 16px; margin-top: 20px;
+  .country-pin:hover {
+    transform: translate(-50%, -55%) scale(0.55);
   }
 
   @media (max-width: 768px) {
-    .region-card-btn { width: 100%; height: 100px; flex-direction: row; gap: 20px; }
-    .region-icon { margin-bottom: 0; width: 40px; height: 40px; }
-    .map-display-area { padding: 60px 20px 30px; }
+    .map-viewport { height: 400px; }
+    .region-pin { padding: 4px 8px; font-size: 12px; }
   }
 </style>
 
@@ -255,72 +203,82 @@ languages.forEach(lang => {
     if (!dataEl) return;
     
     var mapData = JSON.parse(dataEl.textContent);
-    var currentLang = 'ja'; // 初期設定は日本語
+    var currentLang = 'ja'; 
     var currentRegion = null;
 
-    var viewGlobal = document.getElementById('view-global');
-    var viewRegional = document.getElementById('view-regional');
-    var countryGrid = document.getElementById('country-grid');
-    var backBtn = document.getElementById('back-to-global');
+    var mapLayer = document.getElementById('map-layer');
+    var regionPins = document.getElementById('region-pins');
+    var countryPins = document.getElementById('country-pins');
+    var backBtn = document.getElementById('back-to-world');
+    var instruction = document.getElementById('map-instruction');
     
     // 1. 言語ボタンの切り替え
     var langBtns = document.querySelectorAll('.map-lang-btn');
     langBtns.forEach(function(btn) {
       btn.addEventListener('click', function() {
-        // 色を変える
         langBtns.forEach(function(b) { b.classList.remove('active'); });
         this.classList.add('active');
-        
-        // 言語を更新
         currentLang = this.getAttribute('data-lang');
         
-        // もし国選択画面を開いていたら、その言語での国リストに更新する
         if (currentRegion) {
-          renderCountries(currentRegion);
+          renderCountryPins(currentRegion);
         }
       });
     });
 
-    // 2. 地域カードをクリックした時（ズームイン）
-    var regionBtns = document.querySelectorAll('.region-card-btn');
-    regionBtns.forEach(function(btn) {
+    // 2. 地域ピンをクリックした時（地図をズームする！）
+    var rPins = document.querySelectorAll('.region-pin');
+    rPins.forEach(function(btn) {
       btn.addEventListener('click', function() {
         currentRegion = this.getAttribute('data-region');
+        var zoomX = this.getAttribute('data-zoom-x');
+        var zoomY = this.getAttribute('data-zoom-y');
+        var scale = this.getAttribute('data-scale');
         
-        // 画面を切り替え
-        viewGlobal.classList.remove('active');
-        viewRegional.classList.add('active');
+        // 地域ピンを隠して、地図をズームさせる
+        regionPins.style.display = 'none';
+        mapLayer.style.transform = `scale(${scale}) translate(${zoomX}%, ${zoomY}%)`;
         
-        // 選ばれた地域の国リストを表示
-        renderCountries(currentRegion);
+        backBtn.style.display = 'block';
+        instruction.textContent = '国を選択してください';
+        
+        // 国ピンを表示
+        renderCountryPins(currentRegion);
+        countryPins.style.display = 'block';
       });
     });
 
-    // 3. 戻るボタンをクリックした時（ズームアウト）
+    // 3. 戻るボタンをクリックした時（ズームを戻す）
     if (backBtn) {
       backBtn.addEventListener('click', function() {
         currentRegion = null;
-        viewRegional.classList.remove('active');
-        viewGlobal.classList.add('active');
+        
+        // ズームを解除
+        mapLayer.style.transform = 'scale(1) translate(0, 0)';
+        countryPins.style.display = 'none';
+        
+        setTimeout(function() {
+          regionPins.style.display = 'block';
+        }, 300); // ズームが戻り切る頃に地域ピンを再表示
+        
+        backBtn.style.display = 'none';
+        instruction.textContent = '地域を選択してください';
       });
     }
 
-    // 国ボタンを生成して並べる関数
-    function renderCountries(regionId) {
-      countryGrid.innerHTML = ''; // 一度リセット
+    // 4. 国ピンを生成して配置する関数
+    function renderCountryPins(regionId) {
+      countryPins.innerHTML = ''; 
       var countries = mapData[currentLang][regionId] || [];
-      
-      if (countries.length === 0) {
-        countryGrid.innerHTML = '<p class="no-country-msg">この言語で対応している国はまだありません。</p>';
-        return;
-      }
       
       countries.forEach(function(c) {
         var a = document.createElement('a');
         a.href = c.url;
-        a.className = 'country-btn-link';
+        a.className = 'map-pin country-pin';
+        a.style.top = c.top + '%';
+        a.style.left = c.left + '%';
         a.textContent = c.name;
-        countryGrid.appendChild(a);
+        countryPins.appendChild(a);
       });
     }
   });
