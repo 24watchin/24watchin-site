@@ -9,7 +9,7 @@ const languages = [
   { code: 'de', label: 'Deutsch' }, { code: 'ru', label: 'Русский' }
 ];
 
-// ▼ 中東・アフリカの zoomY を 5 にして、北も南もバランスよく見える位置に調整しました
+// ▼ なるかわさん調整済みの完璧なズーム設定（中東アフリカ zoomY: 0）
 const regions = [
   { id: 'americas', name: '南北アメリカ', top: 40, left: 22, zoomX: 25, zoomY: 10, scale: 1.5, countries: ['us', 'ca', 'mx', 'br'] },
   { id: 'europe', name: 'ヨーロッパ', top: 25, left: 50, zoomX: 0, zoomY: 25, scale: 3.2, countries: ['de', 'fr', 'gb', 'it'] },
@@ -25,22 +25,6 @@ const countryPositions: Record<string, { top: number, left: number }> = {
   ae: { top: 42, left: 58 }, tr: { top: 32, left: 56 }, eg: { top: 40, left: 54 }, za: { top: 75, left: 54 },
   us: { top: 32, left: 18 }, ca: { top: 20, left: 20 }, mx: { top: 45, left: 18 }, br: { top: 65, left: 32 }
 };
-
-const mapData: any = {};
-languages.forEach(lang => {
-  mapData[lang.code] = {};
-  regions.forEach(region => {
-    mapData[lang.code][region.id] = region.countries
-      .filter(code => countryPositions[code])
-      .map(code => ({
-        code: code,
-        name: getCountryLabel(code, lang.code) || code.toUpperCase(),
-        url: `/${lang.code}/${code}/`,
-        top: countryPositions[code].top,
-        left: countryPositions[code].left
-      }));
-  });
-});
 ---
 
 <div class="interactive-world-map-container">
@@ -70,12 +54,30 @@ languages.forEach(lang => {
         ))}
       </div>
       
-      <div class="country-pins-layer" id="country-pins" style="display: none;"></div>
+      {/* ▼ 解決策：最初からAstroにすべてのピンを作っておき、必要な時だけ表示させます！ */}
+      <div class="country-pins-layer" id="country-pins-layer" style="display: none;">
+        {languages.map(lang => (
+          <div class="lang-group" data-lang-group={lang.code} style={lang.code === 'ja' ? 'display: block;' : 'display: none;'}>
+            {regions.map(region => (
+              <div class="region-group" data-region-group={region.id} style="display: none;">
+                {region.countries.filter(code => countryPositions[code]).map(code => (
+                  <a 
+                    href={`/${lang.code}/${code}/`}
+                    class="map-pin country-pin"
+                    style={`top: ${countryPositions[code].top}%; left: ${countryPositions[code].left}%;`}
+                  >
+                    {getCountryLabel(code, lang.code) || code.toUpperCase()}
+                  </a>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
     </div>
   </div>
 </div>
-
-<script type="application/json" id="world-map-data" set:html={JSON.stringify(mapData)}></script>
 
 <style>
   .interactive-world-map-container { width: 100%; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 40px; }
@@ -122,80 +124,78 @@ languages.forEach(lang => {
   .pin-pulse { position: absolute; width: 100%; height: 100%; top: 0; left: 0; border-radius: 24px; box-shadow: 0 0 0 0 rgba(135, 39, 50, 0.4); animation: pulse 2s infinite; pointer-events: none; }
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(135, 39, 50, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(135, 39, 50, 0); } 100% { box-shadow: 0 0 0 0 rgba(135, 39, 50, 0); } }
 
-  .country-pin { font-size: 12px; padding: 4px 10px; border-width: 1px; z-index: 15; }
+  /* ▼ ピンが巨大化しないように、JSから渡された倍率(--pin-scale)を使います */
+  .country-pin { 
+    font-size: 12px; padding: 4px 10px; border-width: 1px; z-index: 15; 
+    transform: translate(-50%, -50%) scale(var(--pin-scale, 1));
+  }
+  .country-pin:hover { 
+    transform: translate(-50%, -55%) scale(calc(var(--pin-scale, 1) * 1.05)); 
+  }
 
   @media (max-width: 768px) { .map-viewport { height: 450px; } .region-pin { padding: 4px 8px; font-size: 12px; } .back-to-world-btn { top: 55px; padding: 5px 10px; font-size: 12px; } }
 </style>
 
 <script is:inline>
   window.addEventListener('load', function() {
-    var dataEl = document.getElementById('world-map-data');
-    if (!dataEl) return;
-    var mapData = JSON.parse(dataEl.textContent);
     var currentLang = 'ja'; 
-    var currentRegion = null;
     var mapLayer = document.getElementById('map-layer');
     var regionPins = document.getElementById('region-pins');
-    var countryPinsLayer = document.getElementById('country-pins');
+    var countryPinsLayer = document.getElementById('country-pins-layer');
     var backBtn = document.getElementById('back-to-world');
     var instruction = document.getElementById('map-instruction');
-    var currentScale = 1;
 
     var initScale = 1.15;
     var initTranslateY = 5; 
     mapLayer.style.transform = `scale(${initScale}) translate(0%, ${initTranslateY}%)`;
 
+    // ▼ 言語ボタンを押したときの処理
     document.querySelectorAll('.map-lang-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.map-lang-btn').forEach(function(b) { b.classList.remove('active'); });
         this.classList.add('active');
         currentLang = this.getAttribute('data-lang');
-        if (currentRegion) renderCountryPins(currentRegion, currentScale);
+        
+        // 選ばれた言語のピンだけを表示する
+        document.querySelectorAll('.lang-group').forEach(function(el) { el.style.display = 'none'; });
+        var targetLang = document.querySelector('.lang-group[data-lang-group="' + currentLang + '"]');
+        if(targetLang) targetLang.style.display = 'block';
       });
     });
 
+    // ▼ 地域ボタンを押したときのズーム処理
     document.querySelectorAll('.region-pin').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        currentRegion = this.getAttribute('data-region');
-        currentScale = parseFloat(this.getAttribute('data-scale'));
+        var regionId = this.getAttribute('data-region');
+        var scale = parseFloat(this.getAttribute('data-scale'));
         var zX = this.getAttribute('data-zoom-x');
         var zY = this.getAttribute('data-zoom-y');
 
         regionPins.style.display = 'none';
-        mapLayer.style.transform = `scale(${currentScale}) translate(${zX}%, ${zY}%)`;
+        mapLayer.style.transform = `scale(${scale}) translate(${zX}%, ${zY}%)`;
+        
+        // ズームに合わせてピンの文字サイズを整える魔法
+        countryPinsLayer.style.setProperty('--pin-scale', 1 / scale);
         
         backBtn.style.display = 'block';
         instruction.textContent = '国を選択してください';
         
-        renderCountryPins(currentRegion, currentScale);
+        // 選ばれた地域のピンだけを表示する
+        document.querySelectorAll('.region-group').forEach(function(el) { el.style.display = 'none'; });
+        document.querySelectorAll('.region-group[data-region-group="' + regionId + '"]').forEach(function(el) { el.style.display = 'block'; });
+
         countryPinsLayer.style.display = 'block';
       });
     });
 
+    // ▼ 戻るボタンを押したときの処理
     if (backBtn) {
       backBtn.addEventListener('click', function() {
-        currentRegion = null;
-        currentScale = initScale;
         mapLayer.style.transform = `scale(${initScale}) translate(0%, ${initTranslateY}%)`;
         countryPinsLayer.style.display = 'none';
         setTimeout(function() { regionPins.style.display = 'block'; }, 400);
         backBtn.style.display = 'none';
         instruction.textContent = '地域を選択してください';
-      });
-    }
-
-    function renderCountryPins(regionId, scale) {
-      countryPinsLayer.innerHTML = ''; 
-      var countries = mapData[currentLang][regionId] || [];
-      countries.forEach(function(c) {
-        var a = document.createElement('a');
-        a.href = c.url;
-        a.className = 'map-pin country-pin';
-        a.style.top = c.top + '%';
-        a.style.left = c.left + '%';
-        a.style.transform = `translate(-50%, -50%) scale(${1 / scale})`;
-        a.textContent = c.name;
-        countryPinsLayer.appendChild(a);
       });
     }
   });
