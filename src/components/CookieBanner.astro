@@ -1,0 +1,315 @@
+---
+// CookieBanner.astro
+// EU圏 → フルGDPRバナー、それ以外 → シンプルバナー
+// 両方とも1回のみ表示
+---
+
+<div id="cookie-banner-simple" class="cookie-simple" style="display:none;">
+  <span id="cookie-simple-text">このサイトはGoogle Analyticsを使用しています。</span>
+  <div class="cookie-simple-btns">
+    <button id="cookie-simple-accept" class="cookie-btn-accept">同意する</button>
+    <button id="cookie-simple-close" class="cookie-btn-close">閉じる</button>
+  </div>
+</div>
+
+<div id="cookie-banner-eu" class="cookie-eu-overlay" style="display:none;">
+  <div class="cookie-eu-box">
+    <div class="cookie-eu-logo">🌐 24Watchin</div>
+    <h2 id="cookie-eu-title" class="cookie-eu-title">Datenschutz & Cookies</h2>
+    <p id="cookie-eu-body" class="cookie-eu-body"></p>
+    <div class="cookie-eu-details" id="cookie-eu-details"></div>
+    <div class="cookie-eu-btns">
+      <button id="cookie-eu-accept" class="cookie-eu-btn-accept">Alle akzeptieren</button>
+      <button id="cookie-eu-reject" class="cookie-eu-btn-reject">Ablehnen</button>
+      <button id="cookie-eu-settings" class="cookie-eu-btn-settings">Einstellungen</button>
+    </div>
+    <div class="cookie-eu-links">
+      <a id="cookie-eu-privacy-link" href="#" class="cookie-eu-link">Datenschutz</a>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  // すでに同意済みなら何もしない
+  if (localStorage.getItem('cookieConsent')) return;
+
+  // EU言語リスト
+  const euLangs = ['de','fr','es','it','nl','pl','pt','sv','da','fi','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','mt','el','ga'];
+
+  // ブラウザ言語取得
+  const browserLang = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
+  const langCode = browserLang.toLowerCase().split('-')[0];
+  const isEU = euLangs.includes(langCode);
+
+  // 多言語テキスト
+  const texts = {
+    simple: {
+      ja: { msg: 'このサイトはGoogle Analyticsを使用しています。', accept: '同意する', close: '閉じる' },
+      en: { msg: 'This site uses Google Analytics to improve your experience.', accept: 'Accept', close: 'Close' },
+      'zh-cn': { msg: '本网站使用 Google Analytics 以改善用户体验。', accept: '同意', close: '关闭' },
+      'zh-tw': { msg: '本網站使用 Google Analytics 以改善使用者體驗。', accept: '同意', close: '關閉' },
+      ru: { msg: 'Этот сайт использует Google Analytics для улучшения работы.', accept: 'Принять', close: 'Закрыть' },
+    },
+    eu: {
+      de: {
+        title: 'Datenschutz & Cookies',
+        body: 'Wir verwenden Google Analytics, um die Nutzung dieser Website zu analysieren und Ihr Erlebnis zu verbessern. Durch Klicken auf „Alle akzeptieren" stimmen Sie der Verwendung von Cookies zu. Sie können Ihre Einwilligung jederzeit widerrufen.',
+        details: '• Notwendige Cookies: Immer aktiv\n• Analyse-Cookies (Google Analytics): Nur mit Ihrer Zustimmung',
+        accept: 'Alle akzeptieren',
+        reject: 'Ablehnen',
+        settings: 'Einstellungen',
+        privacy: 'Datenschutzerklärung',
+        privacyHref: '/de/',
+      },
+      fr: {
+        title: 'Confidentialité & Cookies',
+        body: 'Nous utilisons Google Analytics pour analyser l\'utilisation de ce site et améliorer votre expérience. En cliquant sur « Tout accepter », vous consentez à l\'utilisation de cookies. Vous pouvez retirer votre consentement à tout moment.',
+        details: '• Cookies nécessaires : Toujours actifs\n• Cookies d\'analyse (Google Analytics) : Uniquement avec votre consentement',
+        accept: 'Tout accepter',
+        reject: 'Refuser',
+        settings: 'Paramètres',
+        privacy: 'Politique de confidentialité',
+        privacyHref: '/fr/',
+      },
+      es: {
+        title: 'Privacidad & Cookies',
+        body: 'Usamos Google Analytics para analizar el uso de este sitio y mejorar su experiencia. Al hacer clic en «Aceptar todo», acepta el uso de cookies. Puede retirar su consentimiento en cualquier momento.',
+        details: '• Cookies necesarias: Siempre activas\n• Cookies de análisis (Google Analytics): Solo con su consentimiento',
+        accept: 'Aceptar todo',
+        reject: 'Rechazar',
+        settings: 'Configuración',
+        privacy: 'Política de privacidad',
+        privacyHref: '/es/',
+      },
+      default: {
+        title: 'Privacy & Cookies',
+        body: 'We use Google Analytics to analyze the use of this website and improve your experience. By clicking "Accept All", you consent to the use of cookies. You may withdraw your consent at any time.',
+        details: '• Necessary cookies: Always active\n• Analytics cookies (Google Analytics): Only with your consent',
+        accept: 'Accept All',
+        reject: 'Reject',
+        settings: 'Settings',
+        privacy: 'Privacy Policy',
+        privacyHref: '/en/',
+      },
+    }
+  };
+
+  function saveCookieConsent(value) {
+    localStorage.setItem('cookieConsent', value);
+  }
+
+  if (isEU) {
+    // EUバナー表示
+    const t = texts.eu[langCode] || texts.eu['default'];
+    const banner = document.getElementById('cookie-banner-eu');
+
+    document.getElementById('cookie-eu-title').textContent = t.title;
+    document.getElementById('cookie-eu-body').textContent = t.body;
+    document.getElementById('cookie-eu-details').textContent = t.details;
+    document.getElementById('cookie-eu-accept').textContent = t.accept;
+    document.getElementById('cookie-eu-reject').textContent = t.reject;
+    document.getElementById('cookie-eu-settings').textContent = t.settings;
+    const privacyLink = document.getElementById('cookie-eu-privacy-link');
+    privacyLink.textContent = t.privacy;
+    privacyLink.href = t.privacyHref;
+
+    banner.style.display = 'flex';
+
+    document.getElementById('cookie-eu-accept').onclick = function() {
+      saveCookieConsent('accepted');
+      banner.style.display = 'none';
+    };
+    document.getElementById('cookie-eu-reject').onclick = function() {
+      saveCookieConsent('rejected');
+      banner.style.display = 'none';
+    };
+    document.getElementById('cookie-eu-settings').onclick = function() {
+      saveCookieConsent('settings');
+      banner.style.display = 'none';
+    };
+
+  } else {
+    // シンプルバナー表示
+    const simpleLang = ['ja','en','zh-cn','zh-tw','ru'].includes(langCode) ? langCode : 'en';
+    const t = texts.simple[simpleLang] || texts.simple['en'];
+    const banner = document.getElementById('cookie-banner-simple');
+
+    document.getElementById('cookie-simple-text').textContent = t.msg;
+    document.getElementById('cookie-simple-accept').textContent = t.accept;
+    document.getElementById('cookie-simple-close').textContent = t.close;
+
+    banner.style.display = 'flex';
+
+    document.getElementById('cookie-simple-accept').onclick = function() {
+      saveCookieConsent('accepted');
+      banner.style.display = 'none';
+    };
+    document.getElementById('cookie-simple-close').onclick = function() {
+      saveCookieConsent('closed');
+      banner.style.display = 'none';
+    };
+  }
+})();
+</script>
+
+<style>
+  /* ========== シンプルバナー（EU以外） ========== */
+  .cookie-simple {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(30, 30, 30, 0.95);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 13px;
+    z-index: 9999;
+    flex-wrap: wrap;
+  }
+
+  .cookie-simple-btns {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .cookie-btn-accept {
+    background: var(--theme-color, #872732);
+    color: #fff;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+  }
+
+  .cookie-btn-close {
+    background: transparent;
+    color: #ccc;
+    border: 1px solid #ccc;
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .cookie-btn-accept:hover { opacity: 0.85; }
+  .cookie-btn-close:hover { color: #fff; border-color: #fff; }
+
+  /* ========== EUフルバナー ========== */
+  .cookie-eu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+  }
+
+  .cookie-eu-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  }
+
+  .cookie-eu-logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--theme-color, #872732);
+    margin-bottom: 16px;
+  }
+
+  .cookie-eu-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+  }
+
+  .cookie-eu-body {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .cookie-eu-details {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.8;
+    white-space: pre-line;
+    margin-bottom: 24px;
+  }
+
+  .cookie-eu-btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .cookie-eu-btn-accept {
+    background: var(--theme-color, #872732);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    flex: 1;
+  }
+
+  .cookie-eu-btn-reject {
+    background: #fff;
+    color: #444;
+    border: 1px solid #ccc;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  .cookie-eu-btn-settings {
+    background: #fff;
+    color: #444;
+    border: 1px solid #ccc;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  .cookie-eu-btn-accept:hover { opacity: 0.85; }
+  .cookie-eu-btn-reject:hover { background: #f5f5f5; }
+  .cookie-eu-btn-settings:hover { background: #f5f5f5; }
+
+  .cookie-eu-links { text-align: center; }
+  .cookie-eu-link { font-size: 12px; color: #888; text-decoration: underline; }
+  .cookie-eu-link:hover { color: #444; }
+
+  @media (max-width: 480px) {
+    .cookie-eu-box { padding: 24px 16px; }
+    .cookie-eu-btn-accept,
+    .cookie-eu-btn-reject,
+    .cookie-eu-btn-settings { font-size: 13px; padding: 10px 12px; }
+  }
+</style>
