@@ -2,6 +2,7 @@
 // CookieBanner.astro
 // EU圏（URLの言語コードで判定）→ フルGDPRバナー
 // それ以外 → シンプルバナー
+// プライバシーリンクは現在のURL（言語+国）から自動生成
 // 両方とも1回のみ表示
 ---
 
@@ -15,7 +16,7 @@
 
 <div id="cookie-banner-eu" class="cookie-eu-overlay" style="display:none;">
   <div class="cookie-eu-box">
-    <div class="cookie-eu-logo">🌐 24Watchin</div>
+    <div class="cookie-eu-logo"><img src="/images/logo-24watchin.png" alt="24Watchin" class="cookie-eu-logo-img" /></div>
     <h2 id="cookie-eu-title" class="cookie-eu-title">Datenschutz & Cookies</h2>
     <p id="cookie-eu-body" class="cookie-eu-body"></p>
     <div class="cookie-eu-details" id="cookie-eu-details"></div>
@@ -33,8 +34,13 @@
 (function() {
   if (localStorage.getItem('cookieConsent')) return;
 
-  var pathLang = window.location.pathname.split('/').filter(function(s){ return s !== ''; })[0] || 'en';
-  var langCode = pathLang.toLowerCase();
+  // URLから言語コードと国コードを取得
+  var parts = window.location.pathname.split('/').filter(function(s){ return s !== ''; });
+  var langCode = (parts[0] || 'en').toLowerCase();
+  var countryCode = (parts[1] || 'jp').toLowerCase();
+
+  // プライバシーポリシーのURLを動的生成
+  var privacyUrl = '/' + langCode + '/' + countryCode + '/info/privacy/';
 
   var euLangs = ['de','fr','es','it','nl','pl','pt','sv','da','fi','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','mt','el','ga'];
   var isEU = euLangs.indexOf(langCode) !== -1;
@@ -54,17 +60,15 @@
       details: '• Notwendige Cookies: Immer aktiv\n• Analyse-Cookies: Nur mit Ihrer Zustimmung',
       accept: 'Alle akzeptieren',
       reject: 'Ablehnen',
-      privacy: 'Datenschutzerklärung',
-      privacyHref: '/de/'
+      privacy: 'Datenschutzerklärung'
     },
     fr: {
       title: 'Confidentialité & Cookies',
       body: "Nous utilisons des cookies pour analyser l'accès à ce site et améliorer votre expérience. En cliquant sur « Tout accepter », vous consentez à l'utilisation de cookies.",
-      details: '• Cookies nécessaires : Toujours actifs\n• Cookies d\'analyse : Uniquement avec votre consentement',
+      details: "• Cookies nécessaires : Toujours actifs\n• Cookies d'analyse : Uniquement avec votre consentement",
       accept: 'Tout accepter',
       reject: 'Refuser',
-      privacy: 'Politique de confidentialité',
-      privacyHref: '/fr/'
+      privacy: 'Politique de confidentialité'
     },
     es: {
       title: 'Privacidad & Cookies',
@@ -72,8 +76,7 @@
       details: '• Cookies necesarias: Siempre activas\n• Cookies de análisis: Solo con su consentimiento',
       accept: 'Aceptar todo',
       reject: 'Rechazar',
-      privacy: 'Política de privacidad',
-      privacyHref: '/es/'
+      privacy: 'Política de privacidad'
     },
     default: {
       title: 'Privacy & Cookies',
@@ -81,8 +84,7 @@
       details: '• Necessary cookies: Always active\n• Analytics cookies: Only with your consent',
       accept: 'Accept All',
       reject: 'Reject',
-      privacy: 'Privacy Policy',
-      privacyHref: '/en/'
+      privacy: 'Privacy Policy'
     }
   };
 
@@ -100,7 +102,7 @@
     document.getElementById('cookie-eu-reject').textContent = t.reject;
     var link = document.getElementById('cookie-eu-privacy-link');
     link.textContent = t.privacy;
-    link.href = t.privacyHref;
+    link.href = privacyUrl;
     banner.style.display = 'flex';
     document.getElementById('cookie-eu-accept').onclick = function() { save('accepted'); banner.style.display = 'none'; };
     document.getElementById('cookie-eu-reject').onclick = function() { save('rejected'); banner.style.display = 'none'; };
@@ -178,6 +180,7 @@
     overflow-y: auto;
     box-shadow: 0 8px 40px rgba(0,0,0,0.3);
   }
+  .cookie-eu-logo-img { height: 36px; width: auto; display: block; margin-bottom: 16px; }
   .cookie-eu-logo {
     font-size: 20px;
     font-weight: bold;
