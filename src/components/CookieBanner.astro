@@ -1,6 +1,7 @@
 ---
 // CookieBanner.astro
 // EU圏 → フルGDPRバナー、それ以外 → シンプルバナー
+// 判定方法：URLの言語コード（/de/ /fr/ /es/ など）
 // 両方とも1回のみ表示
 ---
 
@@ -34,12 +35,12 @@
   // すでに同意済みなら何もしない
   if (localStorage.getItem('cookieConsent')) return;
 
+  // URLの言語コードを取得（例: /de/ae/ → 'de'）
+  const pathLang = window.location.pathname.split('/').filter(Boolean)[0] || 'en';
+  const langCode = pathLang.toLowerCase();
+
   // EU言語リスト
   const euLangs = ['de','fr','es','it','nl','pl','pt','sv','da','fi','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','mt','el','ga'];
-
-  // ブラウザ言語取得
-  const browserLang = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
-  const langCode = browserLang.toLowerCase().split('-')[0];
   const isEU = euLangs.includes(langCode);
 
   // 多言語テキスト
@@ -54,8 +55,8 @@
     eu: {
       de: {
         title: 'Datenschutz & Cookies',
-        body: 'Wir verwenden Google Analytics, um die Nutzung dieser Website zu analysieren und Ihr Erlebnis zu verbessern. Durch Klicken auf „Alle akzeptieren" stimmen Sie der Verwendung von Cookies zu. Sie können Ihre Einwilligung jederzeit widerrufen.',
-        details: '• Notwendige Cookies: Immer aktiv\n• Analyse-Cookies (Google Analytics): Nur mit Ihrer Zustimmung',
+        body: 'Wir verwenden Cookies für die Zugriffsanalyse dieser Website, um Ihr Erlebnis zu verbessern. Durch Klicken auf „Alle akzeptieren" stimmen Sie der Verwendung von Cookies zu. Sie können Ihre Einwilligung jederzeit widerrufen.',
+        details: '• Notwendige Cookies: Immer aktiv\n• Analyse-Cookies: Nur mit Ihrer Zustimmung',
         accept: 'Alle akzeptieren',
         reject: 'Ablehnen',
         settings: 'Einstellungen',
@@ -64,8 +65,8 @@
       },
       fr: {
         title: 'Confidentialité & Cookies',
-        body: 'Nous utilisons Google Analytics pour analyser l\'utilisation de ce site et améliorer votre expérience. En cliquant sur « Tout accepter », vous consentez à l\'utilisation de cookies. Vous pouvez retirer votre consentement à tout moment.',
-        details: '• Cookies nécessaires : Toujours actifs\n• Cookies d\'analyse (Google Analytics) : Uniquement avec votre consentement',
+        body: 'Nous utilisons des cookies pour analyser l\'accès à ce site et améliorer votre expérience. En cliquant sur « Tout accepter », vous consentez à l\'utilisation de cookies. Vous pouvez retirer votre consentement à tout moment.',
+        details: '• Cookies nécessaires : Toujours actifs\n• Cookies d\'analyse : Uniquement avec votre consentement',
         accept: 'Tout accepter',
         reject: 'Refuser',
         settings: 'Paramètres',
@@ -74,8 +75,8 @@
       },
       es: {
         title: 'Privacidad & Cookies',
-        body: 'Usamos Google Analytics para analizar el uso de este sitio y mejorar su experiencia. Al hacer clic en «Aceptar todo», acepta el uso de cookies. Puede retirar su consentimiento en cualquier momento.',
-        details: '• Cookies necesarias: Siempre activas\n• Cookies de análisis (Google Analytics): Solo con su consentimiento',
+        body: 'Usamos cookies para analizar el acceso a este sitio y mejorar su experiencia. Al hacer clic en «Aceptar todo», acepta el uso de cookies. Puede retirar su consentimiento en cualquier momento.',
+        details: '• Cookies necesarias: Siempre activas\n• Cookies de análisis: Solo con su consentimiento',
         accept: 'Aceptar todo',
         reject: 'Rechazar',
         settings: 'Configuración',
@@ -84,8 +85,8 @@
       },
       default: {
         title: 'Privacy & Cookies',
-        body: 'We use Google Analytics to analyze the use of this website and improve your experience. By clicking "Accept All", you consent to the use of cookies. You may withdraw your consent at any time.',
-        details: '• Necessary cookies: Always active\n• Analytics cookies (Google Analytics): Only with your consent',
+        body: 'We use cookies for access analysis to improve your experience. By clicking "Accept All", you consent to the use of cookies. You may withdraw your consent at any time.',
+        details: '• Necessary cookies: Always active\n• Analytics cookies: Only with your consent',
         accept: 'Accept All',
         reject: 'Reject',
         settings: 'Settings',
@@ -100,7 +101,7 @@
   }
 
   if (isEU) {
-    // EUバナー表示
+    // EUフルバナー表示
     const t = texts.eu[langCode] || texts.eu['default'];
     const banner = document.getElementById('cookie-banner-eu');
 
