@@ -278,10 +278,11 @@ window.addEventListener('DOMContentLoaded', function() {
       html += '<div class="temp-item"><span class="temp-label">' + (labels.min||'Min') + '</span><span class="value-text temp-min">' + day.mintemp + tempUnit + '</span></div>';
       html += '</div>';
       html += '<div class="rain-info"><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
-      html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '</span></div>';
+      html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '<span class="sp-chevron"> ▼</span></span></div>';
       html += '</button>';
 
-      html += '<div id="hourly-pc-' + index + '" class="hourly-details pc-view" hidden>';
+      /* 隠す指示（hidden属性）を使わずにクラスを設定します */
+      html += '<div id="hourly-pc-' + index + '" class="hourly-details pc-view">';
       html += '<div class="hourly-scroll-wrapper"><table class="hourly-table"><thead><tr>';
       html += '<th>' + (labels.time||'Time') + '</th>';
       html += '<th>' + (labels.weather||'Weather') + '</th>';
@@ -322,7 +323,8 @@ window.addEventListener('DOMContentLoaded', function() {
       html += '<div class="badge-wrapper"><span class="hourly-badge sp-btn">' + (labels.hourly||'Hourly') + '<span class="sp-chevron"> ▼</span></span></div>';
       html += '</button>';
 
-      html += '<div id="hourly-sp-' + index + '" class="hourly-details sp-view" hidden>';
+      /* こちらも隠す指示（hidden属性）を使わずにクラスを設定します */
+      html += '<div id="hourly-sp-' + index + '" class="hourly-details sp-view">';
       html += '<div class="hourly-scroll-wrapper"><div class="hourly-flex-container">';
       day.hour.forEach(function(h) {
         var hHour = parseInt(h.time.split(':')[0]);
@@ -379,8 +381,18 @@ window.addEventListener('DOMContentLoaded', function() {
         var targetId = e.currentTarget.getAttribute('data-target');
         var targetEl = document.getElementById(targetId);
         var isExpanded = e.currentTarget.getAttribute('aria-expanded') === 'true';
+        
+        // 状態を反転させます
         e.currentTarget.setAttribute('aria-expanded', String(!isExpanded));
-        if (targetEl) targetEl.hidden = isExpanded;
+        
+        // 「開く・閉じる」のクラスを付け外しして、アニメーションを動かします
+        if (targetEl) {
+          if (isExpanded) {
+            targetEl.classList.remove('is-open');
+          } else {
+            targetEl.classList.add('is-open');
+          }
+        }
       });
     });
   }
@@ -430,14 +442,48 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style is:global>
-  /* ========================================================= */
-  /* ▼▼▼ 共通のシステム設定（開いたままになるのを防ぐ特効薬）▼▼▼ */
-  /* ========================================================= */
-  [hidden] { display: none !important; }
-
   /* PCとスマホの切り替えベース設定 */
-  .pc-view { display: flex; } /* 必要な箇所で上書きします */
+  .pc-view { display: flex; } 
   .sp-view { display: none !important; }
+
+  /* ========================================================= */
+  /* ▼▼▼ ふんわりスライド開閉アニメーションの仕組み ▼▼▼ */
+  /* ========================================================= */
+  
+  /* ①最初は高さをゼロにして、中身を隠しておく設定 */
+  .weather-page .hourly-details { 
+    max-height: 0; 
+    opacity: 0; 
+    overflow: hidden; 
+    transition: max-height 0.6s ease-in-out, opacity 0.4s ease-in-out, padding 0.4s ease-in-out;
+    padding-top: 0 !important; 
+    padding-bottom: 0 !important; 
+    border-top: none !important;
+    background: #f8f9fa;
+  }
+  
+  /* ②開いた時は高さをたっぷりと確保し、中身を表示する設定 */
+  .weather-page .hourly-details.is-open {
+    max-height: 2000px; /* 24時間分の情報が確実に入る高さ */
+    opacity: 1;
+    border-top: 1px solid #eee !important;
+  }
+  
+  /* PC版：開いた時の余白設定 */
+  .weather-page .hourly-details.pc-view.is-open {
+    padding: 0 16px 16px 16px !important;
+  }
+  
+  /* スマホ版：開いた時の余白設定 */
+  @media (max-width: 768px) {
+    .weather-page .hourly-details.sp-view.is-open {
+      padding: 16px !important;
+    }
+  }
+  
+  /* ③「▼」矢印もクリックに合わせてクルッと回るアニメーションを追加 */
+  .sp-chevron { display: inline-block; transition: transform 0.3s ease; }
+  .day-summary-btn[aria-expanded="true"] .sp-chevron { transform: rotate(180deg); }
 
   /* ========================================================= */
   /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
@@ -468,7 +514,7 @@ window.addEventListener('DOMContentLoaded', function() {
   .weather-page .rain-val { font-weight: bold; color: #0288d1; }
   .weather-page .hourly-badge { background-color: var(--theme-color, #872732); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
   
-  .weather-page .hourly-details.pc-view { display: block; background: #f8f9fa; padding: 0 16px 16px 16px; border-top: 1px solid #eee; overflow-x: auto; }
+  .weather-page .hourly-scroll-wrapper { width: 100%; overflow-x: auto; scrollbar-width: thin; box-sizing: border-box; }
   .weather-page .hourly-table { width: 100%; min-width: 600px; border-collapse: collapse; }
   .weather-page .hourly-table th { padding: 12px 6px; font-size: 0.85rem; color: #666; border-bottom: 1px solid #ccc; text-align: center; }
   .weather-page .hourly-table td { padding: 12px 6px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; }
@@ -579,8 +625,6 @@ window.addEventListener('DOMContentLoaded', function() {
       border: 1.5px solid var(--theme-color, #872732); 
     }
     
-    .weather-page .hourly-details.sp-view { background: #f8f9fa; padding: 16px; border-top: 1px solid #eee; }
-    .sp-view .hourly-scroll-wrapper { width: 100%; overflow-x: auto; scrollbar-width: thin; }
     .sp-view .hourly-flex-container { display: flex; gap: 10px; padding-bottom: 8px; }
     
     .sp-view .hourly-card { 
