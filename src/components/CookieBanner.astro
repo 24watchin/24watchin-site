@@ -1,7 +1,7 @@
 ---
 // CookieBanner.astro
-// EU圏 → フルGDPRバナー、それ以外 → シンプルバナー
-// 判定方法：URLの言語コード（/de/ /fr/ /es/ など）
+// EU圏（URLの言語コードで判定）→ フルGDPRバナー
+// それ以外 → シンプルバナー
 // 両方とも1回のみ表示
 ---
 
@@ -31,124 +31,94 @@
 
 <script is:inline>
 (function() {
-  // すでに同意済みなら何もしない
   if (localStorage.getItem('cookieConsent')) return;
 
-  // URLの言語コードを取得（例: /de/ae/ → 'de'）
-  const pathLang = window.location.pathname.split('/').filter(Boolean)[0] || 'en';
-  const langCode = pathLang.toLowerCase();
+  var pathLang = window.location.pathname.split('/').filter(function(s){ return s !== ''; })[0] || 'en';
+  var langCode = pathLang.toLowerCase();
 
-  // EU言語リスト
-  const euLangs = ['de','fr','es','it','nl','pl','pt','sv','da','fi','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','mt','el','ga'];
-  const isEU = euLangs.includes(langCode);
+  var euLangs = ['de','fr','es','it','nl','pl','pt','sv','da','fi','cs','sk','hu','ro','bg','hr','sl','et','lv','lt','mt','el','ga'];
+  var isEU = euLangs.indexOf(langCode) !== -1;
 
-  // 多言語テキスト
-  const texts = {
-    simple: {
-      ja: { msg: 'このサイトはアクセス解析のためCookieを使用しています。', accept: '同意する', close: '閉じる' },
-      en: { msg: 'This site uses cookies for access analysis to improve your experience.', accept: 'Accept', close: 'Close' },
-      'zh-cn': { msg: '本网站使用 Cookie 进行访问分析，以改善用户体验。', accept: '同意', close: '关闭' },
-      'zh-tw': { msg: '本網站使用 Cookie 進行訪問分析，以改善使用者體驗。', accept: '同意', close: '關閉' },
-      ru: { msg: 'Этот сайт использует файлы cookie для анализа посещаемости и улучшения работы.', accept: 'Принять', close: 'Закрыть' },
+  var simpleTexts = {
+    ja: { msg: 'このサイトはアクセス解析のためCookieを使用しています。', accept: '同意する', close: '閉じる' },
+    en: { msg: 'This site uses cookies for access analysis to improve your experience.', accept: 'Accept', close: 'Close' },
+    'zh-cn': { msg: '本网站使用 Cookie 进行访问分析，以改善用户体验。', accept: '同意', close: '关闭' },
+    'zh-tw': { msg: '本網站使用 Cookie 進行訪問分析，以改善使用者體驗。', accept: '同意', close: '關閉' },
+    ru: { msg: 'Этот сайт использует файлы cookie для анализа посещаемости.', accept: 'Принять', close: 'Закрыть' }
+  };
+
+  var euTexts = {
+    de: {
+      title: 'Datenschutz & Cookies',
+      body: 'Wir verwenden Cookies für die Zugriffsanalyse dieser Website, um Ihr Erlebnis zu verbessern. Durch Klicken auf „Alle akzeptieren" stimmen Sie der Verwendung von Cookies zu.',
+      details: '• Notwendige Cookies: Immer aktiv\n• Analyse-Cookies: Nur mit Ihrer Zustimmung',
+      accept: 'Alle akzeptieren',
+      reject: 'Ablehnen',
+      privacy: 'Datenschutzerklärung',
+      privacyHref: '/de/'
     },
-    eu: {
-      de: {
-        title: 'Datenschutz & Cookies',
-        body: 'Wir verwenden Cookies für die Zugriffsanalyse dieser Website, um Ihr Erlebnis zu verbessern. Durch Klicken auf „Alle akzeptieren" stimmen Sie der Verwendung von Cookies zu. Sie können Ihre Einwilligung jederzeit widerrufen.',
-        details: '• Notwendige Cookies: Immer aktiv\n• Analyse-Cookies: Nur mit Ihrer Zustimmung',
-        accept: 'Alle akzeptieren',
-        reject: 'Ablehnen',
-        privacy: 'Datenschutzerklärung',
-        privacyHref: '/de/',
-      },
-      fr: {
-        title: 'Confidentialité & Cookies',
-        body: 'Nous utilisons des cookies pour analyser l\'accès à ce site et améliorer votre expérience. En cliquant sur « Tout accepter », vous consentez à l\'utilisation de cookies. Vous pouvez retirer votre consentement à tout moment.',
-        details: '• Cookies nécessaires : Toujours actifs\n• Cookies d\'analyse : Uniquement avec votre consentement',
-        accept: 'Tout accepter',
-        reject: 'Refuser',
-        privacy: 'Politique de confidentialité',
-        privacyHref: '/fr/',
-      },
-      es: {
-        title: 'Privacidad & Cookies',
-        body: 'Usamos cookies para analizar el acceso a este sitio y mejorar su experiencia. Al hacer clic en «Aceptar todo», acepta el uso de cookies. Puede retirar su consentimiento en cualquier momento.',
-        details: '• Cookies necesarias: Siempre activas\n• Cookies de análisis: Solo con su consentimiento',
-        accept: 'Aceptar todo',
-        reject: 'Rechazar',
-        privacy: 'Política de privacidad',
-        privacyHref: '/es/',
-      },
-      default: {
-        title: 'Privacy & Cookies',
-        body: 'We use cookies for access analysis to improve your experience. By clicking "Accept All", you consent to the use of cookies. You may withdraw your consent at any time.',
-        details: '• Necessary cookies: Always active\n• Analytics cookies: Only with your consent',
-        accept: 'Accept All',
-        reject: 'Reject',
-        privacy: 'Privacy Policy',
-        privacyHref: '/en/',
-      },
+    fr: {
+      title: 'Confidentialité & Cookies',
+      body: "Nous utilisons des cookies pour analyser l'accès à ce site et améliorer votre expérience. En cliquant sur « Tout accepter », vous consentez à l'utilisation de cookies.",
+      details: '• Cookies nécessaires : Toujours actifs\n• Cookies d\'analyse : Uniquement avec votre consentement',
+      accept: 'Tout accepter',
+      reject: 'Refuser',
+      privacy: 'Politique de confidentialité',
+      privacyHref: '/fr/'
+    },
+    es: {
+      title: 'Privacidad & Cookies',
+      body: 'Usamos cookies para analizar el acceso a este sitio y mejorar su experiencia. Al hacer clic en «Aceptar todo», acepta el uso de cookies.',
+      details: '• Cookies necesarias: Siempre activas\n• Cookies de análisis: Solo con su consentimiento',
+      accept: 'Aceptar todo',
+      reject: 'Rechazar',
+      privacy: 'Política de privacidad',
+      privacyHref: '/es/'
+    },
+    default: {
+      title: 'Privacy & Cookies',
+      body: 'We use cookies for access analysis to improve your experience. By clicking "Accept All", you consent to the use of cookies.',
+      details: '• Necessary cookies: Always active\n• Analytics cookies: Only with your consent',
+      accept: 'Accept All',
+      reject: 'Reject',
+      privacy: 'Privacy Policy',
+      privacyHref: '/en/'
     }
   };
 
-  function saveCookieConsent(value) {
+  function save(value) {
     localStorage.setItem('cookieConsent', value);
   }
 
   if (isEU) {
-    // EUフルバナー表示
-    const t = texts.eu[langCode] || texts.eu['default'];
-    const banner = document.getElementById('cookie-banner-eu');
-
+    var t = euTexts[langCode] || euTexts['default'];
+    var banner = document.getElementById('cookie-banner-eu');
     document.getElementById('cookie-eu-title').textContent = t.title;
     document.getElementById('cookie-eu-body').textContent = t.body;
     document.getElementById('cookie-eu-details').textContent = t.details;
     document.getElementById('cookie-eu-accept').textContent = t.accept;
     document.getElementById('cookie-eu-reject').textContent = t.reject;
-    const privacyLink = document.getElementById('cookie-eu-privacy-link');
-    privacyLink.textContent = t.privacy;
-    privacyLink.href = t.privacyHref;
-
+    var link = document.getElementById('cookie-eu-privacy-link');
+    link.textContent = t.privacy;
+    link.href = t.privacyHref;
     banner.style.display = 'flex';
-
-    document.getElementById('cookie-eu-accept').onclick = function() {
-      saveCookieConsent('accepted');
-      banner.style.display = 'none';
-    };
-    document.getElementById('cookie-eu-reject').onclick = function() {
-      saveCookieConsent('rejected');
-      banner.style.display = 'none';
-    };
-      saveCookieConsent('settings');
-      banner.style.display = 'none';
-    };
-
+    document.getElementById('cookie-eu-accept').onclick = function() { save('accepted'); banner.style.display = 'none'; };
+    document.getElementById('cookie-eu-reject').onclick = function() { save('rejected'); banner.style.display = 'none'; };
   } else {
-    // シンプルバナー表示
-    const simpleLang = ['ja','en','zh-cn','zh-tw','ru'].includes(langCode) ? langCode : 'en';
-    const t = texts.simple[simpleLang] || texts.simple['en'];
-    const banner = document.getElementById('cookie-banner-simple');
-
-    document.getElementById('cookie-simple-text').textContent = t.msg;
-    document.getElementById('cookie-simple-accept').textContent = t.accept;
-    document.getElementById('cookie-simple-close').textContent = t.close;
-
-    banner.style.display = 'flex';
-
-    document.getElementById('cookie-simple-accept').onclick = function() {
-      saveCookieConsent('accepted');
-      banner.style.display = 'none';
-    };
-    document.getElementById('cookie-simple-close').onclick = function() {
-      saveCookieConsent('closed');
-      banner.style.display = 'none';
-    };
+    var sl = ['ja','en','zh-cn','zh-tw','ru'].indexOf(langCode) !== -1 ? langCode : 'en';
+    var st = simpleTexts[sl] || simpleTexts['en'];
+    var sbanner = document.getElementById('cookie-banner-simple');
+    document.getElementById('cookie-simple-text').textContent = st.msg;
+    document.getElementById('cookie-simple-accept').textContent = st.accept;
+    document.getElementById('cookie-simple-close').textContent = st.close;
+    sbanner.style.display = 'flex';
+    document.getElementById('cookie-simple-accept').onclick = function() { save('accepted'); sbanner.style.display = 'none'; };
+    document.getElementById('cookie-simple-close').onclick = function() { save('closed'); sbanner.style.display = 'none'; };
   }
 })();
 </script>
 
 <style>
-  /* ========== シンプルバナー（EU以外） ========== */
   .cookie-simple {
     position: fixed;
     bottom: 0;
@@ -165,13 +135,7 @@
     z-index: 9999;
     flex-wrap: wrap;
   }
-
-  .cookie-simple-btns {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
+  .cookie-simple-btns { display: flex; gap: 8px; flex-shrink: 0; }
   .cookie-btn-accept {
     background: var(--theme-color, #872732);
     color: #fff;
@@ -182,7 +146,6 @@
     font-size: 13px;
     font-weight: bold;
   }
-
   .cookie-btn-close {
     background: transparent;
     color: #ccc;
@@ -192,11 +155,9 @@
     cursor: pointer;
     font-size: 13px;
   }
-
   .cookie-btn-accept:hover { opacity: 0.85; }
   .cookie-btn-close:hover { color: #fff; border-color: #fff; }
 
-  /* ========== EUフルバナー ========== */
   .cookie-eu-overlay {
     position: fixed;
     inset: 0;
@@ -207,7 +168,6 @@
     z-index: 99999;
     padding: 20px;
   }
-
   .cookie-eu-box {
     background: #fff;
     border-radius: 12px;
@@ -218,28 +178,24 @@
     overflow-y: auto;
     box-shadow: 0 8px 40px rgba(0,0,0,0.3);
   }
-
   .cookie-eu-logo {
     font-size: 20px;
     font-weight: bold;
     color: var(--theme-color, #872732);
     margin-bottom: 16px;
   }
-
   .cookie-eu-title {
     font-size: 22px;
     font-weight: bold;
     color: #1a1a1a;
     margin-bottom: 16px;
   }
-
   .cookie-eu-body {
     font-size: 14px;
     color: #444;
     line-height: 1.7;
     margin-bottom: 16px;
   }
-
   .cookie-eu-details {
     background: #f8f9fa;
     border-radius: 6px;
@@ -250,14 +206,12 @@
     white-space: pre-line;
     margin-bottom: 24px;
   }
-
   .cookie-eu-btns {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 16px;
   }
-
   .cookie-eu-btn-accept {
     background: var(--theme-color, #872732);
     color: #fff;
@@ -269,7 +223,6 @@
     font-weight: bold;
     flex: 1;
   }
-
   .cookie-eu-btn-reject {
     background: #fff;
     color: #444;
@@ -280,15 +233,15 @@
     font-size: 14px;
     flex: 1;
   }
-
-
   .cookie-eu-btn-accept:hover { opacity: 0.85; }
   .cookie-eu-btn-reject:hover { background: #f5f5f5; }
+  .cookie-eu-links { text-align: center; }
   .cookie-eu-link { font-size: 12px; color: #888; text-decoration: underline; }
   .cookie-eu-link:hover { color: #444; }
 
   @media (max-width: 480px) {
     .cookie-eu-box { padding: 24px 16px; }
     .cookie-eu-btn-accept,
-    .cookie-eu-btn-reject,
+    .cookie-eu-btn-reject { font-size: 13px; padding: 10px 12px; }
+  }
 </style>
