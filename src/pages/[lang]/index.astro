@@ -14,23 +14,23 @@ const { lang } = Astro.params;
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId(lang);
 
-// ▼ 【修正】「一時保存の箱」を言語ごとに分けました！
-if (!globalThis.bloggerPostsCache) {
-  globalThis.bloggerPostsCache = {};
+// ▼ 【超強力な修正】複数ページからの同時アクセスによるパンクを防ぐ「プロミス・キャッシュ」
+if (!globalThis.bloggerApiCache) {
+  globalThis.bloggerApiCache = {};
 }
 
-// 今見ている言語の箱から記事を取り出します
-let allPosts = globalThis.bloggerPostsCache[lang] || [];
-
-// もしその言語の箱が空っぽだったら、Bloggerから取得して箱に入れます
-if (allPosts.length === 0 && API_KEY && BLOG_ID) {
-  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
-  const response = await fetch(url).catch(() => null);
-  if (response && response.ok) {
-    const data = await response.json();
-    allPosts = data.items || [];
-    globalThis.bloggerPostsCache[lang] = allPosts; // 取ってきた記事をその言語の箱にしまいます
+let allPosts = [];
+if (API_KEY && BLOG_ID) {
+  // まだその言語のブログIDでデータ取得が始まっていなければ、取得を開始する
+  if (!globalThis.bloggerApiCache[BLOG_ID]) {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+    globalThis.bloggerApiCache[BLOG_ID] = fetch(url)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => data && data.items ? data.items : [])
+      .catch(() => []); // エラーが起きても画面が壊れないように空っぽの箱を返す
   }
+  // 取得完了を待つ（すでに他のページが取得済みの場合は、通信せずにそのデータをもらいます）
+  allPosts = await globalThis.bloggerApiCache[BLOG_ID];
 }
 
 const themeColors: Record<string, string> = {
@@ -87,4 +87,3 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
     .ad-space-horizontal { min-height: 50px; }
   }
 </style>
-
