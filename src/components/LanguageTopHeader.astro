@@ -246,9 +246,15 @@ const defaultWeatherData = cityDataForJs[0] || null;
   </header>
 </div>
 
+{/* ▼ 通常の「地域 / 言語」パネル */}
 <RegionLangPanel currentLang={lang} currentCountry={defaultCountryForWeather} themeColor={labels.themeColor || '#872732'} />
 
+{/* ▼ 【完全リニューアル】 新しい美しくなった国名ドロップダウン */}
 <div id="cat-country-panel" class="cat-country-panel">
+  <div class="cat-country-header">
+    <span id="cat-country-title" class="cat-country-title">カテゴリ名</span>
+    <button id="cat-country-close" class="cat-country-close" aria-label="閉じる">&times;</button>
+  </div>
   <div class="cat-country-panel-inner" id="cat-country-panel-inner"></div>
 </div>
 
@@ -263,25 +269,72 @@ const defaultWeatherData = cityDataForJs[0] || null;
     .header-sp-wrapper { display: block; }
   }
 
+  /* ▼▼▼ リニューアルしたドロップダウンのデザイン ▼▼▼ */
   .cat-country-panel {
     display: none;
     position: absolute;
     background: #ffffff;
-    border: 2px solid var(--theme-color, #872732);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #dddddd;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     border-radius: 6px;
     z-index: 99999;
-    min-width: 150px;
+    width: 220px; /* 横いっぱいではなく、スマートな狭い幅に */
     overflow: hidden;
   }
   .cat-country-panel.show { display: block; animation: fadeIn 0.2s ease; }
+  
+  /* パネル上部のカテゴリ名が入るヘッダー部分 */
+  .cat-country-header {
+    background-color: #f8f9fa; /* 薄いグレーで上品に */
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--theme-color, #872732); /* テーマカラーのライン */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cat-country-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #333333;
+    margin: 0;
+  }
+  .cat-country-close {
+    background: none; border: none; font-size: 22px; line-height: 1; color: #aaaaaa; cursor: pointer; padding: 0;
+  }
+  .cat-country-close:hover { color: #333333; }
+
+  /* パネル内の国リスト部分（フッターのような縦並び） */
+  .cat-country-panel-inner {
+    padding: 6px 0;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
   .cat-country-link {
-    display: block; padding: 12px 16px; color: #333; text-decoration: none; font-size: 14px; font-weight: bold; border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #444444;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px dashed #eeeeee; /* フッター風の薄い点線 */
+    transition: background 0.2s, padding-left 0.2s, color 0.2s;
   }
   .cat-country-link:last-child { border-bottom: none; }
-  .cat-country-link:hover { background: #f8f9fa; color: var(--theme-color, #872732); }
+  .cat-country-link:hover {
+    background: #fdfdfd;
+    color: var(--theme-color, #872732);
+    padding-left: 20px; /* ホバーで少し右に動くおしゃれな演出 */
+  }
+  .cat-country-icon {
+    font-size: 10px; color: #cccccc; margin-right: 10px; transition: color 0.2s;
+  }
+  .cat-country-link:hover .cat-country-icon {
+    color: var(--theme-color, #872732);
+  }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
+  /* ＝＝＝ 以下、元のヘッダーデザインを維持 ＝＝＝ */
   .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
   .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
   .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
@@ -348,9 +401,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
   .bottom-line { height: 10px; }
 
-  .sp-top-gray-bar { 
-    background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative;
-  }
+  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative; }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
   .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
   
@@ -365,9 +416,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
     position: absolute; right: 34px; top: 50%; transform: translateY(-50%); width: 0; height: 30px !important; padding: 0 !important; background: #fff; border: 1px solid transparent;
     border-radius: 8px; opacity: 0; transition: all 0.3s ease; box-sizing: border-box; z-index: 10;
   }
-  .sp-search-input.active { 
-    width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1;
-  }
+  .sp-search-input.active { width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1; }
   .sp-search-btn { 
     width: 28px !important; height: 28px !important; border-radius: 50%; box-sizing: border-box; flex-shrink: 0;
     background: #fff; border: 1px solid #ccc; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 11;
@@ -391,9 +440,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-scroll::-webkit-scrollbar { display: none; }
   .sp-scroll-padding { width: 45px; flex-shrink: 0; }
 
-  @media (max-width: 768px) { 
-    .category-link { font-size: 14px; padding: 0 10px; height: 46px; }
-  }
+  @media (max-width: 768px) { .category-link { font-size: 14px; padding: 0 10px; height: 46px; } }
 </style>
 
 <script is:inline>
@@ -462,8 +509,11 @@ const defaultWeatherData = cityDataForJs[0] || null;
     window.addEventListener('resize', updateArrows);
     updateArrows();
 
+    // ▼▼▼ 新しくなったドロップダウンの動き ▼▼▼
     var catCountryPanel = document.getElementById('cat-country-panel');
     var catCountryInner = document.getElementById('cat-country-panel-inner');
+    var catCountryTitle = document.getElementById('cat-country-title');
+    var catCountryClose = document.getElementById('cat-country-close');
     var countriesDataEl = document.getElementById('lang-top-countries-data');
     var currentPanelSlug = null;
     
@@ -476,6 +526,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
           e.preventDefault();
           e.stopPropagation();
           var slug = btn.getAttribute('data-slug');
+          var catName = btn.textContent.trim(); // クリックしたカテゴリの名前を取得
 
           if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) {
               catCountryPanel.classList.remove('show');
@@ -484,22 +535,31 @@ const defaultWeatherData = cityDataForJs[0] || null;
           }
           currentPanelSlug = slug;
 
+          // ヘッダーにカテゴリ名を入れる
+          if (catCountryTitle) {
+            catCountryTitle.textContent = catName;
+          }
+
           var rect = btn.getBoundingClientRect();
           catCountryInner.innerHTML = ''; 
 
+          // フッター風の縦並びリンクを作成
           availableCountries.forEach(function(c) {
             var a = document.createElement('a');
             a.className = 'cat-country-link';
             a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
-            a.textContent = c.name + ' >';
+            a.innerHTML = '<span class="cat-country-icon">▶</span>' + c.name;
             catCountryInner.appendChild(a);
           });
 
-          var top = rect.bottom + window.scrollY + 5;
+          var top = rect.bottom + window.scrollY + 8;
           var left = rect.left + window.scrollX;
 
-          if (left + 160 > window.innerWidth) {
-             left = window.innerWidth - 160;
+          // スマホなどの狭い画面でドロップダウンがはみ出さないための調整（幅220px）
+          if (window.innerWidth <= 600) {
+             left = (window.innerWidth - 220) / 2; // スマホでは画面中央に
+          } else if (left + 220 > window.innerWidth) {
+             left = window.innerWidth - 240; // 右端からはみ出さないように
           }
 
           catCountryPanel.style.top = top + 'px';
@@ -508,6 +568,16 @@ const defaultWeatherData = cityDataForJs[0] || null;
         });
       });
 
+      // 閉じるボタン（×）を押したときの処理
+      if (catCountryClose) {
+        catCountryClose.addEventListener('click', function(e) {
+          e.stopPropagation();
+          catCountryPanel.classList.remove('show');
+          currentPanelSlug = null;
+        });
+      }
+
+      // パネル以外の場所を押したら閉じる
       document.addEventListener('click', function(e) {
         if (!e.target.closest('.cat-country-panel') && !e.target.closest('.cat-dropdown-trigger')) {
            catCountryPanel.classList.remove('show');
