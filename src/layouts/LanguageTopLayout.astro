@@ -3,8 +3,8 @@ import { categoryLabelMap } from '../lib/categoryLabels.ts';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
 import '../styles/global.css';
 
-// 今は通常のHeaderを読み込みます（次のステップで専用ヘッダーに差し替えます！）
-import Header from '../components/Header.astro';
+// ▼ 【修正】言語ページ専用のヘッダーを読み込みます
+import Header from '../components/LanguageTopHeader.astro';
 import Footer from '../components/Footer.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 
