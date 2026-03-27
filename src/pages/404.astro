@@ -1,0 +1,123 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="404 - Page Not Found">
+  <div class="not-found-container">
+    <div class="not-found-inner">
+      <div class="error-code">404</div>
+      <div class="globe-icon">🌐</div>
+      <h1 class="error-title" id="error-title">ページが見つかりません</h1>
+      <p class="error-sub" id="error-sub">お探しのページは存在しないか、移動した可能性があります。</p>
+      <a href="/ja/" class="back-btn" id="back-btn">トップページに戻る</a>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  // ブラウザの言語設定を取得して自動切り替え
+  const messages = {
+    ja: { title: 'ページが見つかりません', sub: 'お探しのページは存在しないか、移動した可能性があります。', btn: 'トップページに戻る', href: '/ja/' },
+    en: { title: 'Page Not Found', sub: 'The page you are looking for does not exist or has been moved.', btn: 'Back to Top', href: '/en/' },
+    'zh-cn': { title: '页面未找到', sub: '您查找的页面不存在或已被移动。', btn: '返回首页', href: '/zh-cn/' },
+    'zh-tw': { title: '找不到頁面', sub: '您尋找的頁面不存在或已被移動。', btn: '返回首頁', href: '/zh-tw/' },
+    es: { title: 'Página no encontrada', sub: 'La página que busca no existe o ha sido movida.', btn: 'Volver al inicio', href: '/es/' },
+    fr: { title: 'Page introuvable', sub: "La page que vous recherchez n'existe pas ou a été déplacée.", btn: "Retour à l'accueil", href: '/fr/' },
+    de: { title: 'Seite nicht gefunden', sub: 'Die gesuchte Seite existiert nicht oder wurde verschoben.', btn: 'Zurück zur Startseite', href: '/de/' },
+    ru: { title: 'Страница не найдена', sub: 'Страница, которую вы ищете, не существует или была перемещена.', btn: 'На главную', href: '/ru/' },
+  };
+
+  // ブラウザの言語を取得（例: "zh-CN" → "zh-cn", "zh-TW" → "zh-tw"）
+  const browserLangs = navigator.languages || [navigator.language || 'ja'];
+
+  let detectedLang = 'en';
+  for (const bl of browserLangs) {
+    const lower = bl.toLowerCase();
+    if (lower.startsWith('zh-tw') || lower.startsWith('zh-hant')) { detectedLang = 'zh-tw'; break; }
+    if (lower.startsWith('zh')) { detectedLang = 'zh-cn'; break; }
+    if (lower.startsWith('ja')) { detectedLang = 'ja'; break; }
+    if (lower.startsWith('en')) { detectedLang = 'en'; break; }
+    if (lower.startsWith('es')) { detectedLang = 'es'; break; }
+    if (lower.startsWith('fr')) { detectedLang = 'fr'; break; }
+    if (lower.startsWith('de')) { detectedLang = 'de'; break; }
+    if (lower.startsWith('ru')) { detectedLang = 'ru'; break; }
+  }
+
+  const msg = messages[detectedLang] || messages['ja'];
+
+  document.getElementById('error-title').textContent = msg.title;
+  document.getElementById('error-sub').textContent = msg.sub;
+  const btn = document.getElementById('back-btn');
+  btn.textContent = msg.btn;
+  btn.href = msg.href;
+</script>
+
+<style>
+  .not-found-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 40px 20px;
+  }
+
+  .not-found-inner {
+    text-align: center;
+    background: #fff;
+    border-radius: 12px;
+    padding: 60px 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .error-code {
+    font-size: 96px;
+    font-weight: 900;
+    color: var(--theme-color, #872732);
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: -4px;
+  }
+
+  .globe-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .error-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+
+  .error-sub {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .back-btn {
+    display: inline-block;
+    background: var(--theme-color, #872732);
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 15px;
+    transition: opacity 0.2s;
+  }
+
+  .back-btn:hover {
+    opacity: 0.85;
+  }
+
+  @media (max-width: 480px) {
+    .not-found-inner { padding: 40px 20px; }
+    .error-code { font-size: 72px; }
+    .error-title { font-size: 20px; }
+  }
+</style>
