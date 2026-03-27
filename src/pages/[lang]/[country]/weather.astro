@@ -281,7 +281,6 @@ window.addEventListener('DOMContentLoaded', function() {
       html += '<div class="badge-wrapper"><span class="hourly-badge">' + (labels.hourly||'Hourly') + '<span class="sp-chevron"> ▼</span></span></div>';
       html += '</button>';
 
-      /* クラスによるアニメーション用の構成 */
       html += '<div id="hourly-pc-' + index + '" class="hourly-details pc-view">';
       html += '<div class="hourly-scroll-wrapper"><table class="hourly-table"><thead><tr>';
       html += '<th>' + (labels.time||'Time') + '</th>';
@@ -429,7 +428,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var urlParams = new URLSearchParams(window.location.search);
     var savedKey = urlParams.get('city');
     if (!savedKey && storageKey) {
-      try { savedKey = localStorage.getItem(storageKey); } catch(e) {}
+      try { localStorage.getItem(storageKey); } catch(e) {}
     }
     applyCity(savedKey || defaultCity, false);
   }
@@ -439,24 +438,25 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style is:global>
-  /* PCとスマホの切り替えベース設定 */
+  /* ========================================================= */
+  /* 全体設定 */
+  /* ========================================================= */
+  [hidden] { display: none !important; }
   .pc-view { display: flex; } 
   .sp-view { display: none !important; }
 
   /* ========================================================= */
-  /* ▼▼▼ ふんわりスライド開閉アニメーションの仕組み（完全版） ▼▼▼ */
+  /* ふんわりスライド開閉アニメーション（歪み完全防止版） */
   /* ========================================================= */
   .weather-page .hourly-details {
     max-height: 0;
     overflow: hidden;
-    /* 高さを純粋に動かすだけのシンプルなアニメーションにし、中身が歪むのを防ぎます */
     transition: max-height 0.4s ease-out;
     background: #f8f9fa;
   }
   .weather-page .hourly-details.is-open {
-    max-height: 600px; /* 大きすぎない適切な高さにして、開くスピードを一定に保ちます */
+    max-height: 600px;
   }
-  /* 余白や線は「内側の枠」に設定することで、アニメーション中に中身がリサイズされるのを防ぎます */
   .weather-page .hourly-scroll-wrapper {
     border-top: 1px solid #eee;
   }
@@ -467,7 +467,7 @@ window.addEventListener('DOMContentLoaded', function() {
   .day-summary-btn[aria-expanded="true"] .sp-chevron { transform: rotate(180deg); }
 
   /* ========================================================= */
-  /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
+  /* PC版・共通のスタイル */
   /* ========================================================= */
   .weather-page { max-width: 850px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
   .weather-page .section-title { font-size: 1.4rem; margin: 40px 0 20px 0; border-left: 6px solid var(--theme-color, #872732); padding-left: 12px; font-weight: bold; }
@@ -476,7 +476,7 @@ window.addEventListener('DOMContentLoaded', function() {
   
   .weather-page .day-summary-btn.pc-view { 
     width: 100%; 
-    /* ▼修正：右端のボタン領域(1.2fr)を少し広げて、ボタンが改行されるのを防ぎました */
+    /* 右端のボタン領域を広げて改行を防止 */
     display: grid; grid-template-columns: 0.8fr 1.8fr 1.5fr 0.6fr 1.2fr; align-items: center; 
     padding: 12px 16px; background: none; border: none; cursor: pointer; transition: background 0.2s;
   }
@@ -496,7 +496,7 @@ window.addEventListener('DOMContentLoaded', function() {
   
   .weather-page .rain-val { font-weight: bold; color: #0288d1; }
   
-  /* ▼修正：ボタンの中の文字が絶対に改行されないよう、頑丈な設定を追加しました */
+  /* ボタン内文字が絶対に改行されない設定 */
   .weather-page .hourly-badge { 
     background-color: var(--theme-color, #872732); color: white; 
     padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; 
@@ -520,55 +520,30 @@ window.addEventListener('DOMContentLoaded', function() {
   .alert-ticker-empty { width: 100%; }
   @keyframes ticker { 0% { transform: translate(0,0); } 100% { transform: translate(-100%,0); } }
 
-
   /* ========================================================= */
-  /* ▼▼▼ スマホ版のレスポンシブ（見た目切り替え）設定 ▼▼▼ */
+  /* スマホ版のレスポンシブ設定 */
   /* ========================================================= */
   @media (max-width: 768px) {
-    /* PC用を隠し、スマホ用を表示する絶対ルール */
     .pc-view { display: none !important; }
     .sp-view { display: block !important; }
 
     .weather-page { 
-      padding: 12px 10px; 
-      box-sizing: border-box; 
-      width: 100%;
-      overflow-x: hidden; 
+      padding: 12px 10px; box-sizing: border-box; width: 100%; overflow-x: hidden; 
     }
     .weather-page * { box-sizing: border-box; }
     
     .alert-ticker-container.sp-view { 
-      display: flex !important;
-      flex-direction: column; 
-      align-items: stretch; 
-      background: #f0f7ff; 
-      border: 1.5px solid #1fa7db; 
-      border-radius: 8px;
-      padding: 10px 12px; 
-      margin-bottom: 24px;
-      gap: 8px; 
+      display: flex !important; flex-direction: column; align-items: stretch; background: #f0f7ff; 
+      border: 1.5px solid #1fa7db; border-radius: 8px; padding: 10px 12px; margin-bottom: 24px; gap: 8px; 
     }
     .sp-view .alert-ticker-label { font-size: 1rem; color: #0068b7; }
-    .sp-view .alert-ticker-window { 
-      background-color: #ffffff; 
-      border: 1px solid #1fa7db; 
-      border-radius: 4px; 
-      height: 38px; 
-      width: 100%;
-    }
+    .sp-view .alert-ticker-window { background-color: #ffffff; border: 1px solid #1fa7db; border-radius: 4px; height: 38px; width: 100%; }
     .sp-view .alert-ticker-text { color: #c53030; } 
 
     .weather-page .day-summary-btn.sp-view { 
-      width: 100%;
-      display: grid !important; 
-      grid-template-columns: auto 1fr auto; 
-      grid-template-areas: 
-        "date icon temp"
-        "date icon rain"
-        "badge badge badge";
-      padding: 16px 10px; 
-      gap: 8px 10px;
-      background: none; border: none; cursor: pointer;
+      width: 100%; display: grid !important; grid-template-columns: auto 1fr auto; 
+      grid-template-areas: "date icon temp" "date icon rain" "badge badge badge";
+      padding: 16px 10px; gap: 8px 10px; background: none; border: none; cursor: pointer;
     }
     
     .sp-view .date-info { grid-area: date; text-align: left; width: 100%; }
@@ -578,55 +553,26 @@ window.addEventListener('DOMContentLoaded', function() {
     .sp-view .weather-info { grid-area: icon; display: flex; align-items: center; justify-content: center; width: 100%; min-width: auto; }
     .sp-view .summary-icon { margin: 0; width: 64px; height: 64px; }
     
-    .sp-view .temp-info { 
-      grid-area: temp; 
-      display: flex; 
-      flex-direction: row; 
-      justify-content: flex-end; 
-      align-items: center; 
-      width: 100%; 
-      margin: 0; 
-      gap: 6px; 
-    }
+    .sp-view .temp-info { grid-area: temp; display: flex; flex-direction: row; justify-content: flex-end; align-items: center; width: 100%; margin: 0; gap: 6px; }
     .sp-view .temp-sep { font-size: 1.2rem; color: #ccc; margin: 0 2px; }
     .sp-view .temp-max { font-size: 1.2rem; color: #d32f2f; font-weight: bold; }
     .sp-view .temp-min { font-size: 1.2rem; color: #1976d2; font-weight: bold; }
     
-    .sp-view .rain-info { 
-      grid-area: rain; 
-      display: flex; 
-      justify-content: flex-end; 
-      align-items: center; 
-      width: 100%; 
-      margin: 0; 
-      font-size: 0.95rem; 
-    }
+    .sp-view .rain-info { grid-area: rain; display: flex; justify-content: flex-end; align-items: center; width: 100%; margin: 0; font-size: 0.95rem; }
     
     .sp-view .badge-wrapper { grid-area: badge; width: 100%; margin-top: 10px; }
     .sp-view .hourly-badge.sp-btn { 
-      width: 100%; 
-      display: flex;
-      justify-content: center; 
-      padding: 10px; 
-      font-size: 1rem; 
-      border-radius: 8px; 
-      background-color: #ffffff; 
-      color: var(--theme-color, #872732); 
-      border: 1.5px solid var(--theme-color, #872732); 
+      width: 100%; display: flex; justify-content: center; padding: 10px; font-size: 1rem; border-radius: 8px; 
+      background-color: #ffffff; color: var(--theme-color, #872732); border: 1.5px solid var(--theme-color, #872732); 
     }
     
-    /* ▼修正：スマホ版の開いた時の内側余白をここで付けます */
-    .weather-page .hourly-details.sp-view .hourly-scroll-wrapper {
-      padding: 16px 10px;
-    }
-    
+    .weather-page .hourly-details.sp-view .hourly-scroll-wrapper { padding: 16px 10px; }
     .weather-page .hourly-details.sp-view { background: #f8f9fa; padding: 0 !important; border: none !important; }
-    .sp-view .hourly-flex-container { display: flex; gap: 10px; padding-bottom: 8px; }
     
+    .sp-view .hourly-flex-container { display: flex; gap: 10px; padding-bottom: 8px; }
     .sp-view .hourly-card { 
       background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 6px; 
-      min-width: 85px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      min-width: 85px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
     .sp-view .h-time { font-weight: bold; font-size: 0.95rem; color: #333; border-bottom: 1px solid #eee; width: 100%; padding-bottom: 4px; }
     .sp-view .h-icon img { width: 40px; height: 40px; }
