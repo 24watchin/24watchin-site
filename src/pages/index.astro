@@ -1,11 +1,46 @@
 ---
-// モックアップ用データ（最新ニュース順にリアルなデータをセット）
+// モックアップ用データ
 const latestStories = [
-  { id: 1, category: 'Politics', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 2, category: 'Economy', country: 'United States', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 3, category: 'Society', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 4, category: 'Environment', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 5, category: 'Technology', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  {
+    id: 1,
+    category: 'Politics',
+    country: 'Japan',
+    title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry',
+    excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.',
+    image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 2,
+    category: 'Economy',
+    country: 'United States',
+    title: 'Federal Reserve Signals Potential Rate Cuts by Year-End',
+    excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.',
+    image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 3,
+    category: 'Society',
+    country: 'France',
+    title: 'Paris Sets New Standard for Eco-Friendly Urban Planning',
+    excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.',
+    image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 4,
+    category: 'Environment',
+    country: 'Brazil',
+    title: 'Amazon Conservation Efforts Show Promising Results This Quarter',
+    excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.',
+    image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 5,
+    category: 'Technology',
+    country: 'South Korea',
+    title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul',
+    excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.',
+    image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
 ];
 
 const languages = [
@@ -25,17 +60,18 @@ const languages = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>24watchin | Global Gateway</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
   </head>
-  <body class="is-locked">
 
-    <header class="global-header" id="main-header">
+  <body class="is-locked">
+    <header class="global-header">
       <div class="header-band">
         <div class="logo-area">
           <a href="https://24watchin.com">
             <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="header-logo-img" />
           </a>
         </div>
+
         <button class="menu-trigger" id="menu-open" aria-label="Open menu">
           <span class="burger-line"></span>
           <span class="burger-line"></span>
@@ -49,7 +85,7 @@ const languages = [
       <div class="menu-inner">
         <h3>CHOOSE YOUR LANGUAGE</h3>
         <div class="menu-grid">
-          {languages.map(lang => (
+          {languages.map((lang) => (
             <a href={lang.url} class="menu-lang-card" style={`--accent: ${lang.color}`}>
               <span class="lang-name">{lang.name}</span>
             </a>
@@ -67,48 +103,62 @@ const languages = [
       <div class="dot"></div>
     </div>
 
-    <main class="gateway-main">
+    <!-- 4→5 / 5→4 用の幕 -->
+    <div class="transition-mask" id="transition-mask" aria-hidden="true"></div>
 
-      <!-- 1〜4画面目を同じ固定ステージで管理 -->
+    <main class="gateway-main">
+      <!-- 1〜4画面目は同じ固定ステージ -->
       <div class="desktop-sequence" id="desktop-sequence">
-        <div class="split-stage" id="split-stage">
+        <div class="split-stage">
           <div class="left-track">
             <div class="panel p1">
               <div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
-              <div class="word-band-container"><div class="word-band"><h2>CONFLICT</h2></div></div>
+              <div class="word-band-container">
+                <div class="word-band"><h2>CONFLICT</h2></div>
+              </div>
             </div>
+
             <div class="panel p2">
               <div class="bg-layer" style="background-image: url('/images/cities.webp');"></div>
-              <div class="word-band-container"><div class="word-band"><h2>CITIES</h2></div></div>
+              <div class="word-band-container">
+                <div class="word-band"><h2>CITIES</h2></div>
+              </div>
             </div>
+
             <div class="panel p3">
               <div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
-              <div class="word-band-container"><div class="word-band"><h2>INNOVATION</h2></div></div>
+              <div class="word-band-container">
+                <div class="word-band"><h2>INNOVATION</h2></div>
+              </div>
             </div>
           </div>
 
           <div class="right-track">
             <div class="panel p1">
               <div class="bg-layer" style="background-image: url('/images/crisis.png');"></div>
-              <div class="word-band-container"><div class="word-band"><h2>CRISIS</h2></div></div>
+              <div class="word-band-container">
+                <div class="word-band"><h2>CRISIS</h2></div>
+              </div>
             </div>
+
             <div class="panel p2">
               <div class="bg-layer" style="background-image: url('/images/people.webp');"></div>
-              <div class="word-band-container"><div class="word-band"><h2>PEOPLE</h2></div></div>
+              <div class="word-band-container">
+                <div class="word-band"><h2>PEOPLE</h2></div>
+              </div>
             </div>
+
             <div class="panel p3">
               <div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
-              <div class="word-band-container"><div class="word-band"><h2>FRONTIER</h2></div></div>
+              <div class="word-band-container">
+                <div class="word-band"><h2>FRONTIER</h2></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <section class="brand-panel" id="brand-panel" aria-label="Brand panel">
-          <div class="twilight-veil">
-            <div class="twilight-stars stars-a"></div>
-            <div class="twilight-stars stars-b"></div>
-          </div>
-
+        <section class="brand-panel" id="brand-panel">
+          <div class="brand-night"></div>
           <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
           <div class="brand-bg-overlay"></div>
 
@@ -125,6 +175,7 @@ const languages = [
         </section>
       </div>
 
+      <!-- 固定ステージの下敷き -->
       <section class="hero-spacer" aria-hidden="true">
         <div class="hero-spacer-brand">
           <div class="hero-spacer-bg" style="background-image: url('/images/explanation.png');"></div>
@@ -133,31 +184,41 @@ const languages = [
       </section>
 
       <div class="mobile-only-area">
-        <div style="height: 100vh; display: flex; align-items: center; justify-content: center; background: #111;">
-          <p style="color: #666; font-size: 14px; letter-spacing: 2px;">スマホ版は準備中です</p>
+        <div class="mobile-placeholder">
+          <p>スマホ版は準備中です</p>
         </div>
       </div>
 
       <section class="carousel-section section-observer" id="screen-5">
         <div class="section-fade-in">
-          <div class="section-header"><h2>Latest Stories</h2></div>
+          <div class="section-header">
+            <h2>Latest Stories</h2>
+          </div>
+
           <div class="carousel-wrapper">
             <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
+
             <div class="carousel-container" id="story-carousel">
               <div class="carousel-spacer"></div>
+
               {latestStories.map((story) => (
                 <a href={`/en/story/${story.id}`} class="story-card observer-card">
                   <div class="card-bg" style={`background-image: ${story.image};`}></div>
                   <div class="card-content">
-                    <div class="card-meta"><span class="category">{story.category}</span><span class="country">{story.country}</span></div>
+                    <div class="card-meta">
+                      <span class="category">{story.category}</span>
+                      <span class="country">{story.country}</span>
+                    </div>
                     <h3 class="card-title">{story.title}</h3>
                     <p class="card-excerpt">{story.excerpt}</p>
                     <div class="cta-link">Read story <span>&rarr;</span></div>
                   </div>
                 </a>
               ))}
+
               <div class="carousel-spacer"></div>
             </div>
+
             <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
           </div>
         </div>
@@ -168,10 +229,13 @@ const languages = [
           <div class="section-header">
             <h2>CHOOSE YOUR LANGUAGE</h2>
           </div>
+
           <div class="carousel-wrapper">
             <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
+
             <div class="carousel-container" id="lang-carousel">
               <div class="carousel-spacer"></div>
+
               {languages.map((lang) => (
                 <a href={lang.url} class="lang-card observer-card">
                   <div class="lang-bg" style={`background-color: ${lang.color};`}></div>
@@ -182,17 +246,18 @@ const languages = [
                   </div>
                 </a>
               ))}
+
               <div class="carousel-spacer"></div>
             </div>
+
             <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
           </div>
         </div>
       </section>
 
-      <footer style="height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333;">
-        <p style="color: #666; font-size: 14px;">[ フッター領域 ]</p>
+      <footer class="site-footer">
+        <p>[ フッター領域 ]</p>
       </footer>
-
     </main>
 
     <style>
@@ -226,7 +291,6 @@ const languages = [
         width: 100%;
         z-index: 300;
         pointer-events: none;
-        transition: opacity 0.8s ease;
       }
 
       .header-band {
@@ -234,7 +298,7 @@ const languages = [
         justify-content: space-between;
         align-items: center;
         padding: 30px 50px;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
         pointer-events: auto;
       }
 
@@ -275,7 +339,7 @@ const languages = [
         right: -100%;
         width: 100%;
         height: 100%;
-        background: rgba(10,10,10,0.98);
+        background: rgba(10, 10, 10, 0.98);
         z-index: 400;
         transition: right 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         padding: 80px 40px;
@@ -319,10 +383,10 @@ const languages = [
 
       .menu-lang-card {
         padding: 40px;
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 4px;
         transition: 0.3s;
-        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
         text-decoration: none;
         color: white;
       }
@@ -356,20 +420,39 @@ const languages = [
         background: rgba(255, 255, 255, 0.9);
       }
 
+      .transition-mask {
+        position: fixed;
+        inset: 0;
+        z-index: 220;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 50% 42%, rgba(70, 70, 76, 0.18) 0%, rgba(34, 34, 38, 0.68) 58%, rgba(12, 12, 14, 0.92) 100%),
+          linear-gradient(to bottom, rgba(44, 44, 48, 0.42) 0%, rgba(14, 14, 16, 0.88) 100%);
+        transition: opacity 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.42s;
+      }
+
+      .transition-mask.is-visible {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
       .desktop-sequence {
         position: fixed;
         inset: 0;
         z-index: 120;
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.4s ease, visibility 0s linear 0s;
+        transition: opacity 0.32s ease, visibility 0s linear 0s;
       }
 
       .desktop-sequence.is-hidden {
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        transition: opacity 0.32s ease, visibility 0s linear 0.32s;
+        transition: opacity 0.28s ease, visibility 0s linear 0.28s;
       }
 
       .hero-spacer {
@@ -395,7 +478,7 @@ const languages = [
       .hero-spacer-bg-overlay {
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.62) 100%);
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%);
       }
 
       .split-stage {
@@ -518,78 +601,22 @@ const languages = [
         pointer-events: none;
       }
 
-      .brand-panel.is-night-visible,
-      .brand-panel.is-bg-visible {
+      .brand-panel.is-visible {
         visibility: visible;
       }
 
-      .twilight-veil {
+      .brand-night {
         position: absolute;
         inset: 0;
         opacity: 0;
         background:
           radial-gradient(circle at 50% 35%, rgba(33, 76, 160, 0.18) 0%, rgba(17, 36, 82, 0.28) 22%, rgba(7, 15, 40, 0.62) 56%, rgba(4, 8, 24, 0.92) 100%),
           linear-gradient(to bottom, rgba(8, 18, 48, 0.55) 0%, rgba(5, 12, 32, 0.88) 75%, rgba(3, 7, 20, 0.96) 100%);
-        transition: opacity 1.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      .brand-panel.is-night-visible .twilight-veil {
+      .brand-panel.is-night .brand-night {
         opacity: 1;
-      }
-
-      .twilight-stars {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity 2s ease;
-        mix-blend-mode: screen;
-      }
-
-      .brand-panel.is-night-visible .twilight-stars {
-        opacity: 0.55;
-      }
-
-      .stars-a {
-        background-image:
-          radial-gradient(circle at 8% 18%, rgba(255,255,255,0.85) 0 1px, transparent 1.6px),
-          radial-gradient(circle at 16% 30%, rgba(181,215,255,0.8) 0 1.1px, transparent 1.8px),
-          radial-gradient(circle at 24% 12%, rgba(255,255,255,0.85) 0 1px, transparent 1.7px),
-          radial-gradient(circle at 31% 25%, rgba(196,223,255,0.8) 0 1px, transparent 1.8px),
-          radial-gradient(circle at 39% 16%, rgba(255,255,255,0.75) 0 1px, transparent 1.6px),
-          radial-gradient(circle at 48% 22%, rgba(170,210,255,0.8) 0 1.2px, transparent 2px),
-          radial-gradient(circle at 57% 14%, rgba(255,255,255,0.85) 0 1px, transparent 1.7px),
-          radial-gradient(circle at 66% 28%, rgba(201,228,255,0.75) 0 1px, transparent 1.8px),
-          radial-gradient(circle at 76% 18%, rgba(255,255,255,0.8) 0 1px, transparent 1.7px),
-          radial-gradient(circle at 84% 11%, rgba(181,215,255,0.8) 0 1.1px, transparent 1.8px),
-          radial-gradient(circle at 92% 24%, rgba(255,255,255,0.75) 0 1px, transparent 1.8px);
-        animation: starTwinkleA 5.8s ease-in-out infinite alternate;
-      }
-
-      .stars-b {
-        background-image:
-          radial-gradient(circle at 12% 42%, rgba(255,255,255,0.65) 0 0.9px, transparent 1.6px),
-          radial-gradient(circle at 20% 52%, rgba(176,210,255,0.7) 0 1px, transparent 1.7px),
-          radial-gradient(circle at 28% 40%, rgba(255,255,255,0.68) 0 0.9px, transparent 1.6px),
-          radial-gradient(circle at 36% 56%, rgba(185,220,255,0.68) 0 1px, transparent 1.7px),
-          radial-gradient(circle at 44% 44%, rgba(255,255,255,0.7) 0 1px, transparent 1.6px),
-          radial-gradient(circle at 53% 58%, rgba(170,210,255,0.68) 0 1px, transparent 1.7px),
-          radial-gradient(circle at 62% 46%, rgba(255,255,255,0.68) 0 0.9px, transparent 1.6px),
-          radial-gradient(circle at 70% 54%, rgba(190,223,255,0.68) 0 1px, transparent 1.7px),
-          radial-gradient(circle at 79% 42%, rgba(255,255,255,0.68) 0 0.9px, transparent 1.6px),
-          radial-gradient(circle at 88% 57%, rgba(170,210,255,0.68) 0 1px, transparent 1.7px);
-        animation: starTwinkleB 7.2s ease-in-out infinite alternate;
-      }
-
-      @keyframes starTwinkleA {
-        0%   { opacity: 0.38; }
-        50%  { opacity: 0.58; }
-        100% { opacity: 0.46; }
-      }
-
-      @keyframes starTwinkleB {
-        0%   { opacity: 0.26; }
-        50%  { opacity: 0.48; }
-        100% { opacity: 0.34; }
       }
 
       .brand-bg {
@@ -598,11 +625,11 @@ const languages = [
         background-size: cover;
         background-position: center;
         opacity: 0;
-        transform: scale(1.06);
-        transition: opacity 1.95s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: scale(1.04);
+        transition: opacity 1.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.1s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      .brand-panel.is-bg-visible .brand-bg {
+      .brand-panel.is-bg .brand-bg {
         opacity: 0.96;
         transform: scale(1);
       }
@@ -610,12 +637,12 @@ const languages = [
       .brand-bg-overlay {
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.62) 100%);
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%);
         opacity: 0;
-        transition: opacity 1.6s ease;
+        transition: opacity 1.3s ease;
       }
 
-      .brand-panel.is-bg-visible .brand-bg-overlay {
+      .brand-panel.is-bg .brand-bg-overlay {
         opacity: 1;
       }
 
@@ -641,7 +668,7 @@ const languages = [
         margin-bottom: 30px;
         font-weight: 300;
         letter-spacing: 0.05em;
-        text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
       }
 
       .brand-desc p {
@@ -650,12 +677,12 @@ const languages = [
         color: #eee;
         margin-bottom: 15px;
         letter-spacing: 0.05em;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
       }
 
       .fade-base {
         opacity: 0;
-        transition: opacity 3.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 3.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3.2s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .fade-up {
@@ -677,13 +704,27 @@ const languages = [
       }
 
       .anim-logo { transition-delay: 0.2s; }
-      .anim-catch { transition-delay: 1.0s; }
-      .anim-desc1 { transition-delay: 2.0s; }
-      .anim-desc2 { transition-delay: 3.0s; }
-      .anim-desc3 { transition-delay: 4.0s; }
+      .anim-catch { transition-delay: 0.9s; }
+      .anim-desc1 { transition-delay: 1.8s; }
+      .anim-desc2 { transition-delay: 2.6s; }
+      .anim-desc3 { transition-delay: 3.4s; }
 
       .mobile-only-area {
         display: none;
+      }
+
+      .mobile-placeholder {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #111;
+      }
+
+      .mobile-placeholder p {
+        color: #666;
+        font-size: 14px;
+        letter-spacing: 2px;
       }
 
       .carousel-section {
@@ -697,8 +738,8 @@ const languages = [
 
       .section-fade-in {
         opacity: 0;
-        transform: translateY(180px);
-        transition: opacity 3.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: translateY(140px);
+        transition: opacity 2.4s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         width: 100%;
       }
 
@@ -730,8 +771,8 @@ const languages = [
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
         color: white;
         width: 60px;
         height: 60px;
@@ -744,7 +785,7 @@ const languages = [
       }
 
       .nav-arrow:hover {
-        background: rgba(255,255,255,0.3);
+        background: rgba(255, 255, 255, 0.3);
         transform: translateY(-50%) scale(1.05);
       }
 
@@ -783,14 +824,14 @@ const languages = [
         transform: scale(0.85);
         display: block;
         user-select: none;
-        border: 1px solid rgba(255,255,255,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         background-color: #111;
       }
 
       .observer-card.is-center {
         opacity: 1;
         transform: scale(1);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
         z-index: 10;
       }
 
@@ -810,7 +851,7 @@ const languages = [
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%);
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%);
       }
 
       .card-content {
@@ -839,7 +880,7 @@ const languages = [
 
       .card-meta .category {
         color: #fff;
-        border-bottom: 1px solid rgba(255,255,255,0.4);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         padding-bottom: 4px;
       }
 
@@ -852,7 +893,7 @@ const languages = [
         font-weight: 400;
         line-height: 1.3;
         margin-bottom: 16px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
       }
 
       .card-excerpt {
@@ -861,7 +902,7 @@ const languages = [
         margin-bottom: 24px;
         display: none;
         line-height: 1.5;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
       }
 
       .story-card.is-center .card-excerpt {
@@ -892,7 +933,7 @@ const languages = [
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid rgba(255,255,255,0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
       .lang-bg {
@@ -954,6 +995,20 @@ const languages = [
         transform: scale(1.05);
       }
 
+      .site-footer {
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0a0a0a;
+        border-top: 1px solid #333;
+      }
+
+      .site-footer p {
+        color: #666;
+        font-size: 14px;
+      }
+
       @media (min-width: 769px) {
         .nav-arrow {
           display: flex;
@@ -965,6 +1020,7 @@ const languages = [
       @media (max-width: 768px) {
         .scroll-indicator { display: none; }
         .desktop-sequence { display: none; }
+        .transition-mask { display: none; }
         .hero-spacer { display: none; }
         .mobile-only-area { display: block; }
         body.is-locked { overflow: auto; }
@@ -981,15 +1037,18 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
         const DESKTOP_BREAKPOINT = 768;
         const HERO_ANIM_MS = 1500;
-
         const WHEEL_THRESHOLD = 24;
 
-        const BRAND_BG_START_DELAY_MS = 900;
-        const BRAND_TEXT_DELAY_AFTER_BG_MS = 900;
-        const BRAND_UNLOCK_MS = 2600;
+        const BRAND_BG_DELAY_MS = 700;
+        const BRAND_TEXT_DELAY_MS = 1350;
+        const BRAND_UNLOCK_MS = 2300;
+        const BRAND_HIDE_MS = 500;
 
-        const BRAND_HIDE_MS = 700;
-        const SECTION_ANIM_MS = 1100;
+        const MASK_IN_MS = 380;
+        const MASK_HOLD_MS = 80;
+        const MASK_OUT_MS = 420;
+
+        const SECTION_ANIM_MS = 1000;
         const FOOTER_ANIM_MS = 900;
 
         let currentStep = 0;
@@ -998,11 +1057,12 @@ const languages = [
 
         const body = document.body;
         const sideMenu = document.getElementById('side-menu');
-        const footer = document.querySelector('footer');
+        const footer = document.querySelector('.site-footer');
 
         const desktopSequence = document.getElementById('desktop-sequence');
         const brandPanel = document.getElementById('brand-panel');
         const brandTextTarget = document.getElementById('brand-text-target');
+        const transitionMask = document.getElementById('transition-mask');
 
         const screen5 = document.getElementById('screen-5');
         const screen6 = document.getElementById('screen-6');
@@ -1027,9 +1087,16 @@ const languages = [
 
         function updateIndicator(index) {
           dots.forEach((dot, i) => {
-            if (i === index) dot.classList.add('active');
-            else dot.classList.remove('active');
+            dot.classList.toggle('active', i === index);
           });
+        }
+
+        function showMask() {
+          transitionMask?.classList.add('is-visible');
+        }
+
+        function hideMask() {
+          transitionMask?.classList.remove('is-visible');
         }
 
         function clearSectionVisibility() {
@@ -1039,73 +1106,56 @@ const languages = [
 
         function showSection(step) {
           clearSectionVisibility();
-
-          if (step === 4) {
-            screen5?.classList.add('is-visible');
-          }
-
-          if (step === 5) {
-            screen6?.classList.add('is-visible');
-          }
-        }
-
-        function resetBrandText() {
-          brandTextTarget?.classList.remove('is-visible');
+          if (step === 4) screen5?.classList.add('is-visible');
+          if (step === 5) screen6?.classList.add('is-visible');
         }
 
         function resetBrandPanel() {
-          brandPanel?.classList.remove('is-night-visible');
-          brandPanel?.classList.remove('is-bg-visible');
-          resetBrandText();
+          brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg');
+          brandTextTarget?.classList.remove('is-visible');
         }
 
-        function showBrandPanelAnimated() {
+        function revealBrandImmediate() {
           desktopSequence?.classList.remove('is-hidden');
           resetBrandPanel();
+          brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
 
-          brandPanel?.classList.add('is-night-visible');
+          requestAnimationFrame(() => {
+            brandTextTarget?.classList.add('is-visible');
+          });
+        }
+
+        function showBrandAnimated() {
+          desktopSequence?.classList.remove('is-hidden');
+          resetBrandPanel();
+          brandPanel?.classList.add('is-visible', 'is-night');
 
           window.setTimeout(() => {
-            brandPanel?.classList.add('is-bg-visible');
-          }, BRAND_BG_START_DELAY_MS);
+            brandPanel?.classList.add('is-bg');
+          }, BRAND_BG_DELAY_MS);
 
           window.setTimeout(() => {
             brandTextTarget?.classList.add('is-visible');
-          }, BRAND_BG_START_DELAY_MS + BRAND_TEXT_DELAY_AFTER_BG_MS);
+          }, BRAND_TEXT_DELAY_MS);
 
           window.setTimeout(() => {
             isAnimating = false;
           }, BRAND_UNLOCK_MS);
         }
 
-        function showBrandPanelImmediate() {
-          desktopSequence?.classList.remove('is-hidden');
-          resetBrandPanel();
-          brandPanel?.classList.add('is-night-visible');
-          brandPanel?.classList.add('is-bg-visible');
-
-          requestAnimationFrame(() => {
-            brandTextTarget?.classList.add('is-visible');
-          });
+        function hideBrandAnimated() {
+          brandTextTarget?.classList.remove('is-visible');
+          brandPanel?.classList.remove('is-bg', 'is-night');
 
           window.setTimeout(() => {
-            isAnimating = false;
-          }, 250);
-        }
-
-        function hideBrandPanel() {
-          resetBrandText();
-          brandPanel?.classList.remove('is-bg-visible');
-          brandPanel?.classList.remove('is-night-visible');
-
-          window.setTimeout(() => {
+            brandPanel?.classList.remove('is-visible');
             isAnimating = false;
           }, BRAND_HIDE_MS);
         }
 
-        function setHeroSlide(index) {
-          leftPanels.forEach(panel => panel.classList.remove('is-active'));
-          rightPanels.forEach(panel => panel.classList.remove('is-active'));
+        function activateHeroSlide(index) {
+          leftPanels.forEach((panel) => panel.classList.remove('is-active'));
+          rightPanels.forEach((panel) => panel.classList.remove('is-active'));
 
           if (index === 0) {
             l2?.classList.remove('is-open');
@@ -1131,31 +1181,87 @@ const languages = [
           }, HERO_ANIM_MS);
         }
 
+        function transitionBrandToStories() {
+          setBodyLocked(true);
+          showMask();
+
+          window.setTimeout(() => {
+            desktopSequence?.classList.add('is-hidden');
+            showSection(4);
+
+            window.scrollTo({
+              top: screen5?.offsetTop ?? window.innerHeight,
+              left: 0,
+              behavior: 'auto'
+            });
+
+            window.setTimeout(() => {
+              setBodyLocked(false);
+              hideMask();
+
+              window.setTimeout(() => {
+                isAnimating = false;
+              }, MASK_OUT_MS);
+            }, MASK_HOLD_MS);
+          }, MASK_IN_MS);
+        }
+
+        function transitionStoriesToBrand() {
+          setBodyLocked(true);
+          showMask();
+
+          window.setTimeout(() => {
+            clearSectionVisibility();
+
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'auto'
+            });
+
+            revealBrandImmediate();
+            desktopSequence?.classList.remove('is-hidden');
+
+            window.setTimeout(() => {
+              hideMask();
+
+              window.setTimeout(() => {
+                isAnimating = false;
+              }, MASK_OUT_MS);
+            }, MASK_HOLD_MS);
+          }, MASK_IN_MS);
+        }
+
         function goToStep(step) {
           if (!isDesktop()) return;
           if (step < 0 || step > 5) return;
           if (isAnimating) return;
 
           const previousStep = currentStep;
-
-          isAnimating = true;
           currentStep = step;
+          isAnimating = true;
           updateIndicator(step);
 
           if (step <= 2) {
             isFreeScroll = false;
             setBodyLocked(true);
             desktopSequence?.classList.remove('is-hidden');
+            hideMask();
             clearSectionVisibility();
-            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'auto'
+            });
 
             if (previousStep === 3 && step === 2) {
-              hideBrandPanel();
+              hideBrandAnimated();
               return;
             }
 
             resetBrandPanel();
-            setHeroSlide(step);
+            activateHeroSlide(step);
             return;
           }
 
@@ -1163,24 +1269,43 @@ const languages = [
             isFreeScroll = false;
             setBodyLocked(true);
             desktopSequence?.classList.remove('is-hidden');
+            hideMask();
             clearSectionVisibility();
-            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
-            if (previousStep >= 4) {
-              showBrandPanelImmediate();
-            } else {
-              showBrandPanelAnimated();
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'auto'
+            });
+
+            if (previousStep === 4) {
+              transitionStoriesToBrand();
+              return;
             }
+
+            if (previousStep >= 5) {
+              revealBrandImmediate();
+              window.setTimeout(() => {
+                isAnimating = false;
+              }, 200);
+            } else {
+              showBrandAnimated();
+            }
+            return;
+          }
+
+          if (step === 4 && previousStep === 3) {
+            transitionBrandToStories();
             return;
           }
 
           isFreeScroll = false;
           setBodyLocked(false);
           desktopSequence?.classList.add('is-hidden');
+          hideMask();
           showSection(step);
 
           const target = step === 4 ? screen5 : screen6;
-
           target?.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
@@ -1198,6 +1323,7 @@ const languages = [
           isFreeScroll = true;
           setBodyLocked(false);
           desktopSequence?.classList.add('is-hidden');
+          hideMask();
 
           footer?.scrollIntoView({
             behavior: 'smooth',
@@ -1289,6 +1415,7 @@ const languages = [
             isFreeScroll = false;
             setBodyLocked(false);
             desktopSequence?.classList.remove('is-hidden');
+            hideMask();
             resetBrandPanel();
             clearSectionVisibility();
           }
@@ -1296,6 +1423,7 @@ const languages = [
 
         setBodyLocked(true);
         desktopSequence?.classList.remove('is-hidden');
+        hideMask();
         resetBrandPanel();
         clearSectionVisibility();
         updateIndicator(0);
@@ -1309,19 +1437,19 @@ const languages = [
         document.getElementById('menu-close').onclick = () => sideMenu?.classList.remove('is-open');
 
         const sectionObserver = new IntersectionObserver((entries) => {
-          entries.forEach(en => {
-            if (en.isIntersecting) {
-              en.target.classList.add('is-visible');
-              if (en.target.id === 'screen-5') updateIndicator(4);
-              if (en.target.id === 'screen-6') updateIndicator(5);
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
             }
           });
         }, { threshold: 0.15 });
 
-        document.querySelectorAll('.section-observer').forEach(el => sectionObserver.observe(el));
+        document.querySelectorAll('.section-observer').forEach((el) => {
+          sectionObserver.observe(el);
+        });
 
         const carouselObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
+          entries.forEach((entry) => {
             if (entry.isIntersecting) entry.target.classList.add('is-center');
             else entry.target.classList.remove('is-center');
           });
@@ -1331,11 +1459,11 @@ const languages = [
           threshold: 0
         });
 
-        document.querySelectorAll('.observer-card').forEach(card => {
+        document.querySelectorAll('.observer-card').forEach((card) => {
           carouselObserver.observe(card);
         });
 
-        document.querySelectorAll('.carousel-wrapper').forEach(wrapper => {
+        document.querySelectorAll('.carousel-wrapper').forEach((wrapper) => {
           const container = wrapper.querySelector('.carousel-container');
           const leftBtn = wrapper.querySelector('.left-arrow');
           const rightBtn = wrapper.querySelector('.right-arrow');
