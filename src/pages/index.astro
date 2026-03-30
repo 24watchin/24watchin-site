@@ -106,6 +106,9 @@ const languages = [
     <!-- 4→5 / 5→4 用の幕 -->
     <div class="transition-mask" id="transition-mask" aria-hidden="true"></div>
 
+    <!-- 5→6 用のライン -->
+    <div class="line-wipe" id="line-wipe" aria-hidden="true"></div>
+
     <main class="gateway-main">
       <!-- 1〜4画面目は同じ固定ステージ -->
       <div class="desktop-sequence" id="desktop-sequence">
@@ -430,13 +433,38 @@ const languages = [
         background:
           radial-gradient(circle at 50% 38%, rgba(33, 76, 160, 0.14) 0%, rgba(17, 36, 82, 0.30) 26%, rgba(7, 15, 40, 0.70) 60%, rgba(4, 8, 24, 0.94) 100%),
           linear-gradient(to bottom, rgba(8, 18, 48, 0.34) 0%, rgba(5, 12, 32, 0.86) 100%);
-        transition: opacity 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.32s;
+        transition: opacity 0.34s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.34s;
       }
 
       .transition-mask.is-visible {
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      /* ===== 5→6 ライン演出 ===== */
+      .line-wipe {
+        position: fixed;
+        top: 50%;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 230;
+        transform: translateY(-50%);
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        transition: none;
+        pointer-events: none;
+      }
+
+      .line-wipe.is-running {
+        width: 100vw;
+        transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .line-wipe.is-fading {
+        opacity: 0;
+        transition: opacity 0.3s ease;
       }
 
       .desktop-sequence {
@@ -1045,10 +1073,13 @@ const languages = [
         const BRAND_UNLOCK_MS = 2300;
         const BRAND_HIDE_MS = 500;
 
-        const MASK_IN_MS = 320;
-        const MASK_HOLD_MS = 120;
-        const MASK_OUT_MS = 380;
+        const MASK_IN_MS = 260;
+        const MASK_HOLD_MS = 30;
+        const MASK_OUT_MS = 280;
         const MASK_UNLOCK_MS = 80;
+
+        const LINE_WIPE_MS = 650;      // 線が伸びる時間
+        const LINE_FADE_MS = 300;      // 線がフェードアウトする時間
 
         const SECTION_ANIM_MS = 240;
         const FOOTER_ANIM_MS = 900;
@@ -1068,6 +1099,35 @@ const languages = [
 
         const screen5 = document.getElementById('screen-5');
         const screen6 = document.getElementById('screen-6');
+        const lineWipe = document.getElementById('line-wipe');
+
+        function runLineWipe(callback) {
+          // リセット
+          lineWipe.classList.remove('is-running', 'is-fading');
+          lineWipe.style.width = '0';
+
+          // 少し待ってから線を伸ばす
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              lineWipe.classList.add('is-running');
+
+              // 線が伸びきったら画面切り替え
+              window.setTimeout(() => {
+                callback();
+
+                // 線をフェードアウト
+                lineWipe.classList.remove('is-running');
+                lineWipe.classList.add('is-fading');
+
+                window.setTimeout(() => {
+                  lineWipe.classList.remove('is-fading');
+                  lineWipe.style.width = '0';
+                }, LINE_FADE_MS);
+
+              }, LINE_WIPE_MS);
+            });
+          });
+        }
 
         const dots = document.querySelectorAll('.scroll-indicator .dot');
 
@@ -1239,16 +1299,20 @@ const languages = [
           showMask();
 
           window.setTimeout(() => {
+            desktopSequence?.classList.add('is-hidden');
             showSection(targetStep);
 
             const target = targetStep === 4 ? screen5 : screen6;
-            const targetTop = target?.offsetTop ?? 0;
 
-            window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
+            window.scrollTo({
+              top: target?.offsetTop ?? 0,
+              left: 0,
+              behavior: 'auto'
+            });
 
             window.setTimeout(() => {
-              hideMask();
               setBodyLocked(false);
+              hideMask();
 
               window.setTimeout(() => {
                 isAnimating = false;
@@ -1325,7 +1389,15 @@ const languages = [
           }
 
           if (step === 5 && previousStep === 4) {
-            transitionBetweenSections(5);
+            // 5→6：ライン演出
+            runLineWipe(() => {
+              showSection(5);
+              const targetTop = screen6?.offsetTop ?? 0;
+              window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
+            });
+            window.setTimeout(() => {
+              isAnimating = false;
+            }, LINE_WIPE_MS + LINE_FADE_MS);
             return;
           }
 
@@ -1355,21 +1427,19 @@ const languages = [
           if (isAnimating) return;
 
           isAnimating = true;
-          showMask();
+          isFreeScroll = true;
+          setBodyLocked(false);
+          desktopSequence?.classList.add('is-hidden');
+          hideMask();
+
+          footer?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
 
           window.setTimeout(() => {
-            isFreeScroll = true;
-            setBodyLocked(false);
-            desktopSequence?.classList.add('is-hidden');
-            hideMask();
-
-            const footerTop = footer?.offsetTop ?? document.body.scrollHeight;
-            window.scrollTo({ top: footerTop, left: 0, behavior: 'auto' });
-
-            window.setTimeout(() => {
-              isAnimating = false;
-            }, MASK_UNLOCK_MS);
-          }, MASK_IN_MS);
+            isAnimating = false;
+          }, FOOTER_ANIM_MS);
         }
 
         function leaveFooterMode() {
