@@ -39,61 +39,78 @@ const languages = [
         <div class="sticky-view">
           
           <div class="left-track track">
-            <div class="panel">
+            <div class="panel" style="z-index: 1;">
               <div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
               <div class="dark-overlay"></div>
-              <h2 class="split-word">Conflict</h2>
+              <div class="split-word-box"><h2 class="split-word">Conflict</h2></div>
             </div>
-            <div class="panel">
+            <div class="panel" style="z-index: 2;" id="left-panel-2">
               <div class="bg-layer" style="background-image: url('/images/cities.webp');"></div>
               <div class="dark-overlay"></div>
-              <h2 class="split-word">Cities</h2>
+              <div class="split-word-box"><h2 class="split-word">Cities</h2></div>
             </div>
-            <div class="panel">
+            <div class="panel" style="z-index: 3;" id="left-panel-3">
               <div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
               <div class="dark-overlay"></div>
-              <h2 class="split-word">Innovation</h2>
+              <div class="split-word-box"><h2 class="split-word">Innovation</h2></div>
             </div>
           </div>
 
           <div class="right-track track">
-            <div class="panel">
-              <div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
-              <div class="dark-overlay"></div>
-              <h2 class="split-word">Frontier</h2>
-            </div>
-            <div class="panel">
-              <div class="bg-layer" style="background-image: url('/images/people.webp');"></div>
-              <div class="dark-overlay"></div>
-              <h2 class="split-word">People</h2>
-            </div>
-            <div class="panel">
+            <div class="panel" style="z-index: 1;">
               <div class="bg-layer" style="background-image: url('/images/crisis.webp');"></div>
               <div class="dark-overlay"></div>
-              <h2 class="split-word">Crisis</h2>
+              <div class="split-word-box"><h2 class="split-word">Crisis</h2></div>
+            </div>
+            <div class="panel" style="z-index: 2;" id="right-panel-2">
+              <div class="bg-layer" style="background-image: url('/images/people.webp');"></div>
+              <div class="dark-overlay"></div>
+              <div class="split-word-box"><h2 class="split-word">People</h2></div>
+            </div>
+            <div class="panel" style="z-index: 3;" id="right-panel-3">
+              <div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
+              <div class="dark-overlay"></div>
+              <div class="split-word-box"><h2 class="split-word">Frontier</h2></div>
             </div>
           </div>
           
         </div>
       </div>
       <div class="mobile-stack-wrapper">
-        <section class="mobile-set">
-          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div><div class="dark-overlay"></div><h2 class="split-word">Conflict</h2></div>
-          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/crisis.webp');"></div><div class="dark-overlay"></div><h2 class="split-word">Crisis</h2></div>
-        </section>
-        <section class="mobile-set">
-          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/cities.webp');"></div><div class="dark-overlay"></div><h2 class="split-word">Cities</h2></div>
-          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/people.webp');"></div><div class="dark-overlay"></div><h2 class="split-word">People</h2></div>
-        </section>
-        <section class="mobile-set">
-          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div><div class="dark-overlay"></div><h2 class="split-word">Innovation</h2></div>
-          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div><div class="dark-overlay"></div><h2 class="split-word">Frontier</h2></div>
-        </section>
+        <div class="mobile-panel observer-mobile">
+          <div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
+          <div class="dark-overlay"></div>
+          <div class="split-word-box"><h2 class="split-word">Conflict</h2></div>
+        </div>
+        <div class="mobile-panel observer-mobile">
+          <div class="bg-layer" style="background-image: url('/images/crisis.webp');"></div>
+          <div class="dark-overlay"></div>
+          <div class="split-word-box"><h2 class="split-word">Crisis</h2></div>
+        </div>
+        <div class="mobile-panel observer-mobile">
+          <div class="bg-layer" style="background-image: url('/images/cities.webp');"></div>
+          <div class="dark-overlay"></div>
+          <div class="split-word-box"><h2 class="split-word">Cities</h2></div>
+        </div>
+        <div class="mobile-panel observer-mobile">
+          <div class="bg-layer" style="background-image: url('/images/people.webp');"></div>
+          <div class="dark-overlay"></div>
+          <div class="split-word-box"><h2 class="split-word">People</h2></div>
+        </div>
+        <div class="mobile-panel observer-mobile">
+          <div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
+          <div class="dark-overlay"></div>
+          <div class="split-word-box"><h2 class="split-word">Innovation</h2></div>
+        </div>
+        <div class="mobile-panel observer-mobile">
+          <div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
+          <div class="dark-overlay"></div>
+          <div class="split-word-box"><h2 class="split-word">Frontier</h2></div>
+        </div>
       </div>
       <section class="brand-section" id="screen-4">
         <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
         <div class="brand-bg-overlay"></div>
-        
         <div class="brand-content observer-target">
           <h1 class="brand-logo fade-item">24watchin</h1>
           <h2 class="brand-catch fade-item">Watch the world with clarity.</h2>
@@ -115,10 +132,7 @@ const languages = [
             <a href={`/en/story/${story.id}`} class="story-card observer-card">
               <div class="card-bg" style={`background: ${story.image};`}></div>
               <div class="card-content">
-                <div class="card-meta">
-                  <span class="category">{story.category}</span>
-                  <span class="country">{story.country}</span>
-                </div>
+                <div class="card-meta"><span class="category">{story.category}</span><span class="country">{story.country}</span></div>
                 <h3 class="card-title">{story.title}</h3>
                 <p class="card-excerpt">{story.excerpt}</p>
                 <div class="cta-link">Read story <span>&rarr;</span></div>
@@ -159,7 +173,6 @@ const languages = [
     </main>
 
     <style>
-      /* --- Global Reset & Variables --- */
       :root {
         --bg-color: #0d0d0d;
         --text-main: #f0f0f0;
@@ -173,26 +186,58 @@ const languages = [
       .global-header { position: fixed; top: 0; left: 0; width: 100%; padding: 40px 50px; z-index: 100; pointer-events: none; }
       .global-header .logo { font-weight: 600; font-size: 20px; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-      /* --- PC専用：スプリットスクロール --- */
-      .desktop-split-wrapper { position: relative; width: 100%; height: 300vh; /* 3画面分の高さ */ }
+      /* --- PC専用：ページめくり（リビール） --- */
+      .desktop-split-wrapper { position: relative; width: 100%; height: 300vh; }
       .sticky-view { position: sticky; top: 0; left: 0; width: 100%; height: 100vh; display: flex; overflow: hidden; }
       
-      .track { position: relative; width: 50vw; height: 300vh; will-change: transform; }
-      .left-track { top: 0; left: 0; }
-      .right-track { top: 0; right: 0; transform: translateY(-200vh); /* 右側は一番下からスタート */ }
+      .track { position: relative; width: 50vw; height: 100vh; }
       
-      .panel { position: relative; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      /* パネルをすべて同じ場所に重ねます */
+      .panel { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
       
+      /* 最初は2番目と3番目の画像を隠しておきます */
+      #left-panel-2, #left-panel-3 { clip-path: inset(100% 0 0 0); }
+      #right-panel-2, #right-panel-3 { clip-path: inset(0 0 100% 0); }
+
       .bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 1; }
-      .dark-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 2; }
-      .split-word { position: relative; z-index: 3; font-weight: 300; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: 0.1em; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+      .dark-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 2; }
+      
+      /* ▼ 修正：文字の後ろの半透明の黒い座布団 */
+      .split-word-box {
+        position: relative;
+        z-index: 3;
+        background: rgba(0, 0, 0, 0.4); /* 半透明のグレー */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px); /* すりガラス効果 */
+        padding: 15px 40px;
+        border-radius: 6px;
+        /* アニメーションの初期状態（透明で少しズレている） */
+        opacity: 0;
+        transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .split-word { font-weight: 300; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
 
-      /* --- スマホ専用：上下分割 --- */
+      /* 左は左から、右は右から文字がスライドする準備 */
+      .left-track .split-word-box { transform: translateX(-40px); }
+      .right-track .split-word-box { transform: translateX(40px); }
+
+      /* パネルが表示されたら文字をフワッと出す */
+      .panel.is-active .split-word-box { opacity: 1; transform: translateX(0); }
+
+
+      /* --- スマホ専用：1画面ずつフワッと表示 --- */
       .mobile-stack-wrapper { display: none; }
-      .mobile-set { width: 100vw; height: 100vh; display: flex; flex-direction: column; }
-      .mobile-panel { position: relative; width: 100%; height: 50vh; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.1); }
+      .mobile-panel { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      
+      /* スマホ用のアニメーション */
+      .mobile-panel .bg-layer { opacity: 0; transform: translateY(40px); transition: opacity 1s ease, transform 1s ease; }
+      .mobile-panel.is-visible .bg-layer { opacity: 1; transform: translateY(0); }
+      
+      .mobile-panel .split-word-box { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease 0.6s, transform 0.8s ease 0.6s; } /* 画像より0.6秒遅れて文字が出る */
+      .mobile-panel.is-visible .split-word-box { opacity: 1; transform: translateY(0); }
 
-      /* --- 4画面目: Brand Core --- */
+
+      /* --- 4画面目以降 (変更なし) --- */
       .brand-section { position: relative; width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
       .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 1; opacity: 0.6; }
       .brand-bg-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(17,17,17,1) 0%, rgba(17,17,36,0.5) 50%, rgba(17,17,17,1) 100%); z-index: 2; }
@@ -207,19 +252,15 @@ const languages = [
       .fade-item:nth-child(3) { transition-delay: 1.0s; }
       .observer-target.is-visible .fade-item { opacity: 1; transform: translateY(0); }
 
-      /* --- 5 & 6画面目: Carousel --- */
       .carousel-section { display: flex; flex-direction: column; justify-content: center; padding: 100px 0; min-height: 100vh; }
       .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
       .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
       .section-header .sub-header { margin-top: 12px; font-size: 18px; font-weight: 300; color: #ddd; }
-      
       .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 40px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
       .carousel-container::-webkit-scrollbar { display: none; }
       .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
-      
       .observer-card { scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; position: relative; border-radius: 4px; overflow: hidden; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease; opacity: 0.4; transform: scale(0.85); cursor: pointer; display: block; }
       .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 10; }
-
       .story-card .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
       .story-card.is-center:hover .card-bg { transform: scale(1.05); }
       .story-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%); }
@@ -232,7 +273,6 @@ const languages = [
       .story-card.is-center .card-excerpt { display: block; }
       .cta-link { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #fff; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
       .story-card.is-center .cta-link { opacity: 1; transform: translateY(0); }
-
       .lang-card { flex: 0 0 28vw; height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.05); }
       .lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
       .lang-card.is-center .lang-bg { opacity: 0.8; }
@@ -244,12 +284,11 @@ const languages = [
       .lang-card.is-center .lang-border { width: 40px; }
       .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
 
-      /* --- スマホ対応 (メディアクエリ) --- */
       @media (max-width: 768px) {
         .global-header { padding: 20px; }
         .global-header .logo { font-size: 16px; }
         
-        /* スマホでは複雑なスプリットスクロールを非表示にし、上下分割のシンプルなスクロールを表示します */
+        /* スマホ時はパソコン用画面を隠す */
         .desktop-split-wrapper { display: none; }
         .mobile-stack-wrapper { display: block; }
         
@@ -267,44 +306,73 @@ const languages = [
     <script is:inline>
       document.addEventListener('DOMContentLoaded', () => {
         
-        // ▼ スプリットスクロール（左右が逆方向に動く魔法）の計算用プログラム
+        // ▼ パソコン用のページめくり（リビール）の計算
         const splitWrapper = document.querySelector('.desktop-split-wrapper');
-        const leftTrack = document.querySelector('.left-track');
-        const rightTrack = document.querySelector('.right-track');
+        const l2 = document.getElementById('left-panel-2');
+        const l3 = document.getElementById('left-panel-3');
+        const r2 = document.getElementById('right-panel-2');
+        const r3 = document.getElementById('right-panel-3');
+        const allPanels = document.querySelectorAll('.desktop-split-wrapper .panel');
 
-        if (splitWrapper && leftTrack && rightTrack) {
+        if (splitWrapper) {
+          // 最初の画像(1組目)の文字を表示しておく
+          allPanels[0].classList.add('is-active'); // Conflict
+          allPanels[3].classList.add('is-active'); // Crisis
+
           window.addEventListener('scroll', () => {
-            // パソコンの画面幅の時だけ動かします
             if (window.innerWidth <= 768) return;
 
-            // スクロールの進み具合（0% 〜 100%）を計算します
             const rect = splitWrapper.getBoundingClientRect();
             const maxScroll = rect.height - window.innerHeight;
-            let progress = -rect.top / maxScroll;
-            progress = Math.max(0, Math.min(1, progress));
+            let progress = -rect.top / (maxScroll / 2); // 0から2までの数値になります
 
-            // 左側は 0vh から -200vh へ（上に引っ張る）
-            leftTrack.style.transform = `translateY(-${progress * 200}vh)`;
-            
-            // 右側は -200vh から 0vh へ（下に引っ張る）
-            // （progressが0の時は-200vh、1の時は0vhになります）
-            rightTrack.style.transform = `translateY(${-200 + (progress * 200)}vh)`;
+            // 2組目の画像（Cities / People）を削って表示する
+            let p2 = Math.max(0, Math.min(1, progress));
+            if(l2) l2.style.clipPath = `inset(${100 - (p2 * 100)}% 0 0 0)`;
+            if(r2) r2.style.clipPath = `inset(0 0 ${100 - (p2 * 100)}% 0)`;
+
+            // 2組目が半分以上見えたら文字をスライドさせる
+            if (p2 > 0.5) {
+              l2.classList.add('is-active'); r2.classList.add('is-active');
+            } else {
+              l2.classList.remove('is-active'); r2.classList.remove('is-active');
+            }
+
+            // 3組目の画像（Innovation / Frontier）を削って表示する
+            let p3 = Math.max(0, Math.min(1, progress - 1));
+            if(l3) l3.style.clipPath = `inset(${100 - (p3 * 100)}% 0 0 0)`;
+            if(r3) r3.style.clipPath = `inset(0 0 ${100 - (p3 * 100)}% 0)`;
+
+            // 3組目が半分以上見えたら文字をスライドさせる
+            if (p3 > 0.5) {
+              l3.classList.add('is-active'); r3.classList.add('is-active');
+            } else {
+              l3.classList.remove('is-active'); r3.classList.remove('is-active');
+            }
           });
         }
 
-        // ▼ 文字をフワッと出すアニメーションのプログラム
-        const observerOptions = { root: null, threshold: 0.3 };
-        const fadeObserver = new IntersectionObserver((entries) => {
+        // ▼ スマホ用の1画面ずつフワッと出すセンサー
+        const mobileObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
+              entry.target.classList.add('is-visible'); // 画面に入ったらクラスをつける
             }
           });
-        }, observerOptions);
+        }, { threshold: 0.3 }); // 画面に30%入ったら発動
+
+        document.querySelectorAll('.observer-mobile').forEach(panel => {
+          mobileObserver.observe(panel);
+        });
+
+        // ▼ 4画面目以降のアニメーション
+        const fadeObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('is-visible');
+          });
+        }, { threshold: 0.3 });
         document.querySelectorAll('.observer-target').forEach(el => fadeObserver.observe(el));
 
-        // ▼ 横スクロールで中央のカードを大きくするプログラム
-        const carouselObserverOptions = { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 };
         const carouselObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -313,7 +381,7 @@ const languages = [
               entry.target.classList.remove('is-center');
             }
           });
-        }, carouselObserverOptions);
+        }, { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 });
         document.querySelectorAll('.observer-card').forEach(card => carouselObserver.observe(card));
 
       });
