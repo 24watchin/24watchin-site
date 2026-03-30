@@ -1239,20 +1239,16 @@ const languages = [
           showMask();
 
           window.setTimeout(() => {
-            desktopSequence?.classList.add('is-hidden');
             showSection(targetStep);
 
             const target = targetStep === 4 ? screen5 : screen6;
+            const targetTop = target?.offsetTop ?? 0;
 
-            window.scrollTo({
-              top: target?.offsetTop ?? 0,
-              left: 0,
-              behavior: 'auto'
-            });
+            window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
 
             window.setTimeout(() => {
-              setBodyLocked(false);
               hideMask();
+              setBodyLocked(false);
 
               window.setTimeout(() => {
                 isAnimating = false;
@@ -1359,19 +1355,21 @@ const languages = [
           if (isAnimating) return;
 
           isAnimating = true;
-          isFreeScroll = true;
-          setBodyLocked(false);
-          desktopSequence?.classList.add('is-hidden');
-          hideMask();
-
-          footer?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+          showMask();
 
           window.setTimeout(() => {
-            isAnimating = false;
-          }, FOOTER_ANIM_MS);
+            isFreeScroll = true;
+            setBodyLocked(false);
+            desktopSequence?.classList.add('is-hidden');
+            hideMask();
+
+            const footerTop = footer?.offsetTop ?? document.body.scrollHeight;
+            window.scrollTo({ top: footerTop, left: 0, behavior: 'auto' });
+
+            window.setTimeout(() => {
+              isAnimating = false;
+            }, MASK_UNLOCK_MS);
+          }, MASK_IN_MS);
         }
 
         function leaveFooterMode() {
