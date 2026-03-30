@@ -177,12 +177,9 @@ const languages = [
           </div>
         </section>
 
-        <!-- screen-5・6もdesktop-sequenceの中に入れる -->
         <section class="seq-panel" id="screen-5">
-          <div class="section-fade-in">
-            <div class="section-header">
-              <h2>Latest Stories</h2>
-            </div>
+          <div class="seq-inner">
+            <div class="section-header"><h2>Latest Stories</h2></div>
             <div class="carousel-wrapper">
               <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
               <div class="carousel-container" id="story-carousel">
@@ -208,11 +205,9 @@ const languages = [
           </div>
         </section>
 
-        <section class="seq-panel lang-section" id="screen-6">
-          <div class="section-fade-in">
-            <div class="section-header">
-              <h2>CHOOSE YOUR LANGUAGE</h2>
-            </div>
+        <section class="seq-panel" id="screen-6">
+          <div class="seq-inner">
+            <div class="section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
             <div class="carousel-wrapper">
               <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
               <div class="carousel-container" id="lang-carousel">
@@ -234,7 +229,7 @@ const languages = [
           </div>
         </section>
 
-      </div>
+      </div><!-- /.desktop-sequence -->
 
       <!-- 固定ステージの下敷き -->
       <section class="hero-spacer" aria-hidden="true">
@@ -625,31 +620,38 @@ const languages = [
         visibility: visible;
       }
 
-      /* ===== screen-5・6：brand-panelと同じ仕組み ===== */
+      /* ===== seq-panel: screen-5・6 ===== */
       .seq-panel {
         position: absolute;
         inset: 0;
         z-index: 40;
         visibility: hidden;
         pointer-events: none;
-        opacity: 0;
         background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%);
         display: flex;
         flex-direction: column;
+        align-items: center;
         justify-content: center;
-        padding: 100px 0;
-        box-sizing: border-box;
-        transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
-                    visibility 0s linear 0.5s;
+        overflow: hidden;
       }
-
       #screen-6 { z-index: 41; }
 
       .seq-panel.is-visible {
         visibility: visible;
-        opacity: 1;
         pointer-events: auto;
-        transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .seq-inner {
+        width: 100%;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s,
+                    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s;
+      }
+
+      .seq-panel.is-visible .seq-inner {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       .brand-night {
@@ -1263,7 +1265,6 @@ const languages = [
         }
 
         function transitionBrandToStories() {
-          // マスクで隠してからscreen-5をフェードイン
           showMask();
           window.setTimeout(() => {
             showSection(4);
@@ -1326,14 +1327,12 @@ const languages = [
 
           if (step === 3) {
             setBodyLocked(true);
-            hideMask();
             clearSectionVisibility();
 
             if (previousStep === 4) {
               transitionStoriesToBrand();
               return;
             }
-
             if (previousStep >= 5) {
               clearSectionVisibility();
               revealBrandImmediate();
@@ -1359,15 +1358,13 @@ const languages = [
             return;
           }
 
-          // step5（言語）→ フッターへ
           showSection(step);
-          window.setTimeout(() => { isAnimating = false; }, MASK_IN_MS + MASK_UNLOCK_MS);
+          window.setTimeout(() => { isAnimating = false; }, 300);
         }
 
         function enterFooterMode() {
           if (isAnimating) return;
           isAnimating = true;
-          // footerはdesktop-sequenceの外なので不要。step5のまま終了。
           window.setTimeout(() => { isAnimating = false; }, 200);
         }
 
