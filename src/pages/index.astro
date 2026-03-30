@@ -254,7 +254,7 @@ const languages = [
       }
 
       .brand-section { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
-      .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.6; transform: scale(1.15); transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+      .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.6; transform: scale(1.15); transition: transform 4.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
       .section-observer.is-visible .brand-bg { transform: scale(1); }
       .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); }
       
@@ -264,7 +264,7 @@ const languages = [
       
       .brand-desc p { font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 300; color: #eee; margin-bottom: 15px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 
-      .fade-base { opacity: 0; transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+      .fade-base { opacity: 0; transition: opacity 3.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
       
       .fade-up { transform: translateY(40px); }
       .text-anim-target.is-visible .fade-up { transform: translateY(0); opacity: 1; }
@@ -284,8 +284,8 @@ const languages = [
       }
 
       .section-fade-in {
-        opacity: 0; transform: translateY(150px);
-        transition: opacity 2.0s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.0s cubic-bezier(0.2, 0.8, 0.2, 1);
+        opacity: 0; transform: translateY(180px);
+        transition: opacity 3.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3.2s cubic-bezier(0.2, 0.8, 0.2, 1);
         width: 100%;
       }
       .section-observer.is-visible .section-fade-in {
@@ -351,7 +351,7 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
         const DESKTOP_BREAKPOINT = 768;
         const HERO_ANIM_MS = 1500;
-        const SECTION_ANIM_MS = 1100;
+        const SECTION_ANIM_MS = 1900;
         const FOOTER_ANIM_MS = 900;
 
         let currentStep = 0;
