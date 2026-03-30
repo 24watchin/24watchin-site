@@ -258,12 +258,12 @@ const languages = [
         visibility: hidden;
         pointer-events: none;
         background: #000;
-        transition: opacity 1.05s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 1.05s;
+        transition: opacity 1.45s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 1.45s;
       }
       .brand-transition-overlay.is-visible {
         opacity: 1;
         visibility: visible;
-        transition: opacity 1.05s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 1.45s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .brand-transition-bg {
         position: absolute;
@@ -271,8 +271,8 @@ const languages = [
         background-size: cover;
         background-position: center;
         opacity: 0;
-        transform: scale(1.06);
-        transition: transform 1.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: scale(1.08);
+        transition: transform 2.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.55s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .brand-transition-overlay.is-visible .brand-transition-bg {
         opacity: 1;
@@ -281,9 +281,9 @@ const languages = [
       .brand-transition-bg-overlay {
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.72) 100%);
+        background: radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.68) 100%);
         opacity: 0;
-        transition: opacity 1.05s ease;
+        transition: opacity 1.35s ease;
       }
       .brand-transition-overlay.is-visible .brand-transition-bg-overlay {
         opacity: 1;
@@ -299,9 +299,17 @@ const languages = [
       }
 
       .brand-section { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
-      .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.85; transform: scale(1.15); transition: transform 4.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+      .brand-bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.92;
+        transform: scale(1);
+        transition: none;
+      }
       .section-observer.is-visible .brand-bg { transform: scale(1); }
-      .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.72) 100%); }
+      .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.68) 100%); }
       
       .brand-content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; }
       .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; }
@@ -396,7 +404,8 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
         const DESKTOP_BREAKPOINT = 768;
         const HERO_ANIM_MS = 1500;
-        const HERO_TO_BRAND_OVERLAY_MS = 1200;
+        const HERO_TO_BRAND_OVERLAY_MS = 1550;
+        const HERO_TO_BRAND_RELEASE_MS = 650;
         const SECTION_ANIM_MS = 1900;
         const FOOTER_ANIM_MS = 900;
 
@@ -515,14 +524,17 @@ const languages = [
               behavior: 'auto'
             });
 
-            requestAnimationFrame(() => {
+            window.setTimeout(() => {
               textAnimTarget?.classList.add('is-visible');
-            });
+            }, 160);
 
             window.setTimeout(() => {
               clearOverlayVisibility();
+            }, HERO_TO_BRAND_RELEASE_MS);
+
+            window.setTimeout(() => {
               isAnimating = false;
-            }, 260);
+            }, HERO_TO_BRAND_RELEASE_MS + 500);
           }, HERO_TO_BRAND_OVERLAY_MS);
         }
 
