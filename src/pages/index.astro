@@ -428,15 +428,15 @@ const languages = [
         visibility: hidden;
         pointer-events: none;
         background:
-          radial-gradient(circle at 50% 42%, rgba(70, 70, 76, 0.18) 0%, rgba(34, 34, 38, 0.68) 58%, rgba(12, 12, 14, 0.92) 100%),
-          linear-gradient(to bottom, rgba(44, 44, 48, 0.42) 0%, rgba(14, 14, 16, 0.88) 100%);
-        transition: opacity 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.42s;
+          radial-gradient(circle at 50% 38%, rgba(33, 76, 160, 0.14) 0%, rgba(17, 36, 82, 0.30) 26%, rgba(7, 15, 40, 0.70) 60%, rgba(4, 8, 24, 0.94) 100%),
+          linear-gradient(to bottom, rgba(8, 18, 48, 0.34) 0%, rgba(5, 12, 32, 0.86) 100%);
+        transition: opacity 0.34s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.34s;
       }
 
       .transition-mask.is-visible {
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .desktop-sequence {
@@ -738,9 +738,10 @@ const languages = [
 
       .section-fade-in {
         opacity: 0;
-        transform: translateY(140px);
-        transition: opacity 2.4s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: translateY(70px);
+        transition: opacity 1.45s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.45s cubic-bezier(0.2, 0.8, 0.2, 1);
         width: 100%;
+        will-change: opacity, transform;
       }
 
       .section-observer.is-visible .section-fade-in {
@@ -1044,11 +1045,12 @@ const languages = [
         const BRAND_UNLOCK_MS = 2300;
         const BRAND_HIDE_MS = 500;
 
-        const MASK_IN_MS = 380;
-        const MASK_HOLD_MS = 80;
-        const MASK_OUT_MS = 420;
+        const MASK_IN_MS = 300;
+        const MASK_HOLD_MS = 40;
+        const MASK_OUT_MS = 340;
+        const MASK_UNLOCK_MS = 120;
 
-        const SECTION_ANIM_MS = 1000;
+        const SECTION_ANIM_MS = 320;
         const FOOTER_ANIM_MS = 900;
 
         let currentStep = 0;
@@ -1201,7 +1203,7 @@ const languages = [
 
               window.setTimeout(() => {
                 isAnimating = false;
-              }, MASK_OUT_MS);
+              }, MASK_UNLOCK_MS);
             }, MASK_HOLD_MS);
           }, MASK_IN_MS);
         }
@@ -1227,7 +1229,7 @@ const languages = [
 
               window.setTimeout(() => {
                 isAnimating = false;
-              }, MASK_OUT_MS);
+              }, MASK_UNLOCK_MS);
             }, MASK_HOLD_MS);
           }, MASK_IN_MS);
         }
