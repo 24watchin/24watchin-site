@@ -1,7 +1,6 @@
 ---
 // モックアップ用ダミーデータ
 
-// 5画面目用：最新ニュースダミー
 const latestStories = [
   { id: 1, category: 'Politics', country: 'United States', title: 'New Economic Policies Reshape the Global Market', excerpt: 'An in-depth look at the recent shifts in international trade agreements.', image: 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)' },
   { id: 2, category: 'Economy', country: 'Taiwan', title: 'Tech Giants Announce Next-Generation Semiconductor', excerpt: 'Would you like to see what happened in Taiwan? The new chip architecture unveiled today.', image: 'linear-gradient(135deg, #2c2519 0%, #4a3f2c 100%)' },
@@ -9,7 +8,6 @@ const latestStories = [
   { id: 4, category: 'Environment', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results', excerpt: 'Deforestation rates drop as new monitoring technologies are deployed.', image: 'linear-gradient(135deg, #2b1d1d 0%, #442e2e 100%)' },
 ];
 
-// 6画面目用：言語ダミー
 const languages = [
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
@@ -37,44 +35,65 @@ const languages = [
 
     <main class="gateway-main">
       
-      <section class="split-section" id="screen-1">
-        <div class="split-pane left-pane dark-overlay">
-          <div class="bg-layer" style="background: linear-gradient(to bottom, #2a2a2a, #111);"></div>
-          <h2 class="split-word">Conflict</h2>
-        </div>
-        <div class="split-pane right-pane dark-overlay">
-          <div class="bg-layer" style="background: linear-gradient(to bottom, #3a3a3a, #1a1a1a);"></div>
-          <h2 class="split-word">People</h2>
-        </div>
-        <div class="scroll-indicator">
-          <span class="line"></span>
-        </div>
-      </section>
+      <div class="desktop-split-wrapper">
+        <div class="sticky-view">
+          
+          <div class="left-track track">
+            <div class="panel">
+              <div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
+              <div class="dark-overlay"></div>
+              <h2 class="split-word">Conflict</h2>
+            </div>
+            <div class="panel">
+              <div class="bg-layer" style="background-image: url('/images/cities.webp');"></div>
+              <div class="dark-overlay"></div>
+              <h2 class="split-word">Cities</h2>
+            </div>
+            <div class="panel">
+              <div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
+              <div class="dark-overlay"></div>
+              <h2 class="split-word">Innovation</h2>
+            </div>
+          </div>
 
-      <section class="split-section" id="screen-2">
-        <div class="split-pane left-pane dark-overlay">
-          <div class="bg-layer" style="background: linear-gradient(to bottom, #1f1a1a, #0a0a0a);"></div>
-          <h2 class="split-word">Crisis</h2>
+          <div class="right-track track">
+            <div class="panel">
+              <div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
+              <div class="dark-overlay"></div>
+              <h2 class="split-word">Frontier</h2>
+            </div>
+            <div class="panel">
+              <div class="bg-layer" style="background-image: url('/images/people.webp');"></div>
+              <div class="dark-overlay"></div>
+              <h2 class="split-word">People</h2>
+            </div>
+            <div class="panel">
+              <div class="bg-layer" style="background-image: url('/images/crisis.webp');"></div>
+              <div class="dark-overlay"></div>
+              <h2 class="split-word">Crisis</h2>
+            </div>
+          </div>
+          
         </div>
-        <div class="split-pane right-pane dark-overlay">
-          <div class="bg-layer" style="background: linear-gradient(to bottom, #1a1f2b, #0a0a11);"></div>
-          <h2 class="split-word">Cities</h2>
-        </div>
-      </section>
-
-      <section class="split-section" id="screen-3">
-        <div class="split-pane left-pane dark-overlay">
-          <div class="bg-layer" style="background: linear-gradient(to bottom, #1a2b2b, #0a1111);"></div>
-          <h2 class="split-word">Innovation</h2>
-        </div>
-        <div class="split-pane right-pane dark-overlay">
-          <div class="bg-layer" style="background: linear-gradient(to bottom, #2b2a1a, #11110a);"></div>
-          <h2 class="split-word">Change</h2>
-        </div>
-      </section>
-
+      </div>
+      <div class="mobile-stack-wrapper">
+        <section class="mobile-set">
+          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div><div class="dark-overlay"></div><h2 class="split-word">Conflict</h2></div>
+          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/crisis.webp');"></div><div class="dark-overlay"></div><h2 class="split-word">Crisis</h2></div>
+        </section>
+        <section class="mobile-set">
+          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/cities.webp');"></div><div class="dark-overlay"></div><h2 class="split-word">Cities</h2></div>
+          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/people.webp');"></div><div class="dark-overlay"></div><h2 class="split-word">People</h2></div>
+        </section>
+        <section class="mobile-set">
+          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div><div class="dark-overlay"></div><h2 class="split-word">Innovation</h2></div>
+          <div class="mobile-panel"><div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div><div class="dark-overlay"></div><h2 class="split-word">Frontier</h2></div>
+        </section>
+      </div>
       <section class="brand-section" id="screen-4">
-        <div class="brand-bg"></div>
+        <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
+        <div class="brand-bg-overlay"></div>
+        
         <div class="brand-content observer-target">
           <h1 class="brand-logo fade-item">24watchin</h1>
           <h2 class="brand-catch fade-item">Watch the world with clarity.</h2>
@@ -146,76 +165,74 @@ const languages = [
         --text-main: #f0f0f0;
         --text-muted: #a0a0a0;
         --font-sans: 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
-        --font-serif: 'Playfair Display', serif;
       }
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; line-height: 1.6; overflow-x: hidden; }
+      body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); overflow-x: hidden; }
       a { text-decoration: none; color: inherit; }
 
-      /* --- Header --- */
       .global-header { position: fixed; top: 0; left: 0; width: 100%; padding: 40px 50px; z-index: 100; pointer-events: none; }
-      .global-header .logo { font-weight: 600; font-size: 20px; letter-spacing: 1px; }
+      .global-header .logo { font-weight: 600; font-size: 20px; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-      /* --- 共通: Section Setup --- */
-      section { position: relative; width: 100%; min-height: 100vh; overflow: hidden; }
-
-      /* --- Screen 1-3: Split Screens --- */
-      .split-section { display: flex; flex-direction: row; }
-      .split-pane { position: relative; width: 50vw; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-      .bg-layer { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; background-size: cover !important; background-position: center !important; transition: transform 0.1s ease-out; z-index: 1; }
-      .dark-overlay::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 2; }
-      .split-word { position: relative; z-index: 3; font-weight: 300; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10vh; opacity: 0.9; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+      /* --- PC専用：スプリットスクロール --- */
+      .desktop-split-wrapper { position: relative; width: 100%; height: 300vh; /* 3画面分の高さ */ }
+      .sticky-view { position: sticky; top: 0; left: 0; width: 100%; height: 100vh; display: flex; overflow: hidden; }
       
-      /* Scroll Indicator */
-      .scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; flex-direction: column; align-items: center; opacity: 0.6; }
-      .scroll-indicator .line { width: 1px; height: 60px; background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent); animation: scrollLine 2s infinite; transform-origin: top; }
-      @keyframes scrollLine { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(0); transform-origin: bottom; } }
+      .track { position: relative; width: 50vw; height: 300vh; will-change: transform; }
+      .left-track { top: 0; left: 0; }
+      .right-track { top: 0; right: 0; transform: translateY(-200vh); /* 右側は一番下からスタート */ }
+      
+      .panel { position: relative; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      
+      .bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 1; }
+      .dark-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 2; }
+      .split-word { position: relative; z-index: 3; font-weight: 300; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: 0.1em; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
-      /* --- Screen 4: Brand Core --- */
-      .brand-section { display: flex; align-items: center; justify-content: center; text-align: center; }
-      .brand-bg { position: absolute; inset: 0; background: linear-gradient(180deg, #111 0%, #1a1a24 50%, #111 100%); z-index: 1; opacity: 0.8; }
-      .brand-content { position: relative; z-index: 2; max-width: 800px; padding: 0 20px; }
+      /* --- スマホ専用：上下分割 --- */
+      .mobile-stack-wrapper { display: none; }
+      .mobile-set { width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+      .mobile-panel { position: relative; width: 100%; height: 50vh; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+      /* --- 4画面目: Brand Core --- */
+      .brand-section { position: relative; width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
+      .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 1; opacity: 0.6; }
+      .brand-bg-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(17,17,17,1) 0%, rgba(17,17,36,0.5) 50%, rgba(17,17,17,1) 100%); z-index: 2; }
+      .brand-content { position: relative; z-index: 3; max-width: 800px; padding: 0 20px; }
       .brand-logo { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 400; letter-spacing: 2px; margin-bottom: 24px; color: var(--text-muted); }
-      .brand-catch { font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 300; line-height: 1.2; margin-bottom: 40px; letter-spacing: 0.02em; }
-      .brand-desc p { font-size: clamp(1.1rem, 2vw, 1.5rem); font-weight: 300; color: #ccc; margin-bottom: 8px; letter-spacing: 0.05em; }
+      .brand-catch { font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 300; line-height: 1.2; margin-bottom: 40px; letter-spacing: 0.02em; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+      .brand-desc p { font-size: clamp(1.1rem, 2vw, 1.5rem); font-weight: 300; color: #ddd; margin-bottom: 8px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
       
-      /* Fade Animations for Screen 4 */
       .fade-item { opacity: 0; transform: translateY(30px); transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
       .fade-item:nth-child(1) { transition-delay: 0.2s; }
       .fade-item:nth-child(2) { transition-delay: 0.6s; }
       .fade-item:nth-child(3) { transition-delay: 1.0s; }
       .observer-target.is-visible .fade-item { opacity: 1; transform: translateY(0); }
 
-      /* --- Screen 5 & 6: Carousel Common --- */
+      /* --- 5 & 6画面目: Carousel --- */
       .carousel-section { display: flex; flex-direction: column; justify-content: center; padding: 100px 0; min-height: 100vh; }
       .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
       .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
       .section-header .sub-header { margin-top: 12px; font-size: 18px; font-weight: 300; color: #ddd; }
       
-      .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 40px; align-items: center; /* 隠しスクロールバー */ -ms-overflow-style: none; scrollbar-width: none; }
+      .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 40px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
       .carousel-container::-webkit-scrollbar { display: none; }
+      .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
       
-      /* Spacer to allow first/last items to center */
-      .carousel-spacer { flex: 0 0 calc(50vw - 20vw); /* 中央カード(40vw)の半分の残りを計算 */ }
-      
-      .observer-card { scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; position: relative; border-radius: 4px; overflow: hidden; text-decoration: none; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease; opacity: 0.4; transform: scale(0.85); cursor: pointer; }
+      .observer-card { scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; position: relative; border-radius: 4px; overflow: hidden; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease; opacity: 0.4; transform: scale(0.85); cursor: pointer; display: block; }
       .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 10; }
 
-      /* --- Screen 5: Story Cards --- */
-      .story-card .card-bg { position: absolute; inset: 0; background-size: cover !important; background-position: center !important; transition: transform 0.8s ease; }
+      .story-card .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
       .story-card.is-center:hover .card-bg { transform: scale(1.05); }
-      .story-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%); pointer-events: none; }
+      .story-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%); }
       .card-content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
       .card-meta { display: flex; gap: 12px; margin-bottom: 16px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
       .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.4); padding-bottom: 4px; }
       .card-meta .country { color: var(--text-muted); }
       .card-title { font-size: clamp(1.2rem, 2vw, 2rem); font-weight: 400; line-height: 1.3; margin-bottom: 16px; }
       .card-excerpt { font-size: 14px; color: #ccc; margin-bottom: 24px; display: none; line-height: 1.5; }
-      .story-card.is-center .card-excerpt { display: block; } /* 中央のみ補足表示 */
+      .story-card.is-center .card-excerpt { display: block; }
       .cta-link { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #fff; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
       .story-card.is-center .cta-link { opacity: 1; transform: translateY(0); }
 
-      /* --- Screen 6: Language Cards --- */
       .lang-card { flex: 0 0 28vw; height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.05); }
       .lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
       .lang-card.is-center .lang-bg { opacity: 0.8; }
@@ -227,15 +244,18 @@ const languages = [
       .lang-card.is-center .lang-border { width: 40px; }
       .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
 
-      /* --- Responsive (Mobile) --- */
+      /* --- スマホ対応 (メディアクエリ) --- */
       @media (max-width: 768px) {
         .global-header { padding: 20px; }
         .global-header .logo { font-size: 16px; }
-        /* Mobile: Keep 50:50 side-by-side but tighten design */
-        .split-word { font-size: 1.2rem; margin-bottom: 5vh; letter-spacing: 0.05em; }
+        
+        /* スマホでは複雑なスプリットスクロールを非表示にし、上下分割のシンプルなスクロールを表示します */
+        .desktop-split-wrapper { display: none; }
+        .mobile-stack-wrapper { display: block; }
+        
+        .split-word { font-size: 1.8rem; }
         .brand-content { padding: 0 15px; }
-        /* Carousel Mobile Adjustments */
-        .carousel-spacer { flex: 0 0 calc(50vw - 37.5vw); } /* adjust for 75vw card */
+        .carousel-spacer { flex: 0 0 calc(50vw - 37.5vw); }
         .observer-card { flex: 0 0 75vw; height: 55vh; margin: 0 2vw; }
         .lang-card { flex: 0 0 65vw; height: 45vh; }
         .card-content { padding: 25px 20px; }
@@ -247,18 +267,32 @@ const languages = [
     <script is:inline>
       document.addEventListener('DOMContentLoaded', () => {
         
-        // 1. Mouse Parallax for Screen 1-3
-        const bgLayers = document.querySelectorAll('.bg-layer');
-        window.addEventListener('mousemove', (e) => {
-          const mouseX = e.clientX / window.innerWidth - 0.5;
-          const mouseY = e.clientY / window.innerHeight - 0.5;
-          bgLayers.forEach(layer => {
-            // 微小な動き（MAX 2% 程度）に抑えて上品さを保つ
-            layer.style.transform = `translate(${mouseX * -2}%, ${mouseY * -2}%)`;
-          });
-        });
+        // ▼ スプリットスクロール（左右が逆方向に動く魔法）の計算用プログラム
+        const splitWrapper = document.querySelector('.desktop-split-wrapper');
+        const leftTrack = document.querySelector('.left-track');
+        const rightTrack = document.querySelector('.right-track');
 
-        // 2. Intersection Observer for Screen 4 (Fade In)
+        if (splitWrapper && leftTrack && rightTrack) {
+          window.addEventListener('scroll', () => {
+            // パソコンの画面幅の時だけ動かします
+            if (window.innerWidth <= 768) return;
+
+            // スクロールの進み具合（0% 〜 100%）を計算します
+            const rect = splitWrapper.getBoundingClientRect();
+            const maxScroll = rect.height - window.innerHeight;
+            let progress = -rect.top / maxScroll;
+            progress = Math.max(0, Math.min(1, progress));
+
+            // 左側は 0vh から -200vh へ（上に引っ張る）
+            leftTrack.style.transform = `translateY(-${progress * 200}vh)`;
+            
+            // 右側は -200vh から 0vh へ（下に引っ張る）
+            // （progressが0の時は-200vh、1の時は0vhになります）
+            rightTrack.style.transform = `translateY(${-200 + (progress * 200)}vh)`;
+          });
+        }
+
+        // ▼ 文字をフワッと出すアニメーションのプログラム
         const observerOptions = { root: null, threshold: 0.3 };
         const fadeObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
@@ -269,13 +303,8 @@ const languages = [
         }, observerOptions);
         document.querySelectorAll('.observer-target').forEach(el => fadeObserver.observe(el));
 
-        // 3. Intersection Observer for Carousels (Center Focus Effect)
-        // 画面中央付近にあるカードを検知してクラスを付与する
-        const carouselObserverOptions = {
-          root: null, // viewportを基準
-          rootMargin: "0px -40% 0px -40%", // 画面の中央20%の領域に入ったものを検知
-          threshold: 0
-        };
+        // ▼ 横スクロールで中央のカードを大きくするプログラム
+        const carouselObserverOptions = { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 };
         const carouselObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -285,10 +314,7 @@ const languages = [
             }
           });
         }, carouselObserverOptions);
-        
-        document.querySelectorAll('.observer-card').forEach(card => {
-          carouselObserver.observe(card);
-        });
+        document.querySelectorAll('.observer-card').forEach(card => carouselObserver.observe(card));
 
       });
     </script>
