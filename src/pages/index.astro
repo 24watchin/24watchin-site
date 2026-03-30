@@ -108,7 +108,6 @@ const languages = [
       </div>
 
       <div id="full-page-stack">
-
       <section class="brand-section fp-screen" id="screen-4">
         <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
         <div class="brand-bg-overlay"></div>
@@ -175,7 +174,6 @@ const languages = [
           </div>
         </div>
       </section>
-
       </div><!-- /#full-page-stack -->
 
       <footer style="height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333;">
@@ -261,7 +259,8 @@ const languages = [
 
       /* ==========================================
          フルページスタック（画面4〜6）
-         position:fixed で重ねてホイールで制御
+         ポイント：z-indexは「先に出る画面ほど高く」
+         後から乗る画面は下から上がってきて被さる
       ========================================== */
       #full-page-stack { position: relative; }
 
@@ -272,16 +271,24 @@ const languages = [
         /* 初期状態：画面の下に隠れている */
         transform: translateY(100%);
         transition: transform 1.4s cubic-bezier(0.64, 0.04, 0.35, 1);
-        /* 重なり順：後の画面が上に来る */
       }
-      #screen-4 { z-index: 10; }
-      #screen-5 { z-index: 20; }
-      #screen-6 { z-index: 30; }
 
-      /* 表示中 */
-      .fp-screen.fp-active  { transform: translateY(0); }
-      /* 通過済み（上に消える） */
-      .fp-screen.fp-passed  { transform: translateY(-100%); }
+      /*
+        z-indexの順序：
+        screen-4が一番上（最初に出るので上にないと見えない）
+        screen-5がその下から上がってくる
+        screen-6がさらにその下から上がってくる
+        ← これが「前の画面を残しながら次が被さる」動きになる
+      */
+      #screen-4 { z-index: 30; }
+      #screen-5 { z-index: 20; }
+      #screen-6 { z-index: 10; }
+
+      /* アクティブ：画面に表示 */
+      .fp-screen.fp-active { transform: translateY(0); }
+
+      /* 通過済み：上に掃ける */
+      .fp-screen.fp-passed { transform: translateY(-100%); }
 
       /* コンテンツのフェードイン */
       .fp-screen .brand-content {
@@ -306,7 +313,7 @@ const languages = [
       .fp-screen.fp-active .text-anim-target .fade-up  { transform: translateY(0); opacity: 1; }
       .fp-screen.fp-active .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
 
-      /* carousel-sectionの min-height を上書き */
+      /* carousel-sectionのmin-heightを上書き */
       .carousel-section.fp-screen {
         min-height: unset;
         height: 100vh;
@@ -432,17 +439,15 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
 
         // =============================================
-        // 状態管理
-        // 全画面をホイールで制御（スクロールは一切使わない）
+        // 状態管理（全画面ホイール制御・スクロールなし）
         // zone 0: 画面1〜3（スプリット）
         // zone 1: 画面4〜6（フルページスタック）
         // =============================================
-        let currentSlide = 0;  // 0,1,2 = 画面1,2,3
-        let fpIndex = -1;      // -1=未, 0=screen-4, 1=screen-5, 2=screen-6
-        let zone = 0;          // 0=スプリット, 1=フルページ
+        let currentSlide = 0;
+        let fpIndex = -1;      // -1=未到達, 0=screen-4, 1=screen-5, 2=screen-6
+        let zone = 0;
         let isAnimating = false;
 
-        // body.is-locked は常に維持（overflow:hidden）
         document.body.classList.add('is-locked');
 
         const FP_ELS = [
@@ -461,14 +466,40 @@ const languages = [
 
         // =============================================
         // フルページスタック表示制御
+        //
+        // z-indexは screen-4(30) > screen-5(20) > screen-6(10)
+        // 「次の画面」は下(translateY:100%)から上がって来て
+        // 「前の画面」の上に被さる → 前の画面はそのまま(translateY:0)でOK
+        // 「前の画面に戻る」ときだけ、現在画面を上(translateY:-100%)に追い出す
         // =============================================
-        function setFpScreen(index) {
+        function setFpScreen(index, direction) {
+          // direction: 'next' or 'prev'
           FP_ELS.forEach((el, i) => {
-            el.classList.remove('fp-active', 'fp-passed');
-            if (i < index)      el.classList.add('fp-passed');
-            else if (i === index) el.classList.add('fp-active');
-            // i > index → 初期状態(translateY(100%))のまま
+            el.classList.remove('fp-active', 'fp-passed', 'fp-behind');
+
+            if (i === index) {
+              // アクティブ画面：中央に表示
+              el.classList.add('fp-active');
+            } else if (i < index) {
+              // 通過済み（後ろに隠れている）：次の画面が上から被さっているので下に残す
+              el.style.transform = 'translateY(0)';
+              el.classList.add('fp-behind');
+            } else {
+              // まだ来ていない画面：下に待機
+              el.style.transform = '';  // CSS初期値のtranslateY(100%)に戻す
+              el.classList.remove('fp-active', 'fp-passed', 'fp-behind');
+            }
           });
+
+          if (direction === 'prev') {
+            // 前に戻るとき：現在より大きいインデックスの画面を上に追い出す
+            FP_ELS.forEach((el, i) => {
+              if (i > index) {
+                el.style.transform = 'translateY(100%)';
+              }
+            });
+          }
+
           updateIndicator(index + 3);
           fpIndex = index;
         }
@@ -507,7 +538,7 @@ const languages = [
         }
 
         // =============================================
-        // ホイールイベント（全画面統合）
+        // ホイールイベント
         // =============================================
         window.addEventListener('wheel', (e) => {
           if (window.innerWidth <= 768) return;
@@ -523,10 +554,10 @@ const languages = [
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
-                // 画面3→画面4へ
+                // 画面3 → 画面4へ
                 zone = 1;
                 isAnimating = true;
-                setFpScreen(0);
+                setFpScreen(0, 'next');
                 setTimeout(() => { isAnimating = false; }, 1500);
               }
             } else if (up) {
@@ -535,25 +566,27 @@ const languages = [
 
           } else {
             // ── 画面4〜6ゾーン ──
-            if (down) {
-              if (fpIndex < 2) {
-                isAnimating = true;
-                setFpScreen(fpIndex + 1);
-                setTimeout(() => { isAnimating = false; }, 1500);
-              }
+            if (down && fpIndex < 2) {
+              isAnimating = true;
+              setFpScreen(fpIndex + 1, 'next');
+              setTimeout(() => { isAnimating = false; }, 1500);
+
             } else if (up) {
               if (fpIndex > 0) {
                 isAnimating = true;
-                setFpScreen(fpIndex - 1);
+                setFpScreen(fpIndex - 1, 'prev');
                 setTimeout(() => { isAnimating = false; }, 1500);
               } else {
-                // 画面4→画面3に戻る
+                // 画面4 → 画面3（スプリット）に戻る
                 zone = 0;
                 isAnimating = true;
-                FP_ELS.forEach(el => el.classList.remove('fp-active', 'fp-passed'));
+                // screen-4を下に送る
+                FP_ELS[0].classList.remove('fp-active', 'fp-behind');
+                FP_ELS[0].style.transform = 'translateY(100%)';
                 fpIndex = -1;
-                goToSlide(2);
-                // goToSlide内でisAnimating=falseになる
+                setTimeout(() => {
+                  goToSlide(2);
+                }, 200);
               }
             }
           }
