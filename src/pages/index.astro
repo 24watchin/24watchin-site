@@ -60,30 +60,30 @@ const languages = [
       <div class="desktop-only-area" id="desktop-hero">
         
         <div class="left-track">
-          <div class="panel p1" style="z-index: 1;">
+          <div class="panel p1">
             <div class="bg-layer" style="background-image: url('/images/conflict.png');"></div>
             <div class="word-band-container"><div class="word-band"><h2>CONFLICT</h2></div></div>
           </div>
-          <div class="panel p2" style="z-index: 2; clip-path: inset(100% 0 0 0);">
+          <div class="panel p2">
             <div class="bg-layer" style="background-image: url('/images/cities.jpg');"></div>
             <div class="word-band-container"><div class="word-band"><h2>CITIES</h2></div></div>
           </div>
-          <div class="panel p3" style="z-index: 3; clip-path: inset(100% 0 0 0);">
+          <div class="panel p3">
             <div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
             <div class="word-band-container"><div class="word-band"><h2>INNOVATION</h2></div></div>
           </div>
         </div>
         
         <div class="right-track">
-          <div class="panel p1" style="z-index: 1;">
+          <div class="panel p1">
             <div class="bg-layer" style="background-image: url('/images/crisis.png');"></div>
             <div class="word-band-container"><div class="word-band"><h2>CRISIS</h2></div></div>
           </div>
-          <div class="panel p2" style="z-index: 2; clip-path: inset(0 0 100% 0);">
+          <div class="panel p2">
             <div class="bg-layer" style="background-image: url('/images/people.webp');"></div>
             <div class="word-band-container"><div class="word-band"><h2>PEOPLE</h2></div></div>
           </div>
-          <div class="panel p3" style="z-index: 3; clip-path: inset(0 0 100% 0);">
+          <div class="panel p3">
             <div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
             <div class="word-band-container"><div class="word-band"><h2>FRONTIER</h2></div></div>
           </div>
@@ -158,18 +158,14 @@ const languages = [
       * { box-sizing: border-box; margin: 0; padding: 0; }
       
       body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); margin: 0; }
-      
-      /* ロック中はスクロールバーを消し、普通のスクロールを禁止します */
       body.is-locked { overflow: hidden; }
 
-      /* ヘッダー */
       .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 200; transition: opacity 0.8s ease; }
       .header-band { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.05); }
       .header-logo-img { height: 32px; width: auto; }
       .menu-trigger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
       .burger-line { width: 30px; height: 2px; background: #fff; border-radius: 2px; }
 
-      /* サイドメニュー */
       .side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: rgba(10,10,10,0.98); z-index: 300; transition: right 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); padding: 80px 40px; display: flex; justify-content: center; }
       .side-menu.is-open { right: 0; }
       .menu-close { position: absolute; top: 30px; right: 40px; font-size: 40px; background: none; border: none; color: #fff; cursor: pointer; }
@@ -180,62 +176,55 @@ const languages = [
       .menu-lang-card:hover { border-color: var(--accent); transform: translateY(-5px); }
 
       /* ==========================================
-         PC専用：めくれるアニメーション
+         PC専用：画像の重なりとフワッとめくれる設定
       ========================================== */
       .desktop-only-area { width: 100vw; height: 100vh; display: flex; position: relative; overflow: hidden; }
       .left-track, .right-track { width: 50vw; height: 100vh; position: relative; }
-      .panel { position: absolute; inset: 0; overflow: hidden; 
-        /* ガクッとしない、超ゆったり1.5秒のめくりアニメーション */
-        transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); 
-      }
+      
+      .panel { position: absolute; inset: 0; overflow: hidden; }
       .bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
 
+      /* ▼ 修正：すべてのブラウザで正しく動くように -webkit- を追加しました！ ▼ */
+      .left-track .p1 { z-index: 1; }
+      .left-track .p2 { z-index: 2; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
+      .left-track .p3 { z-index: 3; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
+
+      .right-track .p1 { z-index: 1; }
+      .right-track .p2 { z-index: 2; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
+      .right-track .p3 { z-index: 3; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
+
+      /* プログラムから合図が出たら、画像を全開にするクラス */
+      .panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
+
       /* ▼ 白い帯と黒い文字のデザイン ▼ */
-      .word-band-container { 
-        position: absolute; top: 50%; transform: translateY(-50%); 
-        z-index: 10; overflow: hidden; /* 枠外を隠すマスク */
-      }
+      .word-band-container { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; overflow: hidden; }
       .left-track .word-band-container { left: 0; }
       .right-track .word-band-container { right: 0; }
 
       .word-band { 
-        background: rgba(255, 255, 255, 0.95); /* 白背景 */
-        padding: 12px 40px; 
-        display: flex; align-items: center;
-        /* 帯がゆっくり1.2秒かけて伸びる */
+        background: rgba(255, 255, 255, 0.95); padding: 12px 40px; display: flex; align-items: center;
         transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .left-track .word-band { transform: translateX(-105%); border-radius: 0 4px 4px 0; }
       .right-track .word-band { transform: translateX(105%); border-radius: 4px 0 0 4px; }
       
       .word-band h2 { 
-        color: #000; /* 黒文字 */
-        font-weight: 600; 
-        font-size: 1.1rem; /* 文字を小さくスタイリッシュに */
-        letter-spacing: 0.2em; 
-        margin: 0; 
-        opacity: 0; 
-        /* 帯が伸びてから「0.8秒遅れて」文字がフワッと出る */
+        color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.2em; margin: 0; opacity: 0; 
         transition: opacity 1s ease 0.8s; 
       }
       
-      /* 画像が完全に止まった合図（is-active）で帯と文字を出現 */
       .panel.is-active .word-band { transform: translateX(0); }
       .panel.is-active .word-band h2 { opacity: 1; }
 
-      /* ▼ PC・スマホの隔離設定 ▼ */
       .mobile-only-area { display: none; }
-      
       @media (max-width: 768px) {
         .desktop-only-area { display: none; }
         .mobile-only-area { display: block; }
-        body.is-locked { overflow: auto; } /* スマホでは最初からスクロール可能に */
+        body.is-locked { overflow: auto; } 
         .header-band { padding: 15px 20px; }
       }
 
-      /* ==========================================
-         4画面目：極めて静かなフェードイン
-      ========================================== */
+      /* 4画面目以降 */
       .brand-section { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; }
       .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.3; }
       .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, transparent 0%, #000 100%); }
@@ -243,14 +232,12 @@ const languages = [
       .brand-logo { font-size: 1.2rem; color: #888; margin-bottom: 20px; font-weight: 300; letter-spacing: 5px;}
       .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
       
-      /* アニメーションを「2.5秒」と長くし、到着から0.5秒後に開始 */
       .fade-item { opacity: 0; transform: translateY(20px); transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
       .fade-item:nth-child(1) { transition-delay: 0.5s; }
       .fade-item:nth-child(2) { transition-delay: 1.5s; }
       .fade-item:nth-child(3) { transition-delay: 2.5s; }
       .observer-target.is-visible .fade-item { opacity: 1; transform: translateY(0); }
 
-      /* 5画面目以降 */
       .carousel-section { display: flex; flex-direction: column; justify-content: center; padding: 100px 0; min-height: 100vh; }
       .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
       .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
@@ -285,50 +272,45 @@ const languages = [
 
     <script is:inline>
       document.addEventListener('DOMContentLoaded', () => {
-        let currentSlide = 0; // 現在の画像セット（0=1組目, 1=2組目, 2=3組目）
-        let isLocked = true;  // 画面ロック状態
-        let isAnimating = false; // 連打防止
+        let currentSlide = 0; 
+        let isLocked = true;  
+        let isAnimating = false; 
 
         const header = document.getElementById('main-header');
         
-        // ▼ マウスホイールの動きを監視する究極に安全なプログラム
         window.addEventListener('wheel', (e) => {
-          // スマホの場合は何もしない（隔離）
           if (window.innerWidth <= 768) return;
 
           if (isLocked) {
-            e.preventDefault(); // ロック中は通常のスクロールを禁止
-            if (isAnimating) return; // アニメーション中は待機
+            e.preventDefault(); 
+            if (isAnimating) return; 
 
             if (e.deltaY > 50) {
-              // 下にスクロールした時
+              // 下にスクロール
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
-                // 3組目が終わったらロックを解除して下へ
                 unlockAndScrollDown();
               }
             } else if (e.deltaY < -50) {
-              // 上にスクロールした時
+              // 上にスクロール
               if (currentSlide > 0) {
                 goToSlide(currentSlide - 1);
               }
             }
           } else {
-            // ロックが解除されている時、一番上まで戻ってきたら再びロックする
+            // ▼ 修正：下から戻ってきた時、確実に「2組目(index: 1)」に戻るように修正しました ▼
             if (window.scrollY <= 0 && e.deltaY < -50 && !isAnimating) {
               e.preventDefault();
               lockAndScrollUp();
             }
           }
-        }, { passive: false }); // preventDefaultを使うための必須設定
+        }, { passive: false }); 
 
-        // ▼ 画像をフワッと切り替える魔法の関数
         function goToSlide(index) {
           isAnimating = true;
           currentSlide = index;
 
-          // 1組目以外はヘッダーを消す
           if (index === 0) {
             header.style.opacity = '1'; header.style.pointerEvents = 'auto';
           } else {
@@ -340,22 +322,20 @@ const languages = [
           const r2 = document.querySelector('.right-track .p2');
           const r3 = document.querySelector('.right-track .p3');
 
-          // 全ての文字を一旦隠す
           document.querySelectorAll('.desktop-only-area .panel').forEach(p => p.classList.remove('is-active'));
 
-          // 画像の「めくり」を実行
+          // 画像のフワッとめくり
           if (index === 0) {
-            l2.style.clipPath = 'inset(100% 0 0 0)'; r2.style.clipPath = 'inset(0 0 100% 0)';
-            l3.style.clipPath = 'inset(100% 0 0 0)'; r3.style.clipPath = 'inset(0 0 100% 0)';
+            l2.classList.remove('is-open'); r2.classList.remove('is-open');
+            l3.classList.remove('is-open'); r3.classList.remove('is-open');
           } else if (index === 1) {
-            l2.style.clipPath = 'inset(0 0 0 0)'; r2.style.clipPath = 'inset(0 0 0 0)';
-            l3.style.clipPath = 'inset(100% 0 0 0)'; r3.style.clipPath = 'inset(0 0 100% 0)';
+            l2.classList.add('is-open'); r2.classList.add('is-open');
+            l3.classList.remove('is-open'); r3.classList.remove('is-open');
           } else if (index === 2) {
-            l2.style.clipPath = 'inset(0 0 0 0)'; r2.style.clipPath = 'inset(0 0 0 0)';
-            l3.style.clipPath = 'inset(0 0 0 0)'; r3.style.clipPath = 'inset(0 0 0 0)';
+            l2.classList.add('is-open'); r2.classList.add('is-open');
+            l3.classList.add('is-open'); r3.classList.add('is-open');
           }
 
-          // 1.5秒待って（画像がめくり終わって）から、白い帯と文字を出す
           setTimeout(() => {
             const leftPanels = document.querySelectorAll('.left-track .panel');
             const rightPanels = document.querySelectorAll('.right-track .panel');
@@ -365,47 +345,41 @@ const languages = [
           }, 1500); 
         }
 
-        // ▼ ロックを解除して4画面目へ行く関数
         function unlockAndScrollDown() {
           isAnimating = true;
           isLocked = false;
-          document.body.classList.remove('is-locked'); // ロック解除
+          document.body.classList.remove('is-locked'); 
           
-          // 4画面目へスムーズにスクロール
           document.getElementById('screen-4').scrollIntoView({ behavior: 'smooth' });
           
           setTimeout(() => { isAnimating = false; }, 1000);
         }
 
-        // ▼ 一番上に戻ってきた時に再びロックする関数
         function lockAndScrollUp() {
           isAnimating = true;
           isLocked = true;
-          document.body.classList.add('is-locked'); // 再びロック
-          window.scrollTo(0, 0); // 画面を一番上に固定
+          document.body.classList.add('is-locked'); 
+          window.scrollTo(0, 0); 
           
-          // 3組目の画像から再開する
-          goToSlide(2);
+          // ▼ 修正：確実に「2組目(index: 1)」へ戻る指示です ▼
+          goToSlide(1);
         }
 
-        // ページ読み込み時に1組目の文字を出す
         setTimeout(() => {
           document.querySelector('.left-track .p1').classList.add('is-active');
           document.querySelector('.right-track .p1').classList.add('is-active');
         }, 500);
 
-        // メニューの開閉
         const sideMenu = document.getElementById('side-menu');
         document.getElementById('menu-open').onclick = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
-        // 4画面目のキャッチコピーを監視してゆっくり出す
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(en => { 
             if(en.isIntersecting) en.target.classList.add('is-visible'); 
           });
         }, { threshold: 0.3 });
-        document.querySelector('#screen-4 .observer-target').classList.remove('is-visible'); // 初期リセット
+        document.querySelector('#screen-4 .observer-target').classList.remove('is-visible');
         document.querySelectorAll('.observer-target').forEach(el => observer.observe(el));
 
         const carouselObserver = new IntersectionObserver((entries) => {
