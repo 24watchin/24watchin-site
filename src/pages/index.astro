@@ -1073,13 +1073,11 @@ const languages = [
         const BRAND_UNLOCK_MS = 2300;
         const BRAND_HIDE_MS = 500;
 
-        const MASK_IN_MS = 260;
-        const MASK_HOLD_MS = 30;
-        const MASK_OUT_MS = 280;
-        const MASK_UNLOCK_MS = 80;
-
-        const LINE_WIPE_MS = 650;      // 線が伸びる時間
-        const LINE_FADE_MS = 300;      // 線がフェードアウトする時間
+        // マスクCSS transition = 0.34s = 340ms に合わせる
+        const MASK_IN_MS  = 360;   // マスクが完全に表示されるまで待つ
+        const MASK_HOLD_MS = 60;   // 完全表示後に少し待つ
+        const MASK_OUT_MS  = 340;  // マスクが消えるまで
+        const MASK_UNLOCK_MS = 60;
 
         const SECTION_ANIM_MS = 240;
         const FOOTER_ANIM_MS = 900;
@@ -1099,36 +1097,6 @@ const languages = [
 
         const screen5 = document.getElementById('screen-5');
         const screen6 = document.getElementById('screen-6');
-        const lineWipe = document.getElementById('line-wipe');
-
-        function runLineWipe(callback) {
-          // リセット
-          lineWipe.classList.remove('is-running', 'is-fading');
-          lineWipe.style.width = '0';
-
-          // 少し待ってから線を伸ばす
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              lineWipe.classList.add('is-running');
-
-              // 線が伸びきったら画面切り替え
-              window.setTimeout(() => {
-                callback();
-
-                // 線をフェードアウト
-                lineWipe.classList.remove('is-running');
-                lineWipe.classList.add('is-fading');
-
-                window.setTimeout(() => {
-                  lineWipe.classList.remove('is-fading');
-                  lineWipe.style.width = '0';
-                }, LINE_FADE_MS);
-
-              }, LINE_WIPE_MS);
-            });
-          });
-        }
-
         const dots = document.querySelectorAll('.scroll-indicator .dot');
 
         const leftPanels = document.querySelectorAll('.left-track .panel');
@@ -1299,21 +1267,15 @@ const languages = [
           showMask();
 
           window.setTimeout(() => {
-            desktopSequence?.classList.add('is-hidden');
+            // スクロール位置を先に移動（マスクで隠れているので見えない）
+            const target = targetStep === 4 ? screen5 : screen6;
+            const targetTop = target?.offsetTop ?? 0;
+            window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
             showSection(targetStep);
 
-            const target = targetStep === 4 ? screen5 : screen6;
-
-            window.scrollTo({
-              top: target?.offsetTop ?? 0,
-              left: 0,
-              behavior: 'auto'
-            });
-
             window.setTimeout(() => {
-              setBodyLocked(false);
               hideMask();
-
+              setBodyLocked(false);
               window.setTimeout(() => {
                 isAnimating = false;
               }, MASK_UNLOCK_MS);
@@ -1389,26 +1351,7 @@ const languages = [
           }
 
           if (step === 5 && previousStep === 4) {
-            // 5→6：幕をかけてから線を走らせて画面切り替え
-            setBodyLocked(true);
-            showMask();
-
-            window.setTimeout(() => {
-              // 幕の上に線を走らせる
-              runLineWipe(() => {
-                showSection(5);
-                const targetTop = screen6?.offsetTop ?? 0;
-                window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
-
-                // 画面切り替え後に幕とロックを解除
-                hideMask();
-                setBodyLocked(false);
-              });
-            }, MASK_IN_MS);
-
-            window.setTimeout(() => {
-              isAnimating = false;
-            }, MASK_IN_MS + LINE_WIPE_MS + LINE_FADE_MS);
+            transitionBetweenSections(5);
             return;
           }
 
