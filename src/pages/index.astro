@@ -61,11 +61,11 @@ const languages = [
         
         <div class="left-track">
           <div class="panel p1">
-            <div class="bg-layer" style="background-image: url('/images/conflict.png');"></div>
+            <div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
             <div class="word-band-container"><div class="word-band"><h2>CONFLICT</h2></div></div>
           </div>
           <div class="panel p2">
-            <div class="bg-layer" style="background-image: url('/images/cities.jpg');"></div>
+            <div class="bg-layer" style="background-image: url('/images/cities.webp');"></div>
             <div class="word-band-container"><div class="word-band"><h2>CITIES</h2></div></div>
           </div>
           <div class="panel p3">
@@ -184,7 +184,6 @@ const languages = [
       .panel { position: absolute; inset: 0; overflow: hidden; }
       .bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
 
-      /* ▼ 修正：すべてのブラウザで正しく動くように -webkit- を追加しました！ ▼ */
       .left-track .p1 { z-index: 1; }
       .left-track .p2 { z-index: 2; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
       .left-track .p3 { z-index: 3; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
@@ -193,7 +192,6 @@ const languages = [
       .right-track .p2 { z-index: 2; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
       .right-track .p3 { z-index: 3; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1); }
 
-      /* プログラムから合図が出たら、画像を全開にするクラス */
       .panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
 
       /* ▼ 白い帯と黒い文字のデザイン ▼ */
@@ -299,7 +297,7 @@ const languages = [
               }
             }
           } else {
-            // ▼ 修正：下から戻ってきた時、確実に「2組目(index: 1)」に戻るように修正しました ▼
+            // ロック解除時に一番上までスクロールしたら再ロック
             if (window.scrollY <= 0 && e.deltaY < -50 && !isAnimating) {
               e.preventDefault();
               lockAndScrollUp();
@@ -324,7 +322,6 @@ const languages = [
 
           document.querySelectorAll('.desktop-only-area .panel').forEach(p => p.classList.remove('is-active'));
 
-          // 画像のフワッとめくり
           if (index === 0) {
             l2.classList.remove('is-open'); r2.classList.remove('is-open');
             l3.classList.remove('is-open'); r3.classList.remove('is-open');
@@ -361,7 +358,6 @@ const languages = [
           document.body.classList.add('is-locked'); 
           window.scrollTo(0, 0); 
           
-          // ▼ 修正：確実に「2組目(index: 1)」へ戻る指示です ▼
           goToSlide(1);
         }
 
