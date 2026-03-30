@@ -107,9 +107,9 @@ const languages = [
         </div>
       </div>
 
-      <div class="full-page-stack" id="full-page-stack">
+      <div id="full-page-stack">
 
-      <section class="brand-section section-observer fp-screen" id="screen-4">
+      <section class="brand-section fp-screen" id="screen-4">
         <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
         <div class="brand-bg-overlay"></div>
         
@@ -125,7 +125,7 @@ const languages = [
         </div>
       </section>
 
-      <section class="carousel-section section-observer fp-screen" id="screen-5">
+      <section class="carousel-section fp-screen" id="screen-5">
         <div class="section-fade-in">
           <div class="section-header"><h2>Latest Stories</h2></div>
           <div class="carousel-wrapper">
@@ -150,7 +150,7 @@ const languages = [
         </div>
       </section>
 
-      <section class="carousel-section lang-section section-observer fp-screen" id="screen-6">
+      <section class="carousel-section lang-section fp-screen" id="screen-6">
         <div class="section-fade-in">
           <div class="section-header">
             <h2>CHOOSE YOUR LANGUAGE</h2>
@@ -176,7 +176,7 @@ const languages = [
         </div>
       </section>
 
-      </div><!-- /.full-page-stack -->
+      </div><!-- /#full-page-stack -->
 
       <footer style="height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333;">
         <p style="color: #666; font-size: 14px;">[ フッター領域 ]</p>
@@ -261,77 +261,74 @@ const languages = [
 
       /* ==========================================
          フルページスタック（画面4〜6）
+         position:fixed で重ねてホイールで制御
       ========================================== */
-      .full-page-stack {
-        position: relative;
-        /* 画面3枚分の高さをdocumentに持たせてフッターを押し下げる */
-        height: 300vh;
-      }
+      #full-page-stack { position: relative; }
+
       .fp-screen {
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        width: 100%;
-        /* 下から上へスライドインするための初期状態 */
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100vh;
+        /* 初期状態：画面の下に隠れている */
         transform: translateY(100%);
-        transition: transform 1.2s cubic-bezier(0.64, 0.04, 0.35, 1);
-        /* z-indexで重なり順を制御 */
+        transition: transform 1.4s cubic-bezier(0.64, 0.04, 0.35, 1);
+        /* 重なり順：後の画面が上に来る */
       }
       #screen-4 { z-index: 10; }
       #screen-5 { z-index: 20; }
       #screen-6 { z-index: 30; }
 
-      /* アクティブ状態：画面に表示 */
-      .fp-screen.fp-active {
-        transform: translateY(0);
-      }
-      /* 通過済み：上に消える */
-      .fp-screen.fp-passed {
-        transform: translateY(-100%);
-      }
+      /* 表示中 */
+      .fp-screen.fp-active  { transform: translateY(0); }
+      /* 通過済み（上に消える） */
+      .fp-screen.fp-passed  { transform: translateY(-100%); }
 
-      /* brand-sectionの height: 100vh をfp-screenで上書き */
-      .brand-section.fp-screen {
-        height: 100vh;
+      /* コンテンツのフェードイン */
+      .fp-screen .brand-content {
+        opacity: 0; transform: translateY(30px);
+        transition: opacity 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s,
+                    transform 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s;
       }
-      /* carousel-sectionの min-height をfp-screenで上書き */
+      .fp-screen.fp-active .brand-content { opacity: 1; transform: translateY(0); }
+
+      .fp-screen .section-fade-in {
+        opacity: 0; transform: translateY(40px);
+        transition: opacity 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s,
+                    transform 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s;
+        width: 100%;
+      }
+      .fp-screen.fp-active .section-fade-in { opacity: 1; transform: translateY(0); }
+
+      /* brand-bgのズームもfp-activeで発火 */
+      .fp-screen.fp-active .brand-bg { transform: scale(1); }
+
+      /* テキストアニメもfp-activeで発火 */
+      .fp-screen.fp-active .text-anim-target .fade-up  { transform: translateY(0); opacity: 1; }
+      .fp-screen.fp-active .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
+
+      /* carousel-sectionの min-height を上書き */
       .carousel-section.fp-screen {
         min-height: unset;
         height: 100vh;
         padding: 100px 0;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
 
-      /* コンテンツのフェードイン（fp-activeになったとき） */
-      .fp-screen .brand-content {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s,
-                    transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s;
-      }
-      .fp-screen.fp-active .brand-content {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .fp-screen .section-fade-in {
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s,
-                    transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s;
-      }
-      .fp-screen.fp-active .section-fade-in {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
+      /* スマホは固定しない */
       @media (max-width: 768px) {
-        .full-page-stack { height: auto; }
         .fp-screen { position: relative; transform: none !important; height: auto; }
+        .carousel-section.fp-screen { min-height: 100vh; height: auto; }
       }
+
+      /* ==========================================
+         4画面目：キャッチコピー画面
+      ========================================== */
       .brand-section { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
       .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.6; transform: scale(1.15); transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-      .section-observer.is-visible .brand-bg,
-      .fp-screen.fp-active .brand-bg { transform: scale(1); }
+      .section-observer.is-visible .brand-bg { transform: scale(1); }
       .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); }
       
       .brand-content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; }
@@ -344,12 +341,10 @@ const languages = [
       .fade-base { opacity: 0; transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
       
       .fade-up { transform: translateY(40px); }
-      .text-anim-target.is-visible .fade-up,
-      .fp-screen.fp-active .text-anim-target .fade-up { transform: translateY(0); opacity: 1; }
+      .text-anim-target.is-visible .fade-up { transform: translateY(0); opacity: 1; }
       
       .fade-left { transform: translateX(-80px); } /* 少し遠くから流す */
-      .text-anim-target.is-visible .fade-left,
-      .fp-screen.fp-active .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
+      .text-anim-target.is-visible .fade-left { transform: translateX(0); opacity: 1; }
 
       /* ▼ 修正：1秒ごとの優雅な間隔を持たせました ▼ */
       .anim-logo { transition-delay: 0.2s; }    
@@ -431,33 +426,51 @@ const languages = [
     </style>
 
     <script is:inline>
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-      }
+      if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
       window.scrollTo(0, 0);
 
       document.addEventListener('DOMContentLoaded', () => {
+
         // =============================================
         // 状態管理
+        // 全画面をホイールで制御（スクロールは一切使わない）
+        // zone 0: 画面1〜3（スプリット）
+        // zone 1: 画面4〜6（フルページスタック）
         // =============================================
-        let currentSlide = 0;   // 画面1〜3（0,1,2）
-        let fpIndex = -1;       // 画面4〜6（-1=未到達, 0=screen-4, 1=screen-5, 2=screen-6）
-        let isLocked = true;    // 画面1〜3のホイールロック
-        let isFpZone = false;   // 画面4〜6のホイールロック
+        let currentSlide = 0;  // 0,1,2 = 画面1,2,3
+        let fpIndex = -1;      // -1=未, 0=screen-4, 1=screen-5, 2=screen-6
+        let zone = 0;          // 0=スプリット, 1=フルページ
         let isAnimating = false;
 
-        const FP_SCREENS = ['screen-4', 'screen-5', 'screen-6'];
-        const FP_ELS = FP_SCREENS.map(id => document.getElementById(id));
-        const STACK_EL = document.getElementById('full-page-stack');
+        // body.is-locked は常に維持（overflow:hidden）
+        document.body.classList.add('is-locked');
+
+        const FP_ELS = [
+          document.getElementById('screen-4'),
+          document.getElementById('screen-5'),
+          document.getElementById('screen-6'),
+        ];
 
         // =============================================
         // ドットインジケーター
         // =============================================
         const dots = document.querySelectorAll('.scroll-indicator .dot');
         function updateIndicator(index) {
-          dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
+          dots.forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+
+        // =============================================
+        // フルページスタック表示制御
+        // =============================================
+        function setFpScreen(index) {
+          FP_ELS.forEach((el, i) => {
+            el.classList.remove('fp-active', 'fp-passed');
+            if (i < index)      el.classList.add('fp-passed');
+            else if (i === index) el.classList.add('fp-active');
+            // i > index → 初期状態(translateY(100%))のまま
           });
+          updateIndicator(index + 3);
+          fpIndex = index;
         }
 
         // =============================================
@@ -479,7 +492,7 @@ const languages = [
             l2.classList.remove('is-open'); r2.classList.remove('is-open');
             l3.classList.remove('is-open'); r3.classList.remove('is-open');
           } else if (index === 1) {
-            l2.classList.add('is-open'); r2.classList.add('is-open');
+            l2.classList.add('is-open');    r2.classList.add('is-open');
             l3.classList.remove('is-open'); r3.classList.remove('is-open');
           } else if (index === 2) {
             l2.classList.add('is-open'); r2.classList.add('is-open');
@@ -487,114 +500,67 @@ const languages = [
           }
 
           setTimeout(() => {
-            const leftPanels = document.querySelectorAll('.left-track .panel');
-            const rightPanels = document.querySelectorAll('.right-track .panel');
-            leftPanels[index].classList.add('is-active');
-            rightPanels[index].classList.add('is-active');
+            document.querySelectorAll('.left-track .panel')[index].classList.add('is-active');
+            document.querySelectorAll('.right-track .panel')[index].classList.add('is-active');
             isAnimating = false;
           }, 1500);
         }
 
         // =============================================
-        // 画面4〜6：フルページスタック制御
-        // =============================================
-        function setFpScreen(index) {
-          FP_ELS.forEach((el, i) => {
-            el.classList.remove('fp-active', 'fp-passed');
-            if (i < index) {
-              el.classList.add('fp-passed');
-            } else if (i === index) {
-              el.classList.add('fp-active');
-            }
-            // i > index は初期状態（translateY(100%)）のまま
-          });
-          updateIndicator(index + 3);
-          fpIndex = index;
-        }
-
-        // 画面3→画面4へ：フルページゾーンに入る
-        function enterFpZone() {
-          isAnimating = true;
-          isLocked = false;
-          isFpZone = true;
-          document.body.classList.remove('is-locked');
-
-          // stackをスクロール位置に持ってくる（スクロール位置をstackの先頭に合わせる）
-          STACK_EL.scrollIntoView({ behavior: 'smooth' });
-
-          setTimeout(() => {
-            setFpScreen(0); // screen-4をアクティブに
-            isAnimating = false;
-          }, 600);
-        }
-
-        // 画面4〜6の前に戻る
-        function goFpPrev() {
-          if (fpIndex <= 0) {
-            // screen-4から画面3（スプリット）に戻る
-            isFpZone = false;
-            isLocked = true;
-            document.body.classList.add('is-locked');
-            // 全fp-screenをリセット
-            FP_ELS.forEach(el => el.classList.remove('fp-active', 'fp-passed'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            fpIndex = -1;
-            goToSlide(2);
-          } else {
-            isAnimating = true;
-            setFpScreen(fpIndex - 1);
-            setTimeout(() => { isAnimating = false; }, 1400);
-          }
-        }
-
-        // 画面4〜6の次へ進む
-        function goFpNext() {
-          if (fpIndex < 2) {
-            isAnimating = true;
-            setFpScreen(fpIndex + 1);
-            setTimeout(() => { isAnimating = false; }, 1400);
-          }
-          // fpIndex === 2（screen-6）のときは何もしない（最後の画面）
-        }
-
-        // =============================================
-        // ホイールイベント
+        // ホイールイベント（全画面統合）
         // =============================================
         window.addEventListener('wheel', (e) => {
           if (window.innerWidth <= 768) return;
+          e.preventDefault();
+          if (isAnimating) return;
 
-          if (isLocked) {
-            // 画面1〜3のスプリットゾーン
-            e.preventDefault();
-            if (isAnimating) return;
+          const down = e.deltaY > 50;
+          const up   = e.deltaY < -50;
 
-            if (e.deltaY > 50) {
+          if (zone === 0) {
+            // ── 画面1〜3ゾーン ──
+            if (down) {
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
-                enterFpZone();
+                // 画面3→画面4へ
+                zone = 1;
+                isAnimating = true;
+                setFpScreen(0);
+                setTimeout(() => { isAnimating = false; }, 1500);
               }
-            } else if (e.deltaY < -50) {
-              if (currentSlide > 0) {
-                goToSlide(currentSlide - 1);
-              }
+            } else if (up) {
+              if (currentSlide > 0) goToSlide(currentSlide - 1);
             }
 
-          } else if (isFpZone) {
-            // 画面4〜6のフルページゾーン
-            e.preventDefault();
-            if (isAnimating) return;
-
-            if (e.deltaY > 50) {
-              goFpNext();
-            } else if (e.deltaY < -50) {
-              goFpPrev();
+          } else {
+            // ── 画面4〜6ゾーン ──
+            if (down) {
+              if (fpIndex < 2) {
+                isAnimating = true;
+                setFpScreen(fpIndex + 1);
+                setTimeout(() => { isAnimating = false; }, 1500);
+              }
+            } else if (up) {
+              if (fpIndex > 0) {
+                isAnimating = true;
+                setFpScreen(fpIndex - 1);
+                setTimeout(() => { isAnimating = false; }, 1500);
+              } else {
+                // 画面4→画面3に戻る
+                zone = 0;
+                isAnimating = true;
+                FP_ELS.forEach(el => el.classList.remove('fp-active', 'fp-passed'));
+                fpIndex = -1;
+                goToSlide(2);
+                // goToSlide内でisAnimating=falseになる
+              }
             }
           }
         }, { passive: false });
 
         // =============================================
-        // 初期化：p1をアクティブに
+        // 初期化
         // =============================================
         setTimeout(() => {
           document.querySelector('.left-track .p1').classList.add('is-active');
@@ -605,29 +571,25 @@ const languages = [
         // サイドメニュー
         // =============================================
         const sideMenu = document.getElementById('side-menu');
-        document.getElementById('menu-open').onclick = () => sideMenu.classList.add('is-open');
+        document.getElementById('menu-open').onclick  = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
         // =============================================
-        // カルーセル：中央カードのハイライト
+        // カルーセル中央カードのハイライト
         // =============================================
         const carouselObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('is-center');
-            else entry.target.classList.remove('is-center');
+            entry.target.classList.toggle('is-center', entry.isIntersecting);
           });
         }, { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 });
         document.querySelectorAll('.observer-card').forEach(card => carouselObserver.observe(card));
 
         document.querySelectorAll('.carousel-wrapper').forEach(wrapper => {
           const container = wrapper.querySelector('.carousel-container');
-          const leftBtn = wrapper.querySelector('.left-arrow');
-          const rightBtn = wrapper.querySelector('.right-arrow');
-
-          leftBtn.addEventListener('click', () => {
+          wrapper.querySelector('.left-arrow').addEventListener('click', () => {
             container.scrollBy({ left: -window.innerWidth * 0.4, behavior: 'smooth' });
           });
-          rightBtn.addEventListener('click', () => {
+          wrapper.querySelector('.right-arrow').addEventListener('click', () => {
             container.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' });
           });
         });
