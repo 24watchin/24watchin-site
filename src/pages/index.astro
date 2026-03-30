@@ -1,10 +1,11 @@
 ---
-// モックアップ用データ
+// モックアップ用データ（最新ニュース順にリアルなデータをセット）
 const latestStories = [
-  { id: 1, category: 'Politics', country: 'United States', title: 'New Economic Policies Reshape the Global Market', excerpt: 'An in-depth look at the recent shifts in international trade agreements.', image: 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)' },
-  { id: 2, category: 'Economy', country: 'Taiwan', title: 'Tech Giants Announce Next-Generation Semiconductor', excerpt: 'Would you like to see what happened in Taiwan?', image: 'linear-gradient(135deg, #2c2519 0%, #4a3f2c 100%)' },
-  { id: 3, category: 'Society', country: 'France', title: 'Urban Renewal Projects Transform Historic Districts', excerpt: 'Paris sets a new standard for eco-friendly city planning.', image: 'linear-gradient(135deg, #1d2b22 0%, #2e4436 100%)' },
-  { id: 4, category: 'Environment', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results', excerpt: 'Deforestation rates drop as new monitoring technologies are deployed.', image: 'linear-gradient(135deg, #2b1d1d 0%, #442e2e 100%)' },
+  { id: 1, category: 'Politics', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 2, category: 'Economy', country: 'United States', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 3, category: 'Society', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 4, category: 'Environment', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 5, category: 'Technology', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
 ];
 
 const languages = [
@@ -131,7 +132,7 @@ const languages = [
               <div class="carousel-spacer"></div>
               {latestStories.map((story) => (
                 <a href={`/en/story/${story.id}`} class="story-card observer-card">
-                  <div class="card-bg" style={`background: ${story.image};`}></div>
+                  <div class="card-bg" style={`background-image: ${story.image};`}></div>
                   <div class="card-content">
                     <div class="card-meta"><span class="category">{story.category}</span><span class="country">{story.country}</span></div>
                     <h3 class="card-title">{story.title}</h3>
@@ -187,16 +188,10 @@ const languages = [
       body.is-locked { overflow: hidden; }
 
       .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 200; pointer-events: none; transition: opacity 0.8s ease; }
-      .header-band { 
-        display: flex; justify-content: space-between; align-items: center; 
-        padding: 30px 50px; 
-        background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); 
-        pointer-events: auto; 
-      }
-      /* ▼ ロゴリンクの装飾を消すための設定 ▼ */
+      .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); pointer-events: auto; }
       .logo-area a { text-decoration: none; outline: none; }
       .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; } 
-      .header-logo-img:hover { opacity: 0.8; } /* ホバー時に少し明るくします */
+      .header-logo-img:hover { opacity: 0.8; }
       
       .menu-trigger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
       .burger-line { width: 30px; height: 2px; background: #fff; border-radius: 2px; }
@@ -210,8 +205,8 @@ const languages = [
       .menu-lang-card { padding: 40px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; transition: 0.3s; background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%); text-decoration: none; color: white;}
       .menu-lang-card:hover { border-color: var(--accent); transform: translateY(-5px); }
 
-      /* インジケーター（進行状況バー） */
-      .scroll-indicator { position: fixed; top: 50%; right: 25px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 500; }
+      /* ▼ 修正：インジケーターを下に（top: 75%）下げました ▼ */
+      .scroll-indicator { position: fixed; top: 75%; right: 25px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 500; }
       .scroll-indicator .dot { width: 6px; height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
       .scroll-indicator .dot.active { height: 32px; background: rgba(255, 255, 255, 0.9); }
       @media (max-width: 768px) { .scroll-indicator { display: none; } }
@@ -233,7 +228,6 @@ const languages = [
 
       .panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
 
-      /* 白い帯と黒い文字 */
       .word-band-container { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; overflow: hidden; }
       .left-track .word-band-container { left: 0; }
       .right-track .word-band-container { right: 0; }
@@ -275,39 +269,42 @@ const languages = [
       
       .brand-desc p { font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 300; color: #eee; margin-bottom: 15px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 
-      /* ▼ 修正：順番が狂わないアニメーション設定 ▼ */
-      .fade-base { opacity: 0; transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+      /* ▼ 修正：アニメーション時間をたっぷりとって「ゆっくり」にしました ▼ */
+      .fade-base { opacity: 0; transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
       
-      /* 下から上へ */
       .fade-up { transform: translateY(40px); }
       .text-anim-target.is-visible .fade-up { transform: translateY(0); opacity: 1; }
       
-      /* 左から右へ */
-      .fade-left { transform: translateX(-60px); }
+      .fade-left { transform: translateX(-80px); } /* 少し遠くから流す */
       .text-anim-target.is-visible .fade-left { transform: translateX(0); opacity: 1; }
 
-      /* ▼ 修正：一つ一つ順番に出るように秒数を細かく設定しました ▼ */
-      .anim-logo { transition-delay: 0.2s; }    /* ロゴ：0.2秒後 */
-      .anim-catch { transition-delay: 0.8s; }   /* キャッチコピー：0.8秒後 */
-      .anim-desc1 { transition-delay: 1.4s; }   /* Global news.：1.4秒後 */
-      .anim-desc2 { transition-delay: 2.0s; }   /* Explained clearly.：2.0秒後 */
-      .anim-desc3 { transition-delay: 2.6s; }   /* In your language.：2.6秒後 */
+      /* ▼ 修正：1秒ごとの優雅な間隔を持たせました ▼ */
+      .anim-logo { transition-delay: 0.2s; }    
+      .anim-catch { transition-delay: 1.0s; }   
+      .anim-desc1 { transition-delay: 2.0s; }   /* Global news. */
+      .anim-desc2 { transition-delay: 3.0s; }   /* Explained clearly. */
+      .anim-desc3 { transition-delay: 4.0s; }   /* In your language. */
 
 
       /* ==========================================
-         5画面目以降：ヌルっと浮き出る設定
+         5画面目以降：ヌルっと浮き出る設定とシックなデザイン
       ========================================== */
-      /* ▼ 修正：コンテンツ全体がフワッと浮かび上がる魔法 ▼ */
+      /* ▼ 修正：5画面目以降の背景を少し明るく高級なダークグレーに ▼ */
+      .carousel-section { 
+        display: flex; flex-direction: column; justify-content: center; padding: 100px 0; min-height: 100vh; 
+        background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); 
+      }
+
+      /* ▼ 修正：距離を大幅に伸ばし（150px）、2秒かけて「ヌルッ」と上げる ▼ */
       .section-fade-in {
-        opacity: 0; transform: translateY(60px);
-        transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        opacity: 0; transform: translateY(150px);
+        transition: opacity 2.0s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.0s cubic-bezier(0.2, 0.8, 0.2, 1);
         width: 100%;
       }
       .section-observer.is-visible .section-fade-in {
         opacity: 1; transform: translateY(0);
       }
 
-      .carousel-section { display: flex; flex-direction: column; justify-content: center; padding: 100px 0; min-height: 100vh; }
       .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
       .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
       
@@ -329,18 +326,22 @@ const languages = [
       .carousel-container::-webkit-scrollbar { display: none; }
       .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
       
-      .observer-card { scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; position: relative; border-radius: 4px; overflow: hidden; transition: transform 0.6s ease, opacity 0.6s ease; opacity: 0.4; transform: scale(0.85); display: block; user-select: none; }
-      .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 10; }
+      /* ▼ 修正：カードの枠線を少し明るくし、くっきり見せる ▼ */
+      .observer-card { scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; position: relative; border-radius: 4px; overflow: hidden; transition: transform 0.6s ease, opacity 0.6s ease; opacity: 0.4; transform: scale(0.85); display: block; user-select: none; border: 1px solid rgba(255,255,255,0.15); background-color: #111; }
+      .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 10; }
       
       .story-card .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
       .story-card.is-center:hover .card-bg { transform: scale(1.05); }
-      .story-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%); }
+      
+      /* ▼ 修正：写真が綺麗に見えるように黒いフィルターを少し弱くしました ▼ */
+      .story-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%); }
+      
       .card-content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; pointer-events: none; }
       .card-meta { display: flex; gap: 12px; margin-bottom: 16px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
       .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.4); padding-bottom: 4px; }
-      .card-meta .country { color: #888; }
-      .card-title { font-size: clamp(1.2rem, 2vw, 2rem); font-weight: 400; line-height: 1.3; margin-bottom: 16px; }
-      .card-excerpt { font-size: 14px; color: #ccc; margin-bottom: 24px; display: none; line-height: 1.5; }
+      .card-meta .country { color: #aaa; }
+      .card-title { font-size: clamp(1.2rem, 2vw, 2rem); font-weight: 400; line-height: 1.3; margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+      .card-excerpt { font-size: 14px; color: #ddd; margin-bottom: 24px; display: none; line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
       .story-card.is-center .card-excerpt { display: block; }
       .cta-link { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #fff; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
       .story-card.is-center .cta-link { opacity: 1; transform: translateY(0); }
@@ -357,7 +358,6 @@ const languages = [
     </style>
 
     <script is:inline>
-      // 更新ボタンを押した時に、必ず一番上からスタートさせる安全装置
       if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
       }
@@ -370,7 +370,6 @@ const languages = [
 
         const header = document.getElementById('main-header');
         
-        // インジケーター（右の点々）を更新する機能
         const dots = document.querySelectorAll('.scroll-indicator .dot');
         function updateIndicator(index) {
           dots.forEach((dot, i) => {
@@ -464,7 +463,6 @@ const languages = [
         document.getElementById('menu-open').onclick = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
-        // ▼ 修正：全体のヌルっと効果とインジケーターの連動（早めに発動させるよう0.15に調整） ▼
         const sectionObserver = new IntersectionObserver((entries) => {
           entries.forEach(en => { 
             if(en.isIntersecting) {
@@ -477,7 +475,6 @@ const languages = [
         }, { threshold: 0.15 });
         document.querySelectorAll('.section-observer').forEach(el => sectionObserver.observe(el));
 
-        // 文字の順番スライドイン
         const textObserver = new IntersectionObserver((entries) => {
           entries.forEach(en => { 
             if(en.isIntersecting) {
@@ -497,7 +494,6 @@ const languages = [
         }, { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 });
         document.querySelectorAll('.observer-card').forEach(card => carouselObserver.observe(card));
 
-        // 矢印ボタンによる横スクロール
         document.querySelectorAll('.carousel-wrapper').forEach(wrapper => {
           const container = wrapper.querySelector('.carousel-container');
           const leftBtn = wrapper.querySelector('.left-arrow');
