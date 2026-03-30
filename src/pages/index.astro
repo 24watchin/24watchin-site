@@ -486,7 +486,7 @@ const languages = [
       .brand-panel {
         position: absolute;
         inset: 0;
-        opacity: 0;
+        z-index: 30;
         visibility: hidden;
         pointer-events: none;
       }
@@ -955,14 +955,14 @@ const languages = [
         const DESKTOP_BREAKPOINT = 768;
         const HERO_ANIM_MS = 1500;
 
-        const NIGHT_ONLY_MS = 1500;
-        const BRAND_BG_START_DELAY_MS = 1150;
-        const BRAND_BG_SHOW_MS = 1900;
-        const BRAND_TEXT_DELAY_AFTER_BG_MS = 1050;
-        const BRAND_TOTAL_MS = BRAND_BG_START_DELAY_MS + BRAND_BG_SHOW_MS + BRAND_TEXT_DELAY_AFTER_BG_MS + 500;
+        const WHEEL_THRESHOLD = 24;
 
-        const BRAND_HIDE_MS = 900;
-        const SECTION_ANIM_MS = 1900;
+        const BRAND_BG_START_DELAY_MS = 900;
+        const BRAND_TEXT_DELAY_AFTER_BG_MS = 900;
+        const BRAND_UNLOCK_MS = 2600;
+
+        const BRAND_HIDE_MS = 700;
+        const SECTION_ANIM_MS = 1300;
         const FOOTER_ANIM_MS = 900;
 
         let currentStep = 0;
@@ -1048,7 +1048,7 @@ const languages = [
 
           window.setTimeout(() => {
             isAnimating = false;
-          }, BRAND_TOTAL_MS);
+          }, BRAND_UNLOCK_MS);
         }
 
         function showBrandPanelImmediate() {
@@ -1063,7 +1063,7 @@ const languages = [
 
           window.setTimeout(() => {
             isAnimating = false;
-          }, 350);
+          }, 250);
         }
 
         function hideBrandPanel() {
@@ -1207,7 +1207,7 @@ const languages = [
           if (sideMenu?.classList.contains('is-open')) return;
 
           if (isFreeScroll) {
-            if (e.deltaY < -50 && window.scrollY <= (footer?.offsetTop ?? 0) + 10) {
+            if (e.deltaY < -WHEEL_THRESHOLD && window.scrollY <= (footer?.offsetTop ?? 0) + 10) {
               e.preventDefault();
               leaveFooterMode();
             }
@@ -1218,9 +1218,9 @@ const languages = [
 
           if (isAnimating) return;
 
-          if (e.deltaY > 50) {
+          if (e.deltaY > WHEEL_THRESHOLD) {
             moveNext();
-          } else if (e.deltaY < -50) {
+          } else if (e.deltaY < -WHEEL_THRESHOLD) {
             movePrev();
           }
         }, { passive: false });
@@ -1280,6 +1280,18 @@ const languages = [
 
         document.getElementById('menu-open').onclick = () => sideMenu?.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu?.classList.remove('is-open');
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+          entries.forEach(en => {
+            if (en.isIntersecting) {
+              en.target.classList.add('is-visible');
+              if (en.target.id === 'screen-5') updateIndicator(4);
+              if (en.target.id === 'screen-6') updateIndicator(5);
+            }
+          });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.section-observer').forEach(el => sectionObserver.observe(el));
 
         const carouselObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
