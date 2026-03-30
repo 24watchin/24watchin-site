@@ -739,7 +739,7 @@ const languages = [
       .section-fade-in {
         opacity: 0;
         transform: translateY(70px);
-        transition: opacity 1.05s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.05s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.78s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.78s cubic-bezier(0.2, 0.8, 0.2, 1);
         width: 100%;
         will-change: opacity, transform;
       }
@@ -1045,10 +1045,10 @@ const languages = [
         const BRAND_UNLOCK_MS = 2300;
         const BRAND_HIDE_MS = 500;
 
-        const MASK_IN_MS = 300;
-        const MASK_HOLD_MS = 40;
-        const MASK_OUT_MS = 340;
-        const MASK_UNLOCK_MS = 120;
+        const MASK_IN_MS = 260;
+        const MASK_HOLD_MS = 30;
+        const MASK_OUT_MS = 280;
+        const MASK_UNLOCK_MS = 80;
 
         const SECTION_ANIM_MS = 240;
         const FOOTER_ANIM_MS = 900;
@@ -1225,6 +1225,33 @@ const languages = [
             desktopSequence?.classList.remove('is-hidden');
 
             window.setTimeout(() => {
+              hideMask();
+
+              window.setTimeout(() => {
+                isAnimating = false;
+              }, MASK_UNLOCK_MS);
+            }, MASK_HOLD_MS);
+          }, MASK_IN_MS);
+        }
+
+        function transitionBetweenSections(targetStep) {
+          setBodyLocked(true);
+          showMask();
+
+          window.setTimeout(() => {
+            desktopSequence?.classList.add('is-hidden');
+            showSection(targetStep);
+
+            const target = targetStep === 4 ? screen5 : screen6;
+
+            window.scrollTo({
+              top: target?.offsetTop ?? 0,
+              left: 0,
+              behavior: 'auto'
+            });
+
+            window.setTimeout(() => {
+              setBodyLocked(false);
               hideMask();
 
               window.setTimeout(() => {
