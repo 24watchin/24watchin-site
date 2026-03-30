@@ -447,21 +447,19 @@ const languages = [
         position: fixed;
         top: 50%;
         left: 0;
-        width: 100vw;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.8);
-        z-index: 9999;
-        transform: translateY(-50%) scaleX(0);
-        transform-origin: left center;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        width: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 230;
+        transform: translateY(-50%);
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
         transition: none;
         pointer-events: none;
-        opacity: 1;
       }
 
       .line-wipe.is-running {
-        transform: translateY(-50%) scaleX(1);
-        transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100vw;
+        transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .line-wipe.is-fading {
@@ -1104,10 +1102,11 @@ const languages = [
         const lineWipe = document.getElementById('line-wipe');
 
         function runLineWipe(callback) {
-          // まずリセット（is-runningもis-fadingも外してscaleX(0)に戻す）
+          // リセット
           lineWipe.classList.remove('is-running', 'is-fading');
+          lineWipe.style.width = '0';
 
-          // ブラウザにリセット状態を認識させてから線を伸ばす
+          // 少し待ってから線を伸ばす
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               lineWipe.classList.add('is-running');
@@ -1122,6 +1121,7 @@ const languages = [
 
                 window.setTimeout(() => {
                   lineWipe.classList.remove('is-fading');
+                  lineWipe.style.width = '0';
                 }, LINE_FADE_MS);
 
               }, LINE_WIPE_MS);
@@ -1389,15 +1389,26 @@ const languages = [
           }
 
           if (step === 5 && previousStep === 4) {
-            // 5→6：ライン演出
-            runLineWipe(() => {
-              showSection(5);
-              const targetTop = screen6?.offsetTop ?? 0;
-              window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
-            });
+            // 5→6：幕をかけてから線を走らせて画面切り替え
+            setBodyLocked(true);
+            showMask();
+
+            window.setTimeout(() => {
+              // 幕の上に線を走らせる
+              runLineWipe(() => {
+                showSection(5);
+                const targetTop = screen6?.offsetTop ?? 0;
+                window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
+
+                // 画面切り替え後に幕とロックを解除
+                hideMask();
+                setBodyLocked(false);
+              });
+            }, MASK_IN_MS);
+
             window.setTimeout(() => {
               isAnimating = false;
-            }, LINE_WIPE_MS + LINE_FADE_MS);
+            }, MASK_IN_MS + LINE_WIPE_MS + LINE_FADE_MS);
             return;
           }
 
