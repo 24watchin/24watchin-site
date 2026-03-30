@@ -101,11 +101,6 @@ const languages = [
         </div>
       </div>
 
-      <div class="brand-transition-overlay" id="screen-4-overlay" aria-hidden="true">
-        <div class="brand-transition-bg" style="background-image: url('/images/explanation.png');"></div>
-        <div class="brand-transition-bg-overlay"></div>
-      </div>
-
       <div class="mobile-only-area">
         <div style="height: 100vh; display: flex; align-items: center; justify-content: center; background: #111;">
           <p style="color: #666; font-size: 14px; letter-spacing: 2px;">スマホ版は準備中です</p>
@@ -113,17 +108,19 @@ const languages = [
       </div>
 
       <section class="brand-section section-observer" id="screen-4">
-        <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
-        <div class="brand-bg-overlay"></div>
-        
-        <div class="brand-content text-anim-target">
-          <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
-          <h2 class="brand-catch fade-base fade-up anim-catch">Watch the world with clarity.</h2>
+        <div class="brand-stage">
+          <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
+          <div class="brand-bg-overlay"></div>
           
-          <div class="brand-desc">
-            <p class="fade-base fade-left anim-desc1">Global news.</p>
-            <p class="fade-base fade-left anim-desc2">Explained clearly.</p>
-            <p class="fade-base fade-left anim-desc3">In your language.</p>
+          <div class="brand-content text-anim-target">
+            <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
+            <h2 class="brand-catch fade-base fade-up anim-catch">Watch the world with clarity.</h2>
+            
+            <div class="brand-desc">
+              <p class="fade-base fade-left anim-desc1">Global news.</p>
+              <p class="fade-base fade-left anim-desc2">Explained clearly.</p>
+              <p class="fade-base fade-left anim-desc3">In your language.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -250,55 +247,39 @@ const languages = [
       .panel.is-active .word-band { transform: translateX(0); }
       .panel.is-active .word-band h2 { opacity: 1; }
 
-      .brand-transition-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 150;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        background: #000;
-        transition: opacity 1.45s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 1.45s;
-      }
-      .brand-transition-overlay.is-visible {
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 1.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-      .brand-transition-bg {
-        position: absolute;
-        inset: 0;
-        background-size: cover;
-        background-position: center;
-        opacity: 0;
-        transform: scale(1.08);
-        transition: transform 2.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.55s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-      .brand-transition-overlay.is-visible .brand-transition-bg {
-        opacity: 1;
-        transform: scale(1);
-      }
-      .brand-transition-bg-overlay {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.68) 100%);
-        opacity: 0;
-        transition: opacity 1.35s ease;
-      }
-      .brand-transition-overlay.is-visible .brand-transition-bg-overlay {
-        opacity: 1;
-      }
-
       .mobile-only-area { display: none; }
       @media (max-width: 768px) {
         .desktop-only-area { display: none; }
         .mobile-only-area { display: block; }
-        .brand-transition-overlay { display: none; }
         body.is-locked { overflow: auto; } 
         .header-band { padding: 15px 20px; }
       }
 
-      .brand-section { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
+      .brand-section {
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+      .brand-stage {
+        position: absolute;
+        inset: 0;
+      }
+
+      .brand-section.hero-transition-mode .brand-stage {
+        position: fixed;
+        inset: 0;
+        z-index: 150;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 1.55s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 1.55s;
+      }
+      .brand-section.hero-transition-mode.hero-transition-active .brand-stage {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 1.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
       .brand-bg {
         position: absolute;
         inset: 0;
@@ -308,20 +289,52 @@ const languages = [
         transform: scale(1);
         transition: none;
       }
-      .section-observer.is-visible .brand-bg { transform: scale(1); }
-      .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.68) 100%); }
-      
-      .brand-content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; }
+      .brand-bg-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.68) 100%);
+      }
+
+      .brand-section.hero-transition-mode .brand-bg {
+        opacity: 0;
+        transform: scale(1.08);
+        transition: transform 2.25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .brand-section.hero-transition-mode.hero-transition-active .brand-bg {
+        opacity: 0.92;
+        transform: scale(1);
+      }
+
+      .brand-section.hero-transition-mode .brand-bg-overlay {
+        opacity: 0;
+        transition: opacity 1.45s ease;
+      }
+      .brand-section.hero-transition-mode.hero-transition-active .brand-bg-overlay {
+        opacity: 1;
+      }
+
+      .brand-content {
+        position: relative;
+        z-index: 3;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .brand-section.hero-transition-mode .brand-content {
+        opacity: 0;
+      }
+
       .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; }
       .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
-      
       .brand-desc p { font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 300; color: #eee; margin-bottom: 15px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 
       .fade-base { opacity: 0; transition: opacity 3.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
-      
       .fade-up { transform: translateY(40px); }
       .text-anim-target.is-visible .fade-up { transform: translateY(0); opacity: 1; }
-      
       .fade-left { transform: translateX(-80px); }
       .text-anim-target.is-visible .fade-left { transform: translateX(0); opacity: 1; }
 
@@ -404,8 +417,8 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
         const DESKTOP_BREAKPOINT = 768;
         const HERO_ANIM_MS = 1500;
-        const HERO_TO_BRAND_OVERLAY_MS = 1550;
-        const HERO_TO_BRAND_RELEASE_MS = 650;
+        const HERO_TO_BRAND_STAGE_MS = 1700;
+        const HERO_TO_BRAND_SETTLE_MS = 420;
         const SECTION_ANIM_MS = 1900;
         const FOOTER_ANIM_MS = 900;
 
@@ -421,7 +434,6 @@ const languages = [
         const screen5 = document.getElementById('screen-5');
         const screen6 = document.getElementById('screen-6');
         const textAnimTarget = screen4?.querySelector('.text-anim-target');
-        const screen4Overlay = document.getElementById('screen-4-overlay');
 
         const dots = document.querySelectorAll('.scroll-indicator .dot');
 
@@ -448,8 +460,9 @@ const languages = [
           });
         }
 
-        function clearOverlayVisibility() {
-          screen4Overlay?.classList.remove('is-visible');
+        function clearHeroTransition() {
+          screen4?.classList.remove('hero-transition-mode');
+          screen4?.classList.remove('hero-transition-active');
         }
 
         function clearSectionVisibility() {
@@ -460,6 +473,7 @@ const languages = [
         }
 
         function showSection(step) {
+          clearHeroTransition();
           clearSectionVisibility();
 
           if (step === 3) {
@@ -510,12 +524,18 @@ const languages = [
           isFreeScroll = false;
           setBodyLocked(true);
           clearSectionVisibility();
-          clearOverlayVisibility();
+          clearHeroTransition();
 
-          screen4Overlay?.classList.add('is-visible');
+          screen4?.classList.add('is-visible');
+          screen4?.classList.add('hero-transition-mode');
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              screen4?.classList.add('hero-transition-active');
+            });
+          });
 
           window.setTimeout(() => {
-            screen4?.classList.add('is-visible');
             setBodyLocked(false);
 
             window.scrollTo({
@@ -524,18 +544,16 @@ const languages = [
               behavior: 'auto'
             });
 
-            window.setTimeout(() => {
-              textAnimTarget?.classList.add('is-visible');
-            }, 160);
+            clearHeroTransition();
 
             window.setTimeout(() => {
-              clearOverlayVisibility();
-            }, HERO_TO_BRAND_RELEASE_MS);
+              textAnimTarget?.classList.add('is-visible');
+            }, 120);
 
             window.setTimeout(() => {
               isAnimating = false;
-            }, HERO_TO_BRAND_RELEASE_MS + 500);
-          }, HERO_TO_BRAND_OVERLAY_MS);
+            }, HERO_TO_BRAND_SETTLE_MS);
+          }, HERO_TO_BRAND_STAGE_MS);
         }
 
         function goToStep(step) {
@@ -552,7 +570,7 @@ const languages = [
           if (step <= 2) {
             isFreeScroll = false;
             setBodyLocked(true);
-            clearOverlayVisibility();
+            clearHeroTransition();
             clearSectionVisibility();
 
             window.scrollTo({
@@ -572,7 +590,7 @@ const languages = [
 
           isFreeScroll = false;
           setBodyLocked(false);
-          clearOverlayVisibility();
+          clearHeroTransition();
           showSection(step);
 
           const target =
@@ -596,7 +614,7 @@ const languages = [
           isAnimating = true;
           isFreeScroll = true;
           setBodyLocked(false);
-          clearOverlayVisibility();
+          clearHeroTransition();
 
           footer?.scrollIntoView({
             behavior: 'smooth',
@@ -687,13 +705,13 @@ const languages = [
             isAnimating = false;
             isFreeScroll = false;
             setBodyLocked(false);
-            clearOverlayVisibility();
+            clearHeroTransition();
             clearSectionVisibility();
           }
         });
 
         setBodyLocked(true);
-        clearOverlayVisibility();
+        clearHeroTransition();
         clearSectionVisibility();
         updateIndicator(0);
 
@@ -743,4 +761,3 @@ const languages = [
     </script>
   </body>
 </html>
-
