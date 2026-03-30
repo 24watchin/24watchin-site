@@ -107,25 +107,78 @@ const languages = [
         </div>
       </div>
 
+      <div class="full-screen-stack" id="full-screen-stack">
+
+        <section class="brand-section section-observer stack-panel" id="screen-4">
+          <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
+          <div class="brand-bg-overlay"></div>
+          <div class="brand-content text-anim-target">
+            <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
+            <h2 class="brand-catch fade-base fade-up anim-catch">Watch the world with clarity.</h2>
+            <div class="brand-desc">
+              <p class="fade-base fade-left anim-desc1">Global news.</p>
+              <p class="fade-base fade-left anim-desc2">Explained clearly.</p>
+              <p class="fade-base fade-left anim-desc3">In your language.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="carousel-section section-observer stack-panel" id="screen-5">
+          <div class="section-fade-in">
+            <div class="section-header"><h2>Latest Stories</h2></div>
+            <div class="carousel-wrapper">
+              <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
+              <div class="carousel-container" id="story-carousel">
+                <div class="carousel-spacer"></div>
+                {latestStories.map((story) => (
+                  <a href={`/en/story/${story.id}`} class="story-card observer-card">
+                    <div class="card-bg" style={`background-image: ${story.image};`}></div>
+                    <div class="card-content">
+                      <div class="card-meta"><span class="category">{story.category}</span><span class="country">{story.country}</span></div>
+                      <h3 class="card-title">{story.title}</h3>
+                      <p class="card-excerpt">{story.excerpt}</p>
+                      <div class="cta-link">Read story <span>&rarr;</span></div>
+                    </div>
+                  </a>
+                ))}
+                <div class="carousel-spacer"></div>
+              </div>
+              <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="carousel-section lang-section section-observer stack-panel" id="screen-6">
+          <div class="section-fade-in">
+            <div class="section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
+            <div class="carousel-wrapper">
+              <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
+              <div class="carousel-container" id="lang-carousel">
+                <div class="carousel-spacer"></div>
+                {languages.map((lang) => (
+                  <a href={lang.url} class="lang-card observer-card">
+                    <div class="lang-bg" style={`background-color: ${lang.color};`}></div>
+                    <div class="lang-content">
+                      <div class="lang-logo">24watchin</div>
+                      <h3 class="lang-name">{lang.name}</h3>
+                      <div class="lang-border"></div>
+                    </div>
+                  </a>
+                ))}
+                <div class="carousel-spacer"></div>
+              </div>
+              <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /.full-screen-stack -->
+
       <footer style="height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333;">
         <p style="color: #666; font-size: 14px;">[ フッター領域 ]</p>
       </footer>
 
     </main>
-
-    <section class="brand-section" id="screen-4">
-      <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
-      <div class="brand-bg-overlay"></div>
-      <div class="brand-content text-anim-target">
-        <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
-        <h2 class="brand-catch fade-base fade-up anim-catch">Watch the world with clarity.</h2>
-        <div class="brand-desc">
-          <p class="fade-base fade-left anim-desc1">Global news.</p>
-          <p class="fade-base fade-left anim-desc2">Explained clearly.</p>
-          <p class="fade-base fade-left anim-desc3">In your language.</p>
-        </div>
-      </div>
-    </section>
 
     <style is:global>
       :root { --bg-color: #0d0d0d; --text-main: #f0f0f0; --font-sans: 'Noto Sans', sans-serif; }
@@ -200,6 +253,82 @@ const languages = [
         .mobile-only-area { display: block; }
         body.is-locked { overflow: auto; } 
         .header-band { padding: 15px 20px; }
+      }
+
+      /* ==========================================
+         画面4〜6：desktop-only-areaと同じ仕組み
+         コンテナ内でstack-panelを重ねてclip-pathで制御
+      ========================================== */
+      .full-screen-stack {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+      .stack-panel {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      /* 初期状態：下に隠す */
+      #screen-4 {
+        z-index: 1;
+        clip-path: inset(100% 0 0 0);
+        -webkit-clip-path: inset(100% 0 0 0);
+        transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1),
+                    -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1);
+      }
+      #screen-5 {
+        z-index: 2;
+        clip-path: inset(100% 0 0 0);
+        -webkit-clip-path: inset(100% 0 0 0);
+        transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1),
+                    -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1);
+      }
+      #screen-6 {
+        z-index: 3;
+        clip-path: inset(100% 0 0 0);
+        -webkit-clip-path: inset(100% 0 0 0);
+        transition: clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1),
+                    -webkit-clip-path 1.5s cubic-bezier(0.64, 0.04, 0.35, 1);
+      }
+      /* 表示中 */
+      .stack-panel.sp-open {
+        clip-path: inset(0 0 0 0) !important;
+        -webkit-clip-path: inset(0 0 0 0) !important;
+      }
+      /* コンテンツフェードイン */
+      .stack-panel .brand-content {
+        opacity: 0; transform: translateY(30px);
+        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
+      }
+      .stack-panel.sp-active .brand-content { opacity: 1; transform: translateY(0); }
+      .stack-panel.sp-active .brand-bg { transform: scale(1); }
+      .stack-panel.sp-active .text-anim-target .fade-up   { transform: translateY(0); opacity: 1; }
+      .stack-panel.sp-active .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
+      .stack-panel .section-fade-in {
+        opacity: 0; transform: translateY(40px);
+        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
+        width: 100%;
+      }
+      .stack-panel.sp-active .section-fade-in { opacity: 1; transform: translateY(0); }
+
+      /* carousel-sectionのmin-height上書き */
+      .carousel-section.stack-panel {
+        min-height: unset;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 100px 0;
+        box-sizing: border-box;
+      }
+
+      @media (max-width: 768px) {
+        .full-screen-stack { height: auto; overflow: visible; }
+        .stack-panel { position: relative; clip-path: none !important; -webkit-clip-path: none !important; height: auto; }
+        .carousel-section.stack-panel { min-height: 100vh; }
       }
 
       /* ==========================================
@@ -302,52 +431,6 @@ const languages = [
       .lang-border { width: 0; height: 1px; background: #fff; margin-top: 20px; transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0.5; }
       .lang-card.is-center .lang-border { width: 40px; }
       .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
-
-      /* ===== screen-4：下からスライドイン ===== */
-      #screen-4 {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        z-index: 30;
-        overflow: hidden;
-        background-color: #0d0d0d;
-        /* 初期状態：下に隠す */
-        transform: translateY(100vh);
-        transition: transform 1.2s cubic-bezier(0.64, 0.04, 0.35, 1);
-      }
-      #screen-4.fp-active {
-        transform: translateY(0);
-      }
-      #screen-4.fp-done {
-        /* アニメーション完了後：固定を解除して通常フローに戻す */
-        position: relative;
-        transform: none;
-        transition: none;
-      }
-      #screen-4.fp-exit {
-        transform: translateY(100vh);
-      }
-      /* コンテンツフェードイン */
-      #screen-4 .brand-content {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
-      }
-      #screen-4.fp-active .brand-content,
-      #screen-4.fp-done .brand-content {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      #screen-4.fp-active .brand-bg,
-      #screen-4.fp-done .brand-bg { transform: scale(1); }
-      #screen-4.fp-active .text-anim-target .fade-up,
-      #screen-4.fp-done .text-anim-target .fade-up   { transform: translateY(0); opacity: 1; }
-      #screen-4.fp-active .text-anim-target .fade-left,
-      #screen-4.fp-done .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
-
-      @media (max-width: 768px) {
-        #screen-4 { position: relative; transform: none; transition: none; height: auto; }
-      }
     </style>
 
     <script is:inline>
@@ -356,17 +439,44 @@ const languages = [
 
       document.addEventListener('DOMContentLoaded', () => {
 
-        let currentSlide = 0;
-        let zone = 0; // 0=スプリット, 1=アニメ中, 2=通常スクロール
+        // 全画面をホイールで制御（body.is-lockedを維持）
+        let currentSlide = 0;   // 0,1,2 = 画面1,2,3
+        let stackIndex = -1;    // -1=未, 0=screen-4, 1=screen-5, 2=screen-6
+        let zone = 0;           // 0=スプリット, 1=スタック
         let isAnimating = false;
 
         document.body.classList.add('is-locked');
 
-        const s4 = document.getElementById('screen-4');
+        const STACK_ELS = [
+          document.getElementById('screen-4'),
+          document.getElementById('screen-5'),
+          document.getElementById('screen-6'),
+        ];
 
         const dots = document.querySelectorAll('.scroll-indicator .dot');
         function updateIndicator(index) {
           dots.forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+
+        // スタック制御：desktop-only-areaのis-openと同じ仕組み
+        function goToStack(index) {
+          isAnimating = true;
+          stackIndex = index;
+          updateIndicator(index + 3);
+
+          // 全パネルのsp-openをリセット
+          STACK_ELS.forEach(el => el.classList.remove('sp-open', 'sp-active'));
+
+          // 指定インデックスまで開く（下から積み上げ）
+          for (let i = 0; i <= index; i++) {
+            STACK_ELS[i].classList.add('sp-open');
+          }
+
+          // アニメーション完了後にsp-activeを付けてコンテンツ表示
+          setTimeout(() => {
+            STACK_ELS[index].classList.add('sp-active');
+            isAnimating = false;
+          }, 1600);
         }
 
         // 画面1〜3スプリット
@@ -399,89 +509,52 @@ const languages = [
           }, 1500);
         }
 
-        // 画面3→screen-4表示
-        function showScreen4() {
-          zone = 1;
-          isAnimating = true;
-          updateIndicator(3);
-
-          // fixed のまま下からスライドイン
-          s4.classList.add('fp-active');
-
-          // アニメーション完了後（1.2s）：position:relativeに切り替えてスクロール解放
-          setTimeout(() => {
-            s4.classList.remove('fp-active');
-            s4.classList.add('fp-done');       // position:relativeに
-            document.body.classList.remove('is-locked'); // スクロール解放
-            // screen-4の位置にスクロール位置を合わせる
-            s4.scrollIntoView({ behavior: 'instant' });
-            zone = 2;
-            isAnimating = false;
-          }, 1300);
-        }
-
-        // screen-4→スプリットに戻る
-        function hideScreen4() {
-          zone = 1;
-          isAnimating = true;
-          document.body.classList.add('is-locked');
-
-          // position:relativeからfixedに戻してスライドアウト
-          s4.classList.remove('fp-done');
-          s4.classList.add('fp-exit');         // translateY(100vh)
-
-          window.scrollTo({ top: 0, behavior: 'instant' });
-
-          setTimeout(() => {
-            s4.classList.remove('fp-exit');
-            zone = 0;
-            goToSlide(2);
-          }, 400);
-        }
-
         window.addEventListener('wheel', (e) => {
           if (window.innerWidth <= 768) return;
+          e.preventDefault();
+          if (isAnimating) return;
+
+          const down = e.deltaY > 10;
+          const up   = e.deltaY < -10;
 
           if (zone === 0) {
-            e.preventDefault();
-            if (isAnimating) return;
-            if (e.deltaY > 10) {
+            // 画面1〜3ゾーン
+            if (down) {
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
-                showScreen4();
+                // 画面3→画面4へ
+                zone = 1;
+                goToStack(0);
               }
-            } else if (e.deltaY < -10 && currentSlide > 0) {
+            } else if (up && currentSlide > 0) {
               goToSlide(currentSlide - 1);
             }
 
-          } else if (zone === 1) {
-            // アニメーション中は何もしない
-            e.preventDefault();
-
           } else {
-            // zone === 2：通常スクロール
-            // 一番上までスクロールして上に戻そうとしたらスプリットへ
-            if (window.scrollY <= 0 && e.deltaY < -10 && !isAnimating) {
-              e.preventDefault();
-              hideScreen4();
+            // 画面4〜6ゾーン
+            if (down && stackIndex < 2) {
+              goToStack(stackIndex + 1);
+            } else if (up) {
+              if (stackIndex > 0) {
+                // 前のスタック画面へ
+                isAnimating = true;
+                stackIndex--;
+                updateIndicator(stackIndex + 3);
+                STACK_ELS[stackIndex + 1].classList.remove('sp-open', 'sp-active');
+                STACK_ELS[stackIndex].classList.add('sp-active');
+                setTimeout(() => { isAnimating = false; }, 1600);
+              } else {
+                // 画面4→画面3に戻る
+                zone = 0;
+                isAnimating = true;
+                STACK_ELS.forEach(el => el.classList.remove('sp-open', 'sp-active'));
+                stackIndex = -1;
+                setTimeout(() => { goToSlide(2); }, 100);
+              }
             }
           }
         }, { passive: false });
-
-        // ドット更新（screen-5・6）
-        const sectionObserver = new IntersectionObserver((entries) => {
-          entries.forEach(en => {
-            if (en.isIntersecting) {
-              if (en.target.id === 'screen-5') updateIndicator(4);
-              if (en.target.id === 'screen-6') updateIndicator(5);
-            }
-          });
-        }, { threshold: 0.3 });
-        ['screen-5','screen-6'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) sectionObserver.observe(el);
-        });
 
         // 初期化
         setTimeout(() => {
