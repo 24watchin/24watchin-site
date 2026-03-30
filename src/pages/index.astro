@@ -100,7 +100,7 @@ const languages = [
 
       <div class="mobile-stack-wrapper">
         {['conflict.jpg', 'crisis.png', 'cities.jpg', 'people.webp', 'innovation.jpg', 'frontier.jpg'].map((img, i) => (
-          <div class="mobile-panel observer-mobile">
+          <div class="mobile-panel observer-mobile snap-point">
             <div class="bg-layer" style={`background-image: url('/images/${img}');`}></div>
             <div class="dark-overlay"></div>
             <div class="word-band-container"><div class="word-band"><h2>{['CONFLICT', 'CRISIS', 'CITIES', 'PEOPLE', 'INNOVATION', 'FRONTIER'][i]}</h2></div></div>
@@ -120,18 +120,64 @@ const languages = [
         </div>
       </section>
 
+      <section class="carousel-section snap-point" id="screen-5">
+        <div class="section-header">
+          <h2>Latest Stories</h2>
+        </div>
+        <div class="carousel-container" id="story-carousel">
+          <div class="carousel-spacer"></div>
+          {latestStories.map((story) => (
+            <a href={`/en/story/${story.id}`} class="story-card observer-card">
+              <div class="card-bg" style={`background: ${story.image};`}></div>
+              <div class="card-content">
+                <div class="card-meta"><span class="category">{story.category}</span><span class="country">{story.country}</span></div>
+                <h3 class="card-title">{story.title}</h3>
+                <p class="card-excerpt">{story.excerpt}</p>
+                <div class="cta-link">Read story <span>&rarr;</span></div>
+              </div>
+            </a>
+          ))}
+          <div class="carousel-spacer"></div>
+        </div>
+      </section>
+
+      <section class="carousel-section lang-section snap-point" id="screen-6">
+        <div class="section-header">
+          <h2>CHOOSE YOUR LANGUAGE</h2>
+          <p class="sub-header">Check the news in your own language.</p>
+        </div>
+        <div class="carousel-container" id="lang-carousel">
+          <div class="carousel-spacer"></div>
+          {languages.map((lang) => (
+            <a href={lang.url} class="lang-card observer-card">
+              <div class="lang-bg" style={`background-color: ${lang.color};`}>
+                <div class="map-pattern"></div>
+              </div>
+              <div class="lang-content">
+                <div class="lang-logo">24watchin</div>
+                <h3 class="lang-name">{lang.name}</h3>
+                <div class="lang-border"></div>
+              </div>
+            </a>
+          ))}
+          <div class="carousel-spacer"></div>
+        </div>
+      </section>
+
+      <footer class="snap-point" style="height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333;">
+        <p style="color: #666; font-size: 14px;">[ 既存のフッター領域（国リンクボタン等） ]</p>
+      </footer>
+
     </main>
 
     <style>
       :root { --bg-color: #0d0d0d; --text-main: #f0f0f0; --font-sans: 'Noto Sans', sans-serif; }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       
-      /* ▼ 修正：本体のスクロールを完全に止め、メインエリア内でスクロールさせます */
+      /* スクロールの土台設定 */
       .no-scroll-body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); overflow: hidden; height: 100vh; width: 100vw; }
-      
-      /* ▼ 究極の魔法：CSSだけでピタッと止まるスクロールスナップ */
       .gateway-main { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
-      .snap-point { scroll-snap-align: start; height: 100vh; width: 100%; }
+      .snap-point { scroll-snap-align: start; width: 100%; }
 
       /* ヘッダー */
       .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 200; transition: opacity 0.5s; }
@@ -150,15 +196,16 @@ const languages = [
       .menu-lang-card { padding: 40px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; transition: 0.3s; background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%); text-decoration: none; color: white;}
       .menu-lang-card:hover { border-color: var(--accent); transform: translateY(-5px); }
 
-      /* PCスプリットスクロール */
-      .desktop-split-wrapper { position: relative; }
+      /* PCスプリットスクロール（抜けていた高さを追加しました！） */
+      .desktop-split-wrapper { position: relative; height: 300vh; }
       .sticky-view { position: sticky; top: 0; height: 100vh; display: flex; overflow: hidden; }
-      .scroll-blocks { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; }
+      .scroll-blocks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; }
+      .scroll-blocks .snap-point { height: 100vh; }
       
       .track { width: 50vw; height: 100vh; position: relative; }
       .panel { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
       
-      /* ▼ 修正：初期状態の画像の重なり順をCSSでガッチリ固定しました */
+      /* 画像の重なり順と初期の隠し方 */
       .left-track .p1 { clip-path: inset(0 0 0 0); z-index: 1; }
       .left-track .p2 { clip-path: inset(100% 0 0 0); z-index: 2; }
       .left-track .p3 { clip-path: inset(100% 0 0 0); z-index: 3; }
@@ -169,34 +216,32 @@ const languages = [
 
       .bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
 
-      /* ▼ 修正：透明なグレーの背景と、横からスライドする文字の設定 */
+      /* 文字の黒い座布団とスライドアニメーション */
       .word-band-container { 
         position: absolute; top: 50%; left: 50%; 
-        transform: translate(-50%, -50%); /* 画面のど真ん中に固定 */
-        overflow: hidden; /* 枠外の文字を隠すマスク */
+        transform: translate(-50%, -50%); 
+        overflow: hidden; 
         z-index: 10;
       }
       .word-band { 
-        background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); /* すりガラス風の黒帯 */
+        background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
         padding: 15px 50px; border-radius: 4px;
-        transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .word-band h2 { color: #fff; font-weight: 300; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: 0.15em; margin: 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
       
-      /* アニメーションの初期位置（左右の枠外） */
       .left-track .word-band { transform: translateX(-101%); }
       .right-track .word-band { transform: translateX(101%); }
-      
-      /* ▼ ピタッと止まったら、元の位置(0)にスライドしてくる（少し遅れて発動） */
-      .panel.is-active .word-band { transform: translateX(0); transition-delay: 0.3s; }
+      .panel.is-active .word-band { transform: translateX(0); transition-delay: 0.4s; }
 
       /* スマホ用 */
       @media (max-width: 768px) {
         .desktop-split-wrapper { display: none; }
         .mobile-stack-wrapper { display: block; }
-        .mobile-panel { scroll-snap-align: start; height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .mobile-panel { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .mobile-panel .bg-layer { opacity: 0; transform: scale(1.1); transition: 1.5s; }
         .mobile-panel.is-visible .bg-layer { opacity: 1; transform: scale(1); }
+        .dark-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
         
         .mobile-panel .word-band-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; }
         .mobile-panel .word-band { transform: translateY(100%); transition: transform 0.8s ease; }
@@ -206,7 +251,7 @@ const languages = [
       }
 
       /* 4画面目以降 */
-      .brand-section { position: relative; display: flex; align-items: center; justify-content: center; text-align: center; }
+      .brand-section { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; }
       .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.5; }
       .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, transparent 0%, #000 100%); }
       .brand-content { position: relative; z-index: 3; }
@@ -214,15 +259,46 @@ const languages = [
       .brand-catch { font-size: 3rem; margin-bottom: 30px; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
       .fade-item { opacity: 0; transform: translateY(20px); transition: 1s; }
       .observer-target.is-visible .fade-item { opacity: 1; transform: translateY(0); }
+
+      .carousel-section { display: flex; flex-direction: column; justify-content: center; padding: 100px 0; min-height: 100vh; }
+      .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
+      .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
+      .section-header .sub-header { margin-top: 12px; font-size: 18px; font-weight: 300; color: #ddd; }
+      .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 40px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
+      .carousel-container::-webkit-scrollbar { display: none; }
+      .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
+      .observer-card { scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; position: relative; border-radius: 4px; overflow: hidden; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease; opacity: 0.4; transform: scale(0.85); display: block; }
+      .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 10; }
+      .story-card .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
+      .story-card.is-center:hover .card-bg { transform: scale(1.05); }
+      .story-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%); }
+      .card-content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+      .card-meta { display: flex; gap: 12px; margin-bottom: 16px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+      .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.4); padding-bottom: 4px; }
+      .card-meta .country { color: #888; }
+      .card-title { font-size: clamp(1.2rem, 2vw, 2rem); font-weight: 400; line-height: 1.3; margin-bottom: 16px; }
+      .card-excerpt { font-size: 14px; color: #ccc; margin-bottom: 24px; display: none; line-height: 1.5; }
+      .story-card.is-center .card-excerpt { display: block; }
+      .cta-link { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #fff; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+      .story-card.is-center .cta-link { opacity: 1; transform: translateY(0); }
+
+      .lang-card { flex: 0 0 28vw; height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.05); }
+      .lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
+      .lang-card.is-center .lang-bg { opacity: 0.8; }
+      .map-pattern { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.5; }
+      .lang-content { position: relative; z-index: 2; width: 100%; height: 100%; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      .lang-logo { position: absolute; bottom: 30px; left: 30px; font-size: 12px; letter-spacing: 2px; opacity: 0.5; }
+      .lang-name { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 300; letter-spacing: 0.05em; transition: transform 0.4s ease; color: #fff; }
+      .lang-border { width: 0; height: 1px; background: #fff; margin-top: 20px; transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0.5; }
+      .lang-card.is-center .lang-border { width: 40px; }
+      .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
     </style>
 
     <script is:inline>
       document.addEventListener('DOMContentLoaded', () => {
-        
         const mainScroll = document.getElementById('main-scroll');
         const header = document.getElementById('main-header');
         
-        // PC用のパネル要素を取得
         const l1 = document.querySelector('.left-track .p1');
         const l2 = document.querySelector('.left-track .p2');
         const l3 = document.querySelector('.left-track .p3');
@@ -231,17 +307,16 @@ const languages = [
         const r3 = document.querySelector('.right-track .p3');
         const allPanels = document.querySelectorAll('.desktop-split-wrapper .panel');
 
-        // 初期状態で1組目の文字を表示
+        // 最初は1組目の文字を表示
         if(l1 && r1) {
           l1.classList.add('is-active');
           r1.classList.add('is-active');
         }
 
-        // ▼ スクロールに連動して画像をめくり、止まったら文字を出す計算式
+        // スクロール時の処理
         mainScroll.addEventListener('scroll', () => {
           if (window.innerWidth <= 768) return;
 
-          // スクロール量を取得 (1画面分 = 1)
           const scrollTop = mainScroll.scrollTop;
           const vh = window.innerHeight;
           const progress = scrollTop / vh; 
@@ -256,7 +331,7 @@ const languages = [
           if(l3) l3.style.clipPath = `inset(${100 - (p3 * 100)}% 0 0 0)`;
           if(r3) r3.style.clipPath = `inset(0 0 ${100 - (p3 * 100)}% 0)`;
 
-          // ▼ スナップしてピタッと止まった時だけ「is-active」をつけて文字を出す
+          // ピタッと止まったら文字を出す
           allPanels.forEach(p => p.classList.remove('is-active'));
           
           if (progress < 0.15) {
@@ -267,7 +342,7 @@ const languages = [
             l3.classList.add('is-active'); r3.classList.add('is-active');
           }
 
-          // ヘッダーの表示切り替え（1組目から離れたら消す）
+          // 1組目から離れたらヘッダーを消す
           if (progress > 0.5) {
             header.style.opacity = '0';
             header.style.pointerEvents = 'none';
@@ -282,11 +357,19 @@ const languages = [
         document.getElementById('menu-open').onclick = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
-        // スマホ用と4画面目以降のフワッと表示
+        // アニメーション用のセンサー
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(en => { if(en.isIntersecting) en.target.classList.add('is-visible'); });
         }, { threshold: 0.3 });
         document.querySelectorAll('.observer-mobile, .observer-target').forEach(el => observer.observe(el));
+
+        const carouselObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('is-center');
+            else entry.target.classList.remove('is-center');
+          });
+        }, { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 });
+        document.querySelectorAll('.observer-card').forEach(card => carouselObserver.observe(card));
       });
     </script>
   </body>
