@@ -113,7 +113,8 @@ const languages = [
 
     </main>
 
-    <section class="brand-section fp-screen" id="screen-4">
+    <!-- screen-4のみbody直下に配置 -->
+    <section class="brand-section" id="screen-4">
       <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
       <div class="brand-bg-overlay"></div>
       <div class="brand-content text-anim-target">
@@ -123,55 +124,6 @@ const languages = [
           <p class="fade-base fade-left anim-desc1">Global news.</p>
           <p class="fade-base fade-left anim-desc2">Explained clearly.</p>
           <p class="fade-base fade-left anim-desc3">In your language.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="carousel-section fp-screen" id="screen-5">
-      <div class="section-fade-in">
-        <div class="section-header"><h2>Latest Stories</h2></div>
-        <div class="carousel-wrapper">
-          <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
-          <div class="carousel-container" id="story-carousel">
-            <div class="carousel-spacer"></div>
-            {latestStories.map((story) => (
-              <a href={`/en/story/${story.id}`} class="story-card observer-card">
-                <div class="card-bg" style={`background-image: ${story.image};`}></div>
-                <div class="card-content">
-                  <div class="card-meta"><span class="category">{story.category}</span><span class="country">{story.country}</span></div>
-                  <h3 class="card-title">{story.title}</h3>
-                  <p class="card-excerpt">{story.excerpt}</p>
-                  <div class="cta-link">Read story <span>&rarr;</span></div>
-                </div>
-              </a>
-            ))}
-            <div class="carousel-spacer"></div>
-          </div>
-          <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="carousel-section lang-section fp-screen" id="screen-6">
-      <div class="section-fade-in">
-        <div class="section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
-        <div class="carousel-wrapper">
-          <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
-          <div class="carousel-container" id="lang-carousel">
-            <div class="carousel-spacer"></div>
-            {languages.map((lang) => (
-              <a href={lang.url} class="lang-card observer-card">
-                <div class="lang-bg" style={`background-color: ${lang.color};`}></div>
-                <div class="lang-content">
-                  <div class="lang-logo">24watchin</div>
-                  <h3 class="lang-name">{lang.name}</h3>
-                  <div class="lang-border"></div>
-                </div>
-              </a>
-            ))}
-            <div class="carousel-spacer"></div>
-          </div>
-          <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
         </div>
       </div>
     </section>
@@ -352,11 +304,8 @@ const languages = [
       .lang-card.is-center .lang-border { width: 40px; }
       .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
 
-      /* ==========================================
-         フルページスタック（画面4〜6）
-         is:global で確実にビルド後も有効
-      ========================================== */
-      .fp-screen {
+      /* ===== screen-4のみフルページ表示 ===== */
+      #screen-4 {
         position: fixed;
         top: 0; left: 0;
         width: 100vw; height: 100vh;
@@ -364,73 +313,37 @@ const languages = [
         -webkit-clip-path: inset(100% 0 0 0);
         transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1),
                     -webkit-clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1);
-        background-color: #0d0d0d;
+        z-index: 30;
         overflow: hidden;
-        min-height: unset;
       }
-      #screen-4 { z-index: 30; }
-      #screen-5 { z-index: 20; }
-      #screen-6 { z-index: 10; }
-
-      .fp-screen.fp-active {
+      #screen-4.fp-active {
         clip-path: inset(0 0 0 0);
         -webkit-clip-path: inset(0 0 0 0);
       }
-      .fp-screen.fp-behind {
-        clip-path: inset(0 0 0 0);
-        -webkit-clip-path: inset(0 0 0 0);
-      }
-      .fp-screen.fp-exit {
+      #screen-4.fp-exit {
         clip-path: inset(0 0 100% 0);
         -webkit-clip-path: inset(0 0 100% 0);
       }
-
-      /* コンテンツフェードイン */
-      .fp-screen .brand-content {
+      /* screen-4のコンテンツフェードイン */
+      #screen-4 .brand-content {
         opacity: 0;
         transform: translateY(30px);
         transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
       }
-      .fp-screen.fp-active .brand-content,
-      .fp-screen.fp-behind .brand-content {
+      #screen-4.fp-active .brand-content {
         opacity: 1;
         transform: translateY(0);
       }
-      .fp-screen .section-fade-in {
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
-        width: 100%;
-      }
-      .fp-screen.fp-active .section-fade-in,
-      .fp-screen.fp-behind .section-fade-in {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .fp-screen.fp-active .brand-bg,
-      .fp-screen.fp-behind .brand-bg { transform: scale(1); }
+      #screen-4.fp-active .brand-bg { transform: scale(1); }
+      #screen-4.fp-active .text-anim-target .fade-up   { transform: translateY(0); opacity: 1; }
+      #screen-4.fp-active .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
 
-      .fp-screen.fp-active .text-anim-target .fade-up,
-      .fp-screen.fp-behind .text-anim-target .fade-up  { transform: translateY(0); opacity: 1; }
-      .fp-screen.fp-active .text-anim-target .fade-left,
-      .fp-screen.fp-behind .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
-
-      .carousel-section.fp-screen {
-        min-height: unset;
-        height: 100vh;
-        padding: 100px 0;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
       @media (max-width: 768px) {
-        .fp-screen {
+        #screen-4 {
           position: relative;
           clip-path: none;
           -webkit-clip-path: none;
           height: auto;
-          min-height: 100vh;
         }
       }
     </style>
@@ -442,45 +355,20 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
 
         let currentSlide = 0;
-        let fpIndex = -1;
-        let zone = 0;
+        let zone = 0; // 0=スプリット, 1=screen-4, 2=通常スクロール
         let isAnimating = false;
         const ANIM_MS = 1300;
 
         document.body.classList.add('is-locked');
 
-        const FP_ELS = [
-          document.getElementById('screen-4'),
-          document.getElementById('screen-5'),
-          document.getElementById('screen-6'),
-        ];
+        const s4 = document.getElementById('screen-4');
 
         const dots = document.querySelectorAll('.scroll-indicator .dot');
         function updateIndicator(index) {
           dots.forEach((d, i) => d.classList.toggle('active', i === index));
         }
 
-        function setFpScreen(index) {
-          FP_ELS.forEach((el, i) => {
-            el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
-            if (i === index)    el.classList.add('fp-active');
-            else if (i < index) el.classList.add('fp-behind');
-          });
-          updateIndicator(index + 3);
-          fpIndex = index;
-        }
-
-        function goFpBack(index) {
-          FP_ELS.forEach((el, i) => {
-            el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
-            if (i === index)    el.classList.add('fp-active');
-            else if (i < index) el.classList.add('fp-behind');
-            else                el.classList.add('fp-exit');
-          });
-          updateIndicator(index + 3);
-          fpIndex = index;
-        }
-
+        // 画面1〜3スプリット
         function goToSlide(index) {
           isAnimating = true;
           currentSlide = index;
@@ -510,61 +398,93 @@ const languages = [
           }, 1500);
         }
 
+        // screen-4を表示してスクロール解放
+        function showScreen4AndUnlock() {
+          zone = 1;
+          isAnimating = true;
+          s4.classList.add('fp-active');
+          updateIndicator(3);
+          setTimeout(() => {
+            // アニメーション完了後にスクロール解放
+            zone = 2;
+            document.body.classList.remove('is-locked');
+            isAnimating = false;
+          }, ANIM_MS);
+        }
+
+        // screen-4を隠してスプリットに戻る
+        function hideScreen4AndLock() {
+          zone = 1;
+          isAnimating = true;
+          document.body.classList.add('is-locked');
+          s4.classList.remove('fp-active');
+          s4.classList.add('fp-exit');
+          setTimeout(() => {
+            s4.classList.remove('fp-exit');
+            zone = 0;
+            goToSlide(2);
+          }, 300);
+        }
+
         window.addEventListener('wheel', (e) => {
           if (window.innerWidth <= 768) return;
-          e.preventDefault();
-          if (isAnimating) return;
-
-          const down = e.deltaY > 10;
-          const up   = e.deltaY < -10;
 
           if (zone === 0) {
+            // 画面1〜3ゾーン：全部lockして制御
+            e.preventDefault();
+            if (isAnimating) return;
+            const down = e.deltaY > 10;
+            const up   = e.deltaY < -10;
             if (down) {
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
-                zone = 1;
-                isAnimating = true;
-                setFpScreen(0);
-                setTimeout(() => { isAnimating = false; }, ANIM_MS);
+                showScreen4AndUnlock();
               }
             } else if (up && currentSlide > 0) {
               goToSlide(currentSlide - 1);
             }
+
+          } else if (zone === 1) {
+            // screen-4アニメーション中：何もしない
+            e.preventDefault();
+
           } else {
-            if (down && fpIndex < 2) {
-              isAnimating = true;
-              setFpScreen(fpIndex + 1);
-              setTimeout(() => { isAnimating = false; }, ANIM_MS);
-            } else if (up) {
-              if (fpIndex > 0) {
-                isAnimating = true;
-                goFpBack(fpIndex - 1);
-                setTimeout(() => { isAnimating = false; }, ANIM_MS);
-              } else {
-                zone = 0;
-                isAnimating = true;
-                FP_ELS[0].classList.remove('fp-active', 'fp-behind');
-                FP_ELS[0].classList.add('fp-exit');
-                fpIndex = -1;
-                setTimeout(() => {
-                  FP_ELS[0].classList.remove('fp-exit');
-                  goToSlide(2);
-                }, 200);
-              }
+            // zone === 2：通常スクロール中
+            // 一番上まで戻ったらscreen-4→スプリットへ
+            if (window.scrollY <= 0 && e.deltaY < -10 && !isAnimating) {
+              e.preventDefault();
+              hideScreen4AndLock();
             }
           }
         }, { passive: false });
 
+        // IntersectionObserverでドット更新（screen-5・6は通常スクロール）
+        const sectionObserver = new IntersectionObserver((entries) => {
+          entries.forEach(en => {
+            if (en.isIntersecting) {
+              if (en.target.id === 'screen-5') updateIndicator(4);
+              if (en.target.id === 'screen-6') updateIndicator(5);
+            }
+          });
+        }, { threshold: 0.3 });
+        const s5 = document.getElementById('screen-5');
+        const s6 = document.getElementById('screen-6');
+        if (s5) sectionObserver.observe(s5);
+        if (s6) sectionObserver.observe(s6);
+
+        // 初期化
         setTimeout(() => {
           document.querySelector('.left-track .p1').classList.add('is-active');
           document.querySelector('.right-track .p1').classList.add('is-active');
         }, 500);
 
+        // サイドメニュー
         const sideMenu = document.getElementById('side-menu');
         document.getElementById('menu-open').onclick  = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
+        // カルーセル
         const carouselObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => entry.target.classList.toggle('is-center', entry.isIntersecting));
         }, { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 });
