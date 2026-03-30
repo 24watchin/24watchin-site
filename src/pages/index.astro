@@ -69,7 +69,7 @@ const languages = [
 
     <main class="gateway-main">
 
-      <!-- 1〜4画面目を最初から同じ固定ステージ内で管理 -->
+      <!-- 1〜4画面目を同じ固定ステージで管理 -->
       <div class="desktop-sequence" id="desktop-sequence">
         <div class="split-stage" id="split-stage">
           <div class="left-track">
@@ -104,6 +104,11 @@ const languages = [
         </div>
 
         <section class="brand-panel" id="brand-panel" aria-label="Brand panel">
+          <div class="twilight-veil">
+            <div class="twilight-stars stars-a"></div>
+            <div class="twilight-stars stars-b"></div>
+          </div>
+
           <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
           <div class="brand-bg-overlay"></div>
 
@@ -120,7 +125,6 @@ const languages = [
         </section>
       </div>
 
-      <!-- 固定ステージのぶんだけ高さを確保 -->
       <section class="hero-spacer" aria-hidden="true"></section>
 
       <div class="mobile-only-area">
@@ -485,13 +489,80 @@ const languages = [
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        transition: opacity 1.7s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 1.7s;
       }
 
-      .brand-panel.is-visible {
-        opacity: 1;
+      .brand-panel.is-night-visible,
+      .brand-panel.is-bg-visible {
         visibility: visible;
-        transition: opacity 1.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .twilight-veil {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        background:
+          radial-gradient(circle at 50% 35%, rgba(33, 76, 160, 0.18) 0%, rgba(17, 36, 82, 0.28) 22%, rgba(7, 15, 40, 0.62) 56%, rgba(4, 8, 24, 0.92) 100%),
+          linear-gradient(to bottom, rgba(8, 18, 48, 0.55) 0%, rgba(5, 12, 32, 0.88) 75%, rgba(3, 7, 20, 0.96) 100%);
+        transition: opacity 1.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .brand-panel.is-night-visible .twilight-veil {
+        opacity: 1;
+      }
+
+      .twilight-stars {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 2s ease;
+        mix-blend-mode: screen;
+      }
+
+      .brand-panel.is-night-visible .twilight-stars {
+        opacity: 0.55;
+      }
+
+      .stars-a {
+        background-image:
+          radial-gradient(circle at 8% 18%, rgba(255,255,255,0.85) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 16% 30%, rgba(181,215,255,0.8) 0 1.1px, transparent 1.8px),
+          radial-gradient(circle at 24% 12%, rgba(255,255,255,0.85) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 31% 25%, rgba(196,223,255,0.8) 0 1px, transparent 1.8px),
+          radial-gradient(circle at 39% 16%, rgba(255,255,255,0.75) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 48% 22%, rgba(170,210,255,0.8) 0 1.2px, transparent 2px),
+          radial-gradient(circle at 57% 14%, rgba(255,255,255,0.85) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 66% 28%, rgba(201,228,255,0.75) 0 1px, transparent 1.8px),
+          radial-gradient(circle at 76% 18%, rgba(255,255,255,0.8) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 84% 11%, rgba(181,215,255,0.8) 0 1.1px, transparent 1.8px),
+          radial-gradient(circle at 92% 24%, rgba(255,255,255,0.75) 0 1px, transparent 1.8px);
+        animation: starTwinkleA 5.8s ease-in-out infinite alternate;
+      }
+
+      .stars-b {
+        background-image:
+          radial-gradient(circle at 12% 42%, rgba(255,255,255,0.65) 0 0.9px, transparent 1.6px),
+          radial-gradient(circle at 20% 52%, rgba(176,210,255,0.7) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 28% 40%, rgba(255,255,255,0.68) 0 0.9px, transparent 1.6px),
+          radial-gradient(circle at 36% 56%, rgba(185,220,255,0.68) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 44% 44%, rgba(255,255,255,0.7) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 53% 58%, rgba(170,210,255,0.68) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 62% 46%, rgba(255,255,255,0.68) 0 0.9px, transparent 1.6px),
+          radial-gradient(circle at 70% 54%, rgba(190,223,255,0.68) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 79% 42%, rgba(255,255,255,0.68) 0 0.9px, transparent 1.6px),
+          radial-gradient(circle at 88% 57%, rgba(170,210,255,0.68) 0 1px, transparent 1.7px);
+        animation: starTwinkleB 7.2s ease-in-out infinite alternate;
+      }
+
+      @keyframes starTwinkleA {
+        0%   { opacity: 0.38; }
+        50%  { opacity: 0.58; }
+        100% { opacity: 0.46; }
+      }
+
+      @keyframes starTwinkleB {
+        0%   { opacity: 0.26; }
+        50%  { opacity: 0.48; }
+        100% { opacity: 0.34; }
       }
 
       .brand-bg {
@@ -500,11 +571,11 @@ const languages = [
         background-size: cover;
         background-position: center;
         opacity: 0;
-        transform: scale(1.08);
-        transition: transform 2.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: scale(1.06);
+        transition: opacity 1.95s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.4s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      .brand-panel.is-visible .brand-bg {
+      .brand-panel.is-bg-visible .brand-bg {
         opacity: 0.96;
         transform: scale(1);
       }
@@ -512,12 +583,12 @@ const languages = [
       .brand-bg-overlay {
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.72) 100%);
+        background: radial-gradient(circle, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.62) 100%);
         opacity: 0;
-        transition: opacity 1.45s ease;
+        transition: opacity 1.6s ease;
       }
 
-      .brand-panel.is-visible .brand-bg-overlay {
+      .brand-panel.is-bg-visible .brand-bg-overlay {
         opacity: 1;
       }
 
@@ -883,8 +954,13 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
         const DESKTOP_BREAKPOINT = 768;
         const HERO_ANIM_MS = 1500;
-        const BRAND_SHOW_MS = 2350;
-        const BRAND_TEXT_DELAY_MS = 1150;
+
+        const NIGHT_ONLY_MS = 1500;
+        const BRAND_BG_START_DELAY_MS = 1150;
+        const BRAND_BG_SHOW_MS = 1900;
+        const BRAND_TEXT_DELAY_AFTER_BG_MS = 1050;
+        const BRAND_TOTAL_MS = BRAND_BG_START_DELAY_MS + BRAND_BG_SHOW_MS + BRAND_TEXT_DELAY_AFTER_BG_MS + 500;
+
         const BRAND_HIDE_MS = 900;
         const SECTION_ANIM_MS = 1900;
         const FOOTER_ANIM_MS = 900;
@@ -950,23 +1026,50 @@ const languages = [
           brandTextTarget?.classList.remove('is-visible');
         }
 
-        function showBrandPanel() {
-          desktopSequence?.classList.remove('is-hidden');
-          brandPanel?.classList.add('is-visible');
+        function resetBrandPanel() {
+          brandPanel?.classList.remove('is-night-visible');
+          brandPanel?.classList.remove('is-bg-visible');
           resetBrandText();
+        }
+
+        function showBrandPanelAnimated() {
+          desktopSequence?.classList.remove('is-hidden');
+          resetBrandPanel();
+
+          brandPanel?.classList.add('is-night-visible');
+
+          window.setTimeout(() => {
+            brandPanel?.classList.add('is-bg-visible');
+          }, BRAND_BG_START_DELAY_MS);
 
           window.setTimeout(() => {
             brandTextTarget?.classList.add('is-visible');
-          }, BRAND_TEXT_DELAY_MS);
+          }, BRAND_BG_START_DELAY_MS + BRAND_TEXT_DELAY_AFTER_BG_MS);
 
           window.setTimeout(() => {
             isAnimating = false;
-          }, BRAND_SHOW_MS);
+          }, BRAND_TOTAL_MS);
+        }
+
+        function showBrandPanelImmediate() {
+          desktopSequence?.classList.remove('is-hidden');
+          resetBrandPanel();
+          brandPanel?.classList.add('is-night-visible');
+          brandPanel?.classList.add('is-bg-visible');
+
+          requestAnimationFrame(() => {
+            brandTextTarget?.classList.add('is-visible');
+          });
+
+          window.setTimeout(() => {
+            isAnimating = false;
+          }, 350);
         }
 
         function hideBrandPanel() {
           resetBrandText();
-          brandPanel?.classList.remove('is-visible');
+          brandPanel?.classList.remove('is-bg-visible');
+          brandPanel?.classList.remove('is-night-visible');
 
           window.setTimeout(() => {
             isAnimating = false;
@@ -1024,8 +1127,7 @@ const languages = [
               return;
             }
 
-            resetBrandText();
-            brandPanel?.classList.remove('is-visible');
+            resetBrandPanel();
             setHeroSlide(step);
             return;
           }
@@ -1036,7 +1138,12 @@ const languages = [
             desktopSequence?.classList.remove('is-hidden');
             clearSectionVisibility();
             window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-            showBrandPanel();
+
+            if (previousStep >= 4) {
+              showBrandPanelImmediate();
+            } else {
+              showBrandPanelAnimated();
+            }
             return;
           }
 
@@ -1155,16 +1262,14 @@ const languages = [
             isFreeScroll = false;
             setBodyLocked(false);
             desktopSequence?.classList.remove('is-hidden');
-            brandPanel?.classList.remove('is-visible');
-            resetBrandText();
+            resetBrandPanel();
             clearSectionVisibility();
           }
         });
 
         setBodyLocked(true);
         desktopSequence?.classList.remove('is-hidden');
-        brandPanel?.classList.remove('is-visible');
-        resetBrandText();
+        resetBrandPanel();
         clearSectionVisibility();
         updateIndicator(0);
 
