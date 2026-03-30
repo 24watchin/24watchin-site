@@ -263,7 +263,8 @@ const languages = [
       .section-observer.is-visible .brand-bg { transform: scale(1); }
       .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); }
       
-      .brand-content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; }
+      .brand-content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(80px); transition: opacity 1.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+      .screen-4-ready .brand-content { opacity: 1; transform: translateY(0); }
       .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; }
       .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
       
@@ -441,7 +442,14 @@ const languages = [
           isLocked = false;
           document.body.classList.remove('is-locked'); 
           
-          document.getElementById('screen-4').scrollIntoView({ behavior: 'smooth' });
+          const s4 = document.getElementById('screen-4');
+          s4.scrollIntoView({ behavior: 'smooth' });
+
+          // スクロール完了後に浮き上がりアニメを発火（遅延で確実に見せる）
+          setTimeout(() => {
+            s4.classList.add('is-visible');
+            s4.classList.add('screen-4-ready');
+          }, 600);
           
           setTimeout(() => { isAnimating = false; }, 1000);
         }
@@ -472,7 +480,7 @@ const languages = [
               if (en.target.id === 'screen-6') updateIndicator(5);
             }
           });
-        }, { threshold: 0.15 });
+        }, { threshold: 0.08 });
         document.querySelectorAll('.section-observer').forEach(el => sectionObserver.observe(el));
 
         const textObserver = new IntersectionObserver((entries) => {
