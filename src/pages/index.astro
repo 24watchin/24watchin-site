@@ -26,71 +26,6 @@ const languages = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>24watchin | Global Gateway</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <style is:inline>
-      .fp-screen {
-        position: fixed !important;
-        top: 0 !important; left: 0 !important;
-        width: 100vw !important; height: 100vh !important;
-        clip-path: inset(100% 0 0 0) !important;
-        -webkit-clip-path: inset(100% 0 0 0) !important;
-        transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1) !important;
-        background-color: #0d0d0d !important;
-        overflow: hidden !important;
-        min-height: unset !important;
-      }
-      #screen-4 { z-index: 30 !important; }
-      #screen-5 { z-index: 20 !important; }
-      #screen-6 { z-index: 10 !important; }
-
-      /* 表示中 */
-      .fp-screen.fp-active { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
-      /* 通過済み（後ろに残る） */
-      .fp-screen.fp-behind { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
-      /* 上に退場 */
-      .fp-screen.fp-exit   { clip-path: inset(0 0 100% 0) !important; -webkit-clip-path: inset(0 0 100% 0) !important; }
-
-      /* コンテンツ：fp-activeのときだけフェードイン */
-      .fp-screen .brand-content {
-        opacity: 0 !important;
-        transform: translateY(30px) !important;
-        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s !important;
-      }
-      /* fp-activeでもfp-behindでも表示する */
-      .fp-screen.fp-active .brand-content,
-      .fp-screen.fp-behind .brand-content {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-      }
-
-      .fp-screen .section-fade-in {
-        opacity: 0 !important;
-        transform: translateY(40px) !important;
-        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s !important;
-        width: 100% !important;
-      }
-      .fp-screen.fp-active .section-fade-in,
-      .fp-screen.fp-behind .section-fade-in {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-      }
-
-      .fp-screen.fp-active .brand-bg,
-      .fp-screen.fp-behind .brand-bg { transform: scale(1) !important; }
-
-      .fp-screen.fp-active .text-anim-target .fade-up,
-      .fp-screen.fp-behind .text-anim-target .fade-up  { transform: translateY(0) !important; opacity: 1 !important; }
-      .fp-screen.fp-active .text-anim-target .fade-left,
-      .fp-screen.fp-behind .text-anim-target .fade-left { transform: translateX(0) !important; opacity: 1 !important; }
-
-      .carousel-section.fp-screen {
-        display: flex !important; flex-direction: column !important; justify-content: center !important;
-        padding: 100px 0 !important; box-sizing: border-box !important;
-        background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%) !important;
-      }
-      @media (max-width: 768px) {
-        .fp-screen { position: relative !important; clip-path: none !important; -webkit-clip-path: none !important; height: auto !important; min-height: 100vh !important; }
-      }
-    </style>
   </head>
   <body class="is-locked">
 
@@ -241,7 +176,7 @@ const languages = [
       </div>
     </section>
 
-    <style>
+    <style is:global>
       :root { --bg-color: #0d0d0d; --text-main: #f0f0f0; --font-sans: 'Noto Sans', sans-serif; }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       
@@ -416,6 +351,88 @@ const languages = [
       .lang-border { width: 0; height: 1px; background: #fff; margin-top: 20px; transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0.5; }
       .lang-card.is-center .lang-border { width: 40px; }
       .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
+
+      /* ==========================================
+         フルページスタック（画面4〜6）
+         is:global で確実にビルド後も有効
+      ========================================== */
+      .fp-screen {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        clip-path: inset(100% 0 0 0);
+        -webkit-clip-path: inset(100% 0 0 0);
+        transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1),
+                    -webkit-clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1);
+        background-color: #0d0d0d;
+        overflow: hidden;
+        min-height: unset;
+      }
+      #screen-4 { z-index: 30; }
+      #screen-5 { z-index: 20; }
+      #screen-6 { z-index: 10; }
+
+      .fp-screen.fp-active {
+        clip-path: inset(0 0 0 0);
+        -webkit-clip-path: inset(0 0 0 0);
+      }
+      .fp-screen.fp-behind {
+        clip-path: inset(0 0 0 0);
+        -webkit-clip-path: inset(0 0 0 0);
+      }
+      .fp-screen.fp-exit {
+        clip-path: inset(0 0 100% 0);
+        -webkit-clip-path: inset(0 0 100% 0);
+      }
+
+      /* コンテンツフェードイン */
+      .fp-screen .brand-content {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
+      }
+      .fp-screen.fp-active .brand-content,
+      .fp-screen.fp-behind .brand-content {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .fp-screen .section-fade-in {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
+        width: 100%;
+      }
+      .fp-screen.fp-active .section-fade-in,
+      .fp-screen.fp-behind .section-fade-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .fp-screen.fp-active .brand-bg,
+      .fp-screen.fp-behind .brand-bg { transform: scale(1); }
+
+      .fp-screen.fp-active .text-anim-target .fade-up,
+      .fp-screen.fp-behind .text-anim-target .fade-up  { transform: translateY(0); opacity: 1; }
+      .fp-screen.fp-active .text-anim-target .fade-left,
+      .fp-screen.fp-behind .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
+
+      .carousel-section.fp-screen {
+        min-height: unset;
+        height: 100vh;
+        padding: 100px 0;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      @media (max-width: 768px) {
+        .fp-screen {
+          position: relative;
+          clip-path: none;
+          -webkit-clip-path: none;
+          height: auto;
+          min-height: 100vh;
+        }
+      }
     </style>
 
     <script is:inline>
@@ -428,7 +445,7 @@ const languages = [
         let fpIndex = -1;
         let zone = 0;
         let isAnimating = false;
-        const ANIM_MS = 1300; // アニメーション待機時間
+        const ANIM_MS = 1300;
 
         document.body.classList.add('is-locked');
 
@@ -443,19 +460,16 @@ const languages = [
           dots.forEach((d, i) => d.classList.toggle('active', i === index));
         }
 
-        // 次へ
         function setFpScreen(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
             if (i === index)    el.classList.add('fp-active');
             else if (i < index) el.classList.add('fp-behind');
-            // i > index → clip-path:inset(100%) のまま（初期状態）
           });
           updateIndicator(index + 3);
           fpIndex = index;
         }
 
-        // 前へ
         function goFpBack(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
@@ -467,7 +481,6 @@ const languages = [
           fpIndex = index;
         }
 
-        // 画面1〜3スプリット
         function goToSlide(index) {
           isAnimating = true;
           currentSlide = index;
@@ -506,12 +519,10 @@ const languages = [
           const up   = e.deltaY < -10;
 
           if (zone === 0) {
-            // 画面1〜3ゾーン
             if (down) {
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
-                // 画面3→画面4
                 zone = 1;
                 isAnimating = true;
                 setFpScreen(0);
@@ -520,22 +531,17 @@ const languages = [
             } else if (up && currentSlide > 0) {
               goToSlide(currentSlide - 1);
             }
-
           } else {
-            // 画面4〜6ゾーン
             if (down && fpIndex < 2) {
               isAnimating = true;
               setFpScreen(fpIndex + 1);
               setTimeout(() => { isAnimating = false; }, ANIM_MS);
-
             } else if (up) {
               if (fpIndex > 0) {
-                // 画面5→4、画面6→5
                 isAnimating = true;
                 goFpBack(fpIndex - 1);
                 setTimeout(() => { isAnimating = false; }, ANIM_MS);
               } else {
-                // 画面4→画面3に戻る
                 zone = 0;
                 isAnimating = true;
                 FP_ELS[0].classList.remove('fp-active', 'fp-behind');
@@ -550,18 +556,15 @@ const languages = [
           }
         }, { passive: false });
 
-        // 初期化
         setTimeout(() => {
           document.querySelector('.left-track .p1').classList.add('is-active');
           document.querySelector('.right-track .p1').classList.add('is-active');
         }, 500);
 
-        // サイドメニュー
         const sideMenu = document.getElementById('side-menu');
         document.getElementById('menu-open').onclick  = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
-        // カルーセル
         const carouselObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => entry.target.classList.toggle('is-center', entry.isIntersecting));
         }, { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 });
