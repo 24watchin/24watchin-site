@@ -26,6 +26,34 @@ const languages = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>24watchin | Global Gateway</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style is:inline>
+      .fp-screen {
+        position: fixed !important;
+        top: 0 !important; left: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        clip-path: inset(100% 0 0 0) !important;
+        -webkit-clip-path: inset(100% 0 0 0) !important;
+        transition: clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1) !important;
+        background-color: #0d0d0d !important;
+        overflow: hidden !important;
+        min-height: unset !important;
+      }
+      #screen-4 { z-index: 30 !important; }
+      #screen-5 { z-index: 20 !important; }
+      #screen-6 { z-index: 10 !important; }
+      .fp-screen.fp-active  { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
+      .fp-screen.fp-behind  { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
+      .fp-screen.fp-exit    { clip-path: inset(0 0 100% 0) !important; -webkit-clip-path: inset(0 0 100% 0) !important; }
+      .fp-screen .brand-content { opacity: 0 !important; transform: translateY(30px) !important; transition: opacity 1.4s ease 0.5s, transform 1.4s ease 0.5s !important; }
+      .fp-screen.fp-active .brand-content { opacity: 1 !important; transform: translateY(0) !important; }
+      .fp-screen .section-fade-in { opacity: 0 !important; transform: translateY(40px) !important; transition: opacity 1.4s ease 0.5s, transform 1.4s ease 0.5s !important; width: 100% !important; }
+      .fp-screen.fp-active .section-fade-in { opacity: 1 !important; transform: translateY(0) !important; }
+      .fp-screen.fp-active .brand-bg { transform: scale(1) !important; }
+      .fp-screen.fp-active .text-anim-target .fade-up   { transform: translateY(0) !important; opacity: 1 !important; }
+      .fp-screen.fp-active .text-anim-target .fade-left { transform: translateX(0) !important; opacity: 1 !important; }
+      .carousel-section.fp-screen { display: flex !important; flex-direction: column !important; justify-content: center !important; padding: 100px 0 !important; box-sizing: border-box !important; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%) !important; }
+      @media (max-width: 768px) { .fp-screen { position: relative !important; clip-path: none !important; -webkit-clip-path: none !important; height: auto !important; min-height: 100vh !important; } }
+    </style>
   </head>
   <body class="is-locked">
 
@@ -113,7 +141,6 @@ const languages = [
 
     </main>
 
-    <!-- fp-screens: body直下 -->
     <section class="brand-section fp-screen" id="screen-4">
       <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
       <div class="brand-bg-overlay"></div>
@@ -253,70 +280,6 @@ const languages = [
       }
 
       /* ==========================================
-         フルページスタック（画面4〜6）
-      ========================================== */
-      .fp-screen {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        /* 下に隠す */
-        transform: translateY(100vh);
-        transition: transform 1.4s cubic-bezier(0.64, 0.04, 0.35, 1);
-        will-change: transform;
-        /* 背景を確実に持たせる */
-        background-color: var(--bg-color);
-      }
-      #screen-4 { z-index: 30; }
-      #screen-5 { z-index: 20; }
-      #screen-6 { z-index: 10; }
-
-      .fp-screen.fp-active { transform: translateY(0); }
-      .fp-screen.fp-behind { transform: translateY(0); }
-      .fp-screen.fp-exit   { transform: translateY(-100vh); }
-
-      /* コンテンツのフェードイン */
-      .fp-screen .brand-content {
-        opacity: 0; transform: translateY(30px);
-        transition: opacity 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s,
-                    transform 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s;
-      }
-      .fp-screen.fp-active .brand-content { opacity: 1; transform: translateY(0); }
-
-      .fp-screen .section-fade-in {
-        opacity: 0; transform: translateY(40px);
-        transition: opacity 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s,
-                    transform 1.4s cubic-bezier(0.2,0.8,0.2,1) 0.5s;
-        width: 100%;
-      }
-      .fp-screen.fp-active .section-fade-in { opacity: 1; transform: translateY(0); }
-
-      .fp-screen.fp-active .brand-bg { transform: scale(1); }
-      .fp-screen.fp-active .text-anim-target .fade-up   { transform: translateY(0); opacity: 1; }
-      .fp-screen.fp-active .text-anim-target .fade-left { transform: translateX(0); opacity: 1; }
-
-      /* carousel-sectionの高さ上書き */
-      .carousel-section.fp-screen {
-        min-height: unset !important;
-        height: 100vh;
-        padding: 100px 0;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        /* backgroundはcarousel-sectionから継承 */
-      }
-
-      @media (max-width: 768px) {
-        .fp-screen {
-          position: relative !important;
-          transform: none !important;
-          height: auto !important;
-          will-change: auto;
-        }
-        .carousel-section.fp-screen { min-height: 100vh !important; }
-      }
-
-      /* ==========================================
          4画面目：キャッチコピー画面
       ========================================== */
       .brand-section { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
@@ -437,25 +400,21 @@ const languages = [
           document.getElementById('screen-6'),
         ];
 
-        // ドットインジケーター
         const dots = document.querySelectorAll('.scroll-indicator .dot');
         function updateIndicator(index) {
           dots.forEach((d, i) => d.classList.toggle('active', i === index));
         }
 
-        // フルページ表示制御（次へ）
         function setFpScreen(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
             if (i === index)    el.classList.add('fp-active');
             else if (i < index) el.classList.add('fp-behind');
-            // i > index → 初期状態(translateY(100vh))のまま
           });
           updateIndicator(index + 3);
           fpIndex = index;
         }
 
-        // フルページ表示制御（前へ）
         function goFpBack(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
@@ -467,7 +426,6 @@ const languages = [
           fpIndex = index;
         }
 
-        // 画面1〜3：スプリット
         function goToSlide(index) {
           isAnimating = true;
           currentSlide = index;
@@ -498,7 +456,6 @@ const languages = [
           }, 1500);
         }
 
-        // ホイールイベント（しきい値10）
         window.addEventListener('wheel', (e) => {
           if (window.innerWidth <= 768) return;
           e.preventDefault();
@@ -520,7 +477,6 @@ const languages = [
             } else if (up && currentSlide > 0) {
               goToSlide(currentSlide - 1);
             }
-
           } else {
             if (down && fpIndex < 2) {
               isAnimating = true;
@@ -532,7 +488,6 @@ const languages = [
                 goFpBack(fpIndex - 1);
                 setTimeout(() => { isAnimating = false; }, 1500);
               } else {
-                // 画面4 → 画面3に戻る
                 zone = 0;
                 isAnimating = true;
                 FP_ELS[0].classList.remove('fp-active', 'fp-behind');
@@ -547,18 +502,15 @@ const languages = [
           }
         }, { passive: false });
 
-        // 初期化
         setTimeout(() => {
           document.querySelector('.left-track .p1').classList.add('is-active');
           document.querySelector('.right-track .p1').classList.add('is-active');
         }, 500);
 
-        // サイドメニュー
         const sideMenu = document.getElementById('side-menu');
         document.getElementById('menu-open').onclick  = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
-        // カルーセル
         const carouselObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             entry.target.classList.toggle('is-center', entry.isIntersecting);
