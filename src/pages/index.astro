@@ -33,7 +33,7 @@ const languages = [
         width: 100vw !important; height: 100vh !important;
         clip-path: inset(100% 0 0 0) !important;
         -webkit-clip-path: inset(100% 0 0 0) !important;
-        transition: clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1) !important;
+        transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1), -webkit-clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1) !important;
         background-color: #0d0d0d !important;
         overflow: hidden !important;
         min-height: unset !important;
@@ -41,18 +41,55 @@ const languages = [
       #screen-4 { z-index: 30 !important; }
       #screen-5 { z-index: 20 !important; }
       #screen-6 { z-index: 10 !important; }
-      .fp-screen.fp-active  { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
-      .fp-screen.fp-behind  { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
-      .fp-screen.fp-exit    { clip-path: inset(0 0 100% 0) !important; -webkit-clip-path: inset(0 0 100% 0) !important; }
-      .fp-screen .brand-content { opacity: 0 !important; transform: translateY(30px) !important; transition: opacity 1.4s ease 0.5s, transform 1.4s ease 0.5s !important; }
-      .fp-screen.fp-active .brand-content { opacity: 1 !important; transform: translateY(0) !important; }
-      .fp-screen .section-fade-in { opacity: 0 !important; transform: translateY(40px) !important; transition: opacity 1.4s ease 0.5s, transform 1.4s ease 0.5s !important; width: 100% !important; }
-      .fp-screen.fp-active .section-fade-in { opacity: 1 !important; transform: translateY(0) !important; }
-      .fp-screen.fp-active .brand-bg { transform: scale(1) !important; }
-      .fp-screen.fp-active .text-anim-target .fade-up   { transform: translateY(0) !important; opacity: 1 !important; }
-      .fp-screen.fp-active .text-anim-target .fade-left { transform: translateX(0) !important; opacity: 1 !important; }
-      .carousel-section.fp-screen { display: flex !important; flex-direction: column !important; justify-content: center !important; padding: 100px 0 !important; box-sizing: border-box !important; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%) !important; }
-      @media (max-width: 768px) { .fp-screen { position: relative !important; clip-path: none !important; -webkit-clip-path: none !important; height: auto !important; min-height: 100vh !important; } }
+
+      /* 表示中 */
+      .fp-screen.fp-active { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
+      /* 通過済み（後ろに残る） */
+      .fp-screen.fp-behind { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
+      /* 上に退場 */
+      .fp-screen.fp-exit   { clip-path: inset(0 0 100% 0) !important; -webkit-clip-path: inset(0 0 100% 0) !important; }
+
+      /* コンテンツ：fp-activeのときだけフェードイン */
+      .fp-screen .brand-content {
+        opacity: 0 !important;
+        transform: translateY(30px) !important;
+        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s !important;
+      }
+      /* fp-activeでもfp-behindでも表示する */
+      .fp-screen.fp-active .brand-content,
+      .fp-screen.fp-behind .brand-content {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+      }
+
+      .fp-screen .section-fade-in {
+        opacity: 0 !important;
+        transform: translateY(40px) !important;
+        transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s !important;
+        width: 100% !important;
+      }
+      .fp-screen.fp-active .section-fade-in,
+      .fp-screen.fp-behind .section-fade-in {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+      }
+
+      .fp-screen.fp-active .brand-bg,
+      .fp-screen.fp-behind .brand-bg { transform: scale(1) !important; }
+
+      .fp-screen.fp-active .text-anim-target .fade-up,
+      .fp-screen.fp-behind .text-anim-target .fade-up  { transform: translateY(0) !important; opacity: 1 !important; }
+      .fp-screen.fp-active .text-anim-target .fade-left,
+      .fp-screen.fp-behind .text-anim-target .fade-left { transform: translateX(0) !important; opacity: 1 !important; }
+
+      .carousel-section.fp-screen {
+        display: flex !important; flex-direction: column !important; justify-content: center !important;
+        padding: 100px 0 !important; box-sizing: border-box !important;
+        background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%) !important;
+      }
+      @media (max-width: 768px) {
+        .fp-screen { position: relative !important; clip-path: none !important; -webkit-clip-path: none !important; height: auto !important; min-height: 100vh !important; }
+      }
     </style>
   </head>
   <body class="is-locked">
@@ -391,6 +428,7 @@ const languages = [
         let fpIndex = -1;
         let zone = 0;
         let isAnimating = false;
+        const ANIM_MS = 1300; // アニメーション待機時間
 
         document.body.classList.add('is-locked');
 
@@ -405,16 +443,19 @@ const languages = [
           dots.forEach((d, i) => d.classList.toggle('active', i === index));
         }
 
+        // 次へ
         function setFpScreen(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
             if (i === index)    el.classList.add('fp-active');
             else if (i < index) el.classList.add('fp-behind');
+            // i > index → clip-path:inset(100%) のまま（初期状態）
           });
           updateIndicator(index + 3);
           fpIndex = index;
         }
 
+        // 前へ
         function goFpBack(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
@@ -426,6 +467,7 @@ const languages = [
           fpIndex = index;
         }
 
+        // 画面1〜3スプリット
         function goToSlide(index) {
           isAnimating = true;
           currentSlide = index;
@@ -435,7 +477,6 @@ const languages = [
           const l3 = document.querySelector('.left-track .p3');
           const r2 = document.querySelector('.right-track .p2');
           const r3 = document.querySelector('.right-track .p3');
-
           document.querySelectorAll('.desktop-only-area .panel').forEach(p => p.classList.remove('is-active'));
 
           if (index === 0) {
@@ -465,29 +506,36 @@ const languages = [
           const up   = e.deltaY < -10;
 
           if (zone === 0) {
+            // 画面1〜3ゾーン
             if (down) {
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
+                // 画面3→画面4
                 zone = 1;
                 isAnimating = true;
                 setFpScreen(0);
-                setTimeout(() => { isAnimating = false; }, 1500);
+                setTimeout(() => { isAnimating = false; }, ANIM_MS);
               }
             } else if (up && currentSlide > 0) {
               goToSlide(currentSlide - 1);
             }
+
           } else {
+            // 画面4〜6ゾーン
             if (down && fpIndex < 2) {
               isAnimating = true;
               setFpScreen(fpIndex + 1);
-              setTimeout(() => { isAnimating = false; }, 1500);
+              setTimeout(() => { isAnimating = false; }, ANIM_MS);
+
             } else if (up) {
               if (fpIndex > 0) {
+                // 画面5→4、画面6→5
                 isAnimating = true;
                 goFpBack(fpIndex - 1);
-                setTimeout(() => { isAnimating = false; }, 1500);
+                setTimeout(() => { isAnimating = false; }, ANIM_MS);
               } else {
+                // 画面4→画面3に戻る
                 zone = 0;
                 isAnimating = true;
                 FP_ELS[0].classList.remove('fp-active', 'fp-behind');
@@ -502,19 +550,20 @@ const languages = [
           }
         }, { passive: false });
 
+        // 初期化
         setTimeout(() => {
           document.querySelector('.left-track .p1').classList.add('is-active');
           document.querySelector('.right-track .p1').classList.add('is-active');
         }, 500);
 
+        // サイドメニュー
         const sideMenu = document.getElementById('side-menu');
         document.getElementById('menu-open').onclick  = () => sideMenu.classList.add('is-open');
         document.getElementById('menu-close').onclick = () => sideMenu.classList.remove('is-open');
 
+        // カルーセル
         const carouselObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            entry.target.classList.toggle('is-center', entry.isIntersecting);
-          });
+          entries.forEach(entry => entry.target.classList.toggle('is-center', entry.isIntersecting));
         }, { root: null, rootMargin: "0px -40% 0px -40%", threshold: 0 });
         document.querySelectorAll('.observer-card').forEach(card => carouselObserver.observe(card));
 
