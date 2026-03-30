@@ -101,6 +101,11 @@ const languages = [
         </div>
       </div>
 
+      <div class="brand-transition-overlay" id="screen-4-overlay" aria-hidden="true">
+        <div class="brand-transition-bg" style="background-image: url('/images/explanation.png');"></div>
+        <div class="brand-transition-bg-overlay"></div>
+      </div>
+
       <div class="mobile-only-area">
         <div style="height: 100vh; display: flex; align-items: center; justify-content: center; background: #111;">
           <p style="color: #666; font-size: 14px; letter-spacing: 2px;">スマホ版は準備中です</p>
@@ -245,10 +250,48 @@ const languages = [
       .panel.is-active .word-band { transform: translateX(0); }
       .panel.is-active .word-band h2 { opacity: 1; }
 
+      .brand-transition-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 150;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.9s ease, visibility 0s linear 0.9s;
+      }
+      .brand-transition-overlay.is-visible {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.9s ease;
+      }
+      .brand-transition-bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.6;
+        transform: translateY(120px) scale(1.12);
+        transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.2s ease;
+      }
+      .brand-transition-overlay.is-visible .brand-transition-bg {
+        transform: translateY(0) scale(1);
+      }
+      .brand-transition-bg-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
+        opacity: 0;
+        transition: opacity 1.2s ease;
+      }
+      .brand-transition-overlay.is-visible .brand-transition-bg-overlay {
+        opacity: 1;
+      }
+
       .mobile-only-area { display: none; }
       @media (max-width: 768px) {
         .desktop-only-area { display: none; }
         .mobile-only-area { display: block; }
+        .brand-transition-overlay { display: none; }
         body.is-locked { overflow: auto; } 
         .header-band { padding: 15px 20px; }
       }
@@ -351,6 +394,7 @@ const languages = [
       document.addEventListener('DOMContentLoaded', () => {
         const DESKTOP_BREAKPOINT = 768;
         const HERO_ANIM_MS = 1500;
+        const HERO_TO_BRAND_OVERLAY_MS = 1650;
         const SECTION_ANIM_MS = 1900;
         const FOOTER_ANIM_MS = 900;
 
@@ -366,6 +410,7 @@ const languages = [
         const screen5 = document.getElementById('screen-5');
         const screen6 = document.getElementById('screen-6');
         const textAnimTarget = screen4?.querySelector('.text-anim-target');
+        const screen4Overlay = document.getElementById('screen-4-overlay');
 
         const dots = document.querySelectorAll('.scroll-indicator .dot');
 
@@ -390,6 +435,10 @@ const languages = [
             if (i === index) dot.classList.add('active');
             else dot.classList.remove('active');
           });
+        }
+
+        function clearOverlayVisibility() {
+          screen4Overlay?.classList.remove('is-visible');
         }
 
         function clearSectionVisibility() {
@@ -446,10 +495,41 @@ const languages = [
           }, HERO_ANIM_MS);
         }
 
+        function transitionFromHeroToBrand() {
+          isFreeScroll = false;
+          setBodyLocked(true);
+          clearSectionVisibility();
+          clearOverlayVisibility();
+
+          screen4Overlay?.classList.add('is-visible');
+
+          window.setTimeout(() => {
+            screen4?.classList.add('is-visible');
+            setBodyLocked(false);
+
+            window.scrollTo({
+              top: screen4?.offsetTop ?? 0,
+              left: 0,
+              behavior: 'auto'
+            });
+
+            requestAnimationFrame(() => {
+              textAnimTarget?.classList.add('is-visible');
+            });
+
+            window.setTimeout(() => {
+              clearOverlayVisibility();
+              isAnimating = false;
+            }, 120);
+          }, HERO_TO_BRAND_OVERLAY_MS);
+        }
+
         function goToStep(step) {
           if (!isDesktop()) return;
           if (step < 0 || step > 5) return;
           if (isAnimating) return;
+
+          const previousStep = currentStep;
 
           isAnimating = true;
           currentStep = step;
@@ -458,6 +538,7 @@ const languages = [
           if (step <= 2) {
             isFreeScroll = false;
             setBodyLocked(true);
+            clearOverlayVisibility();
             clearSectionVisibility();
 
             window.scrollTo({
@@ -470,8 +551,14 @@ const languages = [
             return;
           }
 
+          if (step === 3 && previousStep === 2) {
+            transitionFromHeroToBrand();
+            return;
+          }
+
           isFreeScroll = false;
           setBodyLocked(false);
+          clearOverlayVisibility();
           showSection(step);
 
           const target =
@@ -495,6 +582,7 @@ const languages = [
           isAnimating = true;
           isFreeScroll = true;
           setBodyLocked(false);
+          clearOverlayVisibility();
 
           footer?.scrollIntoView({
             behavior: 'smooth',
@@ -585,11 +673,13 @@ const languages = [
             isAnimating = false;
             isFreeScroll = false;
             setBodyLocked(false);
+            clearOverlayVisibility();
             clearSectionVisibility();
           }
         });
 
         setBodyLocked(true);
+        clearOverlayVisibility();
         clearSectionVisibility();
         updateIndicator(0);
 
