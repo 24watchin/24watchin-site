@@ -739,7 +739,7 @@ const languages = [
       .section-fade-in {
         opacity: 0;
         transform: translateY(70px);
-        transition: opacity 1.45s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 1.05s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.05s cubic-bezier(0.2, 0.8, 0.2, 1);
         width: 100%;
         will-change: opacity, transform;
       }
@@ -1050,7 +1050,7 @@ const languages = [
         const MASK_OUT_MS = 340;
         const MASK_UNLOCK_MS = 120;
 
-        const SECTION_ANIM_MS = 320;
+        const SECTION_ANIM_MS = 240;
         const FOOTER_ANIM_MS = 900;
 
         let currentStep = 0;
@@ -1298,6 +1298,16 @@ const languages = [
 
           if (step === 4 && previousStep === 3) {
             transitionBrandToStories();
+            return;
+          }
+
+          if (step === 5 && previousStep === 4) {
+            transitionBetweenSections(5);
+            return;
+          }
+
+          if (step === 4 && previousStep === 5) {
+            transitionBetweenSections(4);
             return;
           }
 
