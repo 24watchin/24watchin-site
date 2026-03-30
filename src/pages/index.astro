@@ -107,12 +107,13 @@ const languages = [
         </div>
       </div>
 
-      <footer style="height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a;">
+      <footer style="height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333;">
+        <p style="color: #666; font-size: 14px;">[ フッター領域 ]</p>
       </footer>
 
     </main>
 
-    <!-- ▼ fp-screenはbody直下に置く（position:fixedをビューポート基準にするため） -->
+    <!-- fp-screens: body直下 -->
     <section class="brand-section fp-screen" id="screen-4">
       <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
       <div class="brand-bg-overlay"></div>
@@ -253,38 +254,25 @@ const languages = [
 
       /* ==========================================
          フルページスタック（画面4〜6）
-         clip-pathで表示制御（画面1〜3と同じ技法）
       ========================================== */
       .fp-screen {
         position: fixed;
         top: 0; left: 0;
-        width: 100%; height: 100vh;
-        /* 初期状態：下に隠す */
-        clip-path: inset(100% 0 0 0);
-        -webkit-clip-path: inset(100% 0 0 0);
-        transition: clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1),
-                    -webkit-clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1);
-        overflow: hidden;
+        width: 100vw; height: 100vh;
+        /* 下に隠す */
+        transform: translateY(100vh);
+        transition: transform 1.4s cubic-bezier(0.64, 0.04, 0.35, 1);
+        will-change: transform;
+        /* 背景を確実に持たせる */
+        background-color: var(--bg-color);
       }
       #screen-4 { z-index: 30; }
       #screen-5 { z-index: 20; }
       #screen-6 { z-index: 10; }
 
-      /* 表示中 */
-      .fp-screen.fp-active {
-        clip-path: inset(0 0 0 0);
-        -webkit-clip-path: inset(0 0 0 0);
-      }
-      /* 通過済み（後ろに残す） */
-      .fp-screen.fp-behind {
-        clip-path: inset(0 0 0 0);
-        -webkit-clip-path: inset(0 0 0 0);
-      }
-      /* 上に退場 */
-      .fp-screen.fp-exit {
-        clip-path: inset(0 0 100% 0);
-        -webkit-clip-path: inset(0 0 100% 0);
-      }
+      .fp-screen.fp-active { transform: translateY(0); }
+      .fp-screen.fp-behind { transform: translateY(0); }
+      .fp-screen.fp-exit   { transform: translateY(-100vh); }
 
       /* コンテンツのフェードイン */
       .fp-screen .brand-content {
@@ -308,23 +296,24 @@ const languages = [
 
       /* carousel-sectionの高さ上書き */
       .carousel-section.fp-screen {
-        min-height: unset;
+        min-height: unset !important;
         height: 100vh;
         padding: 100px 0;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        /* backgroundはcarousel-sectionから継承 */
       }
 
       @media (max-width: 768px) {
         .fp-screen {
-          position: relative;
-          clip-path: none !important;
-          -webkit-clip-path: none !important;
-          height: auto;
+          position: relative !important;
+          transform: none !important;
+          height: auto !important;
+          will-change: auto;
         }
-        .carousel-section.fp-screen { min-height: 100vh; height: auto; }
+        .carousel-section.fp-screen { min-height: 100vh !important; }
       }
 
       /* ==========================================
@@ -458,29 +447,21 @@ const languages = [
         function setFpScreen(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
-            if (i === index) {
-              el.classList.add('fp-active');
-            } else if (i < index) {
-              el.classList.add('fp-behind');
-            }
-            // i > index：初期状態(clip-path:inset(100%))のまま
+            if (i === index)    el.classList.add('fp-active');
+            else if (i < index) el.classList.add('fp-behind');
+            // i > index → 初期状態(translateY(100vh))のまま
           });
           updateIndicator(index + 3);
           fpIndex = index;
         }
 
-        // 戻るとき
+        // フルページ表示制御（前へ）
         function goFpBack(index) {
           FP_ELS.forEach((el, i) => {
             el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
-            if (i === index) {
-              el.classList.add('fp-active');
-            } else if (i < index) {
-              el.classList.add('fp-behind');
-            } else {
-              // 上に退場
-              el.classList.add('fp-exit');
-            }
+            if (i === index)    el.classList.add('fp-active');
+            else if (i < index) el.classList.add('fp-behind');
+            else                el.classList.add('fp-exit');
           });
           updateIndicator(index + 3);
           fpIndex = index;
@@ -517,21 +498,20 @@ const languages = [
           }, 1500);
         }
 
-        // ホイールイベント
+        // ホイールイベント（しきい値10）
         window.addEventListener('wheel', (e) => {
           if (window.innerWidth <= 768) return;
           e.preventDefault();
           if (isAnimating) return;
 
-          const down = e.deltaY > 50;
-          const up   = e.deltaY < -50;
+          const down = e.deltaY > 10;
+          const up   = e.deltaY < -10;
 
           if (zone === 0) {
             if (down) {
               if (currentSlide < 2) {
                 goToSlide(currentSlide + 1);
               } else {
-                // 画面3 → 画面4
                 zone = 1;
                 isAnimating = true;
                 setFpScreen(0);
@@ -546,7 +526,6 @@ const languages = [
               isAnimating = true;
               setFpScreen(fpIndex + 1);
               setTimeout(() => { isAnimating = false; }, 1500);
-
             } else if (up) {
               if (fpIndex > 0) {
                 isAnimating = true;
@@ -562,7 +541,7 @@ const languages = [
                 setTimeout(() => {
                   FP_ELS[0].classList.remove('fp-exit');
                   goToSlide(2);
-                }, 100);
+                }, 200);
               }
             }
           }
