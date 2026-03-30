@@ -253,23 +253,38 @@ const languages = [
 
       /* ==========================================
          フルページスタック（画面4〜6）
-         body直下に置いてposition:fixedをビューポート基準に
+         clip-pathで表示制御（画面1〜3と同じ技法）
       ========================================== */
       .fp-screen {
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100vh;
-        transform: translateY(100%);
-        transition: transform 1.4s cubic-bezier(0.64, 0.04, 0.35, 1);
+        /* 初期状態：下に隠す */
+        clip-path: inset(100% 0 0 0);
+        -webkit-clip-path: inset(100% 0 0 0);
+        transition: clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1),
+                    -webkit-clip-path 1.4s cubic-bezier(0.64, 0.04, 0.35, 1);
         overflow: hidden;
       }
-      /* z-index：先に出る画面ほど高く */
       #screen-4 { z-index: 30; }
       #screen-5 { z-index: 20; }
       #screen-6 { z-index: 10; }
 
-      .fp-screen.fp-active { transform: translateY(0); }
-      .fp-screen.fp-behind { transform: translateY(0); } /* 後ろに残る */
+      /* 表示中 */
+      .fp-screen.fp-active {
+        clip-path: inset(0 0 0 0);
+        -webkit-clip-path: inset(0 0 0 0);
+      }
+      /* 通過済み（後ろに残す） */
+      .fp-screen.fp-behind {
+        clip-path: inset(0 0 0 0);
+        -webkit-clip-path: inset(0 0 0 0);
+      }
+      /* 上に退場 */
+      .fp-screen.fp-exit {
+        clip-path: inset(0 0 100% 0);
+        -webkit-clip-path: inset(0 0 100% 0);
+      }
 
       /* コンテンツのフェードイン */
       .fp-screen .brand-content {
@@ -303,7 +318,12 @@ const languages = [
       }
 
       @media (max-width: 768px) {
-        .fp-screen { position: relative; transform: none !important; height: auto; }
+        .fp-screen {
+          position: relative;
+          clip-path: none !important;
+          -webkit-clip-path: none !important;
+          height: auto;
+        }
         .carousel-section.fp-screen { min-height: 100vh; height: auto; }
       }
 
@@ -434,36 +454,32 @@ const languages = [
           dots.forEach((d, i) => d.classList.toggle('active', i === index));
         }
 
-        // フルページ表示制御
+        // フルページ表示制御（次へ）
         function setFpScreen(index) {
           FP_ELS.forEach((el, i) => {
-            el.classList.remove('fp-active', 'fp-behind');
-            el.style.transform = '';
+            el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
             if (i === index) {
               el.classList.add('fp-active');
             } else if (i < index) {
-              // 通過済み：後ろに残す（次の画面が上から被さる）
               el.classList.add('fp-behind');
             }
-            // i > index：CSS初期値 translateY(100%) のまま
+            // i > index：初期状態(clip-path:inset(100%))のまま
           });
           updateIndicator(index + 3);
           fpIndex = index;
         }
 
-        // 戻るとき：現在の画面を下に送る
+        // 戻るとき
         function goFpBack(index) {
-          // 現在より大きいindex（上に来ていた画面）を下に戻す
           FP_ELS.forEach((el, i) => {
-            el.classList.remove('fp-active', 'fp-behind');
-            el.style.transform = '';
+            el.classList.remove('fp-active', 'fp-behind', 'fp-exit');
             if (i === index) {
               el.classList.add('fp-active');
             } else if (i < index) {
               el.classList.add('fp-behind');
             } else {
-              // 下に送る
-              el.style.transform = 'translateY(100%)';
+              // 上に退場
+              el.classList.add('fp-exit');
             }
           });
           updateIndicator(index + 3);
@@ -541,9 +557,12 @@ const languages = [
                 zone = 0;
                 isAnimating = true;
                 FP_ELS[0].classList.remove('fp-active', 'fp-behind');
-                FP_ELS[0].style.transform = 'translateY(100%)';
+                FP_ELS[0].classList.add('fp-exit');
                 fpIndex = -1;
-                setTimeout(() => { goToSlide(2); }, 100);
+                setTimeout(() => {
+                  FP_ELS[0].classList.remove('fp-exit');
+                  goToSlide(2);
+                }, 100);
               }
             }
           }
