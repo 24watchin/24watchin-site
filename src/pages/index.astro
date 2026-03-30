@@ -26,7 +26,7 @@ const languages = [
     <title>24watchin | Global Gateway</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   </head>
-  <body class="no-scroll-body">
+  <body>
 
     <header class="global-header" id="main-header">
       <div class="header-band">
@@ -55,7 +55,7 @@ const languages = [
       </div>
     </nav>
 
-    <main class="gateway-main" id="main-scroll">
+    <main class="gateway-main">
       
       <div class="desktop-split-wrapper">
         <div class="sticky-view">
@@ -174,10 +174,12 @@ const languages = [
       :root { --bg-color: #0d0d0d; --text-main: #f0f0f0; --font-sans: 'Noto Sans', sans-serif; }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       
-      /* スクロールの土台設定 */
-      .no-scroll-body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); overflow: hidden; height: 100vh; width: 100vw; }
-      .gateway-main { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
-      .snap-point { scroll-snap-align: start; width: 100%; }
+      /* ▼ 修正：Webサイト全体にスクロールスナップ（ピタッと止まる魔法）をかけます */
+      html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+      body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); overflow-x: hidden; margin: 0; }
+      
+      /* 各セクションの開始位置でピタッと止まる設定 */
+      .snap-point { scroll-snap-align: start; }
 
       /* ヘッダー */
       .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 200; transition: opacity 0.5s; }
@@ -196,16 +198,18 @@ const languages = [
       .menu-lang-card { padding: 40px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; transition: 0.3s; background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%); text-decoration: none; color: white;}
       .menu-lang-card:hover { border-color: var(--accent); transform: translateY(-5px); }
 
-      /* PCスプリットスクロール（抜けていた高さを追加しました！） */
-      .desktop-split-wrapper { position: relative; height: 300vh; }
-      .sticky-view { position: sticky; top: 0; height: 100vh; display: flex; overflow: hidden; }
-      .scroll-blocks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; }
-      .scroll-blocks .snap-point { height: 100vh; }
+      /* PCスプリットスクロール */
+      .desktop-split-wrapper { position: relative; height: 300vh; /* 3画面分の高さを確保 */ }
+      .sticky-view { position: sticky; top: 0; height: 100vh; display: flex; overflow: hidden; z-index: 1; }
+      
+      /* スクロールブロック（3画面分の長さを持ち、スナップの基準点になります） */
+      .scroll-blocks { position: relative; margin-top: -100vh; z-index: 2; pointer-events: none; }
+      .scroll-blocks .snap-point { height: 100vh; width: 100%; }
       
       .track { width: 50vw; height: 100vh; position: relative; }
       .panel { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
       
-      /* 画像の重なり順と初期の隠し方 */
+      /* 画像の重なり順をCSSでガッチリ固定 */
       .left-track .p1 { clip-path: inset(0 0 0 0); z-index: 1; }
       .left-track .p2 { clip-path: inset(100% 0 0 0); z-index: 2; }
       .left-track .p3 { clip-path: inset(100% 0 0 0); z-index: 3; }
@@ -216,23 +220,27 @@ const languages = [
 
       .bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
 
-      /* 文字の黒い座布団とスライドアニメーション */
+      /* ▼ 修正：文字がバグらずに必ず横からスライドする設定 */
       .word-band-container { 
         position: absolute; top: 50%; left: 50%; 
         transform: translate(-50%, -50%); 
-        overflow: hidden; 
         z-index: 10;
       }
       .word-band { 
         background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
         padding: 15px 50px; border-radius: 4px;
-        transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        /* 最初は透明にしておく */
+        opacity: 0; 
+        transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
       }
       .word-band h2 { color: #fff; font-weight: 300; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: 0.15em; margin: 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
       
-      .left-track .word-band { transform: translateX(-101%); }
-      .right-track .word-band { transform: translateX(101%); }
-      .panel.is-active .word-band { transform: translateX(0); transition-delay: 0.4s; }
+      /* 左右の少し外側からスタート */
+      .left-track .word-band { transform: translateX(-40px); }
+      .right-track .word-band { transform: translateX(40px); }
+      
+      /* 画像がめくり終わったら、フワッと現れて中央にスライドする */
+      .panel.is-active .word-band { opacity: 1; transform: translateX(0); transition-delay: 0.4s; }
 
       /* スマホ用 */
       @media (max-width: 768px) {
@@ -243,9 +251,9 @@ const languages = [
         .mobile-panel.is-visible .bg-layer { opacity: 1; transform: scale(1); }
         .dark-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
         
-        .mobile-panel .word-band-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; }
-        .mobile-panel .word-band { transform: translateY(100%); transition: transform 0.8s ease; }
-        .mobile-panel.is-visible .word-band { transform: translateY(0); transition-delay: 0.5s; }
+        .mobile-panel .word-band-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .mobile-panel .word-band { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .mobile-panel.is-visible .word-band { opacity: 1; transform: translateY(0); transition-delay: 0.5s; }
         
         .header-band { padding: 15px 20px; }
       }
@@ -296,7 +304,6 @@ const languages = [
 
     <script is:inline>
       document.addEventListener('DOMContentLoaded', () => {
-        const mainScroll = document.getElementById('main-scroll');
         const header = document.getElementById('main-header');
         
         const l1 = document.querySelector('.left-track .p1');
@@ -313,13 +320,18 @@ const languages = [
           r1.classList.add('is-active');
         }
 
-        // スクロール時の処理
-        mainScroll.addEventListener('scroll', () => {
+        // ▼ 全てのサイトで共通の「最も安全なスクロール監視（window scroll）」
+        window.addEventListener('scroll', () => {
           if (window.innerWidth <= 768) return;
 
-          const scrollTop = mainScroll.scrollTop;
+          const wrapper = document.querySelector('.desktop-split-wrapper');
+          if (!wrapper) return;
+
+          // スクロール量の計算
+          const rect = wrapper.getBoundingClientRect();
           const vh = window.innerHeight;
-          const progress = scrollTop / vh; 
+          // 上にスクロールした分を計算（0 から 2 の数値になります）
+          let progress = -rect.top / vh; 
 
           // 2組目の画像をめくる
           let p2 = Math.max(0, Math.min(1, progress));
@@ -334,11 +346,11 @@ const languages = [
           // ピタッと止まったら文字を出す
           allPanels.forEach(p => p.classList.remove('is-active'));
           
-          if (progress < 0.15) {
+          if (progress < 0.2) {
             l1.classList.add('is-active'); r1.classList.add('is-active');
-          } else if (progress > 0.85 && progress < 1.15) {
+          } else if (progress > 0.8 && progress < 1.2) {
             l2.classList.add('is-active'); r2.classList.add('is-active');
-          } else if (progress > 1.85 && progress < 2.15) {
+          } else if (progress > 1.8 && progress < 2.2) {
             l3.classList.add('is-active'); r3.classList.add('is-active');
           }
 
