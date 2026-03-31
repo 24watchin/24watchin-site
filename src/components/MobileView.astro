@@ -100,11 +100,11 @@ function getThumbnail(content) {
           <div class="m-word-band-container"><div class="m-word-band"><h2>CONFLICT</h2></div></div>
         </div>
         <div class="m-panel m-p2">
-          <div class="m-bg-layer" style="background-image: url('/images/cities.webp');"></div>
+          <div class="m-bg-layer" style="background-image: url('/images/cities.webp'); background-position: center 20%;"></div>
           <div class="m-word-band-container"><div class="m-word-band"><h2>CITIES</h2></div></div>
         </div>
         <div class="m-panel m-p3">
-          <div class="m-bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
+          <div class="m-bg-layer" style="background-image: url('/images/innovation.jpg'); background-position: center 15%;"></div>
           <div class="m-word-band-container"><div class="m-word-band"><h2>INNOVATION</h2></div></div>
         </div>
       </div>
@@ -272,7 +272,7 @@ function getThumbnail(content) {
 </div>
 
 <style>
-  /* 画面幅が768px（スマホや小さめタブレット）以下の時だけこの設定を有効にします */
+  /* 画面幅が768px以上の時は表示しない */
   @media (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
@@ -282,6 +282,9 @@ function getThumbnail(content) {
       display: block;
       -webkit-user-select: none;
       user-select: none;
+      /* ▼ PC版が裏にあっても絶対に透けないバリアを設定 ▼ */
+      position: relative;
+      z-index: 9999;
       background: #010411;
     }
     
@@ -289,7 +292,7 @@ function getThumbnail(content) {
       overflow: hidden !important;
     }
     
-    .m-global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
+    .m-global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 10000; pointer-events: none; }
     .m-header-band { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
     .m-logo-area a { text-decoration: none; outline: none; }
     .m-header-logo-img { height: 32px; width: auto; filter: brightness(0) invert(1); } 
@@ -297,7 +300,7 @@ function getThumbnail(content) {
     .m-menu-trigger { background: none; border: none; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 5px; }
     .m-burger-line { width: 24px; height: 2px; background: #fff; border-radius: 2px; }
     
-    .m-side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; height: 100dvh; background: rgba(10, 10, 10, 0.98); z-index: 400; transition: right 0.4s ease; padding: 60px 20px; overflow-y: auto; }
+    .m-side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; height: 100dvh; background: rgba(10, 10, 10, 0.98); z-index: 10100; transition: right 0.4s ease; padding: 60px 20px; overflow-y: auto; }
     .m-side-menu.is-open { right: 0; }
     .m-menu-close { position: absolute; top: 20px; right: 20px; font-size: 36px; background: none; border: none; color: #fff; }
     .m-menu-inner { width: 100%; text-align: center; margin-top: 40px; }
@@ -305,46 +308,52 @@ function getThumbnail(content) {
     .m-menu-grid { display: flex; flex-direction: column; gap: 12px; }
     .m-menu-lang-card { padding: 20px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; background-color: var(--accent); text-decoration: none; color: white; }
     
-    /* スマホは画面の右端にスクロールの目印を小さく表示します */
-    .m-scroll-indicator { position: fixed; top: 50%; right: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 500; }
+    /* スマホ用のスクロールインジケーター */
+    .m-scroll-indicator { position: fixed; top: 50%; right: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10000; }
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    .m-transition-mask { position: fixed; inset: 0; z-index: 220; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease; }
+    .m-transition-mask { position: fixed; inset: 0; z-index: 10050; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease; }
     .m-transition-mask.is-visible { opacity: 1; visibility: visible; }
     
-    .m-sequence { position: fixed; inset: 0; z-index: 120; opacity: 1; visibility: visible; height: 100vh; height: 100dvh; }
+    .m-sequence { position: fixed; inset: 0; z-index: 9999; opacity: 1; visibility: visible; height: 100vh; height: 100dvh; }
     .m-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; }
     
-    /* ▼ スマホ専用：上下2段の分割レイアウト ▼ */
+    /* スマホ専用：上下2段の分割レイアウト */
     .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
     
     .m-panel { position: absolute; inset: 0; overflow: hidden; }
     .m-bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
     
-    /* 上半分のスライド（上から下へ降りてくるアニメーション） */
     .m-top-track .m-p1 { z-index: 1; }
     .m-top-track .m-p2 { z-index: 2; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
     .m-top-track .m-p3 { z-index: 3; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
     
-    /* 下半分のスライド（下から上へ上がってくるアニメーション） */
     .m-bottom-track .m-p1 { z-index: 1; }
     .m-bottom-track .m-p2 { z-index: 2; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
     .m-bottom-track .m-p3 { z-index: 3; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
     
     .m-panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
     
-    /* 文字盤も上下それぞれの中央に配置します */
-    .m-word-band-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; overflow: hidden; }
-    .m-word-band { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(8px); padding: 8px 24px; display: flex; align-items: center; border-radius: 4px; transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    /* ▼ 帯を画面幅いっぱいにし、位置を中央から少し下(65%)に設定 ▼ */
+    .m-word-band-container { position: absolute; top: 65%; width: 100%; z-index: 10; overflow: hidden; }
     
-    .m-top-track .m-word-band { transform: translateY(-150%); }
-    .m-bottom-track .m-word-band { transform: translateY(150%); }
+    .m-top-track .m-word-band-container { left: 0; }
+    .m-bottom-track .m-word-band-container { right: 0; }
     
-    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.4rem; letter-spacing: 0.15em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
+    .m-word-band { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(8px); width: 100%; padding: 12px 30px; display: flex; align-items: center; transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
     
-    .m-panel.is-active .m-word-band { transform: translateY(0); }
+    /* 上部の画像は帯が左から右へ（左寄せ） */
+    .m-top-track .m-word-band { justify-content: flex-start; transform: translateX(-100%); }
+    
+    /* 下部の画像は帯が右から左へ（右寄せ） */
+    .m-bottom-track .m-word-band { justify-content: flex-end; transform: translateX(100%); }
+    
+    /* ▼ タイトルの文字サイズを 1.1rem に小さく調整 ▼ */
+    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.2em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
+    
+    .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
     
     /* ブランドパネル */
@@ -372,18 +381,17 @@ function getThumbnail(content) {
     
     /* 共通パネル設定 */
     .m-seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-    #m-screen-6 { z-index: 41; padding-bottom: 220px; } /* スマホのフッターの高さ分だけ上にあげます */
+    #m-screen-6 { z-index: 41; padding-bottom: 220px; } 
     .m-seq-panel.is-visible { visibility: visible; pointer-events: auto; }
     .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
     .m-seq-panel.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); }
     .m-section-header { text-align: center; margin-bottom: 30px; }
     .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
     
-    /* スマホ用カルーセル（横スクロール）設定 */
+    /* スマホ用カルーセル設定 */
     .m-carousel-wrapper { position: relative; width: 100%; }
     .m-no-link-color { color: inherit !important; text-decoration: none !important; }
     
-    /* スマホではカードを少し横幅広めにして見やすくします */
     .m-observer-card { 
       scroll-snap-align: center; flex: 0 0 75vw; height: 45vh; margin: 0 3vw;
       position: relative; border-radius: 8px; overflow: hidden; 
@@ -393,7 +401,6 @@ function getThumbnail(content) {
     }
     .m-observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); z-index: 10; }
     
-    /* ニュースカード */
     .m-card-img-box { width: 100%; height: 60%; position: relative; overflow: hidden; }
     .m-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.6s ease; }
     .m-card-text-box { width: 100%; height: 40%; padding: 15px; background: linear-gradient(to bottom, #050b1e, #02040a); display: flex; flex-direction: column; justify-content: center; }
@@ -403,7 +410,6 @@ function getThumbnail(content) {
     .m-card-date { color: #888; font-size: 10px; margin-bottom: 6px; }
     .m-card-title { font-size: 1.1rem; font-weight: 400; line-height: 1.3; margin: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     
-    /* 言語カード */
     .m-lang-card { flex: 0 0 70vw; height: 35vh; display: flex; align-items: center; justify-content: center; }
     .m-lang-card::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 5; pointer-events: none; transition: all 0.4s ease; }
     .m-lang-card.is-center::before { top: 15px; left: 15px; right: 15px; bottom: 15px; border-color: rgba(255, 255, 255, 0.6); }
@@ -414,10 +420,9 @@ function getThumbnail(content) {
     .m-lang-border { width: 0; height: 1px; background: #fff; margin: 15px auto 0; transition: width 0.6s ease; opacity: 0.5; }
     .m-lang-card.is-center .m-lang-border { width: 30px; }
     
-    /* スマホは指で横にスクロールするため、矢印ボタンは消し、下のドットだけにします */
     .m-carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; touch-action: pan-x; }
     .m-carousel-container::-webkit-scrollbar { display: none; }
-    .m-carousel-spacer { flex: 0 0 calc(50vw - 40vw); } /* スマホ用の余白計算 */
+    .m-carousel-spacer { flex: 0 0 calc(50vw - 40vw); } 
     .m-carousel-bottom-nav { display: flex; align-items: center; justify-content: center; margin-top: 20px; }
     .m-carousel-dots-wrapper { display: flex; gap: 8px; }
     .m-c-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
@@ -437,12 +442,11 @@ function getThumbnail(content) {
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-    // このスクリプトはスマホ画面（768px以下）の時だけ動きます
     if (window.innerWidth > 768) return;
 
     try {
       const HERO_ANIM_MS = 1200;
-      const SWIPE_THRESHOLD = 40; // 指でスワイプしたと判定する距離
+      const SWIPE_THRESHOLD = 40; 
 
       let currentStep = 0;
       let isAnimating = false;
@@ -469,14 +473,13 @@ function getThumbnail(content) {
       menuOpenBtn?.addEventListener('click', () => { sideMenu?.classList.add('is-open'); });
       menuCloseBtn?.addEventListener('click', () => { sideMenu?.classList.remove('is-open'); });
 
-      // スマホでは指の動き（タッチ）で画面を切り替えます
+      // スマホの指の動き（スワイプ）を感知するプログラム
       window.addEventListener('touchstart', (e) => {
         if (sideMenu?.classList.contains('is-open')) return;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
       }, { passive: true });
 
-      // カル―セル以外の場所で画面がビヨンビヨン動くのを防ぎます
       window.addEventListener('touchmove', (e) => {
         if (sideMenu?.classList.contains('is-open') || isFreeScroll) return;
         if (!e.target.closest('.m-carousel-container')) {
@@ -492,11 +495,10 @@ function getThumbnail(content) {
         const diffX = startX - endX;
         const diffY = startY - endY;
 
-        // 横にスワイプした時はカルーセルを回すため、画面切り替えは無視します
+        // 横スワイプはカルーセルの移動に使うため無視
         if (Math.abs(diffX) > Math.abs(diffY)) return;
 
         if (isFreeScroll) {
-          // フッターにいる時に上へスワイプしたら、言語選択画面に戻ります
           if (diffY < -SWIPE_THRESHOLD && window.scrollY <= 10) {
              leaveFooterMode();
           }
@@ -538,6 +540,12 @@ function getThumbnail(content) {
         window.setTimeout(() => { isAnimating = false; }, 1800);
       }
 
+      function hideBrandAnimated() {
+        brandTextTarget?.classList.remove('is-visible');
+        brandPanel?.classList.remove('is-bg', 'is-night');
+        window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, 600);
+      }
+
       function activateHeroSlide(index) {
         topPanels.forEach(panel => panel.classList.remove('is-active', 'is-open'));
         bottomPanels.forEach(panel => panel.classList.remove('is-active', 'is-open'));
@@ -550,6 +558,31 @@ function getThumbnail(content) {
           if(bottomPanels.length > index) bottomPanels[index].classList.add('is-active'); 
           isAnimating = false; 
         }, HERO_ANIM_MS);
+      }
+
+      function transitionBrandToStories() {
+        showMask();
+        window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 800);
+      }
+
+      function transitionStoriesToBrand() {
+        showMask();
+        window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 800);
+      }
+
+      function transitionBetweenSections(targetStep) {
+        showMask();
+        window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 800);
+      }
+
+      function transitionBrandToHero() {
+        showMask();
+        window.setTimeout(() => {
+          resetBrandPanel(); 
+          clearSectionVisibility();
+          activateHeroSlide(2); 
+          hideMask();
+        }, 800);
       }
 
       function goToStep(step) {
@@ -610,7 +643,6 @@ function getThumbnail(content) {
         window.setTimeout(() => { isFreeScroll = false; setBodyLocked(true); goToStep(5); isAnimating = false; }, 400); 
       }
 
-      // カルーセル（横スライド）が画面の真ん中に来たらドットを光らせる機能
       function setupObserver(containerId, cardsClass, dotsId) {
         const container = document.getElementById(containerId);
         const cards = document.querySelectorAll(`${cardsClass}`);
