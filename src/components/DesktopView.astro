@@ -239,6 +239,25 @@ function getThumbnail(content) {
           </div>
         </div>
       </div>
+
+      <footer class="top-footer">
+        <div class="top-footer-inner">
+          <div class="top-footer-logo">
+            <img src="/images/24Watchin-white.png" alt="24Watchin Logo" />
+          </div>
+          <div class="top-footer-right">
+            <div class="top-footer-links">
+              <a href="/info/about/">ABOUT 24WATCHIN</a>
+              <a href="/info/privacy/">PRIVACY POLICY</a>
+              <a href="/info/terms/">TERMS OF USE</a>
+              <a href="/info/contact/">CONTACT</a>
+            </div>
+            <div class="top-footer-copy">
+              &copy; 2026 The Dexent Media Enterprises. All Rights Reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
     </section>
 
   </div>
@@ -250,22 +269,6 @@ function getThumbnail(content) {
     </div>
   </section>
 
-  <footer class="top-footer">
-    <div class="top-footer-inner">
-      <div class="top-footer-logo">
-        <img src="/images/24Watchin-white.png" alt="24Watchin Logo" />
-      </div>
-      <div class="top-footer-links">
-        <a href="/info/about/">ABOUT 24WATCHIN</a>
-        <a href="/info/privacy/">PRIVACY POLICY</a>
-        <a href="/info/terms/">TERMS OF USE</a>
-        <a href="/info/contact/">CONTACT</a>
-      </div>
-      <div class="top-footer-copy">
-        &copy; 2026 The Dexent Media Enterprises. All Rights Reserved.
-      </div>
-    </div>
-  </footer>
 </div>
 
 <style>
@@ -274,11 +277,6 @@ function getThumbnail(content) {
     user-select: none;
   }
   
-  /* スライド中に間違ってスクロールしないように強制ロックする設定を追加しました */
-  html.is-locked, body.is-locked {
-    overflow: hidden !important;
-  }
-
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
@@ -328,7 +326,7 @@ function getThumbnail(content) {
   .brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
   .brand-panel.is-visible { visibility: visible; }
   .seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-  #screen-6 { z-index: 41; }
+  #screen-6 { z-index: 41; padding-bottom: 110px; } /* フッターの高さ分だけ中央位置を上にずらして重なりを防ぎます */
   .seq-panel.is-visible { visibility: visible; pointer-events: auto; }
   .seq-inner { width: 100%; opacity: 0; transform: translateY(40px); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s; }
   .seq-panel.is-visible .seq-inner { opacity: 1; transform: translateY(0); }
@@ -424,44 +422,45 @@ function getThumbnail(content) {
   .desktop-only-wrapper { display: block; }
   @media (max-width: 768px) { .desktop-only-wrapper { display: none; } }
 
-  /* スライド画面に重なって表示されるように z-index を 200 に修正しました */
+  /* ▼ 画面6の底面にピタッと張り付く夜空色のフッター ▼ */
   .top-footer { 
-    height: auto; 
-    min-height: 250px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    background: #02040a; 
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #091225; /* 夜空の濃い青色 */
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
-    padding: 60px 20px; 
-    position: relative; 
-    z-index: 200; 
+    padding: 30px 50px; /* 一番上のヘッダーと完全に同じ余白 */
+    box-sizing: border-box;
+    z-index: 100;
   }
   .top-footer-inner { 
     display: flex; 
-    flex-direction: column; 
     align-items: center; 
-    gap: 30px; 
-    max-width: 800px; 
+    justify-content: space-between; /* ロゴを左、その他を右に配置 */
     width: 100%; 
   }
   .top-footer-logo img { 
-    height: 24px; 
+    height: 48px; /* 一番上のヘッダーロゴと完全に同じ高さ */
     width: auto; 
-    opacity: 0.4; 
+    opacity: 0.8; 
     transition: opacity 0.3s ease; 
   }
   .top-footer-logo img:hover { 
     opacity: 1; 
   }
+  .top-footer-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* 右端に揃える */
+    gap: 8px;
+  }
   .top-footer-links { 
     display: flex; 
-    flex-wrap: wrap; 
-    justify-content: center; 
-    gap: 20px 40px; 
+    gap: 24px; 
   }
   .top-footer-links a { 
-    color: #666; 
+    color: #a0aec0; 
     font-size: 11px; 
     text-decoration: none; 
     letter-spacing: 2px; 
@@ -471,11 +470,9 @@ function getThumbnail(content) {
     color: #fff; 
   }
   .top-footer-copy { 
-    color: #444; 
+    color: #4a5568; 
     font-size: 10px; 
     letter-spacing: 1px; 
-    margin-top: 20px; 
-    text-align: center; 
   }
 </style>
 
@@ -500,10 +497,8 @@ function getThumbnail(content) {
 
     let currentStep = 0;
     let isAnimating = false;
-    let isFreeScroll = false;
 
     const body = document.body;
-    const html = document.documentElement;
     const desktopSequence = document.getElementById('desktop-sequence');
     const brandPanel = document.getElementById('brand-panel');
     const brandTextTarget = document.getElementById('brand-text-target');
@@ -520,10 +515,9 @@ function getThumbnail(content) {
 
     function isDesktop() { return window.innerWidth > DESKTOP_BREAKPOINT; }
     
-    // スクロールをロック・解除する処理
+    // スクロールロック機能（フッターを画面6の一部にしたため、途中でロック解除する複雑な処理をなくしました）
     function setBodyLocked(locked) { 
       body.classList.toggle('is-locked', locked); 
-      html.classList.toggle('is-locked', locked); 
     }
     
     function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
@@ -600,7 +594,6 @@ function getThumbnail(content) {
       updateIndicator(step);
 
       if (step <= 2) {
-        isFreeScroll = false;
         setBodyLocked(true);
         desktopSequence?.classList.remove('is-hidden');
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -609,7 +602,6 @@ function getThumbnail(content) {
       }
 
       if (step === 3) {
-        isFreeScroll = false;
         setBodyLocked(true);
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         if (previousStep === 4) { transitionStoriesToBrand(); return; }
@@ -627,45 +619,11 @@ function getThumbnail(content) {
       window.setTimeout(() => { isAnimating = false; }, 300);
     }
 
-    // 画面ロックを解除して一番下（フッター）までスムーズにスクロールさせる処理
-    function enterFooterMode() { 
-      if (isAnimating) return; 
-      isAnimating = true; 
-      isFreeScroll = true; // 自由にスクロールできるモードにする
-      setBodyLocked(false); // 画面のロックを外す
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); // 一番下へスクロール
-      window.setTimeout(() => { isAnimating = false; }, 600); 
-    }
-    
-    // フッターから元の言語選択スライドに戻る処理
-    function leaveFooterMode() { 
-      if (isAnimating) return; 
-      isAnimating = true; 
-      window.scrollTo({ top: 0, behavior: 'smooth' }); // 一番上へスムーズに戻る
-      window.setTimeout(() => { 
-        isFreeScroll = false; // 自由スクロールモードを終了
-        setBodyLocked(true); // 再び画面をロック
-        goToStep(5); // 言語選択画面に戻す
-        isAnimating = false; 
-      }, 500); 
-    }
-    
-    function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } else { enterFooterMode(); } }
+    function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
     function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
 
     window.addEventListener('wheel', (e) => {
       if (!isDesktop() || document.getElementById('side-menu')?.classList.contains('is-open')) return;
-      
-      // フッターが見えている（自由にスクロールできる）状態の時の動作
-      if (isFreeScroll) {
-        // もし画面の一番上（scrollYが10以下）にいて、さらに上にスクロールしようとしたら、スライド画面に戻す
-        if (e.deltaY < -WHEEL_THRESHOLD && window.scrollY <= 10) { 
-          e.preventDefault(); 
-          leaveFooterMode(); 
-        }
-        return;
-      }
-      
       e.preventDefault();
       if (isAnimating) return;
       if (e.deltaY > WHEEL_THRESHOLD) moveNext(); 
