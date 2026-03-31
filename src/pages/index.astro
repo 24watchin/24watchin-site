@@ -1,14 +1,11 @@
 ---
 import DesktopView from '../components/DesktopView.astro';
 import MobileView from '../components/MobileView.astro';
-// 各言語のブログIDを取得するツールを読み込みます
 import { getBlogId } from '../lib/siteRoutes.ts';
 
-// Blogger APIの鍵と、英語(en)のブログIDを準備します
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId('en');
 
-// 他のページと通信内容を共有する安全なキャッシュ機能
 if (!globalThis.bloggerApiCache) {
   globalThis.bloggerApiCache = {};
 }
@@ -16,18 +13,17 @@ if (!globalThis.bloggerApiCache) {
 let englishPosts = [];
 if (API_KEY && BLOG_ID) {
   if (!globalThis.bloggerApiCache[BLOG_ID]) {
-    // トップページ用なので、最新の5件だけ取得します
-    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=5`;
+    // 確実にデータが取れるように少し多め（10件）に取得リクエストを出します
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
     globalThis.bloggerApiCache[BLOG_ID] = fetch(url)
       .then(res => res.ok ? res.json() : null)
       .then(data => data && data.items ? data.items : [])
-      .catch(() => []); // エラー時は空箱を返す安全設計
+      .catch(() => []); // エラーが起きたら「空の箱（0件）」を返す安全装置
   }
-  // 取得完了を待って記事データを受け取ります
   englishPosts = await globalThis.bloggerApiCache[BLOG_ID];
 }
 
-// 最新5件のデータをまとめます
+// 取得した中から最新5件を切り出します
 const topStories = englishPosts.slice(0, 5);
 ---
 
