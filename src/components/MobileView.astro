@@ -104,7 +104,7 @@ function getThumbnail(content) {
           <div class="m-word-band-container"><div class="m-word-band"><h2>CITIES</h2></div></div>
         </div>
         <div class="m-panel m-p3">
-          <div class="m-bg-layer" style="background-image: url('/images/innovation.jpg'); background-position: center 15%;"></div>
+          <div class="m-bg-layer" style="background-image: url('/images/innovation.jpg'); background-position: center 20%;"></div>
           <div class="m-word-band-container"><div class="m-word-band"><h2>INNOVATION</h2></div></div>
         </div>
       </div>
@@ -272,7 +272,7 @@ function getThumbnail(content) {
 </div>
 
 <style>
-  /* 画面幅が768px以上の時は表示しない */
+  /* 画面幅が768px以上の時は完全に隠す */
   @media (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
@@ -282,7 +282,7 @@ function getThumbnail(content) {
       display: block;
       -webkit-user-select: none;
       user-select: none;
-      /* ▼ PC版が裏にあっても絶対に透けないバリアを設定 ▼ */
+      /* PC版が裏にあっても絶対に透けないようにする強力なバリア */
       position: relative;
       z-index: 9999;
       background: #010411;
@@ -308,7 +308,6 @@ function getThumbnail(content) {
     .m-menu-grid { display: flex; flex-direction: column; gap: 12px; }
     .m-menu-lang-card { padding: 20px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; background-color: var(--accent); text-decoration: none; color: white; }
     
-    /* スマホ用のスクロールインジケーター */
     .m-scroll-indicator { position: fixed; top: 50%; right: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10000; }
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
@@ -319,7 +318,6 @@ function getThumbnail(content) {
     .m-sequence { position: fixed; inset: 0; z-index: 9999; opacity: 1; visibility: visible; height: 100vh; height: 100dvh; }
     .m-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; }
     
-    /* スマホ専用：上下2段の分割レイアウト */
     .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
     
@@ -336,27 +334,27 @@ function getThumbnail(content) {
     
     .m-panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
     
-    /* ▼ 帯を画面幅いっぱいにし、位置を中央から少し下(65%)に設定 ▼ */
+    /* ▼ 帯を画面の幅いっぱい（100%）に広げ、位置を中央から少し下に（top: 65%）設定 ▼ */
     .m-word-band-container { position: absolute; top: 65%; width: 100%; z-index: 10; overflow: hidden; }
     
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
     
+    /* ▼ 帯の背景色と幅の調整 ▼ */
     .m-word-band { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(8px); width: 100%; padding: 12px 30px; display: flex; align-items: center; transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
     
-    /* 上部の画像は帯が左から右へ（左寄せ） */
+    /* 上部の画像は左から右へスライドイン（左寄せ） */
     .m-top-track .m-word-band { justify-content: flex-start; transform: translateX(-100%); }
     
-    /* 下部の画像は帯が右から左へ（右寄せ） */
+    /* 下部の画像は右から左へスライドイン（右寄せ） */
     .m-bottom-track .m-word-band { justify-content: flex-end; transform: translateX(100%); }
     
-    /* ▼ タイトルの文字サイズを 1.1rem に小さく調整 ▼ */
-    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.2em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
+    /* ▼ タイトルの文字サイズを 1.1rem に小さくし、文字間隔を調整 ▼ */
+    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.25em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
     
-    /* ブランドパネル */
     .m-brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
     .m-brand-panel.is-visible { visibility: visible; }
     .m-brand-night { position: absolute; inset: 0; opacity: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); transition: opacity 0.6s ease; }
@@ -379,7 +377,6 @@ function getThumbnail(content) {
     .m-text-anim-target.is-visible .m-anim-desc2 { transition-delay: 1.8s; }
     .m-text-anim-target.is-visible .m-anim-desc3 { transition-delay: 2.4s; }
     
-    /* 共通パネル設定 */
     .m-seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
     #m-screen-6 { z-index: 41; padding-bottom: 220px; } 
     .m-seq-panel.is-visible { visibility: visible; pointer-events: auto; }
@@ -388,7 +385,6 @@ function getThumbnail(content) {
     .m-section-header { text-align: center; margin-bottom: 30px; }
     .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
     
-    /* スマホ用カルーセル設定 */
     .m-carousel-wrapper { position: relative; width: 100%; }
     .m-no-link-color { color: inherit !important; text-decoration: none !important; }
     
@@ -428,7 +424,6 @@ function getThumbnail(content) {
     .m-c-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-c-dot.active { background: #fff; transform: scale(1.5); }
     
-    /* スマホ専用フッター */
     .m-top-footer { position: absolute; bottom: 0; left: 0; width: 100%; background: #393737; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 20px; box-sizing: border-box; z-index: 100; }
     .m-top-footer-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
     .m-top-footer-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
@@ -442,6 +437,7 @@ function getThumbnail(content) {
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
+    // このスクリプトはスマホ画面（768px以下）の時だけ動きます
     if (window.innerWidth > 768) return;
 
     try {
@@ -495,7 +491,6 @@ function getThumbnail(content) {
         const diffX = startX - endX;
         const diffY = startY - endY;
 
-        // 横スワイプはカルーセルの移動に使うため無視
         if (Math.abs(diffX) > Math.abs(diffY)) return;
 
         if (isFreeScroll) {
