@@ -404,6 +404,7 @@ const languages = [
         background: rgba(255, 255, 255, 0.9);
       }
 
+      /* ▼ 修正：幕がゆっくり0.8秒かけて下り、上がるようにしました ▼ */
       .transition-mask {
         position: fixed;
         inset: 0;
@@ -412,13 +413,13 @@ const languages = [
         visibility: hidden;
         pointer-events: none;
         background: #050b18;
-        transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+        transition: opacity 0.8s ease, visibility 0s linear 0.8s;
       }
 
       .transition-mask.is-visible {
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.25s ease;
+        transition: opacity 0.8s ease;
       }
 
       .line-wipe {
@@ -1084,10 +1085,11 @@ const languages = [
         const BRAND_UNLOCK_MS = 2300;
         const BRAND_HIDE_MS = 500;
 
-        const MASK_IN_MS  = 280;   
-        const MASK_HOLD_MS = 30;
-        const MASK_OUT_MS  = 250;
-        const MASK_UNLOCK_MS = 50;
+        // ▼ 修正：幕の上がり下がりを0.8秒ずつ（合計約1.6秒）かけて、ゆっくりじわーっと切り替わるようにしました ▼
+        const MASK_IN_MS  = 800;   
+        const MASK_HOLD_MS = 50;
+        const MASK_OUT_MS  = 800;
+        const MASK_UNLOCK_MS = 100;
 
         const LINE_WIPE_MS = 650;      
         const LINE_FADE_MS = 300;      
@@ -1312,7 +1314,6 @@ const languages = [
             isFreeScroll = false;
             setBodyLocked(true);
 
-            // ▼ 修正：ここでトップに戻してから、幕が完全に下りてから裏側を準備する正しい手順に変更 ▼
             window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
             
             if (previousStep === 4) {
