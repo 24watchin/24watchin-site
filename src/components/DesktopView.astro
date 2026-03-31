@@ -1,10 +1,23 @@
 ---
-// 司令塔から「本物の最新記事データ」を受け取ります
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+
+// 司令塔から記事データを受け取ります
 const { latestStories = [] } = Astro.props;
 
-// ▼ 修正④：アップロードいただいた設計図から、英語のカテゴリ翻訳ルールを読み込みます
-import { categoryLabelMap } from '../lib/categoryLabels.ts';
-const enCategories = categoryLabelMap['en'].allCategories;
+// 英語のカテゴリ翻訳ルールを読み込みます（エラーが起きないよう安全に処理）
+const enCategories = categoryLabelMap?.['en']?.allCategories || [];
+
+// ▼ 万が一、通信エラーで記事が0件だった時に「画面が消える」のを防ぐための予備データ ▼
+const backupStories = [
+  { id: 1, category: 'Politics', countryCode: 'jp', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 2, category: 'Economy', countryCode: 'us', country: 'United States', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 3, category: 'Society', countryCode: 'fr', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 4, category: 'Environment', countryCode: 'br', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 5, category: 'Technology', countryCode: 'kr', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+];
+
+// 本物の記事があればそれを使い、無ければ予備データを使う「絶対消えない」設定です
+const displayStories = latestStories.length > 0 ? latestStories : backupStories;
 
 const languages = [
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -126,32 +139,38 @@ function getThumbnail(content) {
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
             
-            {latestStories.map((post) => {
-              const bgImage = getThumbnail(post.content);
-              
+            {displayStories.map((post) => {
+              let bgImage = '';
               let categoryName = 'News';
               let countryCode = 'world';
+              let dateText = '';
 
-              if (post.labels && post.labels.length > 0) {
-                // ▼ 修正①：「en-jp」などのタグから「jp」の部分だけを切り出して国コードにします
+              // 本物の記事データ（Bloggerのラベルがある場合）
+              if (post.labels && Array.isArray(post.labels)) {
+                bgImage = getThumbnail(post.content);
+                
+                // 国コードを探します（en-jp などから jp を切り出す）
                 const countryTag = post.labels.find(l => l.startsWith('en-'));
                 if (countryTag) {
                   countryCode = countryTag.replace('en-', '');
                 }
                 
-                // ▼ 修正④：Bloggerのタグと、設定ファイルのキーワードを照らし合わせて英語のカテゴリ名を出します
+                // カテゴリ名を翻訳します
                 const foundCat = enCategories.find(cat => 
-                  post.labels.some(label => cat.keywords.some(key => label.includes(key)))
+                  post.labels.some(label => cat.keywords?.some(key => label.includes(key)))
                 );
-                if (foundCat) {
-                  categoryName = foundCat.label;
-                }
-              }
+                if (foundCat) categoryName = foundCat.label;
 
-              // ▼ 修正④：日付を「Mar 31, 2026」のような英語表記にします
-              const date = post.published 
-                ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
-                : '';
+                // 英語の日付を作ります
+                dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+              } 
+              // 予備データの場合
+              else {
+                bgImage = post.image;
+                categoryName = post.category;
+                countryCode = post.countryCode;
+                dateText = post.country; 
+              }
 
               return (
                 <a href={`/en/${countryCode}/news/${post.id}`} class="story-card observer-card no-link-color">
@@ -161,7 +180,7 @@ function getThumbnail(content) {
                   <div class="card-text-box">
                     <div class="card-meta">
                       <span class="category">{categoryName}</span>
-                      <span class="country">{date}</span>
+                      <span class="country">{dateText}</span>
                     </div>
                     <h3 class="card-title">{post.title}</h3>
                   </div>
@@ -175,7 +194,7 @@ function getThumbnail(content) {
           <div class="carousel-bottom-nav">
             <button class="carousel-nav-arrow" id="story-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="story-carousel-dots">
-              {latestStories.map((_, i) => (
+              {displayStories.map((_, i) => (
                 <div class={`c-dot ${i === 0 ? 'active' : ''}`}></div>
               ))}
             </div>
@@ -326,7 +345,6 @@ function getThumbnail(content) {
   .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
   .story-card.is-center:hover .card-bg { transform: scale(1.05); }
 
-  /* ▼ 修正③：カード下部の背景色を濃い紺色のグラデーションに変更しました ▼ */
   .card-text-box { 
     width: 100%; height: 33.33%; padding: 20px 30px; 
     background: linear-gradient(to bottom, #050b1e, #02040a); 
@@ -345,7 +363,6 @@ function getThumbnail(content) {
   .carousel-nav-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
   .carousel-nav-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
 
-  /* ▼ 修正②：JSでの制御と干渉しないよう、CSSのsmooth指定を外しました ▼ */
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
@@ -523,11 +540,9 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    // ▼ 修正②：カードをゆっくり滑らかに横移動させるための専用プログラム ▼
     function slowScroll(element, distance, duration) {
       const start = element.scrollLeft;
       const startTime = performance.now();
-      // ゆっくり加速してゆっくり減速する計算式です
       function easeInOutSine(t) {
         return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       }
@@ -548,7 +563,6 @@ function getThumbnail(content) {
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
-    // 矢印が押されたら「800ミリ秒」かけてゆっくりスクロールさせます
     storyPrevBtn?.addEventListener('click', () => {
       slowScroll(storyContainer, -window.innerWidth * 0.4, 800);
     });
@@ -605,4 +619,3 @@ function getThumbnail(content) {
     window.setTimeout(() => { leftPanels[0]?.classList.add('is-active'); rightPanels[0]?.classList.add('is-active'); }, 400);
   });
 </script>
-
