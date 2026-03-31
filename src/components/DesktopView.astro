@@ -7,7 +7,7 @@ const { latestStories = [] } = Astro.props;
 // 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
-// ▼ 追加：お見せいただいたファイルから、英語の国名辞書を作成しました ▼
+// お見せいただいたファイルから、英語の国名辞書を作成しました
 const countryNameMap = {
   jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
   gb: 'UK', sg: 'Singapore', ca: 'Canada', cn: 'China',
@@ -149,7 +149,7 @@ function getThumbnail(content) {
               let bgImage = '';
               let categoryName = 'News';
               let countryCode = 'world';
-              let countryName = ''; // ▼ 追加：国名を入れる箱です ▼
+              let countryName = '';
               let dateText = '';
 
               if (post.labels && Array.isArray(post.labels)) {
@@ -158,14 +158,13 @@ function getThumbnail(content) {
                 const countryTag = post.labels.find(l => l.startsWith('en-'));
                 if (countryTag) {
                   countryCode = countryTag.replace('en-', '');
-                  // ▼ 追加：辞書から国名を探してセットします ▼
                   if (countryNameMap[countryCode]) {
                     countryName = countryNameMap[countryCode];
                   }
                 }
                 
                 const foundCat = enCategories.find(cat => 
-                  post.labels.some(label => cat.keywords?.some(key => label.includes(key)))
+                  post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
                 );
                 if (foundCat) categoryName = foundCat.label;
 
@@ -175,8 +174,7 @@ function getThumbnail(content) {
                 bgImage = post.image;
                 categoryName = post.category;
                 countryCode = post.countryCode;
-                countryName = post.country; // 予備データからの国名
-                // 予備データ用の現在日付
+                countryName = post.country;
                 dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
               }
 
@@ -361,7 +359,6 @@ function getThumbnail(content) {
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
   }
   
-  /* ▼ 修正③：カード文字部分の美しい3行レイアウト ▼ */
   .card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
   .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 4px; }
   .card-meta .country-name { color: #aaa; font-size: 10px; }
@@ -375,7 +372,9 @@ function getThumbnail(content) {
   .carousel-nav-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
   .carousel-nav-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
 
+  /* ▼ 追加：スクロール中に磁石をオフにするためのクラス ▼ */
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
+  .carousel-container.is-scrolling { scroll-snap-type: none !important; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
   
@@ -552,12 +551,14 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    // ▼ 修正①：ゆっくりと氷の上を滑るような「極上のヌルッとスクロール」を作る魔法です ▼
+    // ▼ 修正：動いている時だけ磁石をオフにする魔法です ▼
     function slowScroll(element, distance, duration) {
+      // スクロールが始まる前に、ピタッと止まる磁石（スナップ）をオフにする
+      element.classList.add('is-scrolling');
+      
       const start = element.scrollLeft;
       const startTime = performance.now();
       
-      // 最初はスッと動き、後半にスーッと減速する計算式（easeOutCubic）
       function easeOutCubic(t) {
         return 1 - Math.pow(1 - t, 3);
       }
@@ -569,6 +570,11 @@ function getThumbnail(content) {
         
         if (timeElapsed < duration) {
           requestAnimationFrame(animation);
+        } else {
+          // 移動が完全に終わってから少し待って、磁石を再びオンにする
+          window.setTimeout(() => {
+            element.classList.remove('is-scrolling');
+          }, 50);
         }
       }
       requestAnimationFrame(animation);
@@ -580,7 +586,6 @@ function getThumbnail(content) {
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
-    // ▼ 修正①：ボタンを押した時、たっぷり1.2秒（1200ミリ秒）かけてヌルッと滑らせます ▼
     storyPrevBtn?.addEventListener('click', () => {
       slowScroll(storyContainer, -window.innerWidth * 0.4, 1200);
     });
