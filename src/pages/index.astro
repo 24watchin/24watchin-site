@@ -164,11 +164,9 @@ const languages = [
           <div class="brand-night"></div>
           <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
           <div class="brand-bg-overlay"></div>
-
           <div class="brand-content text-anim-target" id="brand-text-target">
             <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
             <h2 class="brand-catch fade-base fade-up anim-catch">Watch the world with clarity.</h2>
-
             <div class="brand-desc">
               <p class="fade-base fade-left anim-desc1">Global news.</p>
               <p class="fade-base fade-left anim-desc2">Explained clearly.</p>
@@ -176,7 +174,60 @@ const languages = [
             </div>
           </div>
         </section>
-      </div>
+
+        <section class="seq-panel" id="screen-5">
+          <div class="seq-inner">
+            <div class="section-header"><h2>Latest Stories</h2></div>
+            <div class="carousel-wrapper">
+              <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
+              <div class="carousel-container" id="story-carousel">
+                <div class="carousel-spacer"></div>
+                {latestStories.map((story) => (
+                  <a href={`/en/story/${story.id}`} class="story-card observer-card">
+                    <div class="card-bg" style={`background-image: ${story.image};`}></div>
+                    <div class="card-content">
+                      <div class="card-meta">
+                        <span class="category">{story.category}</span>
+                        <span class="country">{story.country}</span>
+                      </div>
+                      <h3 class="card-title">{story.title}</h3>
+                      <p class="card-excerpt">{story.excerpt}</p>
+                      <div class="cta-link">Read story <span>&rarr;</span></div>
+                    </div>
+                  </a>
+                ))}
+                <div class="carousel-spacer"></div>
+              </div>
+              <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="seq-panel" id="screen-6">
+          <div class="seq-inner">
+            <div class="section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
+            <div class="carousel-wrapper">
+              <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
+              <div class="carousel-container" id="lang-carousel">
+                <div class="carousel-spacer"></div>
+                {languages.map((lang) => (
+                  <a href={lang.url} class="lang-card observer-card">
+                    <div class="lang-bg" style={`background-color: ${lang.color};`}></div>
+                    <div class="lang-content">
+                      <div class="lang-logo">24watchin</div>
+                      <h3 class="lang-name">{lang.name}</h3>
+                      <div class="lang-border"></div>
+                    </div>
+                  </a>
+                ))}
+                <div class="carousel-spacer"></div>
+              </div>
+              <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /.desktop-sequence -->
 
       <!-- 固定ステージの下敷き -->
       <section class="hero-spacer" aria-hidden="true">
@@ -191,72 +242,6 @@ const languages = [
           <p>スマホ版は準備中です</p>
         </div>
       </div>
-
-      <section class="carousel-section section-observer" id="screen-5">
-        <div class="section-fade-in">
-          <div class="section-header">
-            <h2>Latest Stories</h2>
-          </div>
-
-          <div class="carousel-wrapper">
-            <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
-
-            <div class="carousel-container" id="story-carousel">
-              <div class="carousel-spacer"></div>
-
-              {latestStories.map((story) => (
-                <a href={`/en/story/${story.id}`} class="story-card observer-card">
-                  <div class="card-bg" style={`background-image: ${story.image};`}></div>
-                  <div class="card-content">
-                    <div class="card-meta">
-                      <span class="category">{story.category}</span>
-                      <span class="country">{story.country}</span>
-                    </div>
-                    <h3 class="card-title">{story.title}</h3>
-                    <p class="card-excerpt">{story.excerpt}</p>
-                    <div class="cta-link">Read story <span>&rarr;</span></div>
-                  </div>
-                </a>
-              ))}
-
-              <div class="carousel-spacer"></div>
-            </div>
-
-            <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="carousel-section lang-section section-observer" id="screen-6">
-        <div class="section-fade-in">
-          <div class="section-header">
-            <h2>CHOOSE YOUR LANGUAGE</h2>
-          </div>
-
-          <div class="carousel-wrapper">
-            <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
-
-            <div class="carousel-container" id="lang-carousel">
-              <div class="carousel-spacer"></div>
-
-              {languages.map((lang) => (
-                <a href={lang.url} class="lang-card observer-card">
-                  <div class="lang-bg" style={`background-color: ${lang.color};`}></div>
-                  <div class="lang-content">
-                    <div class="lang-logo">24watchin</div>
-                    <h3 class="lang-name">{lang.name}</h3>
-                    <div class="lang-border"></div>
-                  </div>
-                </a>
-              ))}
-
-              <div class="carousel-spacer"></div>
-            </div>
-
-            <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
-          </div>
-        </div>
-      </section>
 
       <footer class="site-footer">
         <p>[ フッター領域 ]</p>
@@ -433,11 +418,17 @@ const languages = [
         background: #050b18;
         transition: opacity 0.25s ease, visibility 0s linear 0.25s;
       }
-
       .transition-mask.is-visible {
         opacity: 1;
         visibility: visible;
         transition: opacity 0.25s ease;
+      }
+      /* 5→4専用：ゆっくりフェード */
+      .transition-mask.is-slow {
+        transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+      }
+      .transition-mask.is-slow.is-visible {
+        transition: opacity 0.5s ease;
       }
 
       /* ===== 5→6 ライン演出 ===== */
@@ -1280,24 +1271,22 @@ const languages = [
           }, MASK_IN_MS);
         }
 
-        // 5→4専用：ゆっくりふわっと（0.5秒）
+        // 5→4専用：is-slowクラスでゆっくりフェード（インラインスタイル不使用）
         function transitionStoriesToBrand() {
-          const SLOW = 500;
-          transitionMask.style.transition = `opacity ${SLOW}ms ease, visibility 0s linear ${SLOW}ms`;
-          transitionMask.classList.add('is-visible');
+          const SLOW_MS = 500;
+          transitionMask?.classList.add('is-slow');
+          showMask();
           window.setTimeout(() => {
             clearSectionVisibility();
             revealBrandImmediate();
-            transitionMask.style.transition = `opacity ${SLOW}ms ease`;
-            transitionMask.classList.remove('is-visible');
+            hideMask();
             window.setTimeout(() => {
-              transitionMask.style.transition = '';
+              transitionMask?.classList.remove('is-slow');
               isAnimating = false;
-            }, SLOW + MASK_UNLOCK_MS);
-          }, SLOW);
+            }, SLOW_MS + MASK_UNLOCK_MS);
+          }, SLOW_MS);
         }
 
-        // 4→5・6→5 共通（通常速度）
         function transitionBetweenSections(targetStep) {
           showMask();
           window.setTimeout(() => {
@@ -1345,7 +1334,7 @@ const languages = [
             clearSectionVisibility();
 
             if (previousStep === 4) {
-              transitionStoriesToBrand(); // 5→4：ゆっくり
+              transitionStoriesToBrand();
               return;
             }
             if (previousStep >= 5) {
@@ -1364,12 +1353,12 @@ const languages = [
           }
 
           if (step === 5 && previousStep === 4) {
-            transitionBetweenSections(5); // 4→5（5→6）：通常速度
+            transitionBetweenSections(5);
             return;
           }
 
           if (step === 4 && previousStep === 5) {
-            transitionBetweenSections(4); // 6→5：通常速度
+            transitionBetweenSections(4);
             return;
           }
 
