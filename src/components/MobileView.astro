@@ -1,36 +1,654 @@
 ---
-// スマホ版専用の部品（現在は準備中）
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+
+// 司令塔から記事データを受け取ります
+const { latestStories = [] } = Astro.props;
+
+// 英語のカテゴリ翻訳ルール
+const enCategories = categoryLabelMap?.['en']?.allCategories || [];
+
+// 英語の国名辞書
+const countryNameMap = {
+  jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
+  gb: 'UK', sg: 'Singapore', ca: 'Canada', cn: 'China',
+  tw: 'Taiwan', es: 'Spain', fr: 'France', de: 'Germany',
+  br: 'Brazil', kr: 'South Korea'
+};
+
+const backupStories = [
+  { id: 1, category: 'Politics', countryCode: 'jp', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 2, category: 'Economy', countryCode: 'us', country: 'USA', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 3, category: 'Society', countryCode: 'fr', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 4, category: 'Environment', countryCode: 'br', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 5, category: 'Technology', countryCode: 'kr', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+];
+
+const displayStories = latestStories.length > 0 ? latestStories : backupStories;
+
+const languages = [
+  { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
+  { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
+  { code: 'zh-cn', name: '简体中文', color: '#C53030', url: '/zh-cn/' },
+  { code: 'zh-tw', name: '繁體中文', color: '#2C5282', url: '/zh-tw/' },
+  { code: 'es', name: 'Español', color: '#B7791F', url: '/es/' },
+  { code: 'fr', name: 'Français', color: '#2B6CB0', url: '/fr/' },
+  { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
+  { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
+];
+
+function stripHtml(html) {
+  if (!html) return '';
+  const text = html.replace(/<[^>]*>?/gm, '');
+  return text.length > 80 ? text.substring(0, 80) + '...' : text;
+}
+
+function getThumbnail(content) {
+  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
+  const match = content.match(/<img[^>]+src="([^">]+)"/);
+  return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
+}
 ---
-<div class="mobile-only-area">
-  <div class="mobile-placeholder">
-    <p>スマホ版は準備中です</p>
+
+<div class="m-wrapper">
+
+  <header class="m-global-header">
+    <div class="m-header-band">
+      <div class="m-logo-area">
+        <a href="https://24watchin.com">
+          <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" class="m-header-logo-img" />
+        </a>
+      </div>
+      <button class="m-menu-trigger" id="m-menu-open" aria-label="Open menu">
+        <span class="m-burger-line"></span>
+        <span class="m-burger-line"></span>
+        <span class="m-burger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="m-side-menu" id="m-side-menu">
+    <button class="m-menu-close" id="m-menu-close" aria-label="Close menu">&times;</button>
+    <div class="m-menu-inner">
+      <h3>CHOOSE YOUR LANGUAGE</h3>
+      <div class="m-menu-grid">
+        {languages.map((lang) => (
+          <a href={lang.url} class="m-menu-lang-card" style={`--accent: ${lang.color}`}>
+            <span class="m-lang-name" lang={lang.code}>{lang.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </nav>
+
+  <div class="m-scroll-indicator" id="m-scroll-indicator">
+    <div class="m-dot active"></div>
+    <div class="m-dot"></div>
+    <div class="m-dot"></div>
+    <div class="m-dot"></div>
+    <div class="m-dot"></div>
+    <div class="m-dot"></div>
   </div>
+
+  <div class="m-transition-mask" id="m-transition-mask" aria-hidden="true"></div>
+
+  <div class="m-sequence" id="m-sequence">
+    <div class="m-split-stage">
+      
+      <div class="m-top-track">
+        <div class="m-panel m-p1">
+          <div class="m-bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
+          <div class="m-word-band-container"><div class="m-word-band"><h2>CONFLICT</h2></div></div>
+        </div>
+        <div class="m-panel m-p2">
+          <div class="m-bg-layer" style="background-image: url('/images/cities.webp');"></div>
+          <div class="m-word-band-container"><div class="m-word-band"><h2>CITIES</h2></div></div>
+        </div>
+        <div class="m-panel m-p3">
+          <div class="m-bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
+          <div class="m-word-band-container"><div class="m-word-band"><h2>INNOVATION</h2></div></div>
+        </div>
+      </div>
+
+      <div class="m-bottom-track">
+        <div class="m-panel m-p1">
+          <div class="m-bg-layer" style="background-image: url('/images/crisis.png');"></div>
+          <div class="m-word-band-container"><div class="m-word-band"><h2>CRISIS</h2></div></div>
+        </div>
+        <div class="m-panel m-p2">
+          <div class="m-bg-layer" style="background-image: url('/images/people.webp');"></div>
+          <div class="m-word-band-container"><div class="m-word-band"><h2>PEOPLE</h2></div></div>
+        </div>
+        <div class="m-panel m-p3">
+          <div class="m-bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
+          <div class="m-word-band-container"><div class="m-word-band"><h2>FRONTIER</h2></div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="m-brand-panel" id="m-brand-panel">
+      <div class="m-brand-night"></div>
+      <div class="m-brand-bg" style="background-image: url('/images/explanation.png');"></div>
+      <div class="m-brand-bg-overlay"></div>
+      <div class="m-brand-content m-text-anim-target" id="m-brand-text-target">
+        <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" class="m-brand-logo-img m-fade-base m-fade-up m-anim-logo" />
+        <h2 class="m-brand-catch m-fade-base m-fade-up m-anim-catch">Watch the world<br>with clarity.</h2>
+        <div class="m-brand-desc">
+          <p class="m-fade-base m-fade-left m-anim-desc1">Global news.</p>
+          <p class="m-fade-base m-fade-left m-anim-desc2">Explained clearly.</p>
+          <p class="m-fade-base m-fade-left m-anim-desc3">In your language.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="m-seq-panel" id="m-screen-5">
+      <div class="m-seq-inner">
+        <div class="m-section-header"><h2>Latest Stories</h2></div>
+        
+        <div class="m-carousel-wrapper">
+          <div class="m-carousel-container" id="m-story-carousel">
+            <div class="m-carousel-spacer"></div>
+            
+            {displayStories.map((post) => {
+              let bgImage = '';
+              let categoryName = 'News';
+              let countryCode = 'world';
+              let countryName = '';
+              let dateText = '';
+              if (post.labels && Array.isArray(post.labels)) {
+                bgImage = getThumbnail(post.content);
+                const countryTag = post.labels.find(l => l.startsWith('en-'));
+                if (countryTag) {
+                  countryCode = countryTag.replace('en-', '');
+                  if (countryNameMap[countryCode]) {
+                    countryName = countryNameMap[countryCode];
+                  }
+                }
+                const foundCat = enCategories.find(cat => 
+                  post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
+                );
+                if (foundCat) categoryName = foundCat.label;
+                dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+              } else {
+                bgImage = post.image;
+                categoryName = post.category;
+                countryCode = post.countryCode;
+                countryName = post.country;
+                dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              }
+
+              return (
+                <a href={`/en/${countryCode}/news/${post.id}`} class="m-story-card m-observer-card m-no-link-color">
+                  <div class="m-card-img-box">
+                    <div class="m-card-bg" style={`background-image: ${bgImage};`}></div>
+                  </div>
+                  <div class="m-card-text-box">
+                    <div class="m-card-meta">
+                      <span class="m-category">{categoryName}</span>
+                      {countryName && <span class="m-country-name">from {countryName}</span>}
+                    </div>
+                    <div class="m-card-date">{dateText}</div>
+                    <h3 class="m-card-title">{post.title}</h3>
+                  </div>
+                </a>
+              );
+            })}
+            <div class="m-carousel-spacer"></div>
+          </div>
+          
+          <div class="m-carousel-bottom-nav">
+            <div class="m-carousel-dots-wrapper" id="m-story-carousel-dots">
+              {displayStories.map((_, i) => (
+                <div class={`m-c-dot ${i === 0 ? 'active' : ''}`}></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="m-seq-panel" id="m-screen-6">
+      <div class="m-seq-inner">
+        <div class="m-section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
+        <div class="m-carousel-wrapper">
+          <div class="m-carousel-container" id="m-lang-carousel">
+            <div class="m-carousel-spacer"></div>
+            {languages.map((lang) => (
+              <a href={lang.url} class="m-lang-card m-observer-card m-no-link-color">
+                <div class="m-lang-bg" style={`background-color: ${lang.color};`}></div>
+                <div class="m-lang-content">
+                  <h3 class="m-lang-name" lang={lang.code}>{lang.name}</h3>
+                  <div class="m-lang-border"></div>
+                </div>
+              </a>
+            ))}
+            <div class="m-carousel-spacer"></div>
+          </div>
+          
+          <div class="m-carousel-bottom-nav">
+            <div class="m-carousel-dots-wrapper" id="m-lang-carousel-dots">
+              {languages.map((_, i) => (
+                <div class={`m-c-dot ${i === 0 ? 'active' : ''}`}></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="m-top-footer">
+        <div class="m-top-footer-inner">
+          <div class="m-top-footer-logo">
+            <a href="https://24watchin.com">
+              <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
+            </a>
+          </div>
+          <div class="m-top-footer-center">
+            <div class="m-top-footer-links">
+              <a href="/info/about/">ABOUT 24WATCHIN</a>
+              <a href="/info/privacy/">PRIVACY POLICY</a>
+              <a href="/info/terms/">TERMS OF USE</a>
+              <a href="/info/contact/">CONTACT</a>
+              <a href="/info/corrections/">CORRECTIONS POLICY</a>
+              <a href="/info/copyright/">COPYRIGHT / REUSE</a>
+            </div>
+            <div class="m-top-footer-copy">
+              <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
+              <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
+              <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </section>
+
+  </div>
+
+  <section class="m-hero-spacer" aria-hidden="true">
+    <div class="m-hero-spacer-brand">
+      <div class="m-hero-spacer-bg" style="background-image: url('/images/explanation.png');"></div>
+      <div class="m-hero-spacer-bg-overlay"></div>
+    </div>
+  </section>
+
 </div>
 
 <style>
-  /* 普段（PCで見ている時）は表示しない */
-  .mobile-only-area {
-    display: none;
+  /* 画面幅が768px（スマホや小さめタブレット）以下の時だけこの設定を有効にします */
+  @media (min-width: 769px) {
+    .m-wrapper { display: none !important; }
   }
 
-  /* 画面幅が768px以下（スマホのサイズ）になった時だけ表示する */
   @media (max-width: 768px) {
-    .mobile-only-area {
+    .m-wrapper {
       display: block;
+      -webkit-user-select: none;
+      user-select: none;
+      background: #010411;
     }
-  }
-
-  .mobile-placeholder {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #111;
-  }
-
-  .mobile-placeholder p {
-    color: #666;
-    font-size: 14px;
-    letter-spacing: 2px;
+    
+    html.m-is-locked, body.m-is-locked {
+      overflow: hidden !important;
+    }
+    
+    .m-global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
+    .m-header-band { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
+    .m-logo-area a { text-decoration: none; outline: none; }
+    .m-header-logo-img { height: 32px; width: auto; filter: brightness(0) invert(1); } 
+    
+    .m-menu-trigger { background: none; border: none; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 5px; }
+    .m-burger-line { width: 24px; height: 2px; background: #fff; border-radius: 2px; }
+    
+    .m-side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; height: 100dvh; background: rgba(10, 10, 10, 0.98); z-index: 400; transition: right 0.4s ease; padding: 60px 20px; overflow-y: auto; }
+    .m-side-menu.is-open { right: 0; }
+    .m-menu-close { position: absolute; top: 20px; right: 20px; font-size: 36px; background: none; border: none; color: #fff; }
+    .m-menu-inner { width: 100%; text-align: center; margin-top: 40px; }
+    .m-menu-inner h3 { font-size: 12px; letter-spacing: 2px; margin-bottom: 30px; color: #888; }
+    .m-menu-grid { display: flex; flex-direction: column; gap: 12px; }
+    .m-menu-lang-card { padding: 20px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; background-color: var(--accent); text-decoration: none; color: white; }
+    
+    /* スマホは画面の右端にスクロールの目印を小さく表示します */
+    .m-scroll-indicator { position: fixed; top: 50%; right: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 500; }
+    .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
+    .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
+    
+    .m-transition-mask { position: fixed; inset: 0; z-index: 220; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease; }
+    .m-transition-mask.is-visible { opacity: 1; visibility: visible; }
+    
+    .m-sequence { position: fixed; inset: 0; z-index: 120; opacity: 1; visibility: visible; height: 100vh; height: 100dvh; }
+    .m-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; }
+    
+    /* ▼ スマホ専用：上下2段の分割レイアウト ▼ */
+    .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
+    .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
+    
+    .m-panel { position: absolute; inset: 0; overflow: hidden; }
+    .m-bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
+    
+    /* 上半分のスライド（上から下へ降りてくるアニメーション） */
+    .m-top-track .m-p1 { z-index: 1; }
+    .m-top-track .m-p2 { z-index: 2; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
+    .m-top-track .m-p3 { z-index: 3; clip-path: inset(0 0 100% 0); -webkit-clip-path: inset(0 0 100% 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
+    
+    /* 下半分のスライド（下から上へ上がってくるアニメーション） */
+    .m-bottom-track .m-p1 { z-index: 1; }
+    .m-bottom-track .m-p2 { z-index: 2; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
+    .m-bottom-track .m-p3 { z-index: 3; clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
+    
+    .m-panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
+    
+    /* 文字盤も上下それぞれの中央に配置します */
+    .m-word-band-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; overflow: hidden; }
+    .m-word-band { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(8px); padding: 8px 24px; display: flex; align-items: center; border-radius: 4px; transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    
+    .m-top-track .m-word-band { transform: translateY(-150%); }
+    .m-bottom-track .m-word-band { transform: translateY(150%); }
+    
+    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.4rem; letter-spacing: 0.15em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
+    
+    .m-panel.is-active .m-word-band { transform: translateY(0); }
+    .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
+    
+    /* ブランドパネル */
+    .m-brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
+    .m-brand-panel.is-visible { visibility: visible; }
+    .m-brand-night { position: absolute; inset: 0; opacity: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); transition: opacity 0.6s ease; }
+    .m-brand-panel.is-night .m-brand-night { opacity: 1; }
+    .m-brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transform: scale(1.05); transition: all 1s ease; }
+    .m-brand-panel.is-bg .m-brand-bg { opacity: 0.8; transform: scale(1); }
+    .m-brand-bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
+    .m-brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 20px; }
+    .m-brand-logo-img { width: 160px; height: auto; margin-bottom: 20px; filter: brightness(0) invert(1); }
+    .m-brand-catch { font-size: 1.8rem; margin-bottom: 20px; font-weight: 300; line-height: 1.3; color: #fff; }
+    .m-brand-desc p { font-size: 1.2rem; font-weight: 300; color: #ccc; margin-bottom: 10px; }
+    
+    .m-fade-base { opacity: 0; transition: all 0.3s ease; }
+    .m-fade-up { transform: translateY(20px); }
+    .m-fade-left { transform: translateX(-30px); }
+    .m-text-anim-target.is-visible .m-fade-up, .m-text-anim-target.is-visible .m-fade-left { transform: translate(0); opacity: 1; transition: all 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .m-text-anim-target.is-visible .m-anim-logo { transition-delay: 0.1s; }
+    .m-text-anim-target.is-visible .m-anim-catch { transition-delay: 0.6s; }
+    .m-text-anim-target.is-visible .m-anim-desc1 { transition-delay: 1.2s; }
+    .m-text-anim-target.is-visible .m-anim-desc2 { transition-delay: 1.8s; }
+    .m-text-anim-target.is-visible .m-anim-desc3 { transition-delay: 2.4s; }
+    
+    /* 共通パネル設定 */
+    .m-seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    #m-screen-6 { z-index: 41; padding-bottom: 220px; } /* スマホのフッターの高さ分だけ上にあげます */
+    .m-seq-panel.is-visible { visibility: visible; pointer-events: auto; }
+    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
+    .m-seq-panel.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); }
+    .m-section-header { text-align: center; margin-bottom: 30px; }
+    .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
+    
+    /* スマホ用カルーセル（横スクロール）設定 */
+    .m-carousel-wrapper { position: relative; width: 100%; }
+    .m-no-link-color { color: inherit !important; text-decoration: none !important; }
+    
+    /* スマホではカードを少し横幅広めにして見やすくします */
+    .m-observer-card { 
+      scroll-snap-align: center; flex: 0 0 75vw; height: 45vh; margin: 0 3vw;
+      position: relative; border-radius: 8px; overflow: hidden; 
+      transition: all 0.4s ease; opacity: 0.5; transform: scale(0.9);
+      display: flex; flex-direction: column; 
+      border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111;
+    }
+    .m-observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); z-index: 10; }
+    
+    /* ニュースカード */
+    .m-card-img-box { width: 100%; height: 60%; position: relative; overflow: hidden; }
+    .m-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.6s ease; }
+    .m-card-text-box { width: 100%; height: 40%; padding: 15px; background: linear-gradient(to bottom, #050b1e, #02040a); display: flex; flex-direction: column; justify-content: center; }
+    .m-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+    .m-card-meta .m-category { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 2px; }
+    .m-card-meta .m-country-name { color: #aaa; font-size: 9px; }
+    .m-card-date { color: #888; font-size: 10px; margin-bottom: 6px; }
+    .m-card-title { font-size: 1.1rem; font-weight: 400; line-height: 1.3; margin: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    /* 言語カード */
+    .m-lang-card { flex: 0 0 70vw; height: 35vh; display: flex; align-items: center; justify-content: center; }
+    .m-lang-card::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 5; pointer-events: none; transition: all 0.4s ease; }
+    .m-lang-card.is-center::before { top: 15px; left: 15px; right: 15px; bottom: 15px; border-color: rgba(255, 255, 255, 0.6); }
+    .m-lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
+    .m-lang-card.is-center .m-lang-bg { opacity: 0.8; }
+    .m-lang-content { position: relative; z-index: 2; text-align: center; }
+    .m-lang-name { font-size: 1.8rem; font-weight: 300; letter-spacing: 0.05em; color: #fff; }
+    .m-lang-border { width: 0; height: 1px; background: #fff; margin: 15px auto 0; transition: width 0.6s ease; opacity: 0.5; }
+    .m-lang-card.is-center .m-lang-border { width: 30px; }
+    
+    /* スマホは指で横にスクロールするため、矢印ボタンは消し、下のドットだけにします */
+    .m-carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; touch-action: pan-x; }
+    .m-carousel-container::-webkit-scrollbar { display: none; }
+    .m-carousel-spacer { flex: 0 0 calc(50vw - 40vw); } /* スマホ用の余白計算 */
+    .m-carousel-bottom-nav { display: flex; align-items: center; justify-content: center; margin-top: 20px; }
+    .m-carousel-dots-wrapper { display: flex; gap: 8px; }
+    .m-c-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
+    .m-c-dot.active { background: #fff; transform: scale(1.5); }
+    
+    /* スマホ専用フッター */
+    .m-top-footer { position: absolute; bottom: 0; left: 0; width: 100%; background: #393737; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 20px; box-sizing: border-box; z-index: 100; }
+    .m-top-footer-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
+    .m-top-footer-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
+    .m-top-footer-center { width: 100%; }
+    .m-top-footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
+    .m-top-footer-links a { color: #a0aec0; font-size: 10px; text-decoration: none; letter-spacing: 1px; }
+    .m-top-footer-copy { display: flex; flex-direction: column; gap: 6px; }
+    .m-top-footer-copy p { margin: 0; color: #cbd5e1; font-size: 9px; line-height: 1.4; }
   }
 </style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    // このスクリプトはスマホ画面（768px以下）の時だけ動きます
+    if (window.innerWidth > 768) return;
+
+    try {
+      const HERO_ANIM_MS = 1200;
+      const SWIPE_THRESHOLD = 40; // 指でスワイプしたと判定する距離
+
+      let currentStep = 0;
+      let isAnimating = false;
+      let isFreeScroll = false;
+      let startX = 0, startY = 0, endX = 0, endY = 0;
+
+      const body = document.body;
+      const html = document.documentElement;
+      const sequence = document.getElementById('m-sequence');
+      const brandPanel = document.getElementById('m-brand-panel');
+      const brandTextTarget = document.getElementById('m-brand-text-target');
+      const transitionMask = document.getElementById('m-transition-mask');
+      const screen5 = document.getElementById('m-screen-5');
+      const screen6 = document.getElementById('m-screen-6');
+      const dots = document.querySelectorAll('#m-scroll-indicator .m-dot');
+      
+      const topPanels = document.querySelectorAll('.m-top-track .m-panel');
+      const bottomPanels = document.querySelectorAll('.m-bottom-track .m-panel');
+
+      const menuOpenBtn = document.getElementById('m-menu-open');
+      const menuCloseBtn = document.getElementById('m-menu-close');
+      const sideMenu = document.getElementById('m-side-menu');
+
+      menuOpenBtn?.addEventListener('click', () => { sideMenu?.classList.add('is-open'); });
+      menuCloseBtn?.addEventListener('click', () => { sideMenu?.classList.remove('is-open'); });
+
+      // スマホでは指の動き（タッチ）で画面を切り替えます
+      window.addEventListener('touchstart', (e) => {
+        if (sideMenu?.classList.contains('is-open')) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      // カル―セル以外の場所で画面がビヨンビヨン動くのを防ぎます
+      window.addEventListener('touchmove', (e) => {
+        if (sideMenu?.classList.contains('is-open') || isFreeScroll) return;
+        if (!e.target.closest('.m-carousel-container')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchend', (e) => {
+        if (sideMenu?.classList.contains('is-open')) return;
+        endX = e.changedTouches[0].clientX;
+        endY = e.changedTouches[0].clientY;
+        
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+
+        // 横にスワイプした時はカルーセルを回すため、画面切り替えは無視します
+        if (Math.abs(diffX) > Math.abs(diffY)) return;
+
+        if (isFreeScroll) {
+          // フッターにいる時に上へスワイプしたら、言語選択画面に戻ります
+          if (diffY < -SWIPE_THRESHOLD && window.scrollY <= 10) {
+             leaveFooterMode();
+          }
+          return;
+        }
+
+        if (isAnimating) return;
+        
+        // 指を上にシュッと動かしたら次へ、下に動かしたら前へ
+        if (diffY > SWIPE_THRESHOLD) moveNext();
+        else if (diffY < -SWIPE_THRESHOLD) movePrev();
+      }, { passive: true });
+
+      function setBodyLocked(locked) { 
+        body.classList.toggle('m-is-locked', locked); 
+        html.classList.toggle('m-is-locked', locked);
+      }
+      
+      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
+      function showMask() { transitionMask?.classList.add('is-visible'); }
+      function hideMask() { transitionMask?.classList.remove('is-visible'); }
+      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
+      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible'); }
+      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible'); }
+      
+      function revealBrandImmediate() {
+        sequence?.classList.remove('is-hidden');
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
+        requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
+      }
+
+      function showBrandAnimated() {
+        sequence?.classList.remove('is-hidden');
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night');
+        window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, 500);
+        window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, 1000);
+        window.setTimeout(() => { isAnimating = false; }, 1800);
+      }
+
+      function activateHeroSlide(index) {
+        topPanels.forEach(panel => panel.classList.remove('is-active', 'is-open'));
+        bottomPanels.forEach(panel => panel.classList.remove('is-active', 'is-open'));
+        
+        if (index >= 1) { topPanels[1]?.classList.add('is-open'); bottomPanels[1]?.classList.add('is-open'); }
+        if (index >= 2) { topPanels[2]?.classList.add('is-open'); bottomPanels[2]?.classList.add('is-open'); }
+        
+        window.setTimeout(() => { 
+          if(topPanels.length > index) topPanels[index].classList.add('is-active'); 
+          if(bottomPanels.length > index) bottomPanels[index].classList.add('is-active'); 
+          isAnimating = false; 
+        }, HERO_ANIM_MS);
+      }
+
+      function goToStep(step) {
+        if (step < 0 || step > 5) return;
+        if (isAnimating) return;
+
+        const previousStep = currentStep;
+        currentStep = step;
+        isAnimating = true;
+        updateIndicator(step);
+
+        if (step <= 2) {
+          setBodyLocked(true);
+          sequence?.classList.remove('is-hidden');
+          window.scrollTo(0,0);
+          if (previousStep === 3 && step === 2) { 
+            showMask(); window.setTimeout(() => { resetBrandPanel(); clearSectionVisibility(); activateHeroSlide(2); hideMask(); }, 600); return; 
+          }
+          hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return;
+        }
+
+        if (step === 3) {
+          setBodyLocked(true);
+          window.scrollTo(0,0);
+          if (previousStep === 4) { 
+            showMask(); window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 600); return; 
+          }
+          hideMask(); clearSectionVisibility(); sequence?.classList.remove('is-hidden');
+          if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 100); } 
+          else { showBrandAnimated(); }
+          return;
+        }
+
+        showMask();
+        window.setTimeout(() => {
+          showSection(step);
+          hideMask();
+          window.setTimeout(() => { isAnimating = false; }, 100);
+        }, 600);
+      }
+
+      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } else { enterFooterMode(); } }
+      function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
+
+      function enterFooterMode() { 
+        if (isAnimating) return; 
+        isAnimating = true; 
+        isFreeScroll = true; 
+        setBodyLocked(false); 
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
+        window.setTimeout(() => { isAnimating = false; }, 500); 
+      }
+      
+      function leaveFooterMode() { 
+        if (isAnimating) return; 
+        isAnimating = true; 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        window.setTimeout(() => { isFreeScroll = false; setBodyLocked(true); goToStep(5); isAnimating = false; }, 400); 
+      }
+
+      // カルーセル（横スライド）が画面の真ん中に来たらドットを光らせる機能
+      function setupObserver(containerId, cardsClass, dotsId) {
+        const container = document.getElementById(containerId);
+        const cards = document.querySelectorAll(`${cardsClass}`);
+        const dots = document.querySelectorAll(`#${dotsId} .m-c-dot`);
+        if(!container || cards.length === 0) return;
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-center');
+              const index = Array.from(cards).indexOf(entry.target);
+              if(index !== -1 && dots[index]) {
+                dots.forEach(d => d.classList.remove('active'));
+                dots[index].classList.add('active');
+              }
+            } else {
+              entry.target.classList.remove('is-center');
+            }
+          });
+        }, { root: container, rootMargin: '0px -30% 0px -30%', threshold: 0 });
+        
+        cards.forEach(card => observer.observe(card));
+      }
+
+      setupObserver('m-story-carousel', '#m-story-carousel .m-observer-card', 'm-story-carousel-dots');
+      setupObserver('m-lang-carousel', '#m-lang-carousel .m-observer-card', 'm-lang-carousel-dots');
+
+      // 最初の画面の準備
+      setBodyLocked(true); 
+      if(sequence) sequence.classList.remove('is-hidden'); 
+      hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
+      window.setTimeout(() => { 
+        if(topPanels.length > 0) topPanels[0].classList.add('is-active'); 
+        if(bottomPanels.length > 0) bottomPanels[0].classList.add('is-active'); 
+      }, 300);
+
+    } catch (error) {
+      console.error("スマホ版プログラムエラー:", error);
+    }
+  });
+</script>
