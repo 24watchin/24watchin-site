@@ -4,19 +4,25 @@ import { categoryLabelMap } from '../lib/categoryLabels.ts';
 // 司令塔から記事データを受け取ります
 const { latestStories = [] } = Astro.props;
 
-// 英語のカテゴリ翻訳ルールを読み込みます（エラーが起きないよう安全に処理）
+// 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
-// ▼ 万が一、通信エラーで記事が0件だった時に「画面が消える」のを防ぐための予備データ ▼
+// ▼ 追加：お見せいただいたファイルから、英語の国名辞書を作成しました ▼
+const countryNameMap = {
+  jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
+  gb: 'UK', sg: 'Singapore', ca: 'Canada', cn: 'China',
+  tw: 'Taiwan', es: 'Spain', fr: 'France', de: 'Germany',
+  br: 'Brazil', kr: 'South Korea'
+};
+
 const backupStories = [
   { id: 1, category: 'Politics', countryCode: 'jp', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 2, category: 'Economy', countryCode: 'us', country: 'United States', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+  { id: 2, category: 'Economy', countryCode: 'us', country: 'USA', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
   { id: 3, category: 'Society', countryCode: 'fr', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
   { id: 4, category: 'Environment', countryCode: 'br', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
   { id: 5, category: 'Technology', countryCode: 'kr', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
 ];
 
-// 本物の記事があればそれを使い、無ければ予備データを使う「絶対消えない」設定です
 const displayStories = latestStories.length > 0 ? latestStories : backupStories;
 
 const languages = [
@@ -143,33 +149,35 @@ function getThumbnail(content) {
               let bgImage = '';
               let categoryName = 'News';
               let countryCode = 'world';
+              let countryName = ''; // ▼ 追加：国名を入れる箱です ▼
               let dateText = '';
 
-              // 本物の記事データ（Bloggerのラベルがある場合）
               if (post.labels && Array.isArray(post.labels)) {
                 bgImage = getThumbnail(post.content);
                 
-                // 国コードを探します（en-jp などから jp を切り出す）
                 const countryTag = post.labels.find(l => l.startsWith('en-'));
                 if (countryTag) {
                   countryCode = countryTag.replace('en-', '');
+                  // ▼ 追加：辞書から国名を探してセットします ▼
+                  if (countryNameMap[countryCode]) {
+                    countryName = countryNameMap[countryCode];
+                  }
                 }
                 
-                // カテゴリ名を翻訳します
                 const foundCat = enCategories.find(cat => 
                   post.labels.some(label => cat.keywords?.some(key => label.includes(key)))
                 );
                 if (foundCat) categoryName = foundCat.label;
 
-                // 英語の日付を作ります
                 dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
               } 
-              // 予備データの場合
               else {
                 bgImage = post.image;
                 categoryName = post.category;
                 countryCode = post.countryCode;
-                dateText = post.country; 
+                countryName = post.country; // 予備データからの国名
+                // 予備データ用の現在日付
+                dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
               }
 
               return (
@@ -180,8 +188,9 @@ function getThumbnail(content) {
                   <div class="card-text-box">
                     <div class="card-meta">
                       <span class="category">{categoryName}</span>
-                      <span class="country">{dateText}</span>
+                      {countryName && <span class="country-name">from {countryName}</span>}
                     </div>
+                    <div class="card-date">{dateText}</div>
                     <h3 class="card-title">{post.title}</h3>
                   </div>
                 </a>
@@ -351,9 +360,12 @@ function getThumbnail(content) {
     display: flex; flex-direction: column; justify-content: center; 
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
   }
-  .card-meta { display: flex; gap: 12px; margin-bottom: 12px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  
+  /* ▼ 修正③：カード文字部分の美しい3行レイアウト ▼ */
+  .card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
   .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 4px; }
-  .card-meta .country { color: #aaa; }
+  .card-meta .country-name { color: #aaa; font-size: 10px; }
+  .card-date { color: #888; font-size: 12px; margin-bottom: 10px; letter-spacing: 0.5px; }
   .card-title { font-size: clamp(1.1rem, 1.8vw, 1.6rem); font-weight: 400; line-height: 1.4; margin-bottom: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
   .carousel-bottom-nav { display: flex; align-items: center; justify-content: center; gap: 30px; margin-top: 40px; }
@@ -540,16 +552,21 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
+    // ▼ 修正①：ゆっくりと氷の上を滑るような「極上のヌルッとスクロール」を作る魔法です ▼
     function slowScroll(element, distance, duration) {
       const start = element.scrollLeft;
       const startTime = performance.now();
-      function easeInOutSine(t) {
-        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      
+      // 最初はスッと動き、後半にスーッと減速する計算式（easeOutCubic）
+      function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
       }
+      
       function animation(currentTime) {
         const timeElapsed = currentTime - startTime;
         const progress = Math.min(timeElapsed / duration, 1);
-        element.scrollLeft = start + distance * easeInOutSine(progress);
+        element.scrollLeft = start + distance * easeOutCubic(progress);
+        
         if (timeElapsed < duration) {
           requestAnimationFrame(animation);
         }
@@ -563,11 +580,12 @@ function getThumbnail(content) {
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
+    // ▼ 修正①：ボタンを押した時、たっぷり1.2秒（1200ミリ秒）かけてヌルッと滑らせます ▼
     storyPrevBtn?.addEventListener('click', () => {
-      slowScroll(storyContainer, -window.innerWidth * 0.4, 800);
+      slowScroll(storyContainer, -window.innerWidth * 0.4, 1200);
     });
     storyNextBtn?.addEventListener('click', () => {
-      slowScroll(storyContainer, window.innerWidth * 0.4, 800);
+      slowScroll(storyContainer, window.innerWidth * 0.4, 1200);
     });
 
     const storyObserver = new IntersectionObserver((entries) => {
@@ -593,10 +611,10 @@ function getThumbnail(content) {
     const langContainer = document.getElementById('lang-carousel');
 
     langPrevBtn?.addEventListener('click', () => {
-      slowScroll(langContainer, -window.innerWidth * 0.4, 800);
+      slowScroll(langContainer, -window.innerWidth * 0.4, 1200);
     });
     langNextBtn?.addEventListener('click', () => {
-      slowScroll(langContainer, window.innerWidth * 0.4, 800);
+      slowScroll(langContainer, window.innerWidth * 0.4, 1200);
     });
 
     const langObserver = new IntersectionObserver((entries) => {
