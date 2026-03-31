@@ -1,0 +1,36 @@
+---
+// スマホ版専用の部品（現在は準備中）
+---
+<div class="mobile-only-area">
+  <div class="mobile-placeholder">
+    <p>スマホ版は準備中です</p>
+  </div>
+</div>
+
+<style>
+  /* 普段（PCで見ている時）は表示しない */
+  .mobile-only-area {
+    display: none;
+  }
+
+  /* 画面幅が768px以下（スマホのサイズ）になった時だけ表示する */
+  @media (max-width: 768px) {
+    .mobile-only-area {
+      display: block;
+    }
+  }
+
+  .mobile-placeholder {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+  }
+
+  .mobile-placeholder p {
+    color: #666;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+</style>
