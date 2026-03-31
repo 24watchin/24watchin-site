@@ -272,17 +272,17 @@ function getThumbnail(content) {
 </div>
 
 <style>
-  /* 画面幅が768px以上の時は完全に隠す */
-  @media (min-width: 769px) {
+  /* ▼ 画面幅に関わらず、PCなどのマウス操作端末（hover）ではスマホ版を完全に隠す ▼ */
+  @media (hover: hover), (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
 
-  @media (max-width: 768px) {
+  /* ▼ 指でタッチする実際のスマホ（pointer: coarse）の時だけ適用されるバリア ▼ */
+  @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
       -webkit-user-select: none;
       user-select: none;
-      /* PC版が裏にあっても絶対に透けないようにする強力なバリア */
       position: relative;
       z-index: 9999;
       background: #010411;
@@ -334,22 +334,14 @@ function getThumbnail(content) {
     
     .m-panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
     
-    /* ▼ 帯を画面の幅いっぱい（100%）に広げ、位置を中央から少し下に（top: 65%）設定 ▼ */
     .m-word-band-container { position: absolute; top: 65%; width: 100%; z-index: 10; overflow: hidden; }
-    
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
     
-    /* ▼ 帯の背景色と幅の調整 ▼ */
     .m-word-band { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(8px); width: 100%; padding: 12px 30px; display: flex; align-items: center; transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
-    
-    /* 上部の画像は左から右へスライドイン（左寄せ） */
     .m-top-track .m-word-band { justify-content: flex-start; transform: translateX(-100%); }
-    
-    /* 下部の画像は右から左へスライドイン（右寄せ） */
     .m-bottom-track .m-word-band { justify-content: flex-end; transform: translateX(100%); }
     
-    /* ▼ タイトルの文字サイズを 1.1rem に小さくし、文字間隔を調整 ▼ */
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.25em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
@@ -437,8 +429,8 @@ function getThumbnail(content) {
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-    // このスクリプトはスマホ画面（768px以下）の時だけ動きます
-    if (window.innerWidth > 768) return;
+    // ▼ PCなどで「指でタッチできない端末」の時は、スマホ用プログラムを完全に停止するバリア ▼
+    if (!window.matchMedia('(pointer: coarse)').matches) return;
 
     try {
       const HERO_ANIM_MS = 1200;
@@ -469,7 +461,6 @@ function getThumbnail(content) {
       menuOpenBtn?.addEventListener('click', () => { sideMenu?.classList.add('is-open'); });
       menuCloseBtn?.addEventListener('click', () => { sideMenu?.classList.remove('is-open'); });
 
-      // スマホの指の動き（スワイプ）を感知するプログラム
       window.addEventListener('touchstart', (e) => {
         if (sideMenu?.classList.contains('is-open')) return;
         startX = e.touches[0].clientX;
@@ -502,7 +493,6 @@ function getThumbnail(content) {
 
         if (isAnimating) return;
         
-        // 指を上にシュッと動かしたら次へ、下に動かしたら前へ
         if (diffY > SWIPE_THRESHOLD) moveNext();
         else if (diffY < -SWIPE_THRESHOLD) movePrev();
       }, { passive: true });
@@ -665,7 +655,6 @@ function getThumbnail(content) {
       setupObserver('m-story-carousel', '#m-story-carousel .m-observer-card', 'm-story-carousel-dots');
       setupObserver('m-lang-carousel', '#m-lang-carousel .m-observer-card', 'm-lang-carousel-dots');
 
-      // 最初の画面の準備
       setBodyLocked(true); 
       if(sequence) sequence.classList.remove('is-hidden'); 
       hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
