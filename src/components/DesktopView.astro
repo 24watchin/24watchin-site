@@ -301,8 +301,22 @@ function getThumbnail(content) {
   .menu-inner { max-width: 1000px; width: 100%; text-align: center; }
   .menu-inner h3 { font-size: 14px; letter-spacing: 4px; margin-bottom: 50px; color: #888; }
   .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-  .menu-lang-card { padding: 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; transition: 0.3s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%); text-decoration: none; color: white; }
-  .menu-lang-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+  
+  /* ▼ メニュー内の言語カード：指定の色で塗りつぶし、マウスオーバーで枠線を白くする設定 ▼ */
+  .menu-lang-card { 
+    padding: 40px; 
+    border: 1px solid rgba(255, 255, 255, 0.15); 
+    border-radius: 4px; 
+    transition: all 0.3s ease; 
+    background-color: var(--accent); /* 画面6と同じテーマカラーを指定 */
+    text-decoration: none; 
+    color: white; 
+  }
+  .menu-lang-card:hover { 
+    border-color: #ffffff; /* マウスオーバーで枠線を白く光らせる */
+    transform: translateY(-5px); 
+  }
+  
   .scroll-indicator { position: fixed; top: 75%; right: 25px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 500; }
   .scroll-indicator .dot { width: 6px; height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .scroll-indicator .dot.active { height: 32px; background: rgba(255, 255, 255, 0.9); }
@@ -338,7 +352,6 @@ function getThumbnail(content) {
   .brand-panel.is-visible { visibility: visible; }
   .seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
   
-  /* ▼ フッターが高くなる分、中央位置のパディングを増やして重ならないように調整 ▼ */
   #screen-6 { z-index: 41; padding-bottom: 180px; }
   
   .seq-panel.is-visible { visibility: visible; pointer-events: auto; }
@@ -411,7 +424,6 @@ function getThumbnail(content) {
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
   
-  /* ▼ 言語カードの高さを 50vh から 42vh に短くしました ▼ */
   .lang-card { flex: 0 0 28vw; height: 42vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
   
   .lang-card::before {
@@ -451,10 +463,9 @@ function getThumbnail(content) {
     z-index: 100;
   }
   
-  /* ▼ ロゴと右側リンクがくっつかないよう、gap（隙間）でバリアを張りました ▼ */
   .top-footer-inner { 
     display: flex; 
-    align-items: flex-start; /* 右側の文字が増えたので上揃えに調整 */
+    align-items: flex-start;
     justify-content: space-between; 
     width: 100%; 
     gap: 40px; 
@@ -470,21 +481,23 @@ function getThumbnail(content) {
     filter: brightness(0) invert(1);
   }
   
-  /* ▼ コピーライトの文字が増えたため、レイアウトを調整しました ▼ */
   .top-footer-right {
     display: flex;
     flex-direction: column;
-    align-items: flex-end; 
-    gap: 16px;
+    align-items: center; /* リンクエリアとコピーライトを右ブロックの中で中央に揃えます */
+    width: 100%;
     max-width: 850px;
   }
   
-  /* ▼ ABOUTなどの6つのリンクの間隔を狭めました（gap: 8px 16px;） ▼ */
   .top-footer-links { 
     display: flex; 
     flex-wrap: wrap; 
-    justify-content: flex-end;
+    justify-content: flex-end; /* リンク自体は右寄りに配置 */
     gap: 8px 16px; 
+    width: 100%;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* リンクの下にだけ細い線を引きます */
   }
   .top-footer-links a { 
     color: #a0aec0; 
@@ -497,13 +510,14 @@ function getThumbnail(content) {
     color: #fff; 
   }
   
-  /* ▼ 3行のコピーライトを綺麗に右揃えで並べる設定 ▼ */
+  /* ▼ コピーライトの3行を中央揃えにしています ▼ */
   .top-footer-copy { 
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    text-align: right;
+    align-items: center; /* 文字を中央揃え */
+    text-align: center; /* テキスト自体も中央揃え */
+    width: 100%;
+    gap: 6px;
   }
   .top-footer-copy p { 
     margin: 0;
