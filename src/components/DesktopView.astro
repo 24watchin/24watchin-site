@@ -1,6 +1,52 @@
 ---
-// 司令塔（index.astro）から渡された「本物の最新記事データ」を受け取ります
-const { latestStories = [] } = Astro.props;
+// モックアップ用データ（リンク用に countryCode を追加しています）
+const latestStories = [
+  {
+    id: 1,
+    category: 'Politics',
+    country: 'Japan',
+    countryCode: 'jp',
+    title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry',
+    excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.',
+    image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 2,
+    category: 'Economy',
+    country: 'United States',
+    countryCode: 'us',
+    title: 'Federal Reserve Signals Potential Rate Cuts by Year-End',
+    excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.',
+    image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 3,
+    category: 'Society',
+    country: 'France',
+    countryCode: 'fr',
+    title: 'Paris Sets New Standard for Eco-Friendly Urban Planning',
+    excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.',
+    image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 4,
+    category: 'Environment',
+    country: 'Brazil',
+    countryCode: 'br',
+    title: 'Amazon Conservation Efforts Show Promising Results This Quarter',
+    excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.',
+    image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+  {
+    id: 5,
+    category: 'Technology',
+    country: 'South Korea',
+    countryCode: 'kr',
+    title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul',
+    excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.',
+    image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
+  },
+];
 
 const languages = [
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -12,24 +58,9 @@ const languages = [
   { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
-
-// 本文からHTMLタグを消して、きれいな「抜粋（100文字）」を作る関数
-function stripHtml(html) {
-  if (!html) return '';
-  const text = html.replace(/<[^>]*>?/gm, ''); // タグを消去
-  return text.length > 100 ? text.substring(0, 100) + '...' : text;
-}
-
-// 記事の中から「最初の画像URL」を見つけ出す関数
-function getThumbnail(content) {
-  // 記事に画像がない時は、シックなグラデーションの背景を代わりに入れます
-  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)'; 
-  const match = content.match(/<img[^>]+src="([^">]+)"/);
-  return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
-}
 ---
 
-<header class="global-header" id="main-header">
+<header class="global-header">
   <div class="header-band">
     <div class="logo-area">
       <a href="https://24watchin.com">
@@ -69,7 +100,6 @@ function getThumbnail(content) {
 </div>
 
 <div class="transition-mask" id="transition-mask" aria-hidden="true"></div>
-<div class="line-wipe" id="line-wipe" aria-hidden="true"></div>
 
 <div class="desktop-only-wrapper">
   <div class="desktop-sequence" id="desktop-sequence">
@@ -122,37 +152,37 @@ function getThumbnail(content) {
     <section class="seq-panel" id="screen-5">
       <div class="seq-inner">
         <div class="section-header"><h2>Latest Stories</h2></div>
+        
         <div class="carousel-wrapper">
-          <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-            
-            {latestStories.map((post) => {
-              const excerpt = stripHtml(post.content);
-              const bgImage = getThumbnail(post.content);
-              const category = post.labels && post.labels.length > 0 ? post.labels[0] : 'News';
-              const date = new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-              return (
-                <a href={`/en/story/${post.id}`} class="story-card observer-card">
-                  <div class="card-bg" style={`background-image: ${bgImage};`}></div>
-                  <div class="card-content">
-                    <div class="card-meta">
-                      <span class="category">{category}</span>
-                      <span class="country">{date}</span>
-                    </div>
-                    <h3 class="card-title">{post.title}</h3>
-                    <p class="card-excerpt">{excerpt}</p>
-                    <div class="cta-link">Read story <span>&rarr;</span></div>
+            {latestStories.map((story) => (
+              <a href={`/en/${story.countryCode}/news/${story.id}`} class="story-card observer-card no-link-color">
+                <div class="card-img-box">
+                  <div class="card-bg" style={`background-image: ${story.image};`}></div>
+                </div>
+                <div class="card-text-box">
+                  <div class="card-meta">
+                    <span class="category">{story.category}</span>
+                    <span class="country">{story.country}</span>
                   </div>
-                </a>
-              );
-            })}
-
+                  <h3 class="card-title">{story.title}</h3>
+                </div>
+              </a>
+            ))}
             <div class="carousel-spacer"></div>
           </div>
-          <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
+          
+          <div class="carousel-bottom-nav">
+            <div class="carousel-dots-wrapper" id="story-carousel-dots">
+              {latestStories.map((_, i) => (
+                <div class={`c-dot ${i === 0 ? 'active' : ''}`}></div>
+              ))}
+            </div>
+            <button class="carousel-next-arrow" id="story-carousel-next" aria-label="Next">&gt;</button>
+          </div>
         </div>
+
       </div>
     </section>
 
@@ -160,11 +190,10 @@ function getThumbnail(content) {
       <div class="seq-inner">
         <div class="section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
         <div class="carousel-wrapper">
-          <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
           <div class="carousel-container" id="lang-carousel">
             <div class="carousel-spacer"></div>
             {languages.map((lang) => (
-              <a href={lang.url} class="lang-card observer-card">
+              <a href={lang.url} class="lang-card observer-card no-link-color">
                 <div class="lang-bg" style={`background-color: ${lang.color};`}></div>
                 <div class="lang-content">
                   <div class="lang-logo">24watchin</div>
@@ -175,10 +204,19 @@ function getThumbnail(content) {
             ))}
             <div class="carousel-spacer"></div>
           </div>
-          <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
+          
+          <div class="carousel-bottom-nav">
+            <div class="carousel-dots-wrapper" id="lang-carousel-dots">
+              {languages.map((_, i) => (
+                <div class={`c-dot ${i === 0 ? 'active' : ''}`}></div>
+              ))}
+            </div>
+            <button class="carousel-next-arrow" id="lang-carousel-next" aria-label="Next">&gt;</button>
+          </div>
         </div>
       </div>
     </section>
+
   </div>
 
   <section class="hero-spacer" aria-hidden="true">
@@ -197,7 +235,7 @@ function getThumbnail(content) {
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
-  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; }
+  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; } 
   .header-logo-img:hover { opacity: 0.8; }
   .menu-trigger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
   .burger-line { width: 30px; height: 2px; background: #fff; border-radius: 2px; }
@@ -214,9 +252,6 @@ function getThumbnail(content) {
   .scroll-indicator .dot.active { height: 32px; background: rgba(255, 255, 255, 0.9); }
   .transition-mask { position: fixed; inset: 0; z-index: 220; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.8s ease, visibility 0s linear 0.8s; }
   .transition-mask.is-visible { opacity: 1; visibility: visible; transition: opacity 0.8s ease; }
-  .line-wipe { position: fixed; top: 50%; left: 0; width: 0; height: 1px; background: rgba(255, 255, 255, 0.7); z-index: 230; transform: translateY(-50%); box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); transition: none; pointer-events: none; }
-  .line-wipe.is-running { width: 100vw; transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1); }
-  .line-wipe.is-fading { opacity: 0; transition: opacity 0.3s ease; }
   .desktop-sequence { position: fixed; inset: 0; z-index: 120; opacity: 1; visibility: visible; transition: opacity 0.32s ease, visibility 0s linear 0s; }
   .desktop-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.28s ease, visibility 0s linear 0.28s; }
   .hero-spacer { height: 100vh; position: relative; overflow: hidden; background: #050b18; }
@@ -254,48 +289,68 @@ function getThumbnail(content) {
   .brand-panel.is-night .brand-night { opacity: 1; transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transform: scale(1.04); transition: opacity 0.6s ease, transform 0.6s ease; }
   .brand-panel.is-bg .brand-bg { opacity: 0.96; transform: scale(1); transition: opacity 1.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.1s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%); opacity: 0; transition: opacity 0.6s ease; }
-  .brand-panel.is-bg .brand-bg-overlay { opacity: 1; transition: opacity 1.3s ease; }
+  .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%); opacity: 0; transition: opacity 1.3s ease; }
+  .brand-panel.is-bg .brand-bg-overlay { opacity: 1; }
   .brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; }
   .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); }
   .brand-desc p { font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 300; color: #eee; margin-bottom: 15px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); }
   .fade-base { opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
   .fade-up { transform: translateY(40px); }
-  .text-anim-target.is-visible .fade-up { transform: translate(0); opacity: 1; transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .fade-left { transform: translateX(-80px); }
-  .text-anim-target.is-visible .fade-left { transform: translate(0); opacity: 1; transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .text-anim-target.is-visible .fade-up, .text-anim-target.is-visible .fade-left { transform: translate(0); opacity: 1; transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .text-anim-target.is-visible .anim-logo { transition-delay: 0.2s; }
   .text-anim-target.is-visible .anim-catch { transition-delay: 0.9s; }
   .text-anim-target.is-visible .anim-desc1 { transition-delay: 1.8s; }
   .text-anim-target.is-visible .anim-desc2 { transition-delay: 2.6s; }
   .text-anim-target.is-visible .anim-desc3 { transition-delay: 3.4s; }
-  .section-fade-in { opacity: 0; transform: translateY(70px); transition: opacity 0.78s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.78s cubic-bezier(0.2, 0.8, 0.2, 1); width: 100%; will-change: opacity, transform; }
-  .section-observer.is-visible .section-fade-in { opacity: 1; transform: translateY(0); }
   .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
   .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
   .carousel-wrapper { position: relative; width: 100%; }
-  .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; z-index: 20; font-size: 24px; transition: background 0.3s ease, transform 0.2s ease; display: none; }
-  .nav-arrow:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-50%) scale(1.05); }
-  .left-arrow { left: 4vw; }
-  .right-arrow { right: 4vw; }
-  .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 40px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
-  .carousel-container::-webkit-scrollbar { display: none; }
-  .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
-  .observer-card { scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; position: relative; border-radius: 4px; overflow: hidden; transition: transform 0.6s ease, opacity 0.6s ease; opacity: 0.4; transform: scale(0.85); display: block; user-select: none; border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111; }
-  .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7); z-index: 10; }
-  .story-card .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
+  
+  /* ▼ 修正：カードの青文字防止と、2/3画像・1/3文字のレイアウト設定 ▼ */
+  .no-link-color { color: inherit !important; text-decoration: none !important; }
+  .no-link-color:visited, .no-link-color:hover, .no-link-color:active { color: inherit !important; text-decoration: none !important; }
+
+  .observer-card { 
+    scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; 
+    position: relative; border-radius: 8px; overflow: hidden; 
+    transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.6s ease; 
+    opacity: 0.4; transform: scale(0.85); display: flex; flex-direction: column; 
+    user-select: none; border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  .observer-card.is-center { 
+    opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); z-index: 10; 
+  }
+
+  .card-img-box { width: 100%; height: 66.66%; position: relative; overflow: hidden; }
+  .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
   .story-card.is-center:hover .card-bg { transform: scale(1.05); }
-  .story-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%); }
-  .card-content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; pointer-events: none; }
-  .card-meta { display: flex; gap: 12px; margin-bottom: 16px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+
+  .card-text-box { 
+    width: 100%; height: 33.33%; padding: 20px 30px; 
+    background: linear-gradient(to bottom, #1a1a24, #0d0d0d); 
+    display: flex; flex-direction: column; justify-content: center; 
+    border-top: 1px solid rgba(255, 255, 255, 0.05); 
+  }
+  .card-meta { display: flex; gap: 12px; margin-bottom: 12px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
   .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 4px; }
   .card-meta .country { color: #aaa; }
-  .card-title { font-size: clamp(1.2rem, 2vw, 2rem); font-weight: 400; line-height: 1.3; margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
-  .card-excerpt { font-size: 14px; color: #ddd; margin-bottom: 24px; display: none; line-height: 1.5; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
-  .story-card.is-center .card-excerpt { display: block; }
-  .cta-link { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #fff; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
-  .story-card.is-center .cta-link { opacity: 1; transform: translateY(0); }
+  .card-title { font-size: clamp(1.1rem, 1.8vw, 1.6rem); font-weight: 400; line-height: 1.4; margin-bottom: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ▼ 修正：下部中央のナビゲーションデザイン ▼ */
+  .carousel-bottom-nav { display: flex; align-items: center; justify-content: center; gap: 30px; margin-top: 40px; }
+  .carousel-dots-wrapper { display: flex; gap: 10px; }
+  .c-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: transform 0.3s ease, background 0.3s ease; }
+  .c-dot.active { background: #fff; transform: scale(1.5); }
+  .carousel-next-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
+  .carousel-next-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
+
+  .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
+  .carousel-container::-webkit-scrollbar { display: none; }
+  .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
+  
   .lang-card { flex: 0 0 28vw; height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
   .lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
   .lang-card.is-center .lang-bg { opacity: 0.8; }
@@ -305,22 +360,14 @@ function getThumbnail(content) {
   .lang-border { width: 0; height: 1px; background: #fff; margin-top: 20px; transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0.5; }
   .lang-card.is-center .lang-border { width: 40px; }
   .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
+  
   .site-footer { height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333; }
   .site-footer p { color: #666; font-size: 14px; }
-
-  /* パソコンで見ている時だけ表示する */
   .desktop-only-wrapper { display: block; }
-  @media (max-width: 768px) {
-    .desktop-only-wrapper { display: none; }
-    .scroll-indicator { display: none; }
-    .transition-mask { display: none; }
-  }
-  @media (min-width: 769px) { .nav-arrow { display: flex; align-items: center; justify-content: center; } }
+  @media (max-width: 768px) { .desktop-only-wrapper { display: none; } }
 </style>
 
 <script is:inline>
-  if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
-  
   document.addEventListener('DOMContentLoaded', () => {
     const DESKTOP_BREAKPOINT = 768;
     const HERO_ANIM_MS = 1500;
@@ -340,8 +387,6 @@ function getThumbnail(content) {
     let isFreeScroll = false;
 
     const body = document.body;
-    const sideMenu = document.getElementById('side-menu');
-    const footer = document.querySelector('.site-footer');
     const desktopSequence = document.getElementById('desktop-sequence');
     const brandPanel = document.getElementById('brand-panel');
     const brandTextTarget = document.getElementById('brand-text-target');
@@ -379,12 +424,6 @@ function getThumbnail(content) {
       window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS);
       window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS);
       window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS);
-    }
-
-    function hideBrandAnimated() {
-      brandTextTarget?.classList.remove('is-visible');
-      brandPanel?.classList.remove('is-bg', 'is-night');
-      window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS);
     }
 
     function activateHeroSlide(index) {
@@ -436,38 +475,18 @@ function getThumbnail(content) {
         setBodyLocked(true);
         desktopSequence?.classList.remove('is-hidden');
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-        
-        if (previousStep === 3 && step === 2) {
-          transitionBrandToHero();
-          return;
-        }
-
-        hideMask();
-        clearSectionVisibility();
-        resetBrandPanel();
-        activateHeroSlide(step);
-        return;
+        if (previousStep === 3 && step === 2) { transitionBrandToHero(); return; }
+        hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return;
       }
 
       if (step === 3) {
         isFreeScroll = false;
         setBodyLocked(true);
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-        
-        if (previousStep === 4) {
-          transitionStoriesToBrand();
-          return;
-        }
-
-        hideMask();
-        clearSectionVisibility();
-        desktopSequence?.classList.remove('is-hidden');
-        if (previousStep >= 5) {
-          revealBrandImmediate();
-          window.setTimeout(() => { isAnimating = false; }, 200);
-        } else {
-          showBrandAnimated();
-        }
+        if (previousStep === 4) { transitionStoriesToBrand(); return; }
+        hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden');
+        if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } 
+        else { showBrandAnimated(); }
         return;
       }
 
@@ -485,9 +504,10 @@ function getThumbnail(content) {
     function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
 
     window.addEventListener('wheel', (e) => {
-      if (!isDesktop() || sideMenu?.classList.contains('is-open')) return;
+      if (!isDesktop() || document.getElementById('side-menu')?.classList.contains('is-open')) return;
+      const footerOffset = document.querySelector('.site-footer')?.offsetTop ?? 0;
       if (isFreeScroll) {
-        if (e.deltaY < -WHEEL_THRESHOLD && window.scrollY <= (footer?.offsetTop ?? 0) + 10) { e.preventDefault(); leaveFooterMode(); }
+        if (e.deltaY < -WHEEL_THRESHOLD && window.scrollY <= footerOffset + 10) { e.preventDefault(); leaveFooterMode(); }
         return;
       }
       e.preventDefault();
@@ -496,43 +516,58 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    window.addEventListener('keydown', (e) => {
-      if (!isDesktop() || sideMenu?.classList.contains('is-open')) return;
-      const downKeys = ['ArrowDown', 'PageDown', ' '], upKeys = ['ArrowUp', 'PageUp'];
-      if (isFreeScroll) {
-        if (upKeys.includes(e.key) && window.scrollY <= (footer?.offsetTop ?? 0) + 10) { e.preventDefault(); leaveFooterMode(); }
-        return;
-      }
-      if (downKeys.includes(e.key)) { e.preventDefault(); if (!isAnimating) moveNext(); }
-      if (upKeys.includes(e.key)) { e.preventDefault(); if (!isAnimating) movePrev(); }
-      if (e.key === 'Home') { e.preventDefault(); goToStep(0); }
+    // ▼ 修正：下部ナビゲーション（ドットの切り替え）の連動プログラム ▼
+    const storyCards = document.querySelectorAll('#story-carousel .observer-card');
+    const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
+    const storyNextBtn = document.getElementById('story-carousel-next');
+    const storyContainer = document.getElementById('story-carousel');
+
+    storyNextBtn?.addEventListener('click', () => {
+      storyContainer?.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' });
     });
 
-    window.addEventListener('resize', () => {
-      if (!isDesktop()) {
-        isAnimating = false; isFreeScroll = false; setBodyLocked(false);
-        desktopSequence?.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility();
-      }
+    const storyObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-center');
+          const index = Array.from(storyCards).indexOf(entry.target);
+          if(index !== -1 && storyDots[index]) {
+            storyDots.forEach(d => d.classList.remove('active'));
+            storyDots[index].classList.add('active');
+          }
+        } else {
+          entry.target.classList.remove('is-center');
+        }
+      });
+    }, { root: storyContainer, rootMargin: '0px -40% 0px -40%', threshold: 0 });
+    storyCards.forEach(card => storyObserver.observe(card));
+
+    const langCards = document.querySelectorAll('#lang-carousel .observer-card');
+    const langDots = document.querySelectorAll('#lang-carousel-dots .c-dot');
+    const langNextBtn = document.getElementById('lang-carousel-next');
+    const langContainer = document.getElementById('lang-carousel');
+
+    langNextBtn?.addEventListener('click', () => {
+      langContainer?.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' });
     });
+
+    const langObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-center');
+          const index = Array.from(langCards).indexOf(entry.target);
+          if(index !== -1 && langDots[index]) {
+            langDots.forEach(d => d.classList.remove('active'));
+            langDots[index].classList.add('active');
+          }
+        } else {
+          entry.target.classList.remove('is-center');
+        }
+      });
+    }, { root: langContainer, rootMargin: '0px -40% 0px -40%', threshold: 0 });
+    langCards.forEach(card => langObserver.observe(card));
 
     setBodyLocked(true); desktopSequence?.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
     window.setTimeout(() => { leftPanels[0]?.classList.add('is-active'); rightPanels[0]?.classList.add('is-active'); }, 400);
-
-    document.getElementById('menu-open').onclick = () => sideMenu?.classList.add('is-open');
-    document.getElementById('menu-close').onclick = () => sideMenu?.classList.remove('is-open');
-
-    const sectionObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); }); }, { threshold: 0.15 });
-    document.querySelectorAll('.section-observer').forEach((el) => { sectionObserver.observe(el); });
-
-    const carouselObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('is-center'); else entry.target.classList.remove('is-center'); }); }, { root: null, rootMargin: '0px -40% 0px -40%', threshold: 0 });
-    document.querySelectorAll('.observer-card').forEach((card) => { carouselObserver.observe(card); });
-
-    document.querySelectorAll('.carousel-wrapper').forEach((wrapper) => {
-      const container = wrapper.querySelector('.carousel-container');
-      const leftBtn = wrapper.querySelector('.left-arrow');
-      const rightBtn = wrapper.querySelector('.right-arrow');
-      leftBtn?.addEventListener('click', () => { container?.scrollBy({ left: -window.innerWidth * 0.4, behavior: 'smooth' }); });
-      rightBtn?.addEventListener('click', () => { container?.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' }); });
-    });
   });
 </script>
