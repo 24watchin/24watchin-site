@@ -257,7 +257,9 @@ function getThumbnail(content) {
               <a href="/info/copyright/">COPYRIGHT / REUSE</a>
             </div>
             <div class="top-footer-copy">
-              &copy; 2026 The Dexent Media Enterprises. All Rights Reserved.
+              <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
+              <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
+              <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
             </div>
           </div>
         </div>
@@ -335,7 +337,10 @@ function getThumbnail(content) {
   .brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
   .brand-panel.is-visible { visibility: visible; }
   .seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-  #screen-6 { z-index: 41; padding-bottom: 110px; }
+  
+  /* ▼ フッターが高くなる分、中央位置のパディングを増やして重ならないように調整 ▼ */
+  #screen-6 { z-index: 41; padding-bottom: 180px; }
+  
   .seq-panel.is-visible { visibility: visible; pointer-events: auto; }
   .seq-inner { width: 100%; opacity: 0; transform: translateY(40px); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s; }
   .seq-panel.is-visible .seq-inner { opacity: 1; transform: translateY(0); }
@@ -406,7 +411,8 @@ function getThumbnail(content) {
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
   
-  .lang-card { flex: 0 0 28vw; height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
+  /* ▼ 言語カードの高さを 50vh から 42vh に短くしました ▼ */
+  .lang-card { flex: 0 0 28vw; height: 42vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
   
   .lang-card::before {
     content: '';
@@ -444,11 +450,14 @@ function getThumbnail(content) {
     box-sizing: border-box;
     z-index: 100;
   }
+  
+  /* ▼ ロゴと右側リンクがくっつかないよう、gap（隙間）でバリアを張りました ▼ */
   .top-footer-inner { 
     display: flex; 
-    align-items: center; 
+    align-items: flex-start; /* 右側の文字が増えたので上揃えに調整 */
     justify-content: space-between; 
     width: 100%; 
+    gap: 40px; 
   }
   
   .top-footer-logo a {
@@ -461,30 +470,46 @@ function getThumbnail(content) {
     filter: brightness(0) invert(1);
   }
   
+  /* ▼ コピーライトの文字が増えたため、レイアウトを調整しました ▼ */
   .top-footer-right {
     display: flex;
     flex-direction: column;
     align-items: flex-end; 
-    gap: 8px;
+    gap: 16px;
+    max-width: 850px;
   }
+  
+  /* ▼ ABOUTなどの6つのリンクの間隔を狭めました（gap: 8px 16px;） ▼ */
   .top-footer-links { 
     display: flex; 
-    gap: 24px; 
+    flex-wrap: wrap; 
+    justify-content: flex-end;
+    gap: 8px 16px; 
   }
   .top-footer-links a { 
     color: #a0aec0; 
     font-size: 11px; 
     text-decoration: none; 
-    letter-spacing: 2px; 
+    letter-spacing: 1px; 
     transition: color 0.3s ease; 
   }
   .top-footer-links a:hover { 
     color: #fff; 
   }
+  
+  /* ▼ 3行のコピーライトを綺麗に右揃えで並べる設定 ▼ */
   .top-footer-copy { 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    text-align: right;
+  }
+  .top-footer-copy p { 
+    margin: 0;
     color: #cbd5e1; 
     font-size: 10px; 
-    letter-spacing: 1px; 
+    letter-spacing: 0.5px; 
   }
 </style>
 
@@ -492,7 +517,6 @@ function getThumbnail(content) {
   if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
   
   document.addEventListener('DOMContentLoaded', () => {
-    // 古いコードの残骸によるエラーを防ぐため、全体を安全な仕組み（try-catch）で囲んでいます
     try {
       document.addEventListener('contextmenu', event => event.preventDefault());
 
@@ -718,7 +742,6 @@ function getThumbnail(content) {
       }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
       langCards.forEach(card => langObserver.observe(card));
 
-      // ページ読み込み時の最初の動き（ここで文字を出しています）
       setBodyLocked(true); 
       if(desktopSequence) desktopSequence.classList.remove('is-hidden'); 
       hideMask(); 
