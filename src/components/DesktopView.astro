@@ -25,9 +25,10 @@ const backupStories = [
 
 const displayStories = latestStories.length > 0 ? latestStories : backupStories;
 
+// ⑤ Englishと日本語の順番を入れ替えました
 const languages = [
-  { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
+  { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
   { code: 'zh-cn', name: '简体中文', color: '#C53030', url: '/zh-cn/' },
   { code: 'zh-tw', name: '繁體中文', color: '#2C5282', url: '/zh-tw/' },
   { code: 'es', name: 'Español', color: '#B7791F', url: '/es/' },
@@ -43,7 +44,7 @@ function stripHtml(html) {
 }
 
 function getThumbnail(content) {
-  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)'; 
+  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
   const match = content.match(/<img[^>]+src="([^">]+)"/);
   return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
 }
@@ -71,7 +72,7 @@ function getThumbnail(content) {
     <div class="menu-grid">
       {languages.map((lang) => (
         <a href={lang.url} class="menu-lang-card" style={`--accent: ${lang.color}`}>
-          <span class="lang-name">{lang.name}</span>
+          <span class="lang-name" lang={lang.code}>{lang.name}</span>
         </a>
       ))}
     </div>
@@ -151,10 +152,8 @@ function getThumbnail(content) {
               let countryCode = 'world';
               let countryName = '';
               let dateText = '';
-
               if (post.labels && Array.isArray(post.labels)) {
                 bgImage = getThumbnail(post.content);
-                
                 const countryTag = post.labels.find(l => l.startsWith('en-'));
                 if (countryTag) {
                   countryCode = countryTag.replace('en-', '');
@@ -222,8 +221,7 @@ function getThumbnail(content) {
               <a href={lang.url} class="lang-card observer-card no-link-color">
                 <div class="lang-bg" style={`background-color: ${lang.color};`}></div>
                 <div class="lang-content">
-                  <div class="lang-logo">24watchin</div>
-                  <h3 class="lang-name">{lang.name}</h3>
+                  <h3 class="lang-name" lang={lang.code}>{lang.name}</h3>
                   <div class="lang-border"></div>
                 </div>
               </a>
@@ -339,11 +337,12 @@ function getThumbnail(content) {
   .no-link-color:visited, .no-link-color:hover, .no-link-color:active { color: inherit !important; text-decoration: none !important; }
 
   .observer-card { 
-    scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw; 
+    scroll-snap-align: center; flex: 0 0 40vw; height: 60vh; margin: 0 1.5vw;
     position: relative; border-radius: 8px; overflow: hidden; 
     transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.6s ease; 
-    opacity: 0.4; transform: scale(0.85); display: flex; flex-direction: column; 
-    user-select: none; border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111; 
+    opacity: 0.4; transform: scale(0.85);
+    display: flex; flex-direction: column; 
+    user-select: none; border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
   .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); z-index: 10; }
@@ -355,7 +354,7 @@ function getThumbnail(content) {
   .card-text-box { 
     width: 100%; height: 33.33%; padding: 20px 30px; 
     background: linear-gradient(to bottom, #050b1e, #02040a); 
-    display: flex; flex-direction: column; justify-content: center; 
+    display: flex; flex-direction: column; justify-content: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
   }
   
@@ -378,10 +377,26 @@ function getThumbnail(content) {
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
   
   .lang-card { flex: 0 0 28vw; height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
+  
+  /* ④ カードの中に細い白い枠線（内枠）を追加しました */
+  .lang-card::before {
+    content: '';
+    position: absolute;
+    top: 15px; left: 15px; right: 15px; bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 5;
+    pointer-events: none;
+    transition: top 0.6s ease, left 0.6s ease, right 0.6s ease, bottom 0.6s ease, border-color 0.6s ease;
+  }
+  /* カードが中央に来た時は、枠を少しだけ内側に縮めて高級感を出します */
+  .lang-card.is-center::before {
+    top: 25px; left: 25px; right: 25px; bottom: 25px;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
   .lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
   .lang-card.is-center .lang-bg { opacity: 0.8; }
   .lang-content { position: relative; z-index: 2; width: 100%; height: 100%; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
-  .lang-logo { position: absolute; bottom: 30px; left: 30px; font-size: 12px; letter-spacing: 2px; opacity: 0.5; }
   .lang-name { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 300; letter-spacing: 0.05em; transition: transform 0.4s ease; color: #fff; }
   .lang-border { width: 0; height: 1px; background: #fff; margin-top: 20px; transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0.5; }
   .lang-card.is-center .lang-border { width: 40px; }
@@ -550,27 +565,24 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    // ▼ 修正：プログラムに「カードの幅と隙間」を自動計算させ、1ミリのズレもなく動かします ▼
     function slowScroll(element, distance, duration) {
       element.classList.add('is-scrolling');
       const start = element.scrollLeft;
       const startTime = performance.now();
       
-      function easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-      }
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
       
       function animation(currentTime) {
         const timeElapsed = currentTime - startTime;
         const progress = Math.min(timeElapsed / duration, 1);
         element.scrollLeft = start + distance * easeOutCubic(progress);
-        
         if (timeElapsed < duration) {
           requestAnimationFrame(animation);
         } else {
+          // ① ガクッとする現象を防ぐため、スクロール完了後の待ち時間を少し長めに調整しました
           window.setTimeout(() => {
             element.classList.remove('is-scrolling');
-          }, 50);
+          }, 150); 
         }
       }
       requestAnimationFrame(animation);
@@ -582,7 +594,6 @@ function getThumbnail(content) {
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
-    // 矢印が押されたら、カード1枚分の正確な横幅（幅＋左右の隙間）を測ってスクロール距離にします
     storyPrevBtn?.addEventListener('click', () => {
       if (storyCards.length > 0) {
         const cardWidth = storyCards[0].offsetWidth;
