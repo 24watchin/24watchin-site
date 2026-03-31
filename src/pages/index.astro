@@ -105,8 +105,6 @@ const languages = [
 
     <div class="transition-mask" id="transition-mask" aria-hidden="true"></div>
 
-    <div class="line-wipe" id="line-wipe" aria-hidden="true"></div>
-
     <main class="gateway-main">
       <div class="desktop-sequence" id="desktop-sequence">
         <div class="split-stage">
@@ -421,30 +419,6 @@ const languages = [
         transition: opacity 0.8s ease;
       }
 
-      .line-wipe {
-        position: fixed;
-        top: 50%;
-        left: 0;
-        width: 0;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.7);
-        z-index: 230;
-        transform: translateY(-50%);
-        box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
-        transition: none;
-        pointer-events: none;
-      }
-
-      .line-wipe.is-running {
-        width: 100vw;
-        transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .line-wipe.is-fading {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
       .desktop-sequence {
         position: fixed;
         inset: 0;
@@ -645,7 +619,6 @@ const languages = [
         transform: translateY(0);
       }
 
-      /* ▼ 修正箇所：消える時（画面4から離れる時）のスピードを0.6秒にして、サッと綺麗に消えるようにしました ▼ */
       .brand-night {
         position: absolute;
         inset: 0;
@@ -653,12 +626,11 @@ const languages = [
         background:
           radial-gradient(circle at 50% 35%, rgba(33, 76, 160, 0.18) 0%, rgba(17, 36, 82, 0.28) 22%, rgba(7, 15, 40, 0.62) 56%, rgba(4, 8, 24, 0.92) 100%),
           linear-gradient(to bottom, rgba(8, 18, 48, 0.55) 0%, rgba(5, 12, 32, 0.88) 75%, rgba(3, 7, 20, 0.96) 100%);
-        transition: opacity 0.6s ease;
+        transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .brand-panel.is-night .brand-night {
         opacity: 1;
-        transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .brand-bg {
@@ -668,13 +640,12 @@ const languages = [
         background-position: center;
         opacity: 0;
         transform: scale(1.04);
-        transition: opacity 0.6s ease, transform 0.6s ease;
+        transition: opacity 1.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.1s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .brand-panel.is-bg .brand-bg {
         opacity: 0.96;
         transform: scale(1);
-        transition: opacity 1.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.1s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .brand-bg-overlay {
@@ -682,14 +653,12 @@ const languages = [
         inset: 0;
         background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%);
         opacity: 0;
-        transition: opacity 0.6s ease;
+        transition: opacity 1.3s ease;
       }
 
       .brand-panel.is-bg .brand-bg-overlay {
         opacity: 1;
-        transition: opacity 1.3s ease;
       }
-      /* ▲ 修正箇所おわり ▲ */
 
       .brand-content {
         position: relative;
@@ -733,13 +702,19 @@ const languages = [
       .fade-up {
         transform: translateY(40px);
       }
+
+      .text-anim-target.is-visible .fade-up {
+        transform: translateY(0);
+        opacity: 1;
+        transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
       .fade-left {
         transform: translateX(-80px);
       }
 
-      .text-anim-target.is-visible .fade-up,
       .text-anim-target.is-visible .fade-left {
-        transform: translate(0);
+        transform: translateX(0);
         opacity: 1;
         transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
@@ -1084,20 +1059,11 @@ const languages = [
         const BRAND_BG_DELAY_MS = 700;
         const BRAND_TEXT_DELAY_MS = 1350;
         const BRAND_UNLOCK_MS = 2300;
-        
-        // ▼ 修正：画面4から離れる時は「0.6秒」でサッと消えるようにプログラム時間を短縮しました ▼
-        const BRAND_HIDE_MS = 600; 
 
         const MASK_IN_MS  = 800;   
         const MASK_HOLD_MS = 50;
         const MASK_OUT_MS  = 800;
         const MASK_UNLOCK_MS = 100;
-
-        const LINE_WIPE_MS = 650;      
-        const LINE_FADE_MS = 300;      
-
-        const SECTION_ANIM_MS = 240;
-        const FOOTER_ANIM_MS = 900;
 
         let currentStep = 0;
         let isAnimating = false;
@@ -1114,31 +1080,6 @@ const languages = [
 
         const screen5 = document.getElementById('screen-5');
         const screen6 = document.getElementById('screen-6');
-        const lineWipe = document.getElementById('line-wipe');
-
-        function runLineWipe(callback) {
-          lineWipe.classList.remove('is-running', 'is-fading');
-          lineWipe.style.width = '0';
-
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              lineWipe.classList.add('is-running');
-
-              window.setTimeout(() => {
-                callback();
-
-                lineWipe.classList.remove('is-running');
-                lineWipe.classList.add('is-fading');
-
-                window.setTimeout(() => {
-                  lineWipe.classList.remove('is-fading');
-                  lineWipe.style.width = '0';
-                }, LINE_FADE_MS);
-
-              }, LINE_WIPE_MS);
-            });
-          });
-        }
 
         const dots = document.querySelectorAll('.scroll-indicator .dot');
 
@@ -1214,16 +1155,6 @@ const languages = [
           }, BRAND_UNLOCK_MS);
         }
 
-        function hideBrandAnimated() {
-          brandTextTarget?.classList.remove('is-visible');
-          brandPanel?.classList.remove('is-bg', 'is-night');
-
-          window.setTimeout(() => {
-            brandPanel?.classList.remove('is-visible');
-            isAnimating = false;
-          }, BRAND_HIDE_MS);
-        }
-
         function activateHeroSlide(index) {
           leftPanels.forEach((panel) => panel.classList.remove('is-active'));
           rightPanels.forEach((panel) => panel.classList.remove('is-active'));
@@ -1280,6 +1211,20 @@ const languages = [
           }, MASK_IN_MS);
         }
 
+        // ▼ 修正：画面4から3へ戻る時、完全に黒い幕を下ろして処理を行う専用の関数です ▼
+        function transitionBrandToHero() {
+          showMask(); // 黒い幕を下ろす（0.8秒）
+          window.setTimeout(() => {
+            // 黒い幕の下で、画面4を一瞬で消して画面3のテキストを再表示する
+            resetBrandPanel(); 
+            clearSectionVisibility();
+            activateHeroSlide(2); 
+            
+            // 幕を上げる（0.8秒）
+            hideMask();
+          }, MASK_IN_MS);
+        }
+
         function goToStep(step) {
           if (!isDesktop()) return;
           if (step < 0 || step > 5) return;
@@ -1294,19 +1239,21 @@ const languages = [
             isFreeScroll = false;
             setBodyLocked(true);
             desktopSequence?.classList.remove('is-hidden');
-            hideMask();
-            clearSectionVisibility();
-
+            
             window.scrollTo({
               top: 0,
               left: 0,
               behavior: 'auto'
             });
+
+            // ▼ 修正：画面4から画面3へ戻る時、新しい「幕の上げ下げ」の魔法を使います ▼
             if (previousStep === 3 && step === 2) {
-              hideBrandAnimated();
+              transitionBrandToHero();
               return;
             }
 
+            hideMask();
+            clearSectionVisibility();
             resetBrandPanel();
             activateHeroSlide(step);
             return;
