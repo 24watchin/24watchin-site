@@ -303,7 +303,6 @@ function getThumbnail(content) {
   .menu-inner h3 { font-size: 14px; letter-spacing: 4px; margin-bottom: 50px; color: #888; }
   .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
   
-  /* ▼ メニュー内の言語カード：指定の色で塗りつぶし、マウスオーバーで枠線を白く光らせる ▼ */
   .menu-lang-card { 
     padding: 40px; 
     border: 1px solid rgba(255, 255, 255, 0.15); 
@@ -450,6 +449,8 @@ function getThumbnail(content) {
   .lang-card.is-center .lang-border { width: 40px; }
   .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
 
+  .desktop-only-wrapper { display: block; }
+
   .top-footer { 
     position: absolute;
     bottom: 0;
@@ -462,16 +463,15 @@ function getThumbnail(content) {
     z-index: 100;
   }
   
-  /* ▼ フッターを3つの箱（左・中央・右）に分けて完璧に中央揃えにする設定 ▼ */
   .top-footer-inner { 
     display: flex; 
-    align-items: center; /* 縦方向の真ん中揃え */
+    align-items: center;
     justify-content: space-between; 
     width: 100%; 
   }
   
   .top-footer-logo {
-    flex: 1; /* 左側のエリア */
+    flex: 1;
     display: flex;
     justify-content: flex-start;
   }
@@ -490,25 +490,25 @@ function getThumbnail(content) {
   }
   
   .top-footer-center {
-    flex: 3; /* 中央の広いエリア */
+    flex: 3;
     display: flex;
     flex-direction: column;
-    align-items: center; /* 中身を真ん中に揃える */
+    align-items: center;
     width: 100%;
   }
 
   .top-footer-spacer {
-    flex: 1; /* 右側にロゴと同じ大きさの見えない箱を置き、文字を完璧な中央に押し出します */
+    flex: 1;
   }
   
   .top-footer-links { 
     display: flex; 
     flex-wrap: wrap; 
-    justify-content: center; /* リンクを中央揃えに */
-    gap: 8px 16px; /* リンク同士の間隔を少し狭めました */
+    justify-content: center;
+    gap: 8px 16px;
     padding-bottom: 16px;
     margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* リンクの下にだけ細い線を引きます */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
   .top-footer-links a { 
     color: #a0aec0; 
@@ -524,7 +524,7 @@ function getThumbnail(content) {
   .top-footer-copy { 
     display: flex;
     flex-direction: column;
-    align-items: center; /* 3行の文字を中央揃えに */
+    align-items: center;
     text-align: center;
     gap: 6px;
   }
@@ -573,15 +573,14 @@ function getThumbnail(content) {
       const menuOpenBtn = document.getElementById('menu-open');
       const menuCloseBtn = document.getElementById('menu-close');
       const sideMenu = document.getElementById('side-menu');
-
+      
       menuOpenBtn?.addEventListener('click', () => {
         sideMenu?.classList.add('is-open');
       });
-
       menuCloseBtn?.addEventListener('click', () => {
         sideMenu?.classList.remove('is-open');
       });
-
+      
       function setBodyLocked(locked) { 
         document.body.classList.toggle('is-locked', locked); 
         document.documentElement.classList.toggle('is-locked', locked);
@@ -769,12 +768,10 @@ function getThumbnail(content) {
       resetBrandPanel(); 
       clearSectionVisibility(); 
       updateIndicator(0);
-      
       window.setTimeout(() => { 
         if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); 
         if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); 
       }, 400);
-
     } catch (error) {
       console.error("プログラムでエラーが発生しました:", error);
     }
