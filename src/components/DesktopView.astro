@@ -1,6 +1,10 @@
 ---
-// ▼ 修正：司令塔から「本物の最新記事データ」を受け取ります（デモデータは削除しました） ▼
+// 司令塔から「本物の最新記事データ」を受け取ります
 const { latestStories = [] } = Astro.props;
+
+// ▼ 修正④：アップロードいただいた設計図から、英語のカテゴリ翻訳ルールを読み込みます
+import { categoryLabelMap } from '../lib/categoryLabels.ts';
+const enCategories = categoryLabelMap['en'].allCategories;
 
 const languages = [
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -13,14 +17,12 @@ const languages = [
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
 
-// 本文からHTMLタグを消して、きれいな「抜粋」を作る関数
 function stripHtml(html) {
   if (!html) return '';
   const text = html.replace(/<[^>]*>?/gm, '');
   return text.length > 100 ? text.substring(0, 100) + '...' : text;
 }
 
-// 記事の中から「最初の画像URL」を見つけ出す関数
 function getThumbnail(content) {
   if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)'; 
   const match = content.match(/<img[^>]+src="([^">]+)"/);
@@ -125,32 +127,31 @@ function getThumbnail(content) {
             <div class="carousel-spacer"></div>
             
             {latestStories.map((post) => {
-              const excerpt = stripHtml(post.content);
               const bgImage = getThumbnail(post.content);
               
-              // Bloggerのタグ（ラベル）から国名や国コードを探し出します
-              let category = 'News';
-              let countryName = '';
-              let countryCode = 'world'; // タグがない場合の予備
+              let categoryName = 'News';
+              let countryCode = 'world';
 
               if (post.labels && post.labels.length > 0) {
-                category = post.labels[0]; // 最初のタグをカテゴリとします
-                
-                // 「jp」など、2文字の小文字のタグを探して国コードにします
-                const codeLabel = post.labels.find(l => l.length === 2 && l === l.toLowerCase());
-                if (codeLabel) {
-                  countryCode = codeLabel;
+                // ▼ 修正①：「en-jp」などのタグから「jp」の部分だけを切り出して国コードにします
+                const countryTag = post.labels.find(l => l.startsWith('en-'));
+                if (countryTag) {
+                  countryCode = countryTag.replace('en-', '');
                 }
                 
-                // カテゴリでも国コードでもないタグを、国名として表示します
-                const nameLabel = post.labels.find(l => l !== category && l !== countryCode);
-                if (nameLabel) {
-                  countryName = nameLabel;
+                // ▼ 修正④：Bloggerのタグと、設定ファイルのキーワードを照らし合わせて英語のカテゴリ名を出します
+                const foundCat = enCategories.find(cat => 
+                  post.labels.some(label => cat.keywords.some(key => label.includes(key)))
+                );
+                if (foundCat) {
+                  categoryName = foundCat.label;
                 }
               }
 
-              // 公開日をフォーマットします
-              const date = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+              // ▼ 修正④：日付を「Mar 31, 2026」のような英語表記にします
+              const date = post.published 
+                ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
+                : '';
 
               return (
                 <a href={`/en/${countryCode}/news/${post.id}`} class="story-card observer-card no-link-color">
@@ -159,14 +160,15 @@ function getThumbnail(content) {
                   </div>
                   <div class="card-text-box">
                     <div class="card-meta">
-                      <span class="category">{category}</span>
-                      <span class="country">{countryName || date}</span>
+                      <span class="category">{categoryName}</span>
+                      <span class="country">{date}</span>
                     </div>
                     <h3 class="card-title">{post.title}</h3>
                   </div>
                 </a>
               );
             })}
+
             <div class="carousel-spacer"></div>
           </div>
           
@@ -303,8 +305,6 @@ function getThumbnail(content) {
   .text-anim-target.is-visible .anim-desc1 { transition-delay: 1.8s; }
   .text-anim-target.is-visible .anim-desc2 { transition-delay: 2.6s; }
   .text-anim-target.is-visible .anim-desc3 { transition-delay: 3.4s; }
-  .section-fade-in { opacity: 0; transform: translateY(70px); transition: opacity 0.78s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.78s cubic-bezier(0.2, 0.8, 0.2, 1); width: 100%; will-change: opacity, transform; }
-  .section-observer.is-visible .section-fade-in { opacity: 1; transform: translateY(0); }
   .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
   .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
   
@@ -326,9 +326,10 @@ function getThumbnail(content) {
   .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
   .story-card.is-center:hover .card-bg { transform: scale(1.05); }
 
+  /* ▼ 修正③：カード下部の背景色を濃い紺色のグラデーションに変更しました ▼ */
   .card-text-box { 
     width: 100%; height: 33.33%; padding: 20px 30px; 
-    background: linear-gradient(to bottom, #1a1a24, #0d0d0d); 
+    background: linear-gradient(to bottom, #050b1e, #02040a); 
     display: flex; flex-direction: column; justify-content: center; 
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
   }
@@ -337,7 +338,6 @@ function getThumbnail(content) {
   .card-meta .country { color: #aaa; }
   .card-title { font-size: clamp(1.1rem, 1.8vw, 1.6rem); font-weight: 400; line-height: 1.4; margin-bottom: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-  /* ▼ 修正：下部中央のナビゲーション（ドットと「＜」「＞」ボタン） ▼ */
   .carousel-bottom-nav { display: flex; align-items: center; justify-content: center; gap: 30px; margin-top: 40px; }
   .carousel-dots-wrapper { display: flex; gap: 10px; }
   .c-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: transform 0.3s ease, background 0.3s ease; }
@@ -345,7 +345,8 @@ function getThumbnail(content) {
   .carousel-nav-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
   .carousel-nav-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
 
-  .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
+  /* ▼ 修正②：JSでの制御と干渉しないよう、CSSのsmooth指定を外しました ▼ */
+  .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
   
@@ -522,18 +523,37 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    // ▼ 修正：中央下の「＜」「＞」ボタンとドットの連動プログラム ▼
+    // ▼ 修正②：カードをゆっくり滑らかに横移動させるための専用プログラム ▼
+    function slowScroll(element, distance, duration) {
+      const start = element.scrollLeft;
+      const startTime = performance.now();
+      // ゆっくり加速してゆっくり減速する計算式です
+      function easeInOutSine(t) {
+        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      }
+      function animation(currentTime) {
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        element.scrollLeft = start + distance * easeInOutSine(progress);
+        if (timeElapsed < duration) {
+          requestAnimationFrame(animation);
+        }
+      }
+      requestAnimationFrame(animation);
+    }
+
     const storyCards = document.querySelectorAll('#story-carousel .observer-card');
     const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
     const storyPrevBtn = document.getElementById('story-carousel-prev');
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
+    // 矢印が押されたら「800ミリ秒」かけてゆっくりスクロールさせます
     storyPrevBtn?.addEventListener('click', () => {
-      storyContainer?.scrollBy({ left: -window.innerWidth * 0.4, behavior: 'smooth' });
+      slowScroll(storyContainer, -window.innerWidth * 0.4, 800);
     });
     storyNextBtn?.addEventListener('click', () => {
-      storyContainer?.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' });
+      slowScroll(storyContainer, window.innerWidth * 0.4, 800);
     });
 
     const storyObserver = new IntersectionObserver((entries) => {
@@ -559,10 +579,10 @@ function getThumbnail(content) {
     const langContainer = document.getElementById('lang-carousel');
 
     langPrevBtn?.addEventListener('click', () => {
-      langContainer?.scrollBy({ left: -window.innerWidth * 0.4, behavior: 'smooth' });
+      slowScroll(langContainer, -window.innerWidth * 0.4, 800);
     });
     langNextBtn?.addEventListener('click', () => {
-      langContainer?.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' });
+      slowScroll(langContainer, window.innerWidth * 0.4, 800);
     });
 
     const langObserver = new IntersectionObserver((entries) => {
