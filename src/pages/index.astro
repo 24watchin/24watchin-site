@@ -64,7 +64,7 @@ const languages = [
   </head>
 
   <body class="is-locked">
-    <header class="global-header">
+    <header class="global-header" id="main-header">
       <div class="header-band">
         <div class="logo-area">
           <a href="https://24watchin.com">
@@ -226,7 +226,9 @@ const languages = [
           </div>
         </section>
 
-      </div><section class="hero-spacer" aria-hidden="true">
+      </div>
+
+      <section class="hero-spacer" aria-hidden="true">
         <div class="hero-spacer-brand">
           <div class="hero-spacer-bg" style="background-image: url('/images/explanation.png');"></div>
           <div class="hero-spacer-bg-overlay"></div>
@@ -404,7 +406,6 @@ const languages = [
         background: rgba(255, 255, 255, 0.9);
       }
 
-      /* ▼ 修正：幕がゆっくり0.8秒かけて下り、上がるようにしました ▼ */
       .transition-mask {
         position: fixed;
         inset: 0;
@@ -720,34 +721,39 @@ const languages = [
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
       }
 
+      /* ▼ 修正：普段（消える時）は遅延なしで、サッと0.3秒で消えるようにしました ▼ */
       .fade-base {
         opacity: 0;
-        transition: opacity 3.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.3s ease, transform 0.3s ease;
       }
 
       .fade-up {
         transform: translateY(40px);
       }
 
+      .fade-left {
+        transform: translateX(-80px);
+      }
+
+      /* ▼ 修正：画面に入った時（表示される時）だけ、ゆっくり2.5秒かけて動かします ▼ */
       .text-anim-target.is-visible .fade-up {
         transform: translateY(0);
         opacity: 1;
-      }
-
-      .fade-left {
-        transform: translateX(-80px);
+        transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .text-anim-target.is-visible .fade-left {
         transform: translateX(0);
         opacity: 1;
+        transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      .anim-logo { transition-delay: 0.2s; }
-      .anim-catch { transition-delay: 0.9s; }
-      .anim-desc1 { transition-delay: 1.8s; }
-      .anim-desc2 { transition-delay: 2.6s; }
-      .anim-desc3 { transition-delay: 3.4s; }
+      /* ▼ 修正：待機時間（ディレイ）も、画面に入った時だけ適用されるように変更しました ▼ */
+      .text-anim-target.is-visible .anim-logo { transition-delay: 0.2s; }
+      .text-anim-target.is-visible .anim-catch { transition-delay: 0.9s; }
+      .text-anim-target.is-visible .anim-desc1 { transition-delay: 1.8s; }
+      .text-anim-target.is-visible .anim-desc2 { transition-delay: 2.6s; }
+      .text-anim-target.is-visible .anim-desc3 { transition-delay: 3.4s; }
 
       .mobile-only-area {
         display: none;
@@ -1085,7 +1091,6 @@ const languages = [
         const BRAND_UNLOCK_MS = 2300;
         const BRAND_HIDE_MS = 500;
 
-        // ▼ 修正：幕の上がり下がりを0.8秒ずつ（合計約1.6秒）かけて、ゆっくりじわーっと切り替わるようにしました ▼
         const MASK_IN_MS  = 800;   
         const MASK_HOLD_MS = 50;
         const MASK_OUT_MS  = 800;
