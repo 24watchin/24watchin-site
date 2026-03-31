@@ -273,6 +273,11 @@ function getThumbnail(content) {
     -webkit-user-select: none;
     user-select: none;
   }
+  
+  /* スライド中に間違ってスクロールしないように強制ロックする設定を追加しました */
+  html.is-locked, body.is-locked {
+    overflow: hidden !important;
+  }
 
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
@@ -419,7 +424,7 @@ function getThumbnail(content) {
   .desktop-only-wrapper { display: block; }
   @media (max-width: 768px) { .desktop-only-wrapper { display: none; } }
 
-  /* ▼ ここから追加したトップページ専用フッターのデザイン ▼ */
+  /* スライド画面に重なって表示されるように z-index を 200 に修正しました */
   .top-footer { 
     height: auto; 
     min-height: 250px; 
@@ -430,7 +435,7 @@ function getThumbnail(content) {
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
     padding: 60px 20px; 
     position: relative; 
-    z-index: 10; 
+    z-index: 200; 
   }
   .top-footer-inner { 
     display: flex; 
@@ -498,6 +503,7 @@ function getThumbnail(content) {
     let isFreeScroll = false;
 
     const body = document.body;
+    const html = document.documentElement;
     const desktopSequence = document.getElementById('desktop-sequence');
     const brandPanel = document.getElementById('brand-panel');
     const brandTextTarget = document.getElementById('brand-text-target');
@@ -513,7 +519,13 @@ function getThumbnail(content) {
     const r3 = document.querySelector('.right-track .p3');
 
     function isDesktop() { return window.innerWidth > DESKTOP_BREAKPOINT; }
-    function setBodyLocked(locked) { body.classList.toggle('is-locked', locked); }
+    
+    // スクロールをロック・解除する処理
+    function setBodyLocked(locked) { 
+      body.classList.toggle('is-locked', locked); 
+      html.classList.toggle('is-locked', locked); 
+    }
+    
     function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
     function showMask() { transitionMask?.classList.add('is-visible'); }
     function hideMask() { transitionMask?.classList.remove('is-visible'); }
@@ -615,19 +627,45 @@ function getThumbnail(content) {
       window.setTimeout(() => { isAnimating = false; }, 300);
     }
 
-    function enterFooterMode() { if (isAnimating) return; isAnimating = true; window.setTimeout(() => { isAnimating = false; }, 200); }
-    function leaveFooterMode() { if (isAnimating) return; goToStep(5); }
+    // 画面ロックを解除して一番下（フッター）までスムーズにスクロールさせる処理
+    function enterFooterMode() { 
+      if (isAnimating) return; 
+      isAnimating = true; 
+      isFreeScroll = true; // 自由にスクロールできるモードにする
+      setBodyLocked(false); // 画面のロックを外す
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); // 一番下へスクロール
+      window.setTimeout(() => { isAnimating = false; }, 600); 
+    }
+    
+    // フッターから元の言語選択スライドに戻る処理
+    function leaveFooterMode() { 
+      if (isAnimating) return; 
+      isAnimating = true; 
+      window.scrollTo({ top: 0, behavior: 'smooth' }); // 一番上へスムーズに戻る
+      window.setTimeout(() => { 
+        isFreeScroll = false; // 自由スクロールモードを終了
+        setBodyLocked(true); // 再び画面をロック
+        goToStep(5); // 言語選択画面に戻す
+        isAnimating = false; 
+      }, 500); 
+    }
+    
     function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } else { enterFooterMode(); } }
     function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
 
     window.addEventListener('wheel', (e) => {
       if (!isDesktop() || document.getElementById('side-menu')?.classList.contains('is-open')) return;
-      // フッター（.top-footer）の高さを基準にするよう修正しました
-      const footerOffset = document.querySelector('.top-footer')?.offsetTop ?? 0;
+      
+      // フッターが見えている（自由にスクロールできる）状態の時の動作
       if (isFreeScroll) {
-        if (e.deltaY < -WHEEL_THRESHOLD && window.scrollY <= footerOffset + 10) { e.preventDefault(); leaveFooterMode(); }
+        // もし画面の一番上（scrollYが10以下）にいて、さらに上にスクロールしようとしたら、スライド画面に戻す
+        if (e.deltaY < -WHEEL_THRESHOLD && window.scrollY <= 10) { 
+          e.preventDefault(); 
+          leaveFooterMode(); 
+        }
         return;
       }
+      
       e.preventDefault();
       if (isAnimating) return;
       if (e.deltaY > WHEEL_THRESHOLD) moveNext(); 
