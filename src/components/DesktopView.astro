@@ -1,47 +1,6 @@
 ---
-// モックアップ用データ
-const latestStories = [
-  {
-    id: 1,
-    category: 'Politics',
-    country: 'Japan',
-    title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry',
-    excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.',
-    image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 2,
-    category: 'Economy',
-    country: 'United States',
-    title: 'Federal Reserve Signals Potential Rate Cuts by Year-End',
-    excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.',
-    image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 3,
-    category: 'Society',
-    country: 'France',
-    title: 'Paris Sets New Standard for Eco-Friendly Urban Planning',
-    excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.',
-    image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 4,
-    category: 'Environment',
-    country: 'Brazil',
-    title: 'Amazon Conservation Efforts Show Promising Results This Quarter',
-    excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.',
-    image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 5,
-    category: 'Technology',
-    country: 'South Korea',
-    title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul',
-    excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.',
-    image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-];
+// 司令塔（index.astro）から渡された「本物の最新記事データ」を受け取ります
+const { latestStories = [] } = Astro.props;
 
 const languages = [
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -53,6 +12,21 @@ const languages = [
   { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
+
+// 本文からHTMLタグを消して、きれいな「抜粋（100文字）」を作る関数
+function stripHtml(html) {
+  if (!html) return '';
+  const text = html.replace(/<[^>]*>?/gm, ''); // タグを消去
+  return text.length > 100 ? text.substring(0, 100) + '...' : text;
+}
+
+// 記事の中から「最初の画像URL」を見つけ出す関数
+function getThumbnail(content) {
+  // 記事に画像がない時は、シックなグラデーションの背景を代わりに入れます
+  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)'; 
+  const match = content.match(/<img[^>]+src="([^">]+)"/);
+  return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
+}
 ---
 
 <header class="global-header" id="main-header">
@@ -95,53 +69,37 @@ const languages = [
 </div>
 
 <div class="transition-mask" id="transition-mask" aria-hidden="true"></div>
+<div class="line-wipe" id="line-wipe" aria-hidden="true"></div>
 
-<main class="gateway-main">
+<div class="desktop-only-wrapper">
   <div class="desktop-sequence" id="desktop-sequence">
     <div class="split-stage">
       <div class="left-track">
         <div class="panel p1">
           <div class="bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
-          <div class="word-band-container">
-            <div class="word-band"><h2>CONFLICT</h2></div>
-          </div>
+          <div class="word-band-container"><div class="word-band"><h2>CONFLICT</h2></div></div>
         </div>
-
         <div class="panel p2">
           <div class="bg-layer" style="background-image: url('/images/cities.webp');"></div>
-          <div class="word-band-container">
-            <div class="word-band"><h2>CITIES</h2></div>
-          </div>
+          <div class="word-band-container"><div class="word-band"><h2>CITIES</h2></div></div>
         </div>
-
         <div class="panel p3">
           <div class="bg-layer" style="background-image: url('/images/innovation.jpg');"></div>
-          <div class="word-band-container">
-            <div class="word-band"><h2>INNOVATION</h2></div>
-          </div>
+          <div class="word-band-container"><div class="word-band"><h2>INNOVATION</h2></div></div>
         </div>
       </div>
-
       <div class="right-track">
         <div class="panel p1">
           <div class="bg-layer" style="background-image: url('/images/crisis.png');"></div>
-          <div class="word-band-container">
-            <div class="word-band"><h2>CRISIS</h2></div>
-          </div>
+          <div class="word-band-container"><div class="word-band"><h2>CRISIS</h2></div></div>
         </div>
-
         <div class="panel p2">
           <div class="bg-layer" style="background-image: url('/images/people.webp');"></div>
-          <div class="word-band-container">
-            <div class="word-band"><h2>PEOPLE</h2></div>
-          </div>
+          <div class="word-band-container"><div class="word-band"><h2>PEOPLE</h2></div></div>
         </div>
-
         <div class="panel p3">
           <div class="bg-layer" style="background-image: url('/images/frontier.jpg');"></div>
-          <div class="word-band-container">
-            <div class="word-band"><h2>FRONTIER</h2></div>
-          </div>
+          <div class="word-band-container"><div class="word-band"><h2>FRONTIER</h2></div></div>
         </div>
       </div>
     </div>
@@ -150,11 +108,9 @@ const languages = [
       <div class="brand-night"></div>
       <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
       <div class="brand-bg-overlay"></div>
-
       <div class="brand-content text-anim-target" id="brand-text-target">
         <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
         <h2 class="brand-catch fade-base fade-up anim-catch">Watch the world with clarity.</h2>
-
         <div class="brand-desc">
           <p class="fade-base fade-left anim-desc1">Global news.</p>
           <p class="fade-base fade-left anim-desc2">Explained clearly.</p>
@@ -170,20 +126,29 @@ const languages = [
           <button class="nav-arrow left-arrow" aria-label="Previous">&larr;</button>
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-            {latestStories.map((story) => (
-              <a href={`/en/story/${story.id}`} class="story-card observer-card">
-                <div class="card-bg" style={`background-image: ${story.image};`}></div>
-                <div class="card-content">
-                  <div class="card-meta">
-                    <span class="category">{story.category}</span>
-                    <span class="country">{story.country}</span>
+            
+            {latestStories.map((post) => {
+              const excerpt = stripHtml(post.content);
+              const bgImage = getThumbnail(post.content);
+              const category = post.labels && post.labels.length > 0 ? post.labels[0] : 'News';
+              const date = new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+              return (
+                <a href={`/en/story/${post.id}`} class="story-card observer-card">
+                  <div class="card-bg" style={`background-image: ${bgImage};`}></div>
+                  <div class="card-content">
+                    <div class="card-meta">
+                      <span class="category">{category}</span>
+                      <span class="country">{date}</span>
+                    </div>
+                    <h3 class="card-title">{post.title}</h3>
+                    <p class="card-excerpt">{excerpt}</p>
+                    <div class="cta-link">Read story <span>&rarr;</span></div>
                   </div>
-                  <h3 class="card-title">{story.title}</h3>
-                  <p class="card-excerpt">{story.excerpt}</p>
-                  <div class="cta-link">Read story <span>&rarr;</span></div>
-                </div>
-              </a>
-            ))}
+                </a>
+              );
+            })}
+
             <div class="carousel-spacer"></div>
           </div>
           <button class="nav-arrow right-arrow" aria-label="Next">&rarr;</button>
@@ -214,7 +179,6 @@ const languages = [
         </div>
       </div>
     </section>
-
   </div>
 
   <section class="hero-spacer" aria-hidden="true">
@@ -227,13 +191,13 @@ const languages = [
   <footer class="site-footer">
     <p>[ フッター領域 ]</p>
   </footer>
-</main>
+</div>
 
 <style>
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
-  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; } 
+  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; }
   .header-logo-img:hover { opacity: 0.8; }
   .menu-trigger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
   .burger-line { width: 30px; height: 2px; background: #fff; border-radius: 2px; }
@@ -250,7 +214,9 @@ const languages = [
   .scroll-indicator .dot.active { height: 32px; background: rgba(255, 255, 255, 0.9); }
   .transition-mask { position: fixed; inset: 0; z-index: 220; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.8s ease, visibility 0s linear 0.8s; }
   .transition-mask.is-visible { opacity: 1; visibility: visible; transition: opacity 0.8s ease; }
-  .transition-mask.is-starry { background-color: #010411; background-image: radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px), radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 2px), radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px); background-size: 550px 550px, 350px 350px, 250px 250px; background-position: 0 0, 40px 60px, 130px 270px; background-repeat: repeat; }
+  .line-wipe { position: fixed; top: 50%; left: 0; width: 0; height: 1px; background: rgba(255, 255, 255, 0.7); z-index: 230; transform: translateY(-50%); box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); transition: none; pointer-events: none; }
+  .line-wipe.is-running { width: 100vw; transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1); }
+  .line-wipe.is-fading { opacity: 0; transition: opacity 0.3s ease; }
   .desktop-sequence { position: fixed; inset: 0; z-index: 120; opacity: 1; visibility: visible; transition: opacity 0.32s ease, visibility 0s linear 0s; }
   .desktop-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.28s ease, visibility 0s linear 0.28s; }
   .hero-spacer { height: 100vh; position: relative; overflow: hidden; background: #050b18; }
@@ -341,17 +307,20 @@ const languages = [
   .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
   .site-footer { height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333; }
   .site-footer p { color: #666; font-size: 14px; }
-  @media (min-width: 769px) { .nav-arrow { display: flex; align-items: center; justify-content: center; } }
+
+  /* パソコンで見ている時だけ表示する */
+  .desktop-only-wrapper { display: block; }
   @media (max-width: 768px) {
+    .desktop-only-wrapper { display: none; }
     .scroll-indicator { display: none; }
-    .desktop-sequence { display: none; }
     .transition-mask { display: none; }
-    .hero-spacer { display: none; }
-    .header-band { padding: 15px 20px; }
   }
+  @media (min-width: 769px) { .nav-arrow { display: flex; align-items: center; justify-content: center; } }
 </style>
 
 <script is:inline>
+  if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+  
   document.addEventListener('DOMContentLoaded', () => {
     const DESKTOP_BREAKPOINT = 768;
     const HERO_ANIM_MS = 1500;
@@ -487,22 +456,6 @@ const languages = [
         
         if (previousStep === 4) {
           transitionStoriesToBrand();
-          return;
-        }
-
-        if (previousStep <= 2) {
-          transitionMask?.classList.add('is-starry');
-          showMask();
-          window.setTimeout(() => {
-            desktopSequence?.classList.remove('is-hidden');
-            resetBrandPanel();
-            clearSectionVisibility();
-            transitionMask?.classList.remove('is-starry');
-            brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-            requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
-            hideMask();
-            window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS);
-          }, MASK_IN_MS);
           return;
         }
 
