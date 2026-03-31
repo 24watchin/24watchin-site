@@ -1,52 +1,6 @@
 ---
-// モックアップ用データ（リンク用に countryCode を追加しています）
-const latestStories = [
-  {
-    id: 1,
-    category: 'Politics',
-    country: 'Japan',
-    countryCode: 'jp',
-    title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry',
-    excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.',
-    image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 2,
-    category: 'Economy',
-    country: 'United States',
-    countryCode: 'us',
-    title: 'Federal Reserve Signals Potential Rate Cuts by Year-End',
-    excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.',
-    image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 3,
-    category: 'Society',
-    country: 'France',
-    countryCode: 'fr',
-    title: 'Paris Sets New Standard for Eco-Friendly Urban Planning',
-    excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.',
-    image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 4,
-    category: 'Environment',
-    country: 'Brazil',
-    countryCode: 'br',
-    title: 'Amazon Conservation Efforts Show Promising Results This Quarter',
-    excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.',
-    image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-  {
-    id: 5,
-    category: 'Technology',
-    country: 'South Korea',
-    countryCode: 'kr',
-    title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul',
-    excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.',
-    image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")'
-  },
-];
+// ▼ 修正：司令塔から「本物の最新記事データ」を受け取ります（デモデータは削除しました） ▼
+const { latestStories = [] } = Astro.props;
 
 const languages = [
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -58,6 +12,20 @@ const languages = [
   { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
+
+// 本文からHTMLタグを消して、きれいな「抜粋」を作る関数
+function stripHtml(html) {
+  if (!html) return '';
+  const text = html.replace(/<[^>]*>?/gm, '');
+  return text.length > 100 ? text.substring(0, 100) + '...' : text;
+}
+
+// 記事の中から「最初の画像URL」を見つけ出す関数
+function getThumbnail(content) {
+  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)'; 
+  const match = content.match(/<img[^>]+src="([^">]+)"/);
+  return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
+}
 ---
 
 <header class="global-header">
@@ -67,7 +35,6 @@ const languages = [
         <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="header-logo-img" />
       </a>
     </div>
-
     <button class="menu-trigger" id="menu-open" aria-label="Open menu">
       <span class="burger-line"></span>
       <span class="burger-line"></span>
@@ -156,30 +123,61 @@ const languages = [
         <div class="carousel-wrapper">
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-            {latestStories.map((story) => (
-              <a href={`/en/${story.countryCode}/news/${story.id}`} class="story-card observer-card no-link-color">
-                <div class="card-img-box">
-                  <div class="card-bg" style={`background-image: ${story.image};`}></div>
-                </div>
-                <div class="card-text-box">
-                  <div class="card-meta">
-                    <span class="category">{story.category}</span>
-                    <span class="country">{story.country}</span>
+            
+            {latestStories.map((post) => {
+              const excerpt = stripHtml(post.content);
+              const bgImage = getThumbnail(post.content);
+              
+              // Bloggerのタグ（ラベル）から国名や国コードを探し出します
+              let category = 'News';
+              let countryName = '';
+              let countryCode = 'world'; // タグがない場合の予備
+
+              if (post.labels && post.labels.length > 0) {
+                category = post.labels[0]; // 最初のタグをカテゴリとします
+                
+                // 「jp」など、2文字の小文字のタグを探して国コードにします
+                const codeLabel = post.labels.find(l => l.length === 2 && l === l.toLowerCase());
+                if (codeLabel) {
+                  countryCode = codeLabel;
+                }
+                
+                // カテゴリでも国コードでもないタグを、国名として表示します
+                const nameLabel = post.labels.find(l => l !== category && l !== countryCode);
+                if (nameLabel) {
+                  countryName = nameLabel;
+                }
+              }
+
+              // 公開日をフォーマットします
+              const date = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+              return (
+                <a href={`/en/${countryCode}/news/${post.id}`} class="story-card observer-card no-link-color">
+                  <div class="card-img-box">
+                    <div class="card-bg" style={`background-image: ${bgImage};`}></div>
                   </div>
-                  <h3 class="card-title">{story.title}</h3>
-                </div>
-              </a>
-            ))}
+                  <div class="card-text-box">
+                    <div class="card-meta">
+                      <span class="category">{category}</span>
+                      <span class="country">{countryName || date}</span>
+                    </div>
+                    <h3 class="card-title">{post.title}</h3>
+                  </div>
+                </a>
+              );
+            })}
             <div class="carousel-spacer"></div>
           </div>
           
           <div class="carousel-bottom-nav">
+            <button class="carousel-nav-arrow" id="story-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="story-carousel-dots">
               {latestStories.map((_, i) => (
                 <div class={`c-dot ${i === 0 ? 'active' : ''}`}></div>
               ))}
             </div>
-            <button class="carousel-next-arrow" id="story-carousel-next" aria-label="Next">&gt;</button>
+            <button class="carousel-nav-arrow" id="story-carousel-next" aria-label="Next">&gt;</button>
           </div>
         </div>
 
@@ -206,12 +204,13 @@ const languages = [
           </div>
           
           <div class="carousel-bottom-nav">
+            <button class="carousel-nav-arrow" id="lang-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="lang-carousel-dots">
               {languages.map((_, i) => (
                 <div class={`c-dot ${i === 0 ? 'active' : ''}`}></div>
               ))}
             </div>
-            <button class="carousel-next-arrow" id="lang-carousel-next" aria-label="Next">&gt;</button>
+            <button class="carousel-nav-arrow" id="lang-carousel-next" aria-label="Next">&gt;</button>
           </div>
         </div>
       </div>
@@ -304,11 +303,12 @@ const languages = [
   .text-anim-target.is-visible .anim-desc1 { transition-delay: 1.8s; }
   .text-anim-target.is-visible .anim-desc2 { transition-delay: 2.6s; }
   .text-anim-target.is-visible .anim-desc3 { transition-delay: 3.4s; }
+  .section-fade-in { opacity: 0; transform: translateY(70px); transition: opacity 0.78s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.78s cubic-bezier(0.2, 0.8, 0.2, 1); width: 100%; will-change: opacity, transform; }
+  .section-observer.is-visible .section-fade-in { opacity: 1; transform: translateY(0); }
   .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
   .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
-  .carousel-wrapper { position: relative; width: 100%; }
   
-  /* ▼ 修正：カードの青文字防止と、2/3画像・1/3文字のレイアウト設定 ▼ */
+  .carousel-wrapper { position: relative; width: 100%; }
   .no-link-color { color: inherit !important; text-decoration: none !important; }
   .no-link-color:visited, .no-link-color:hover, .no-link-color:active { color: inherit !important; text-decoration: none !important; }
 
@@ -320,9 +320,7 @@ const languages = [
     user-select: none; border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111; 
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
-  .observer-card.is-center { 
-    opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); z-index: 10; 
-  }
+  .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); z-index: 10; }
 
   .card-img-box { width: 100%; height: 66.66%; position: relative; overflow: hidden; }
   .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.8s ease; }
@@ -339,13 +337,13 @@ const languages = [
   .card-meta .country { color: #aaa; }
   .card-title { font-size: clamp(1.1rem, 1.8vw, 1.6rem); font-weight: 400; line-height: 1.4; margin-bottom: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-  /* ▼ 修正：下部中央のナビゲーションデザイン ▼ */
+  /* ▼ 修正：下部中央のナビゲーション（ドットと「＜」「＞」ボタン） ▼ */
   .carousel-bottom-nav { display: flex; align-items: center; justify-content: center; gap: 30px; margin-top: 40px; }
   .carousel-dots-wrapper { display: flex; gap: 10px; }
   .c-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: transform 0.3s ease, background 0.3s ease; }
   .c-dot.active { background: #fff; transform: scale(1.5); }
-  .carousel-next-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
-  .carousel-next-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
+  .carousel-nav-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
+  .carousel-nav-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
 
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
@@ -368,6 +366,8 @@ const languages = [
 </style>
 
 <script is:inline>
+  if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+  
   document.addEventListener('DOMContentLoaded', () => {
     const DESKTOP_BREAKPOINT = 768;
     const HERO_ANIM_MS = 1500;
@@ -424,6 +424,12 @@ const languages = [
       window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS);
       window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS);
       window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS);
+    }
+
+    function hideBrandAnimated() {
+      brandTextTarget?.classList.remove('is-visible');
+      brandPanel?.classList.remove('is-bg', 'is-night');
+      window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS);
     }
 
     function activateHeroSlide(index) {
@@ -516,12 +522,16 @@ const languages = [
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    // ▼ 修正：下部ナビゲーション（ドットの切り替え）の連動プログラム ▼
+    // ▼ 修正：中央下の「＜」「＞」ボタンとドットの連動プログラム ▼
     const storyCards = document.querySelectorAll('#story-carousel .observer-card');
     const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
+    const storyPrevBtn = document.getElementById('story-carousel-prev');
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
+    storyPrevBtn?.addEventListener('click', () => {
+      storyContainer?.scrollBy({ left: -window.innerWidth * 0.4, behavior: 'smooth' });
+    });
     storyNextBtn?.addEventListener('click', () => {
       storyContainer?.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' });
     });
@@ -544,9 +554,13 @@ const languages = [
 
     const langCards = document.querySelectorAll('#lang-carousel .observer-card');
     const langDots = document.querySelectorAll('#lang-carousel-dots .c-dot');
+    const langPrevBtn = document.getElementById('lang-carousel-prev');
     const langNextBtn = document.getElementById('lang-carousel-next');
     const langContainer = document.getElementById('lang-carousel');
 
+    langPrevBtn?.addEventListener('click', () => {
+      langContainer?.scrollBy({ left: -window.innerWidth * 0.4, behavior: 'smooth' });
+    });
     langNextBtn?.addEventListener('click', () => {
       langContainer?.scrollBy({ left: window.innerWidth * 0.4, behavior: 'smooth' });
     });
