@@ -103,14 +103,11 @@ const languages = [
       <div class="dot"></div>
     </div>
 
-    <!-- 4→5 / 5→4 用の幕 -->
     <div class="transition-mask" id="transition-mask" aria-hidden="true"></div>
 
-    <!-- 5→6 用のライン -->
     <div class="line-wipe" id="line-wipe" aria-hidden="true"></div>
 
     <main class="gateway-main">
-      <!-- 1〜4画面目は同じ固定ステージ -->
       <div class="desktop-sequence" id="desktop-sequence">
         <div class="split-stage">
           <div class="left-track">
@@ -229,10 +226,7 @@ const languages = [
           </div>
         </section>
 
-      </div><!-- /.desktop-sequence -->
-
-      <!-- 固定ステージの下敷き -->
-      <section class="hero-spacer" aria-hidden="true">
+      </div><section class="hero-spacer" aria-hidden="true">
         <div class="hero-spacer-brand">
           <div class="hero-spacer-bg" style="background-image: url('/images/explanation.png');"></div>
           <div class="hero-spacer-bg-overlay"></div>
@@ -427,7 +421,6 @@ const languages = [
         transition: opacity 0.25s ease;
       }
 
-      /* ===== 5→6 ライン演出 ===== */
       .line-wipe {
         position: fixed;
         top: 50%;
@@ -1091,13 +1084,13 @@ const languages = [
         const BRAND_UNLOCK_MS = 2300;
         const BRAND_HIDE_MS = 500;
 
-        const MASK_IN_MS  = 280;   // 0.25s + 少し余裕
+        const MASK_IN_MS  = 280;   
         const MASK_HOLD_MS = 30;
         const MASK_OUT_MS  = 250;
         const MASK_UNLOCK_MS = 50;
 
-        const LINE_WIPE_MS = 650;      // 線が伸びる時間
-        const LINE_FADE_MS = 300;      // 線がフェードアウトする時間
+        const LINE_WIPE_MS = 650;      
+        const LINE_FADE_MS = 300;      
 
         const SECTION_ANIM_MS = 240;
         const FOOTER_ANIM_MS = 900;
@@ -1120,20 +1113,16 @@ const languages = [
         const lineWipe = document.getElementById('line-wipe');
 
         function runLineWipe(callback) {
-          // リセット
           lineWipe.classList.remove('is-running', 'is-fading');
           lineWipe.style.width = '0';
 
-          // 少し待ってから線を伸ばす
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               lineWipe.classList.add('is-running');
 
-              // 線が伸びきったら画面切り替え
               window.setTimeout(() => {
                 callback();
 
-                // 線をフェードアウト
                 lineWipe.classList.remove('is-running');
                 lineWipe.classList.add('is-fading');
 
@@ -1213,11 +1202,9 @@ const languages = [
           window.setTimeout(() => {
             brandPanel?.classList.add('is-bg');
           }, BRAND_BG_DELAY_MS);
-
           window.setTimeout(() => {
             brandTextTarget?.classList.add('is-visible');
           }, BRAND_TEXT_DELAY_MS);
-
           window.setTimeout(() => {
             isAnimating = false;
           }, BRAND_UNLOCK_MS);
@@ -1274,7 +1261,6 @@ const languages = [
           showMask();
           window.setTimeout(() => {
             clearSectionVisibility();
-            desktopSequence?.classList.remove('is-hidden');
             revealBrandImmediate();
             hideMask();
             window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS);
@@ -1312,7 +1298,6 @@ const languages = [
               left: 0,
               behavior: 'auto'
             });
-
             if (previousStep === 3 && step === 2) {
               hideBrandAnimated();
               return;
@@ -1326,18 +1311,19 @@ const languages = [
           if (step === 3) {
             isFreeScroll = false;
             setBodyLocked(true);
-            clearSectionVisibility();
-            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
+            // ▼ 修正：ここでトップに戻してから、幕が完全に下りてから裏側を準備する正しい手順に変更 ▼
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            
             if (previousStep === 4) {
-              // ★ここでdesktopSequenceを出さない！マスクで隠してから出す
               transitionStoriesToBrand();
               return;
             }
 
-            desktopSequence?.classList.remove('is-hidden');
             hideMask();
+            clearSectionVisibility();
 
+            desktopSequence?.classList.remove('is-hidden');
             if (previousStep >= 5) {
               revealBrandImmediate();
               window.setTimeout(() => { isAnimating = false; }, 200);
@@ -1409,7 +1395,8 @@ const languages = [
 
           if (e.deltaY > WHEEL_THRESHOLD) {
             moveNext();
-          } else if (e.deltaY < -WHEEL_THRESHOLD) {
+          } 
+          else if (e.deltaY < -WHEEL_THRESHOLD) {
             movePrev();
           }
         }, { passive: false });
