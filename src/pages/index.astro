@@ -1270,21 +1270,26 @@ const languages = [
           }, MASK_IN_MS);
         }
 
-        // 5→4専用：マスクが完全に消えてから画面4を表示
+        // 5→4専用：マスクの裏で画面4を完全に準備してからフェードアウト
         function transitionStoriesToBrand() {
           const SLOW_MS = 500;
           transitionMask?.classList.add('is-slow');
           showMask();
+
           window.setTimeout(() => {
+            // マスクが完全に不透明な状態で画面4を準備
             clearSectionVisibility();
-            // マスクをフェードアウト開始
-            hideMask();
-            // マスクが完全に消えてから画面4を表示（暗くならない！）
+            resetBrandPanel();
+            brandPanel?.classList.add('is-visible', 'is-bg'); // is-nightなし！背景画像だけ先に表示
+            brandTextTarget?.classList.add('is-visible');
+
+            // 少し待って画像をプリロードしてからフェードアウト
             window.setTimeout(() => {
-              revealBrandImmediate();
+              brandPanel?.classList.add('is-night'); // 夜空を重ねる
+              hideMask();
               transitionMask?.classList.remove('is-slow');
-              isAnimating = false;
-            }, SLOW_MS + MASK_UNLOCK_MS);
+              window.setTimeout(() => { isAnimating = false; }, SLOW_MS + MASK_UNLOCK_MS);
+            }, 100);
           }, SLOW_MS);
         }
 
