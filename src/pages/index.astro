@@ -16,7 +16,7 @@ if (!globalThis.bloggerApiCache) {
 let englishPosts = [];
 if (API_KEY && BLOG_ID) {
   if (!globalThis.bloggerApiCache[BLOG_ID]) {
-    // トップページ用なので、最新の5件だけ取得すれば十分です
+    // トップページ用なので、最新の5件だけ取得します
     const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=5`;
     globalThis.bloggerApiCache[BLOG_ID] = fetch(url)
       .then(res => res.ok ? res.json() : null)
@@ -27,7 +27,7 @@ if (API_KEY && BLOG_ID) {
   englishPosts = await globalThis.bloggerApiCache[BLOG_ID];
 }
 
-// 念のため、確実な最新5件のデータとしてまとめます
+// 最新5件のデータをまとめます
 const topStories = englishPosts.slice(0, 5);
 ---
 
@@ -38,22 +38,11 @@ const topStories = englishPosts.slice(0, 5);
     <title>24watchin | Global Gateway</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
     <style is:global>
-      :root {
-        --bg-color: #0d0d0d;
-        --text-main: #f0f0f0;
-        --font-sans: 'Noto Sans', sans-serif;
-      }
+      :root { --bg-color: #0d0d0d; --text-main: #f0f0f0; --font-sans: 'Noto Sans', sans-serif; }
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        font-family: var(--font-sans);
-        margin: 0;
-      }
+      body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); margin: 0; }
       body.is-locked { overflow: hidden; }
-      @media (max-width: 768px) {
-        body.is-locked { overflow: auto; }
-      }
+      @media (max-width: 768px) { body.is-locked { overflow: auto; } }
     </style>
   </head>
 
