@@ -7,7 +7,7 @@ const { latestStories = [] } = Astro.props;
 // 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
-// お見せいただいたファイルから、英語の国名辞書を作成しました
+// 英語の国名辞書
 const countryNameMap = {
   jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
   gb: 'UK', sg: 'Singapore', ca: 'Canada', cn: 'China',
@@ -25,7 +25,7 @@ const backupStories = [
 
 const displayStories = latestStories.length > 0 ? latestStories : backupStories;
 
-// ⑤ Englishと日本語の順番を入れ替えました
+// Englishと日本語の順番を入れ替え済み
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -257,6 +257,12 @@ function getThumbnail(content) {
 </div>
 
 <style>
+  /* サイト全体の文字選択（なぞり）を禁止する設定 */
+  body {
+    -webkit-user-select: none; /* Safari用 */
+    user-select: none; /* その他のブラウザ用 */
+  }
+
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
@@ -342,7 +348,7 @@ function getThumbnail(content) {
     transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.6s ease; 
     opacity: 0.4; transform: scale(0.85);
     display: flex; flex-direction: column; 
-    user-select: none; border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111;
+    border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
   .observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); z-index: 10; }
@@ -371,14 +377,13 @@ function getThumbnail(content) {
   .carousel-nav-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
   .carousel-nav-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
 
-  .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
-  .carousel-container.is-scrolling { scroll-snap-type: none !important; }
+  /* スクロールバー非表示・スナップ設定 */
+  .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
   
   .lang-card { flex: 0 0 28vw; height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
   
-  /* ④ カードの中に細い白い枠線（内枠）を追加しました */
   .lang-card::before {
     content: '';
     position: absolute;
@@ -388,7 +393,6 @@ function getThumbnail(content) {
     pointer-events: none;
     transition: top 0.6s ease, left 0.6s ease, right 0.6s ease, bottom 0.6s ease, border-color 0.6s ease;
   }
-  /* カードが中央に来た時は、枠を少しだけ内側に縮めて高級感を出します */
   .lang-card.is-center::before {
     top: 25px; left: 25px; right: 25px; bottom: 25px;
     border-color: rgba(255, 255, 255, 0.6);
@@ -412,6 +416,9 @@ function getThumbnail(content) {
   if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
   
   document.addEventListener('DOMContentLoaded', () => {
+    // サイト全体の右クリックを禁止する設定
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
     const DESKTOP_BREAKPOINT = 768;
     const HERO_ANIM_MS = 1500;
     const WHEEL_THRESHOLD = 24;
@@ -565,27 +572,15 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    function slowScroll(element, distance, duration) {
-      element.classList.add('is-scrolling');
-      const start = element.scrollLeft;
-      const startTime = performance.now();
-      
-      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-      
-      function animation(currentTime) {
-        const timeElapsed = currentTime - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
-        element.scrollLeft = start + distance * easeOutCubic(progress);
-        if (timeElapsed < duration) {
-          requestAnimationFrame(animation);
-        } else {
-          // ① ガクッとする現象を防ぐため、スクロール完了後の待ち時間を少し長めに調整しました
-          window.setTimeout(() => {
-            element.classList.remove('is-scrolling');
-          }, 150); 
-        }
-      }
-      requestAnimationFrame(animation);
+    // スムーズスクロール機能（ブラウザ標準機能を使用することで震えを防止）
+    function scrollCarouselByOneCard(container, direction) {
+      const cards = container.querySelectorAll('.observer-card');
+      if (cards.length === 0) return;
+      const cardWidth = cards[0].offsetWidth;
+      const style = window.getComputedStyle(cards[0]);
+      const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+      const distance = (cardWidth + margin) * direction;
+      container.scrollBy({ left: distance, behavior: 'smooth' });
     }
 
     const storyCards = document.querySelectorAll('#story-carousel .observer-card');
@@ -594,25 +589,10 @@ function getThumbnail(content) {
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
-    storyPrevBtn?.addEventListener('click', () => {
-      if (storyCards.length > 0) {
-        const cardWidth = storyCards[0].offsetWidth;
-        const style = window.getComputedStyle(storyCards[0]);
-        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-        const distance = cardWidth + margin;
-        slowScroll(storyContainer, -distance, 1200);
-      }
-    });
-    storyNextBtn?.addEventListener('click', () => {
-      if (storyCards.length > 0) {
-        const cardWidth = storyCards[0].offsetWidth;
-        const style = window.getComputedStyle(storyCards[0]);
-        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-        const distance = cardWidth + margin;
-        slowScroll(storyContainer, distance, 1200);
-      }
-    });
+    storyPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, -1));
+    storyNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, 1));
 
+    // 中央判定の設定（より厳密な範囲指定でふわっと現象を防ぎます）
     const storyObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -626,7 +606,7 @@ function getThumbnail(content) {
           entry.target.classList.remove('is-center');
         }
       });
-    }, { root: storyContainer, rootMargin: '0px -40% 0px -40%', threshold: 0 });
+    }, { root: storyContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
     storyCards.forEach(card => storyObserver.observe(card));
 
     const langCards = document.querySelectorAll('#lang-carousel .observer-card');
@@ -635,24 +615,8 @@ function getThumbnail(content) {
     const langNextBtn = document.getElementById('lang-carousel-next');
     const langContainer = document.getElementById('lang-carousel');
 
-    langPrevBtn?.addEventListener('click', () => {
-      if (langCards.length > 0) {
-        const cardWidth = langCards[0].offsetWidth;
-        const style = window.getComputedStyle(langCards[0]);
-        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-        const distance = cardWidth + margin;
-        slowScroll(langContainer, -distance, 1200);
-      }
-    });
-    langNextBtn?.addEventListener('click', () => {
-      if (langCards.length > 0) {
-        const cardWidth = langCards[0].offsetWidth;
-        const style = window.getComputedStyle(langCards[0]);
-        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-        const distance = cardWidth + margin;
-        slowScroll(langContainer, distance, 1200);
-      }
-    });
+    langPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, -1));
+    langNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, 1));
 
     const langObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -667,7 +631,7 @@ function getThumbnail(content) {
           entry.target.classList.remove('is-center');
         }
       });
-    }, { root: langContainer, rootMargin: '0px -40% 0px -40%', threshold: 0 });
+    }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
     langCards.forEach(card => langObserver.observe(card));
 
     setBodyLocked(true); desktopSequence?.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
