@@ -581,7 +581,6 @@ const languages = [
         border-radius: 4px 0 0 4px;
       }
 
-      /* ▼ 修正：画面1〜3の文字も、消える時はサッと0.3秒で消すように修正 ▼ */
       .word-band h2 {
         color: #000;
         font-weight: 600;
@@ -596,7 +595,6 @@ const languages = [
         transform: translateX(0);
       }
 
-      /* ▼ 修正：画面1〜3の文字が「出る時だけ」ディレイをかけるように修正 ▼ */
       .panel.is-active .word-band h2 {
         opacity: 1;
         transition: opacity 1s ease 0.8s;
@@ -647,6 +645,7 @@ const languages = [
         transform: translateY(0);
       }
 
+      /* ▼ 修正箇所：消える時（画面4から離れる時）のスピードを0.6秒にして、サッと綺麗に消えるようにしました ▼ */
       .brand-night {
         position: absolute;
         inset: 0;
@@ -654,11 +653,12 @@ const languages = [
         background:
           radial-gradient(circle at 50% 35%, rgba(33, 76, 160, 0.18) 0%, rgba(17, 36, 82, 0.28) 22%, rgba(7, 15, 40, 0.62) 56%, rgba(4, 8, 24, 0.92) 100%),
           linear-gradient(to bottom, rgba(8, 18, 48, 0.55) 0%, rgba(5, 12, 32, 0.88) 75%, rgba(3, 7, 20, 0.96) 100%);
-        transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.6s ease;
       }
 
       .brand-panel.is-night .brand-night {
         opacity: 1;
+        transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .brand-bg {
@@ -668,12 +668,13 @@ const languages = [
         background-position: center;
         opacity: 0;
         transform: scale(1.04);
-        transition: opacity 1.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.6s ease, transform 0.6s ease;
       }
 
       .brand-panel.is-bg .brand-bg {
         opacity: 0.96;
         transform: scale(1);
+        transition: opacity 1.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.1s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .brand-bg-overlay {
@@ -681,12 +682,14 @@ const languages = [
         inset: 0;
         background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%);
         opacity: 0;
-        transition: opacity 1.3s ease;
+        transition: opacity 0.6s ease;
       }
 
       .brand-panel.is-bg .brand-bg-overlay {
         opacity: 1;
+        transition: opacity 1.3s ease;
       }
+      /* ▲ 修正箇所おわり ▲ */
 
       .brand-content {
         position: relative;
@@ -722,7 +725,6 @@ const languages = [
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
       }
 
-      /* ▼ 修正：画面から離れて消える時は、ディレイなしでサッと0.3秒で消す ▼ */
       .fade-base {
         opacity: 0;
         transition: opacity 0.3s ease, transform 0.3s ease;
@@ -735,7 +737,6 @@ const languages = [
         transform: translateX(-80px);
       }
 
-      /* ▼ 修正：画面に入った時（is-visible）だけ、ゆっくり2.5秒かけて表示させる ▼ */
       .text-anim-target.is-visible .fade-up,
       .text-anim-target.is-visible .fade-left {
         transform: translate(0);
@@ -743,7 +744,6 @@ const languages = [
         transition: opacity 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      /* ▼ 修正：待機時間（ディレイ）も、画面に入った時だけ適用する ▼ */
       .text-anim-target.is-visible .anim-logo { transition-delay: 0.2s; }
       .text-anim-target.is-visible .anim-catch { transition-delay: 0.9s; }
       .text-anim-target.is-visible .anim-desc1 { transition-delay: 1.8s; }
@@ -1084,7 +1084,9 @@ const languages = [
         const BRAND_BG_DELAY_MS = 700;
         const BRAND_TEXT_DELAY_MS = 1350;
         const BRAND_UNLOCK_MS = 2300;
-        const BRAND_HIDE_MS = 800; // ▼ 背景が消える時間を長くし、より自然なクロスフェードに
+        
+        // ▼ 修正：画面4から離れる時は「0.6秒」でサッと消えるようにプログラム時間を短縮しました ▼
+        const BRAND_HIDE_MS = 600; 
 
         const MASK_IN_MS  = 800;   
         const MASK_HOLD_MS = 50;
