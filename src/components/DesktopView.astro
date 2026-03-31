@@ -25,7 +25,6 @@ const backupStories = [
 
 const displayStories = latestStories.length > 0 ? latestStories : backupStories;
 
-// Englishと日本語の順番を入れ替え済み
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -251,16 +250,28 @@ function getThumbnail(content) {
     </div>
   </section>
 
-  <footer class="site-footer">
-    <p>[ フッター領域 ]</p>
+  <footer class="top-footer">
+    <div class="top-footer-inner">
+      <div class="top-footer-logo">
+        <img src="/images/24Watchin-white.png" alt="24Watchin Logo" />
+      </div>
+      <div class="top-footer-links">
+        <a href="/info/about/">ABOUT 24WATCHIN</a>
+        <a href="/info/privacy/">PRIVACY POLICY</a>
+        <a href="/info/terms/">TERMS OF USE</a>
+        <a href="/info/contact/">CONTACT</a>
+      </div>
+      <div class="top-footer-copy">
+        &copy; 2026 The Dexent Media Enterprises. All Rights Reserved.
+      </div>
+    </div>
   </footer>
 </div>
 
 <style>
-  /* サイト全体の文字選択（なぞり）を禁止する設定 */
   body {
-    -webkit-user-select: none; /* Safari用 */
-    user-select: none; /* その他のブラウザ用 */
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
@@ -377,7 +388,6 @@ function getThumbnail(content) {
   .carousel-nav-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
   .carousel-nav-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
 
-  /* スクロールバー非表示・スナップ設定 */
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
@@ -406,17 +416,68 @@ function getThumbnail(content) {
   .lang-card.is-center .lang-border { width: 40px; }
   .lang-card.is-center:hover .lang-name { transform: scale(1.05); }
   
-  .site-footer { height: 300px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-top: 1px solid #333; }
-  .site-footer p { color: #666; font-size: 14px; }
   .desktop-only-wrapper { display: block; }
   @media (max-width: 768px) { .desktop-only-wrapper { display: none; } }
+
+  /* ▼ ここから追加したトップページ専用フッターのデザイン ▼ */
+  .top-footer { 
+    height: auto; 
+    min-height: 250px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: #02040a; 
+    border-top: 1px solid rgba(255, 255, 255, 0.05); 
+    padding: 60px 20px; 
+    position: relative; 
+    z-index: 10; 
+  }
+  .top-footer-inner { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 30px; 
+    max-width: 800px; 
+    width: 100%; 
+  }
+  .top-footer-logo img { 
+    height: 24px; 
+    width: auto; 
+    opacity: 0.4; 
+    transition: opacity 0.3s ease; 
+  }
+  .top-footer-logo img:hover { 
+    opacity: 1; 
+  }
+  .top-footer-links { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 20px 40px; 
+  }
+  .top-footer-links a { 
+    color: #666; 
+    font-size: 11px; 
+    text-decoration: none; 
+    letter-spacing: 2px; 
+    transition: color 0.3s ease; 
+  }
+  .top-footer-links a:hover { 
+    color: #fff; 
+  }
+  .top-footer-copy { 
+    color: #444; 
+    font-size: 10px; 
+    letter-spacing: 1px; 
+    margin-top: 20px; 
+    text-align: center; 
+  }
 </style>
 
 <script is:inline>
   if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
   
   document.addEventListener('DOMContentLoaded', () => {
-    // サイト全体の右クリックを禁止する設定
     document.addEventListener('contextmenu', event => event.preventDefault());
 
     const DESKTOP_BREAKPOINT = 768;
@@ -561,7 +622,8 @@ function getThumbnail(content) {
 
     window.addEventListener('wheel', (e) => {
       if (!isDesktop() || document.getElementById('side-menu')?.classList.contains('is-open')) return;
-      const footerOffset = document.querySelector('.site-footer')?.offsetTop ?? 0;
+      // フッター（.top-footer）の高さを基準にするよう修正しました
+      const footerOffset = document.querySelector('.top-footer')?.offsetTop ?? 0;
       if (isFreeScroll) {
         if (e.deltaY < -WHEEL_THRESHOLD && window.scrollY <= footerOffset + 10) { e.preventDefault(); leaveFooterMode(); }
         return;
@@ -572,7 +634,6 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    // スムーズスクロール機能（ブラウザ標準機能を使用することで震えを防止）
     function scrollCarouselByOneCard(container, direction) {
       const cards = container.querySelectorAll('.observer-card');
       if (cards.length === 0) return;
@@ -592,7 +653,6 @@ function getThumbnail(content) {
     storyPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, -1));
     storyNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, 1));
 
-    // 中央判定の設定（より厳密な範囲指定でふわっと現象を防ぎます）
     const storyObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
