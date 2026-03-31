@@ -423,7 +423,6 @@ const languages = [
         visibility: visible;
         transition: opacity 0.25s ease;
       }
-      /* 5→4専用：ゆっくりフェード */
       .transition-mask.is-slow {
         transition: opacity 0.5s ease, visibility 0s linear 0.5s;
       }
@@ -1271,16 +1270,18 @@ const languages = [
           }, MASK_IN_MS);
         }
 
-        // 5→4専用：is-slowクラスでゆっくりフェード（インラインスタイル不使用）
+        // 5→4専用：マスクが完全に消えてから画面4を表示
         function transitionStoriesToBrand() {
           const SLOW_MS = 500;
           transitionMask?.classList.add('is-slow');
           showMask();
           window.setTimeout(() => {
             clearSectionVisibility();
-            revealBrandImmediate();
+            // マスクをフェードアウト開始
             hideMask();
+            // マスクが完全に消えてから画面4を表示（暗くならない！）
             window.setTimeout(() => {
+              revealBrandImmediate();
               transitionMask?.classList.remove('is-slow');
               isAnimating = false;
             }, SLOW_MS + MASK_UNLOCK_MS);
@@ -1332,7 +1333,6 @@ const languages = [
           if (step === 3) {
             setBodyLocked(true);
             clearSectionVisibility();
-
             if (previousStep === 4) {
               transitionStoriesToBrand();
               return;
