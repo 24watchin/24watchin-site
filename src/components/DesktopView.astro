@@ -243,7 +243,9 @@ function getThumbnail(content) {
       <footer class="top-footer">
         <div class="top-footer-inner">
           <div class="top-footer-logo">
-            <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
+            <a href="https://24watchin.com">
+              <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
+            </a>
           </div>
           <div class="top-footer-right">
             <div class="top-footer-links">
@@ -251,6 +253,8 @@ function getThumbnail(content) {
               <a href="/info/privacy/">PRIVACY POLICY</a>
               <a href="/info/terms/">TERMS OF USE</a>
               <a href="/info/contact/">CONTACT</a>
+              <a href="/info/corrections/">CORRECTIONS POLICY</a>
+              <a href="/info/copyright/">COPYRIGHT / REUSE</a>
             </div>
             <div class="top-footer-copy">
               &copy; 2026 The Dexent Media Enterprises. All Rights Reserved.
@@ -281,7 +285,6 @@ function getThumbnail(content) {
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
   
-  /* ▼ ヘッダーロゴを白く反転させるフィルターを追加 ▼ */
   .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; filter: brightness(0) invert(1); } 
   .header-logo-img:hover { opacity: 0.8; }
   
@@ -341,7 +344,6 @@ function getThumbnail(content) {
   .brand-panel.is-bg .brand-bg-overlay { opacity: 1; }
   .brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   
-  /* ▼ 画面中央のロゴを白く反転させるフィルターを追加 ▼ */
   .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; filter: brightness(0) invert(1); }
   
   .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); }
@@ -446,16 +448,15 @@ function getThumbnail(content) {
     width: 100%; 
   }
   
-  /* ▼ フッターのロゴを白く反転させるフィルターを追加 ▼ */
+  /* ▼ フッターのロゴ周りのデザイン設定 ▼ */
+  .top-footer-logo a {
+    display: block;
+    outline: none;
+  }
   .top-footer-logo img { 
     height: 48px; 
     width: auto; 
-    opacity: 0.8; 
-    transition: opacity 0.3s ease; 
     filter: brightness(0) invert(1);
-  }
-  .top-footer-logo img:hover { 
-    opacity: 1; 
   }
   
   .top-footer-right {
@@ -647,70 +648,4 @@ function getThumbnail(content) {
       e.preventDefault();
       if (isAnimating) return;
       if (e.deltaY > WHEEL_THRESHOLD) moveNext(); 
-      else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
-    }, { passive: false });
-
-    function scrollCarouselByOneCard(container, direction) {
-      const cards = container.querySelectorAll('.observer-card');
-      if (cards.length === 0) return;
-      const cardWidth = cards[0].offsetWidth;
-      const style = window.getComputedStyle(cards[0]);
-      const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-      const distance = (cardWidth + margin) * direction;
-      container.scrollBy({ left: distance, behavior: 'smooth' });
-    }
-
-    const storyCards = document.querySelectorAll('#story-carousel .observer-card');
-    const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
-    const storyPrevBtn = document.getElementById('story-carousel-prev');
-    const storyNextBtn = document.getElementById('story-carousel-next');
-    const storyContainer = document.getElementById('story-carousel');
-
-    storyPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, -1));
-    storyNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, 1));
-
-    const storyObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-center');
-          const index = Array.from(storyCards).indexOf(entry.target);
-          if(index !== -1 && storyDots[index]) {
-            storyDots.forEach(d => d.classList.remove('active'));
-            storyDots[index].classList.add('active');
-          }
-        } else {
-          entry.target.classList.remove('is-center');
-        }
-      });
-    }, { root: storyContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
-    storyCards.forEach(card => storyObserver.observe(card));
-
-    const langCards = document.querySelectorAll('#lang-carousel .observer-card');
-    const langDots = document.querySelectorAll('#lang-carousel-dots .c-dot');
-    const langPrevBtn = document.getElementById('lang-carousel-prev');
-    const langNextBtn = document.getElementById('lang-carousel-next');
-    const langContainer = document.getElementById('lang-carousel');
-
-    langPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, -1));
-    langNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, 1));
-
-    const langObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-center');
-          const index = Array.from(langCards).indexOf(entry.target);
-          if(index !== -1 && langDots[index]) {
-            langDots.forEach(d => d.classList.remove('active'));
-            langDots[index].classList.add('active');
-          }
-        } else {
-          entry.target.classList.remove('is-center');
-        }
-      });
-    }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
-    langCards.forEach(card => langObserver.observe(card));
-
-    setBodyLocked(true); desktopSequence?.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
-    window.setTimeout(() => { leftPanels[0]?.classList.add('is-active'); rightPanels[0]?.classList.add('is-active'); }, 400);
-  });
-</script>
+      else if (e.
