@@ -372,7 +372,6 @@ function getThumbnail(content) {
   .carousel-nav-arrow { background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s ease, transform 0.2s ease; }
   .carousel-nav-arrow:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
 
-  /* ▼ 追加：スクロール中に磁石をオフにするためのクラス ▼ */
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container.is-scrolling { scroll-snap-type: none !important; }
   .carousel-container::-webkit-scrollbar { display: none; }
@@ -551,11 +550,9 @@ function getThumbnail(content) {
       else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
     }, { passive: false });
 
-    // ▼ 修正：動いている時だけ磁石をオフにする魔法です ▼
+    // ▼ 修正：プログラムに「カードの幅と隙間」を自動計算させ、1ミリのズレもなく動かします ▼
     function slowScroll(element, distance, duration) {
-      // スクロールが始まる前に、ピタッと止まる磁石（スナップ）をオフにする
       element.classList.add('is-scrolling');
-      
       const start = element.scrollLeft;
       const startTime = performance.now();
       
@@ -571,7 +568,6 @@ function getThumbnail(content) {
         if (timeElapsed < duration) {
           requestAnimationFrame(animation);
         } else {
-          // 移動が完全に終わってから少し待って、磁石を再びオンにする
           window.setTimeout(() => {
             element.classList.remove('is-scrolling');
           }, 50);
@@ -586,11 +582,24 @@ function getThumbnail(content) {
     const storyNextBtn = document.getElementById('story-carousel-next');
     const storyContainer = document.getElementById('story-carousel');
 
+    // 矢印が押されたら、カード1枚分の正確な横幅（幅＋左右の隙間）を測ってスクロール距離にします
     storyPrevBtn?.addEventListener('click', () => {
-      slowScroll(storyContainer, -window.innerWidth * 0.4, 1200);
+      if (storyCards.length > 0) {
+        const cardWidth = storyCards[0].offsetWidth;
+        const style = window.getComputedStyle(storyCards[0]);
+        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        const distance = cardWidth + margin;
+        slowScroll(storyContainer, -distance, 1200);
+      }
     });
     storyNextBtn?.addEventListener('click', () => {
-      slowScroll(storyContainer, window.innerWidth * 0.4, 1200);
+      if (storyCards.length > 0) {
+        const cardWidth = storyCards[0].offsetWidth;
+        const style = window.getComputedStyle(storyCards[0]);
+        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        const distance = cardWidth + margin;
+        slowScroll(storyContainer, distance, 1200);
+      }
     });
 
     const storyObserver = new IntersectionObserver((entries) => {
@@ -616,10 +625,22 @@ function getThumbnail(content) {
     const langContainer = document.getElementById('lang-carousel');
 
     langPrevBtn?.addEventListener('click', () => {
-      slowScroll(langContainer, -window.innerWidth * 0.4, 1200);
+      if (langCards.length > 0) {
+        const cardWidth = langCards[0].offsetWidth;
+        const style = window.getComputedStyle(langCards[0]);
+        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        const distance = cardWidth + margin;
+        slowScroll(langContainer, -distance, 1200);
+      }
     });
     langNextBtn?.addEventListener('click', () => {
-      slowScroll(langContainer, window.innerWidth * 0.4, 1200);
+      if (langCards.length > 0) {
+        const cardWidth = langCards[0].offsetWidth;
+        const style = window.getComputedStyle(langCards[0]);
+        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        const distance = cardWidth + margin;
+        slowScroll(langContainer, distance, 1200);
+      }
     });
 
     const langObserver = new IntersectionObserver((entries) => {
