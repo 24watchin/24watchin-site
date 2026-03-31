@@ -53,7 +53,7 @@ function getThumbnail(content) {
   <div class="header-band">
     <div class="logo-area">
       <a href="https://24watchin.com">
-        <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="header-logo-img" />
+        <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" class="header-logo-img" />
       </a>
     </div>
     <button class="menu-trigger" id="menu-open" aria-label="Open menu">
@@ -127,7 +127,7 @@ function getThumbnail(content) {
       <div class="brand-bg" style="background-image: url('/images/explanation.png');"></div>
       <div class="brand-bg-overlay"></div>
       <div class="brand-content text-anim-target" id="brand-text-target">
-        <img src="/images/24Watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
+        <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" class="brand-logo-img fade-base fade-up anim-logo" />
         <h2 class="brand-catch fade-base fade-up anim-catch">Watch the world with clarity.</h2>
         <div class="brand-desc">
           <p class="fade-base fade-left anim-desc1">Global news.</p>
@@ -243,7 +243,7 @@ function getThumbnail(content) {
       <footer class="top-footer">
         <div class="top-footer-inner">
           <div class="top-footer-logo">
-            <img src="/images/24Watchin-white.png" alt="24Watchin Logo" />
+            <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
           </div>
           <div class="top-footer-right">
             <div class="top-footer-links">
@@ -422,7 +422,6 @@ function getThumbnail(content) {
   .desktop-only-wrapper { display: block; }
   @media (max-width: 768px) { .desktop-only-wrapper { display: none; } }
 
-  /* フッターの背景色をご要望の #393737 に変更しました */
   .top-footer { 
     position: absolute;
     bottom: 0;
@@ -513,7 +512,6 @@ function getThumbnail(content) {
     const r2 = document.querySelector('.right-track .p2');
     const r3 = document.querySelector('.right-track .p3');
 
-    // ▼ 追加：メニューボタンの開け閉めを指示するプログラム ▼
     const menuOpenBtn = document.getElementById('menu-open');
     const menuCloseBtn = document.getElementById('menu-close');
     const sideMenu = document.getElementById('side-menu');
@@ -525,7 +523,6 @@ function getThumbnail(content) {
     menuCloseBtn?.addEventListener('click', () => {
       sideMenu?.classList.remove('is-open');
     });
-    // ▲ 追加ここまで ▲
 
     function isDesktop() { return window.innerWidth > DESKTOP_BREAKPOINT; }
     
@@ -636,7 +633,6 @@ function getThumbnail(content) {
     function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
 
     window.addEventListener('wheel', (e) => {
-      // メニューが開いている間は、背景のスクロール（画面の切り替え）を禁止しています
       if (!isDesktop() || document.getElementById('side-menu')?.classList.contains('is-open')) return;
       e.preventDefault();
       if (isAnimating) return;
