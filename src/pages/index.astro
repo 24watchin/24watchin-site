@@ -64,7 +64,7 @@ const languages = [
   </head>
 
   <body class="is-locked">
-    <header class="global-header" id="main-header">
+    <header class="global-header">
       <div class="header-band">
         <div class="logo-area">
           <a href="https://24watchin.com">
@@ -104,8 +104,6 @@ const languages = [
     </div>
 
     <div class="transition-mask" id="transition-mask" aria-hidden="true"></div>
-
-    <div class="line-wipe" id="line-wipe" aria-hidden="true"></div>
 
     <main class="gateway-main">
       <div class="desktop-sequence" id="desktop-sequence">
@@ -404,7 +402,6 @@ const languages = [
         background: rgba(255, 255, 255, 0.9);
       }
 
-      /* ▼ 修正箇所①：幕のデフォルト背景色を濃い紺色に変更しました ▼ */
       .transition-mask {
         position: fixed;
         inset: 0;
@@ -412,31 +409,15 @@ const languages = [
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        background: #010411; /* 画面4の夜空に近い紺色 */
+        background: #050b18;
         transition: opacity 0.8s ease, visibility 0s linear 0.8s;
       }
-      /* ▲ 修正箇所①おわり ▲ */
 
       .transition-mask.is-visible {
         opacity: 1;
         visibility: visible;
         transition: opacity 0.8s ease;
       }
-
-      /* ▼ 修正箇所②：3→4のみ適用する「星」の魔法（CSS）を定義しました ▼ */
-      .transition-mask.is-starry {
-        background-color: #010411; /* 紺色をベースにする */
-        /* 星をちりばめたCSSグラデーション */
-        background-image:
-          radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px),
-          radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 2px),
-          radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px);
-        /* 星のサイズと位置をランダムにする */
-        background-size: 550px 550px, 350px 350px, 250px 250px;
-        background-position: 0 0, 40px 60px, 130px 270px;
-        background-repeat: repeat; /* リピートして画面全体を覆う */
-      }
-      /* ▲ 修正箇所②おわり ▲ */
 
       .desktop-sequence {
         position: fixed;
@@ -1084,9 +1065,6 @@ const languages = [
         const MASK_OUT_MS  = 800;
         const MASK_UNLOCK_MS = 100;
 
-        const SECTION_ANIM_MS = 240;
-        const FOOTER_ANIM_MS = 900;
-
         let currentStep = 0;
         let isAnimating = false;
         let isFreeScroll = false;
@@ -1233,16 +1211,17 @@ const languages = [
           }, MASK_IN_MS);
         }
 
-        // ▼ 4→3（Brand to Hero）専用。ここでは星は使わず、単色紺色の魔法を使います ▼
+        // ▼ 修正：画面4から3へ戻る時、完全に黒い幕を下ろして処理を行う専用の関数です ▼
         function transitionBrandToHero() {
-          showMask(); // 単色紺色の幕を下ろす（ゆっくり0.8秒）
+          showMask(); // 黒い幕を下ろす（0.8秒）
           window.setTimeout(() => {
-            // 幕の下で処理を行う（残像を完全に消す）
+            // 黒い幕の下で、画面4を一瞬で消して画面3のテキストを再表示する
             resetBrandPanel(); 
             clearSectionVisibility();
             activateHeroSlide(2); 
             
-            hideMask(); // 幕を上げる（ゆっくり0.8秒）
+            // 幕を上げる（0.8秒）
+            hideMask();
           }, MASK_IN_MS);
         }
 
@@ -1267,7 +1246,7 @@ const languages = [
               behavior: 'auto'
             });
 
-            // ▼ 4→3専用の魔法をかける ▼
+            // ▼ 修正：画面4から画面3へ戻る時、新しい「幕の上げ下げ」の魔法を使います ▼
             if (previousStep === 3 && step === 2) {
               transitionBrandToHero();
               return;
@@ -1291,39 +1270,6 @@ const languages = [
               return;
             }
 
-            // ▼ 修正箇所③：3→4専用。幕を出す前に「星の魔法」をかけます ▼
-            if (previousStep <= 2) {
-              // 1. まず星のクラスを追加して、幕を「星空」にする
-              transitionMask?.classList.add('is-starry');
-
-              showMask(); // 2. 星空の幕を下ろす（0.8秒）
-              
-              window.setTimeout(() => {
-                // 3. 幕の下で、画面3を消して画面4の準備をする
-                desktopSequence?.classList.remove('is-hidden');
-                resetBrandPanel();
-                clearSectionVisibility();
-                
-                // 4. 【重要】幕が上がる前に星のクラスを消して、紺色単色に戻す
-                transitionMask?.classList.remove('is-starry');
-
-                // 5. 裏で画面4をパッと表示させる（幕が上がった時に綺麗に見えるように）
-                brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-                requestAnimationFrame(() => {
-                  brandTextTarget?.classList.add('is-visible');
-                });
-
-                // 6. 紺色の幕を上げる（0.8秒）
-                hideMask();
-
-                // 7. すべて終わったら、次のスクロールを許可する
-                window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS);
-              }, MASK_IN_MS); // 0.8秒待機
-              return;
-            }
-            // ▲ 修正箇所③おわり ▲
-
-            // それ以外（6→5→4→3）の場合は、通常の暗転（紺色単色）
             hideMask();
             clearSectionVisibility();
 
