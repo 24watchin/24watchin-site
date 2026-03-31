@@ -242,11 +242,11 @@ const languages = [
           <p>スマホ版は準備中です</p>
         </div>
       </div>
+
       <footer class="site-footer">
         <p>[ フッター領域 ]</p>
       </footer>
     </main>
-
 
     <style>
       :root {
@@ -428,11 +428,6 @@ const languages = [
       }
       .transition-mask.is-slow.is-visible {
         transition: opacity 0.5s ease;
-      }
-      /* マスクの裏で瞬時に状態セット用 */
-      .brand-panel.no-transition,
-      .brand-panel.no-transition * {
-        transition: none !important;
       }
 
       /* ===== 5→6 ライン演出 ===== */
@@ -1269,35 +1264,27 @@ const languages = [
         function transitionBrandToStories() {
           showMask();
           window.setTimeout(() => {
+            // ★核心：マスクの裏で画面4をリセット→5→4戻り時に透けて見えなくなる
+            resetBrandPanel();
             showSection(4);
             hideMask();
             window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS);
           }, MASK_IN_MS);
         }
 
-        // 5→4専用：マスクの裏でno-transitionで瞬時に画面4を完成状態にする
+        // 5→4：マスクで隠してから画面4を表示
         function transitionStoriesToBrand() {
           const SLOW_MS = 500;
           transitionMask?.classList.add('is-slow');
           showMask();
-
           window.setTimeout(() => {
-            // マスクが完全不透明な状態でトランジションをオフにして即座に完成状態へ
             clearSectionVisibility();
-            brandPanel?.classList.add('no-transition');
-            resetBrandPanel();
-            brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-            brandTextTarget?.classList.add('is-visible');
-
-            // 1フレーム待ってno-transitionを外し（以降は通常トランジション）、マスクをフェードアウト
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                brandPanel?.classList.remove('no-transition');
-                hideMask();
-                transitionMask?.classList.remove('is-slow');
-                window.setTimeout(() => { isAnimating = false; }, SLOW_MS + MASK_UNLOCK_MS);
-              });
-            });
+            revealBrandImmediate();
+            hideMask();
+            window.setTimeout(() => {
+              transitionMask?.classList.remove('is-slow');
+              isAnimating = false;
+            }, SLOW_MS + MASK_UNLOCK_MS);
           }, SLOW_MS);
         }
 
