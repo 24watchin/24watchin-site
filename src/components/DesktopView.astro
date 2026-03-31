@@ -280,6 +280,9 @@ function getThumbnail(content) {
     -webkit-user-select: none;
     user-select: none;
   }
+  html.is-locked, body.is-locked {
+    overflow: hidden !important;
+  }
   
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
@@ -448,7 +451,6 @@ function getThumbnail(content) {
     width: 100%; 
   }
   
-  /* ▼ フッターのロゴ周りのデザイン設定 ▼ */
   .top-footer-logo a {
     display: block;
     outline: none;
@@ -490,162 +492,247 @@ function getThumbnail(content) {
   if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
   
   document.addEventListener('DOMContentLoaded', () => {
-    document.addEventListener('contextmenu', event => event.preventDefault());
+    // 古いコードの残骸によるエラーを防ぐため、全体を安全な仕組み（try-catch）で囲んでいます
+    try {
+      document.addEventListener('contextmenu', event => event.preventDefault());
 
-    const DESKTOP_BREAKPOINT = 768;
-    const HERO_ANIM_MS = 1500;
-    const WHEEL_THRESHOLD = 24;
-    const BRAND_BG_DELAY_MS = 700;
-    const BRAND_TEXT_DELAY_MS = 1350;
-    const BRAND_UNLOCK_MS = 2300;
-    const BRAND_HIDE_MS = 600; 
+      const DESKTOP_BREAKPOINT = 768;
+      const HERO_ANIM_MS = 1500;
+      const WHEEL_THRESHOLD = 24;
+      const BRAND_BG_DELAY_MS = 700;
+      const BRAND_TEXT_DELAY_MS = 1350;
+      const BRAND_UNLOCK_MS = 2300;
+      const BRAND_HIDE_MS = 600; 
 
-    const MASK_IN_MS  = 800;   
-    const MASK_HOLD_MS = 50;
-    const MASK_OUT_MS  = 800;
-    const MASK_UNLOCK_MS = 100;
+      const MASK_IN_MS  = 800;   
+      const MASK_UNLOCK_MS = 100;
 
-    let currentStep = 0;
-    let isAnimating = false;
+      let currentStep = 0;
+      let isAnimating = false;
 
-    const body = document.body;
-    const desktopSequence = document.getElementById('desktop-sequence');
-    const brandPanel = document.getElementById('brand-panel');
-    const brandTextTarget = document.getElementById('brand-text-target');
-    const transitionMask = document.getElementById('transition-mask');
-    const screen5 = document.getElementById('screen-5');
-    const screen6 = document.getElementById('screen-6');
-    const dots = document.querySelectorAll('.scroll-indicator .dot');
-    const leftPanels = document.querySelectorAll('.left-track .panel');
-    const rightPanels = document.querySelectorAll('.right-track .panel');
-    const l2 = document.querySelector('.left-track .p2');
-    const l3 = document.querySelector('.left-track .p3');
-    const r2 = document.querySelector('.right-track .p2');
-    const r3 = document.querySelector('.right-track .p3');
+      const desktopSequence = document.getElementById('desktop-sequence');
+      const brandPanel = document.getElementById('brand-panel');
+      const brandTextTarget = document.getElementById('brand-text-target');
+      const transitionMask = document.getElementById('transition-mask');
+      const screen5 = document.getElementById('screen-5');
+      const screen6 = document.getElementById('screen-6');
+      const dots = document.querySelectorAll('.scroll-indicator .dot');
+      const leftPanels = document.querySelectorAll('.left-track .panel');
+      const rightPanels = document.querySelectorAll('.right-track .panel');
+      const l2 = document.querySelector('.left-track .p2');
+      const l3 = document.querySelector('.left-track .p3');
+      const r2 = document.querySelector('.right-track .p2');
+      const r3 = document.querySelector('.right-track .p3');
 
-    const menuOpenBtn = document.getElementById('menu-open');
-    const menuCloseBtn = document.getElementById('menu-close');
-    const sideMenu = document.getElementById('side-menu');
+      const menuOpenBtn = document.getElementById('menu-open');
+      const menuCloseBtn = document.getElementById('menu-close');
+      const sideMenu = document.getElementById('side-menu');
 
-    menuOpenBtn?.addEventListener('click', () => {
-      sideMenu?.classList.add('is-open');
-    });
+      menuOpenBtn?.addEventListener('click', () => {
+        sideMenu?.classList.add('is-open');
+      });
 
-    menuCloseBtn?.addEventListener('click', () => {
-      sideMenu?.classList.remove('is-open');
-    });
+      menuCloseBtn?.addEventListener('click', () => {
+        sideMenu?.classList.remove('is-open');
+      });
 
-    function isDesktop() { return window.innerWidth > DESKTOP_BREAKPOINT; }
-    
-    function setBodyLocked(locked) { 
-      body.classList.toggle('is-locked', locked); 
-    }
-    
-    function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
-    function showMask() { transitionMask?.classList.add('is-visible'); }
-    function hideMask() { transitionMask?.classList.remove('is-visible'); }
-    function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
-    function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible'); }
-    function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible'); }
-    
-    function revealBrandImmediate() {
-      desktopSequence?.classList.remove('is-hidden');
-      resetBrandPanel();
-      brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-      requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
-    }
-
-    function showBrandAnimated() {
-      desktopSequence?.classList.remove('is-hidden');
-      resetBrandPanel();
-      brandPanel?.classList.add('is-visible', 'is-night');
-      window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS);
-      window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS);
-      window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS);
-    }
-
-    function hideBrandAnimated() {
-      brandTextTarget?.classList.remove('is-visible');
-      brandPanel?.classList.remove('is-bg', 'is-night');
-      window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS);
-    }
-
-    function activateHeroSlide(index) {
-      leftPanels.forEach((panel) => panel.classList.remove('is-active'));
-      rightPanels.forEach((panel) => panel.classList.remove('is-active'));
-      if (index === 0) { l2?.classList.remove('is-open'); r2?.classList.remove('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); }
-      else if (index === 1) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); }
-      else if (index === 2) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.add('is-open'); r3?.classList.add('is-open'); }
-      window.setTimeout(() => { leftPanels[index]?.classList.add('is-active'); rightPanels[index]?.classList.add('is-active'); isAnimating = false; }, HERO_ANIM_MS);
-    }
-
-    function transitionBrandToStories() {
-      showMask();
-      window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
-    }
-
-    function transitionStoriesToBrand() {
-      showMask();
-      window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
-    }
-
-    function transitionBetweenSections(targetStep) {
-      showMask();
-      window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
-    }
-
-    function transitionBrandToHero() {
-      showMask();
-      window.setTimeout(() => {
-        resetBrandPanel(); 
-        clearSectionVisibility();
-        activateHeroSlide(2); 
-        hideMask();
-      }, MASK_IN_MS);
-    }
-
-    function goToStep(step) {
-      if (!isDesktop()) return;
-      if (step < 0 || step > 5) return;
-      if (isAnimating) return;
-
-      const previousStep = currentStep;
-      currentStep = step;
-      isAnimating = true;
-      updateIndicator(step);
-
-      if (step <= 2) {
-        setBodyLocked(true);
+      function isDesktop() { return window.innerWidth > DESKTOP_BREAKPOINT; }
+      
+      function setBodyLocked(locked) { 
+        document.body.classList.toggle('is-locked', locked); 
+        document.documentElement.classList.toggle('is-locked', locked);
+      }
+      
+      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
+      function showMask() { transitionMask?.classList.add('is-visible'); }
+      function hideMask() { transitionMask?.classList.remove('is-visible'); }
+      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
+      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible'); }
+      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible'); }
+      
+      function revealBrandImmediate() {
         desktopSequence?.classList.remove('is-hidden');
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-        if (previousStep === 3 && step === 2) { transitionBrandToHero(); return; }
-        hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return;
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
+        requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
       }
 
-      if (step === 3) {
-        setBodyLocked(true);
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-        if (previousStep === 4) { transitionStoriesToBrand(); return; }
-        hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden');
-        if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } 
-        else { showBrandAnimated(); }
-        return;
+      function showBrandAnimated() {
+        desktopSequence?.classList.remove('is-hidden');
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night');
+        window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS);
+        window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS);
+        window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS);
       }
 
-      if (step === 4 && previousStep === 3) { transitionBrandToStories(); return; }
-      if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return; }
-      if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; }
+      function hideBrandAnimated() {
+        brandTextTarget?.classList.remove('is-visible');
+        brandPanel?.classList.remove('is-bg', 'is-night');
+        window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS);
+      }
 
-      showSection(step);
-      window.setTimeout(() => { isAnimating = false; }, 300);
+      function activateHeroSlide(index) {
+        leftPanels.forEach((panel) => panel.classList.remove('is-active'));
+        rightPanels.forEach((panel) => panel.classList.remove('is-active'));
+        if (index === 0) { l2?.classList.remove('is-open'); r2?.classList.remove('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); }
+        else if (index === 1) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); }
+        else if (index === 2) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.add('is-open'); r3?.classList.add('is-open'); }
+        window.setTimeout(() => { 
+          if(leftPanels.length > index) leftPanels[index].classList.add('is-active'); 
+          if(rightPanels.length > index) rightPanels[index].classList.add('is-active'); 
+          isAnimating = false; 
+        }, HERO_ANIM_MS);
+      }
+
+      function transitionBrandToStories() {
+        showMask();
+        window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+
+      function transitionStoriesToBrand() {
+        showMask();
+        window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+
+      function transitionBetweenSections(targetStep) {
+        showMask();
+        window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+
+      function transitionBrandToHero() {
+        showMask();
+        window.setTimeout(() => {
+          resetBrandPanel(); 
+          clearSectionVisibility();
+          activateHeroSlide(2); 
+          hideMask();
+        }, MASK_IN_MS);
+      }
+
+      function goToStep(step) {
+        if (!isDesktop()) return;
+        if (step < 0 || step > 5) return;
+        if (isAnimating) return;
+
+        const previousStep = currentStep;
+        currentStep = step;
+        isAnimating = true;
+        updateIndicator(step);
+
+        if (step <= 2) {
+          setBodyLocked(true);
+          desktopSequence?.classList.remove('is-hidden');
+          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+          if (previousStep === 3 && step === 2) { transitionBrandToHero(); return; }
+          hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return;
+        }
+
+        if (step === 3) {
+          setBodyLocked(true);
+          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+          if (previousStep === 4) { transitionStoriesToBrand(); return; }
+          hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden');
+          if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } 
+          else { showBrandAnimated(); }
+          return;
+        }
+
+        if (step === 4 && previousStep === 3) { transitionBrandToStories(); return; }
+        if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return; }
+        if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; }
+
+        showSection(step);
+        window.setTimeout(() => { isAnimating = false; }, 300);
+      }
+
+      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
+      function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
+
+      window.addEventListener('wheel', (e) => {
+        if (!isDesktop() || document.getElementById('side-menu')?.classList.contains('is-open')) return;
+        e.preventDefault();
+        if (isAnimating) return;
+        if (e.deltaY > WHEEL_THRESHOLD) moveNext(); 
+        else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
+      }, { passive: false });
+
+      function scrollCarouselByOneCard(container, direction) {
+        if (!container) return;
+        const cards = container.querySelectorAll('.observer-card');
+        if (cards.length === 0) return;
+        const cardWidth = cards[0].offsetWidth;
+        const style = window.getComputedStyle(cards[0]);
+        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        const distance = (cardWidth + margin) * direction;
+        container.scrollBy({ left: distance, behavior: 'smooth' });
+      }
+
+      const storyCards = document.querySelectorAll('#story-carousel .observer-card');
+      const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
+      const storyPrevBtn = document.getElementById('story-carousel-prev');
+      const storyNextBtn = document.getElementById('story-carousel-next');
+      const storyContainer = document.getElementById('story-carousel');
+
+      storyPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, -1));
+      storyNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, 1));
+
+      const storyObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-center');
+            const index = Array.from(storyCards).indexOf(entry.target);
+            if(index !== -1 && storyDots[index]) {
+              storyDots.forEach(d => d.classList.remove('active'));
+              storyDots[index].classList.add('active');
+            }
+          } else {
+            entry.target.classList.remove('is-center');
+          }
+        });
+      }, { root: storyContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
+      storyCards.forEach(card => storyObserver.observe(card));
+
+      const langCards = document.querySelectorAll('#lang-carousel .observer-card');
+      const langDots = document.querySelectorAll('#lang-carousel-dots .c-dot');
+      const langPrevBtn = document.getElementById('lang-carousel-prev');
+      const langNextBtn = document.getElementById('lang-carousel-next');
+      const langContainer = document.getElementById('lang-carousel');
+
+      langPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, -1));
+      langNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, 1));
+
+      const langObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-center');
+            const index = Array.from(langCards).indexOf(entry.target);
+            if(index !== -1 && langDots[index]) {
+              langDots.forEach(d => d.classList.remove('active'));
+              langDots[index].classList.add('active');
+            }
+          } else {
+            entry.target.classList.remove('is-center');
+          }
+        });
+      }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
+      langCards.forEach(card => langObserver.observe(card));
+
+      // ページ読み込み時の最初の動き（ここで文字を出しています）
+      setBodyLocked(true); 
+      if(desktopSequence) desktopSequence.classList.remove('is-hidden'); 
+      hideMask(); 
+      resetBrandPanel(); 
+      clearSectionVisibility(); 
+      updateIndicator(0);
+      
+      window.setTimeout(() => { 
+        if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); 
+        if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); 
+      }, 400);
+
+    } catch (error) {
+      console.error("プログラムでエラーが発生しました:", error);
     }
-
-    function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
-    function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
-
-    window.addEventListener('wheel', (e) => {
-      if (!isDesktop() || document.getElementById('side-menu')?.classList.contains('is-open')) return;
-      e.preventDefault();
-      if (isAnimating) return;
-      if (e.deltaY > WHEEL_THRESHOLD) moveNext(); 
-      else if (e.
+  });
+</script>
