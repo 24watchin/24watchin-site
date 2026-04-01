@@ -51,6 +51,8 @@ function getThumbnail(content) {
 
 <div class="m-wrapper">
 
+  <div class="m-desktop-blocker"></div>
+
   <header class="m-global-header">
     <div class="m-header-band">
       <div class="m-logo-area">
@@ -89,12 +91,10 @@ function getThumbnail(content) {
     <div class="m-dot"></div>
   </div>
 
-  <div class="m-transition-mask" id="m-transition-mask" aria-hidden="true"></div>
-
-  <div class="m-sequence" id="m-sequence">
+  <div class="m-step-target is-visible" id="m-stage-hero">
     <div class="m-split-stage">
       <div class="m-top-track">
-        <div class="m-panel m-p1">
+        <div class="m-panel m-p1 is-active">
           <div class="m-bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
           <div class="m-word-band-container"><div class="m-word-band"><h2>CONFLICT</h2></div></div>
         </div>
@@ -109,7 +109,7 @@ function getThumbnail(content) {
       </div>
 
       <div class="m-bottom-track">
-        <div class="m-panel m-p1">
+        <div class="m-panel m-p1 is-active">
           <div class="m-bg-layer" style="background-image: url('/images/crisis.png');"></div>
           <div class="m-word-band-container"><div class="m-word-band"><h2>CRISIS</h2></div></div>
         </div>
@@ -123,29 +123,30 @@ function getThumbnail(content) {
         </div>
       </div>
     </div>
+  </div>
 
-    <section class="m-brand-panel" id="m-brand-panel">
-      <div class="m-brand-night"></div>
-      <div class="m-brand-bg" style="background-image: url('/images/explanation.png');"></div>
-      <div class="m-brand-bg-overlay"></div>
-      <div class="m-brand-content m-text-anim-target" id="m-brand-text-target">
-        <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" class="m-brand-logo-img m-fade-base m-fade-up m-anim-logo" />
-        <h2 class="m-brand-catch m-fade-base m-fade-up m-anim-catch">Watch the world<br>with clarity.</h2>
-        <div class="m-brand-desc">
-          <p class="m-fade-base m-fade-left m-anim-desc1">Global news.</p>
-          <p class="m-fade-base m-fade-left m-anim-desc2">Explained clearly.</p>
-          <p class="m-fade-base m-fade-left m-anim-desc3">In your language.</p>
-        </div>
+  <section class="m-step-target m-brand-panel" id="m-brand-panel">
+    <div class="m-brand-night"></div>
+    <div class="m-brand-bg" style="background-image: url('/images/explanation.png');"></div>
+    <div class="m-brand-bg-overlay"></div>
+    <div class="m-brand-content m-text-anim-target" id="m-brand-text-target">
+      <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" class="m-brand-logo-img m-fade-base m-fade-up m-anim-logo" />
+      <h2 class="m-brand-catch m-fade-base m-fade-up m-anim-catch">Watch the world<br>with clarity.</h2>
+      <div class="m-brand-desc">
+        <p class="m-fade-base m-fade-left m-anim-desc1">Global news.</p>
+        <p class="m-fade-base m-fade-left m-anim-desc2">Explained clearly.</p>
+        <p class="m-fade-base m-fade-left m-anim-desc3">In your language.</p>
       </div>
-    </section>
-  </div> <section class="m-seq-panel" id="m-screen-5">
+    </div>
+  </section>
+
+  <section class="m-step-target m-seq-panel" id="m-screen-5">
     <div class="m-seq-inner">
       <div class="m-section-header"><h2>Latest Stories</h2></div>
       
       <div class="m-carousel-wrapper">
         <div class="m-carousel-container" id="m-story-carousel">
           <div class="m-carousel-spacer"></div>
-          
           {displayStories.map((post) => {
             let bgImage = '';
             let categoryName = 'News';
@@ -157,9 +158,7 @@ function getThumbnail(content) {
               const countryTag = post.labels.find(l => l.startsWith('en-'));
               if (countryTag) {
                 countryCode = countryTag.replace('en-', '');
-                if (countryNameMap[countryCode]) {
-                  countryName = countryNameMap[countryCode];
-                }
+                if (countryNameMap[countryCode]) { countryName = countryNameMap[countryCode]; }
               }
               const foundCat = enCategories.find(cat => 
                 post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
@@ -204,7 +203,7 @@ function getThumbnail(content) {
     </div>
   </section>
 
-  <section class="m-seq-panel" id="m-screen-6">
+  <section class="m-step-target m-seq-panel" id="m-screen-6">
     <div class="m-seq-inner">
       <div class="m-section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
       <div class="m-carousel-wrapper">
@@ -272,17 +271,20 @@ function getThumbnail(content) {
       display: block;
       -webkit-user-select: none;
       user-select: none;
-      position: relative;
-      z-index: 9999;
+    }
+
+    /* ▼ PC版を完全に封じ込める絶対的な壁 ▼ */
+    .m-desktop-blocker {
+      position: fixed;
+      inset: 0;
       background: #010411;
-      min-height: 100vh;
-      min-height: 100dvh;
-      width: 100%;
+      z-index: 9998; /* PC版の要素より確実に上に配置 */
+      pointer-events: all;
     }
     
     html.m-is-locked, body.m-is-locked { overflow: hidden !important; }
     
-    .m-global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 10000; pointer-events: none; }
+    .m-global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 10100; pointer-events: none; }
     .m-header-band { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
     .m-logo-area a { text-decoration: none; outline: none; }
     .m-header-logo-img { height: 32px; width: auto; filter: brightness(0) invert(1); } 
@@ -290,7 +292,7 @@ function getThumbnail(content) {
     .m-menu-trigger { background: none; border: none; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 5px; }
     .m-burger-line { width: 24px; height: 2px; background: #fff; border-radius: 2px; }
     
-    .m-side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; height: 100dvh; background: rgba(10, 10, 10, 0.98); z-index: 10100; transition: right 0.4s ease; padding: 60px 20px; overflow-y: auto; }
+    .m-side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; height: 100dvh; background: rgba(10, 10, 10, 0.98); z-index: 10200; transition: right 0.4s ease; padding: 60px 20px; overflow-y: auto; }
     .m-side-menu.is-open { right: 0; }
     .m-menu-close { position: absolute; top: 20px; right: 20px; font-size: 36px; background: none; border: none; color: #fff; }
     .m-menu-inner { width: 100%; text-align: center; margin-top: 40px; }
@@ -298,37 +300,55 @@ function getThumbnail(content) {
     .m-menu-grid { display: flex; flex-direction: column; gap: 12px; }
     .m-menu-lang-card { padding: 20px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; background-color: var(--accent); text-decoration: none; color: white; }
     
-    .m-scroll-indicator { position: fixed; top: 50%; right: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10000; }
+    .m-scroll-indicator { position: fixed; top: 50%; right: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10100; }
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    .m-transition-mask { position: fixed; inset: 0; z-index: 10050; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease, visibility 0s linear 0.6s; }
-    .m-transition-mask.is-visible { opacity: 1; visibility: visible; transition: opacity 0.6s ease, visibility 0s linear 0s; }
-    
-    .m-sequence { position: fixed; inset: 0; z-index: 9999; height: 100vh; height: 100dvh; background: #010411; }
-    .m-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    
+    /* ▼ スライドの重なりを完全防止！すべての画面を完全に独立した箱として扱い、CSSでクロスフェードさせる ▼ */
+    .m-step-target {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      /* 消える時は0.8秒かけてフワッと消える */
+      transition: opacity 0.8s ease, visibility 0s linear 0.8s;
+    }
+    .m-step-target.is-visible {
+      z-index: 10000;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      /* 現れる時は0.8秒かけてフワッと現れる */
+      transition: opacity 0.8s ease, visibility 0s linear 0s;
+    }
+
+    /* 画面1〜3（上下分割） */
     .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
     
-    .m-panel { position: absolute; inset: 0; overflow: hidden; }
+    /* 画面1〜3もフワッと切り替わるように設定 */
+    .m-panel { 
+      position: absolute; inset: 0; overflow: hidden; 
+      opacity: 0; visibility: hidden; 
+      transition: opacity 0.8s ease, visibility 0s linear 0.8s; 
+    }
+    .m-panel.is-active { 
+      opacity: 1; visibility: visible; 
+      transition: opacity 0.8s ease, visibility 0s linear 0s; 
+    }
+    
     .m-bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
     
-    .m-top-track .m-p1 { z-index: 1; }
-    .m-top-track .m-p2 { z-index: 2; clip-path: inset(0 0 100% 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
-    .m-top-track .m-p3 { z-index: 3; clip-path: inset(0 0 100% 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
-    
-    .m-bottom-track .m-p1 { z-index: 1; }
-    .m-bottom-track .m-p2 { z-index: 2; clip-path: inset(100% 0 0 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
-    .m-bottom-track .m-p3 { z-index: 3; clip-path: inset(100% 0 0 0); transition: clip-path 1.2s cubic-bezier(0.64, 0.04, 0.35, 1); }
-    
-    .m-panel.is-open { clip-path: inset(0 0 0 0) !important; }
-    
+    /* ▼ 帯の幅を画面の半分（50%）に固定 ▼ */
     .m-word-band-container { position: absolute; top: 65%; width: 50%; z-index: 10; overflow: hidden; }
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
     
+    /* ▼ 帯のベース設定：不透明度0.95（5%透明）の白 ▼ */
     .m-word-band { 
+      background: rgba(255, 255, 255, 0.95); 
       backdrop-filter: blur(2px); 
       width: 100%; 
       padding: 6px 12px; 
@@ -337,31 +357,32 @@ function getThumbnail(content) {
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
     
-    /* 始まり(0%)は不透明度0.95、文字が終わる(70%)から不透明度0.15へグラデーション */
+    /* ▼ 上部画像：始まりはそのまま(0.95)、文字終わり(75%)から透明(0.15)へ抜けるグラデーション ▼ */
     .m-top-track .m-word-band { 
       justify-content: flex-start; 
       transform: translateX(-100%); 
-      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 70%, rgba(255,255,255,0.15) 100%);
+      -webkit-mask-image: linear-gradient(to right, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
+      mask-image: linear-gradient(to right, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
     }
 
+    /* ▼ 下部画像：始まりはそのまま(0.95)、文字終わり(75%)から透明(0.15)へ抜けるグラデーション ▼ */
     .m-bottom-track .m-word-band { 
       justify-content: flex-end; 
       transform: translateX(100%); 
-      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 70%, rgba(255,255,255,0.15) 100%);
+      -webkit-mask-image: linear-gradient(to left, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
+      mask-image: linear-gradient(to left, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
     }
     
+    /* ▼ 文字間隔を限界まで狭く(-0.05em)してはみ出しを防止 ▼ */
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
     
-    .m-brand-panel { position: absolute; inset: 0; z-index: 30; opacity: 0; visibility: hidden; pointer-events: none; }
-    .m-brand-panel.is-visible { opacity: 1; visibility: visible; pointer-events: auto; }
-    
-    .m-brand-night { position: absolute; inset: 0; opacity: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); transition: opacity 0.6s ease; }
-    .m-brand-panel.is-night .m-brand-night { opacity: 1; }
-    .m-brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transform: scale(1.05); transition: all 1s ease; }
-    .m-brand-panel.is-bg .m-brand-bg { opacity: 0.8; transform: scale(1); }
+    /* 画面4：ブランドパネル */
+    .m-brand-night { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); transition: opacity 0.6s ease; }
+    .m-brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.8; transform: scale(1.05); transition: all 1s ease; }
+    .m-brand-panel.is-visible .m-brand-bg { transform: scale(1); }
     .m-brand-bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
     .m-brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 20px; }
     .m-brand-logo-img { width: 160px; height: auto; margin-bottom: 20px; filter: brightness(0) invert(1); }
@@ -371,19 +392,18 @@ function getThumbnail(content) {
     .m-fade-base { opacity: 0; transition: all 0.3s ease; }
     .m-fade-up { transform: translateY(20px); }
     .m-fade-left { transform: translateX(-30px); }
-    .m-text-anim-target.is-visible .m-fade-up, .m-text-anim-target.is-visible .m-fade-left { transform: translate(0); opacity: 1; transition: all 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-    .m-text-anim-target.is-visible .m-anim-logo { transition-delay: 0.1s; }
-    .m-text-anim-target.is-visible .m-anim-catch { transition-delay: 0.6s; }
-    .m-text-anim-target.is-visible .m-anim-desc1 { transition-delay: 1.2s; }
-    .m-text-anim-target.is-visible .m-anim-desc2 { transition-delay: 1.8s; }
-    .m-text-anim-target.is-visible .m-anim-desc3 { transition-delay: 2.4s; }
+    .m-step-target.is-visible .m-fade-up, .m-step-target.is-visible .m-fade-left { transform: translate(0); opacity: 1; transition: all 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .m-step-target.is-visible .m-anim-logo { transition-delay: 0.1s; }
+    .m-step-target.is-visible .m-anim-catch { transition-delay: 0.4s; }
+    .m-step-target.is-visible .m-anim-desc1 { transition-delay: 0.8s; }
+    .m-step-target.is-visible .m-anim-desc2 { transition-delay: 1.2s; }
+    .m-step-target.is-visible .m-anim-desc3 { transition-delay: 1.6s; }
     
-    .m-seq-panel { position: absolute; inset: 0; z-index: 40; opacity: 0; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; overflow-y: auto; overflow-x: hidden; }
-    #m-screen-6 { z-index: 50; padding-bottom: 220px; } 
-    .m-seq-panel.is-visible { opacity: 1; visibility: visible; pointer-events: auto; }
+    /* 画面5と6 */
+    .m-seq-panel { background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); overflow-y: auto; overflow-x: hidden; }
     
-    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 40px; padding-bottom: 40px; }
-    .m-seq-panel.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; padding-bottom: 80px; }
+    .m-step-target.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
     
     #m-screen-5 .m-seq-inner { justify-content: center; }
     #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 220px; } 
@@ -446,7 +466,6 @@ function getThumbnail(content) {
     if (!window.matchMedia('(pointer: coarse)').matches) return;
 
     try {
-      const HERO_ANIM_MS = 1200;
       const SWIPE_THRESHOLD = 40; 
 
       let currentStep = 0;
@@ -455,10 +474,8 @@ function getThumbnail(content) {
 
       const body = document.body;
       const html = document.documentElement;
-      const sequence = document.getElementById('m-sequence');
+      const stageHero = document.getElementById('m-stage-hero');
       const brandPanel = document.getElementById('m-brand-panel');
-      const brandTextTarget = document.getElementById('m-brand-text-target');
-      const transitionMask = document.getElementById('m-transition-mask');
       const screen5 = document.getElementById('m-screen-5');
       const screen6 = document.getElementById('m-screen-6');
       const dots = document.querySelectorAll('#m-scroll-indicator .m-dot');
@@ -497,13 +514,15 @@ function getThumbnail(content) {
         if (Math.abs(diffX) > Math.abs(diffY)) return;
         if (isAnimating) return;
 
-        const visiblePanel = document.querySelector('.m-seq-panel.is-visible');
-        if (visiblePanel) {
+        const visiblePanel = document.querySelector('.m-step-target.is-visible');
+        if (visiblePanel && (currentStep === 4 || currentStep === 5)) {
             if (diffY < -SWIPE_THRESHOLD && visiblePanel.scrollTop <= 10) {
                movePrev();
+               return;
             }
-            else if (diffY > SWIPE_THRESHOLD && visiblePanel.scrollTop + visiblePanel.clientHeight >= visiblePanel.scrollHeight - 10) {
+            if (diffY > SWIPE_THRESHOLD && visiblePanel.scrollTop + visiblePanel.clientHeight >= visiblePanel.scrollHeight - 10) {
                moveNext();
+               return;
             }
             return;
         }
@@ -519,90 +538,41 @@ function getThumbnail(content) {
       
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
       
-      function showMask() { transitionMask?.classList.add('is-visible'); }
-      function hideMask() { transitionMask?.classList.remove('is-visible'); }
-      
-      function clearSectionVisibility() { 
-        screen5?.classList.remove('is-visible'); 
-        screen6?.classList.remove('is-visible'); 
-      }
-      
-      function resetBrandPanel() { 
-        brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); 
-        brandTextTarget?.classList.remove('is-visible'); 
-      }
-      
+      // ▼ 全ての画面移動を統括する完璧なフェードプログラム ▼
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
-
-        const previousStep = currentStep;
-        currentStep = step;
         isAnimating = true;
+        currentStep = step;
         updateIndicator(step);
 
-        // 1〜3画面目の「進む」時だけ、手前の画像を縮めて次を見せる（スライド）
-        const isBackward = step < previousStep;
-        if (!isBackward && step <= 2 && previousStep <= 2) {
-            if (step >= 1) { topPanels[step]?.classList.add('is-open'); bottomPanels[step]?.classList.add('is-open'); }
-            window.setTimeout(() => {
-                topPanels[step]?.classList.add('is-active'); bottomPanels[step]?.classList.add('is-active');
-                if (previousStep >= 0) {
-                    topPanels[previousStep]?.classList.remove('is-active'); bottomPanels[previousStep]?.classList.remove('is-active');
-                }
-                isAnimating = false;
-            }, 800); 
-            return;
+        // まず、大枠となるすべての画面（1〜6）をCSSの力でフェードアウトして隠す
+        stageHero?.classList.remove('is-visible');
+        brandPanel?.classList.remove('is-visible');
+        screen5?.classList.remove('is-visible');
+        screen6?.classList.remove('is-visible');
+
+        // 画面1〜3（上下分割）の中のパネルもすべてフェードアウトさせる
+        topPanels.forEach(p => p.classList.remove('is-active'));
+        bottomPanels.forEach(p => p.classList.remove('is-active'));
+
+        // 次に、行きたい画面だけをフェードインさせて表示する
+        if (step <= 2) {
+            stageHero?.classList.add('is-visible');
+            if (topPanels[step]) topPanels[step].classList.add('is-active');
+            if (bottomPanels[step]) bottomPanels[step].classList.add('is-active');
+        } else if (step === 3) {
+            brandPanel?.classList.add('is-visible');
+        } else if (step === 4) {
+            screen5?.classList.add('is-visible');
+            screen5.scrollTop = 0; // スクロール位置を一番上に戻しておく
+        } else if (step === 5) {
+            screen6?.classList.add('is-visible');
+            screen6.scrollTop = 0; // スクロール位置を一番上に戻しておく
         }
 
-        // ▼ 全ての画面移動で「黒いフェード」を使って完全に画面を暗くしてから切り替える ▼
-        showMask();
-        
-        window.setTimeout(() => {
-          // 画面が完全に真っ暗になったタイミングで、裏側の画面を一瞬で切り替える
-          resetBrandPanel();
-          clearSectionVisibility();
-          
-          topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-          bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-          
-          if (step <= 2) {
-              sequence?.classList.remove('is-hidden');
-              if (step >= 1) { topPanels[1]?.classList.add('is-open', 'is-active'); bottomPanels[1]?.classList.add('is-open', 'is-active'); }
-              if (step >= 2) { topPanels[2]?.classList.add('is-open', 'is-active'); bottomPanels[2]?.classList.add('is-open', 'is-active'); }
-              if (step >= 0) { topPanels[0]?.classList.add('is-active'); bottomPanels[0]?.classList.add('is-active'); }
-          }
-          else if (step === 3) {
-              sequence?.classList.remove('is-hidden');
-              brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-              brandTextTarget?.classList.add('is-visible');
-              if (topPanels[1]) { topPanels[1].classList.add('is-open', 'is-active'); bottomPanels[1].classList.add('is-open', 'is-active'); }
-              if (topPanels[2]) { topPanels[2].classList.add('is-open', 'is-active'); bottomPanels[2].classList.add('is-open', 'is-active'); }
-              if (topPanels[0]) { topPanels[0].classList.add('is-active'); bottomPanels[0].classList.add('is-active'); }
-          }
-          else if (step === 4) {
-              sequence?.classList.add('is-hidden');
-              screen5?.classList.add('is-visible');
-          }
-          else if (step === 5) {
-              sequence?.classList.add('is-hidden');
-              screen6?.classList.add('is-visible');
-          }
-
-          // HTMLに強制的に変更を認識させるおまじない
-          void document.body.offsetHeight;
-
-          // アニメーションを元に戻す
-          topPanels.forEach(panel => { panel.style.transition = ''; });
-          bottomPanels.forEach(panel => { panel.style.transition = ''; });
-
-          // 裏側のすり替えが完了！マスクを外して明るくする
-          hideMask();
-
-          // 画面が完全に明るくなるまで待ってから操作できるようにする
-          window.setTimeout(() => { isAnimating = false; }, 600);
-          
-        }, 600); // 画面が完全に真っ黒になるまで待つ時間（0.6秒）
+        // アニメーションが完全に終わる（0.8秒）まで次の操作をロックする
+        window.setTimeout(() => { isAnimating = false; }, 850);
       }
 
       function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
@@ -636,13 +606,6 @@ function getThumbnail(content) {
       setupObserver('m-lang-carousel', '#m-lang-carousel .m-observer-card', 'm-lang-carousel-dots');
 
       setBodyLocked(true); 
-      if(sequence) sequence.classList.remove('is-hidden'); 
-      hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
-      window.setTimeout(() => { 
-        if(topPanels.length > 0) topPanels[0].classList.add('is-active'); 
-        if(bottomPanels.length > 0) bottomPanels[0].classList.add('is-active'); 
-      }, 300);
-
     } catch (error) {
       console.error("スマホ版プログラムエラー:", error);
     }
