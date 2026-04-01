@@ -1,94 +1,113 @@
-// src/lib/info/contactData.ts
+---
+// src/components/info/ContactBody.astro
+import { contactData } from '../../lib/info/contactData.ts';
+---
 
-export const contactData = {
-  ja: {
-    title: 'お問い合わせ',
-    description: '24Watchinへのお問い合わせはこちらから。記事の訂正・転載・著作権などもお気軽にどうぞ。',
-    intro1: '24Watchinをご利用いただきありがとうございます。当サイトに関するご意見、ご感想、お問い合わせは、下記フォームよりご連絡ください。',
-    intro2: '記事内容に関するご意見・ご指摘、訂正のご連絡、著作権・転載に関するお問い合わせ、広告掲載・提携に関するご相談などを受け付けています。',
-    beforeTitle: 'お問い合わせの前にご確認ください',
-    before1: 'お問い合わせの内容、件数、確認状況その他の事情により、回答までお時間をいただく場合や、回答を差し上げられない場合があります。',
-    before2: '土曜、日曜、祝日、年末年始にいただいたお問い合わせは、翌営業日以降の確認となる場合があります。',
-    before3: '当サイトからの回答内容について、無断で転載、引用、再配布することはご遠慮ください。',
-    before4: '営業・勧誘・宣伝のみを目的とした送信については、回答いたしかねる場合があります。',
-    privacyTitle: '個人情報の取り扱いについて',
-    privacyText: 'お問い合わせフォームにご入力いただいた情報は、お問い合わせへの対応、内容の確認、必要なご連絡その他これらに付随する目的のために利用します。詳細については',
-    privacyLink: 'プライバシーポリシー',
-    privacyEnd: 'をご確認ください。',
-    formTitle: 'お問い合わせフォーム',
-    typeLabel: 'お問い合わせの種類',
-    typePlaceholder: '選択してください',
-    typeOptions: ['一般のお問い合わせ', '記事内容に関するご意見・ご指摘', '訂正・修正のご連絡', '著作権・転載・引用に関するお問い合わせ', '画像・写真・掲載素材に関するお問い合わせ', '個人情報の取り扱いに関するお問い合わせ', '広告掲載・提携に関するお問い合わせ', 'その他'],
-    nameLabel: 'お名前',
-    namePlaceholder: '例：山田 太郎',
-    emailLabel: '連絡可能なメールアドレス',
-    emailPlaceholder: '例：example@email.com',
-    companyLabel: '会社名・団体名',
-    companyPlaceholder: '例：株式会社〇〇',
-    subjectLabel: '件名',
-    subjectPlaceholder: '例：記事について',
-    urlLabel: '対象ページURL',
-    urlPlaceholder: '例：https://24watchin.com/...',
-    urlNote: '記事やページについてのお問い合わせの場合は、該当URLをご記入ください。',
-    messageLabel: 'お問い合わせ内容',
-    messagePlaceholder: 'できるだけ具体的にご記入ください。',
-    agreementText: 'ご入力いただいた情報の取り扱いについて、プライバシーポリシーを確認し、同意します。',
-    submitBtn: '送信する',
-    sending: '送信中...',
-    required: '必須',
-    optional: '任意',
-    successTitle: 'お問い合わせを受け付けました。',
-    successText: '内容を確認のうえ、必要に応じてご連絡いたします。',
-    errorText: '送信に失敗しました。時間をおいて再度お試しください。',
-  },
-  en: {
-    title: 'Contact',
-    description: 'Contact 24Watchin here. Feel free to reach out about article corrections, reprints, copyright, and more.',
-    intro1: 'Thank you for using 24Watchin. Please use the form below to send us your questions, opinions, or feedback.',
-    intro2: 'We accept inquiries about article content, corrections, copyright and reprints, advertising, and more.',
-    beforeTitle: 'Before You Contact Us',
-    before1: 'Depending on the nature and volume of inquiries, we may not be able to respond to every message.',
-    before2: 'Inquiries received on weekends or holidays will be addressed on the next day.',
-    before3: 'Please do not reprint or redistribute our responses without permission.',
-    before4: 'We may not respond to messages sent solely for promotional or solicitation purposes.',
-    privacyTitle: 'Privacy',
-    privacyText: 'Information you submit will be used to respond to your inquiry. For details, please see our',
-    privacyLink: 'Privacy Policy',
-    privacyEnd: '.',
-    formTitle: 'Contact Form',
-    typeLabel: 'Type of Inquiry',
-    typePlaceholder: 'Please select',
-    typeOptions: ['General Inquiry', 'Opinion / Feedback on Article', 'Correction Request', 'Copyright / Reprint Inquiry', 'Image / Media Inquiry', 'Privacy Inquiry', 'Advertising / Partnership', 'Other'],
-    nameLabel: 'Your Name',
-    namePlaceholder: 'e.g. John Smith',
-    emailLabel: 'Email Address',
-    emailPlaceholder: 'e.g. example@email.com',
-    companyLabel: 'Company / Organization',
-    companyPlaceholder: 'e.g. Example Inc.',
-    subjectLabel: 'Subject',
-    subjectPlaceholder: 'e.g. About an article',
-    urlLabel: 'Relevant Page URL',
-    urlPlaceholder: 'e.g. https://24watchin.com/...',
-    urlNote: 'If your inquiry is about a specific page or article, please include the URL.',
-    messageLabel: 'Message',
-    messagePlaceholder: 'Please describe your inquiry in detail.',
-    agreementText: 'I have read and agree to the Privacy Policy regarding the handling of my information.',
-    submitBtn: 'Send',
-    sending: 'Sending...',
-    required: 'Required',
-    optional: 'Optional',
-    successTitle: 'Your message has been received.',
-    successText: 'We will review your inquiry and get back to you if needed.',
-    errorText: 'Failed to send. Please try again later.',
-  },
-  // ※他の言語は一旦英語のダミーを入れています
-  'zh-cn': { title: '联系我们', description: '在这里联系24Watchin。', intro1: 'Thank you for using 24Watchin...', intro2: 'We accept inquiries...', beforeTitle: 'Before You Contact Us', before1: 'Depending...', before2: 'Inquiries...', before3: 'Please...', before4: 'We may not...', privacyTitle: 'Privacy', privacyText: 'Information you submit...', privacyLink: 'Privacy Policy', privacyEnd: '.', formTitle: 'Contact Form', typeLabel: 'Type of Inquiry', typePlaceholder: 'Please select', typeOptions: ['General Inquiry', 'Other'], nameLabel: 'Your Name', namePlaceholder: 'e.g. John Smith', emailLabel: 'Email Address', emailPlaceholder: 'e.g. example@email.com', companyLabel: 'Company / Organization', companyPlaceholder: 'e.g. Example Inc.', subjectLabel: 'Subject', subjectPlaceholder: 'e.g. About an article', urlLabel: 'Relevant Page URL', urlPlaceholder: 'e.g. https://...', urlNote: 'If your inquiry...', messageLabel: 'Message', messagePlaceholder: 'Please describe...', agreementText: 'I agree...', submitBtn: 'Send', sending: 'Sending...', required: 'Required', optional: 'Optional', successTitle: 'Received', successText: 'We will review...', errorText: 'Failed to send.' },
-  'zh-tw': { title: '聯絡我們', description: '在這裡聯絡24Watchin。', intro1: 'Thank you for using 24Watchin...', intro2: 'We accept inquiries...', beforeTitle: 'Before You Contact Us', before1: 'Depending...', before2: 'Inquiries...', before3: 'Please...', before4: 'We may not...', privacyTitle: 'Privacy', privacyText: 'Information you submit...', privacyLink: 'Privacy Policy', privacyEnd: '.', formTitle: 'Contact Form', typeLabel: 'Type of Inquiry', typePlaceholder: 'Please select', typeOptions: ['General Inquiry', 'Other'], nameLabel: 'Your Name', namePlaceholder: 'e.g. John Smith', emailLabel: 'Email Address', emailPlaceholder: 'e.g. example@email.com', companyLabel: 'Company / Organization', companyPlaceholder: 'e.g. Example Inc.', subjectLabel: 'Subject', subjectPlaceholder: 'e.g. About an article', urlLabel: 'Relevant Page URL', urlPlaceholder: 'e.g. https://...', urlNote: 'If your inquiry...', messageLabel: 'Message', messagePlaceholder: 'Please describe...', agreementText: 'I agree...', submitBtn: 'Send', sending: 'Sending...', required: 'Required', optional: 'Optional', successTitle: 'Received', successText: 'We will review...', errorText: 'Failed to send.' },
-  es: { title: 'Contacto', description: 'Contacte a 24Watchin aquí.', intro1: 'Thank you for using 24Watchin...', intro2: 'We accept inquiries...', beforeTitle: 'Before You Contact Us', before1: 'Depending...', before2: 'Inquiries...', before3: 'Please...', before4: 'We may not...', privacyTitle: 'Privacy', privacyText: 'Information you submit...', privacyLink: 'Privacy Policy', privacyEnd: '.', formTitle: 'Contact Form', typeLabel: 'Type of Inquiry', typePlaceholder: 'Please select', typeOptions: ['General Inquiry', 'Other'], nameLabel: 'Your Name', namePlaceholder: 'e.g. John Smith', emailLabel: 'Email Address', emailPlaceholder: 'e.g. example@email.com', companyLabel: 'Company / Organization', companyPlaceholder: 'e.g. Example Inc.', subjectLabel: 'Subject', subjectPlaceholder: 'e.g. About an article', urlLabel: 'Relevant Page URL', urlPlaceholder: 'e.g. https://...', urlNote: 'If your inquiry...', messageLabel: 'Message', messagePlaceholder: 'Please describe...', agreementText: 'I agree...', submitBtn: 'Send', sending: 'Sending...', required: 'Required', optional: 'Optional', successTitle: 'Received', successText: 'We will review...', errorText: 'Failed to send.' },
-  de: { title: 'Kontakt', description: 'Kontaktieren Sie 24Watchin hier.', intro1: 'Thank you for using 24Watchin...', intro2: 'We accept inquiries...', beforeTitle: 'Before You Contact Us', before1: 'Depending...', before2: 'Inquiries...', before3: 'Please...', before4: 'We may not...', privacyTitle: 'Privacy', privacyText: 'Information you submit...', privacyLink: 'Privacy Policy', privacyEnd: '.', formTitle: 'Contact Form', typeLabel: 'Type of Inquiry', typePlaceholder: 'Please select', typeOptions: ['General Inquiry', 'Other'], nameLabel: 'Your Name', namePlaceholder: 'e.g. John Smith', emailLabel: 'Email Address', emailPlaceholder: 'e.g. example@email.com', companyLabel: 'Company / Organization', companyPlaceholder: 'e.g. Example Inc.', subjectLabel: 'Subject', subjectPlaceholder: 'e.g. About an article', urlLabel: 'Relevant Page URL', urlPlaceholder: 'e.g. https://...', urlNote: 'If your inquiry...', messageLabel: 'Message', messagePlaceholder: 'Please describe...', agreementText: 'I agree...', submitBtn: 'Send', sending: 'Sending...', required: 'Required', optional: 'Optional', successTitle: 'Received', successText: 'We will review...', errorText: 'Failed to send.' },
-  fr: { title: 'Contact', description: 'Contactez 24Watchin ici.', intro1: 'Thank you for using 24Watchin...', intro2: 'We accept inquiries...', beforeTitle: 'Before You Contact Us', before1: 'Depending...', before2: 'Inquiries...', before3: 'Please...', before4: 'We may not...', privacyTitle: 'Privacy', privacyText: 'Information you submit...', privacyLink: 'Privacy Policy', privacyEnd: '.', formTitle: 'Contact Form', typeLabel: 'Type of Inquiry', typePlaceholder: 'Please select', typeOptions: ['General Inquiry', 'Other'], nameLabel: 'Your Name', namePlaceholder: 'e.g. John Smith', emailLabel: 'Email Address', emailPlaceholder: 'e.g. example@email.com', companyLabel: 'Company / Organization', companyPlaceholder: 'e.g. Example Inc.', subjectLabel: 'Subject', subjectPlaceholder: 'e.g. About an article', urlLabel: 'Relevant Page URL', urlPlaceholder: 'e.g. https://...', urlNote: 'If your inquiry...', messageLabel: 'Message', messagePlaceholder: 'Please describe...', agreementText: 'I agree...', submitBtn: 'Send', sending: 'Sending...', required: 'Required', optional: 'Optional', successTitle: 'Received', successText: 'We will review...', errorText: 'Failed to send.' },
-  ru: { title: 'Контакты', description: 'Свяжитесь с 24Watchin здесь.', intro1: 'Thank you for using 24Watchin...', intro2: 'We accept inquiries...', beforeTitle: 'Before You Contact Us', before1: 'Depending...', before2: 'Inquiries...', before3: 'Please...', before4: 'We may not...', privacyTitle: 'Privacy', privacyText: 'Information you submit...', privacyLink: 'Privacy Policy', privacyEnd: '.', formTitle: 'Contact Form', typeLabel: 'Type of Inquiry', typePlaceholder: 'Please select', typeOptions: ['General Inquiry', 'Other'], nameLabel: 'Your Name', namePlaceholder: 'e.g. John Smith', emailLabel: 'Email Address', emailPlaceholder: 'e.g. example@email.com', companyLabel: 'Company / Organization', companyPlaceholder: 'e.g. Example Inc.', subjectLabel: 'Subject', subjectPlaceholder: 'e.g. About an article', urlLabel: 'Relevant Page URL', urlPlaceholder: 'e.g. https://...', urlNote: 'If your inquiry...', messageLabel: 'Message', messagePlaceholder: 'Please describe...', agreementText: 'I agree...', submitBtn: 'Send', sending: 'Sending...', required: 'Required', optional: 'Optional', successTitle: 'Received', successText: 'We will review...', errorText: 'Failed to send.' }
-} as const;
+<div class="info-content-card">
+  <h1 id="info-title">Contact</h1>
+  
+  <div class="info-body-text">
+    <div id="intro-section" class="section">
+      <p id="intro1"></p>
+      <p id="intro2"></p>
+    </div>
 
-export type ContactDataKey = keyof typeof contactData;
+    <section class="info-section-box">
+      <h2 id="before-title"></h2>
+      <ul class="info-list">
+        <li id="before1"></li>
+        <li id="before2"></li>
+        <li id="before3"></li>
+        <li id="before4"></li>
+      </ul>
+    </section>
 
+    <section class="info-section-box">
+      <h2 id="privacy-title"></h2>
+      <p>
+        <span id="privacy-text"></span>
+        <a href="/ja/jp/info/privacy/" id="privacy-link" class="theme-link"></a>
+        <span id="privacy-end"></span>
+      </p>
+    </section>
+
+    <section class="info-section-box contact-info">
+      <h2 id="form-title"></h2>
+      <p>現在、フォームの準備中です。お急ぎの場合は、以下のメールアドレスまで直接ご連絡ください。</p>
+      <table class="info-table">
+        <tr>
+          <th>Email</th>
+          <td>24watchin.info@gmail.com</td>
+        </tr>
+      </table>
+    </section>
+  </div>
+</div>
+
+<style>
+  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
+  
+  h1 { font-size: 24px; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
+  
+  /* 本文サイズ：パソコン16px */
+  .info-body-text { font-size: 16px; line-height: 1.8; color: #444; }
+  
+  .section { margin-bottom: 25px; }
+  .info-section-box { margin-top: 30px; padding: 20px; background-color: #fcfcfc; border-radius: 6px; border: 1px solid #eee; }
+  
+  h2 { font-size: 20px; margin-top: 0; margin-bottom: 15px; color: #1a1a1a; border-left: 4px solid var(--theme-color); padding-left: 10px; }
+  
+  .info-list { padding-left: 20px; margin: 0; }
+  .info-list li { margin-bottom: 8px; }
+  
+  .info-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  .info-table th, .info-table td { border: 1px solid #ddd; padding: 12px; font-size: 16px; }
+  .info-table th { background-color: #f8f9fa; width: 30%; text-align: left; }
+  
+  .theme-link { color: var(--theme-color); text-decoration: underline; font-weight: bold; }
+
+  /* スマホ表示：18px */
+  @media (max-width: 640px) { 
+    .info-content-card { padding: 25px 15px; } 
+    h1 { font-size: 22px; } 
+    .info-body-text { font-size: 18px; }
+    h2 { font-size: 20px; }
+    .info-table th, .info-table td { font-size: 16px; padding: 8px; }
+  }
+</style>
+
+<script define:vars={{ pageData: contactData }}>
+  (function() {
+    const themeColors = {
+      ja: '#872732', en: '#0033a0', 'zh-cn': '#e60012', 'zh-tw': '#000095',
+      es: '#aa151b', de: '#000000', fr: '#002395', ru: '#d52b1e'
+    };
+
+    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+    const lang = pageData[browserLang] ? browserLang : 'ja'; 
+    const t = pageData[lang];
+    const theme = themeColors[lang] || '#872732';
+
+    // データの流し込み
+    document.title = t.title + ' | 24Watchin';
+    document.getElementById('info-title').textContent = t.title;
+    
+    document.getElementById('intro1').textContent = t.intro1;
+    document.getElementById('intro2').textContent = t.intro2;
+    
+    document.getElementById('before-title').textContent = t.beforeTitle;
+    document.getElementById('before1').textContent = t.before1;
+    document.getElementById('before2').textContent = t.before2;
+    document.getElementById('before3').textContent = t.before3;
+    document.getElementById('before4').textContent = t.before4;
+    
+    document.getElementById('privacy-title').textContent = t.privacyTitle;
+    document.getElementById('privacy-text').textContent = t.privacyText;
+    document.getElementById('privacy-link').textContent = t.privacyLink;
+    document.getElementById('privacy-end').textContent = t.privacyEnd;
+    
+    document.getElementById('form-title').textContent = t.formTitle;
+
+    document.body.style.setProperty('--theme-color', theme);
+  })();
+</script>
