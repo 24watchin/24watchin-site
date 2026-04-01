@@ -1,6 +1,6 @@
 ---
 // src/components/info/AboutBody.astro
-// 手順1で作った「まとめファイル」を読み込みます
+// 「まとめファイル」を読み込みます
 import { aboutData } from '../../lib/info/aboutData.ts';
 ---
 
@@ -13,22 +13,32 @@ import { aboutData } from '../../lib/info/aboutData.ts';
 
 <style>
   .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
-  h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
   
-  /* 本物のデータに含まれる <h2> や <table> などを綺麗に表示するための設定です */
-  .info-body-text { line-height: 1.8; color: #444; }
-  .info-body-text :global(h2) { font-size: 1.4rem; margin-top: 30px; border-left: 4px solid var(--theme-color); padding-left: 10px; }
+  /* トップの大見出し：24px (1.5rem) に設定 */
+  h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
+  
+  /* 本文の基本サイズ：16px (1rem) に設定 */
+  .info-body-text { font-size: 1rem; line-height: 1.8; color: #444; }
+  
+  /* セクションの中見出し：20px (1.25rem) に設定 */
+  .info-body-text :global(h2) { font-size: 1.25rem; margin-top: 30px; border-left: 4px solid var(--theme-color); padding-left: 10px; }
+  
   .info-body-text :global(section) { margin-bottom: 30px; }
-  .info-body-text :global(table.info-table) { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  .info-body-text :global(table.info-table) { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 1rem; }
   .info-body-text :global(th), .info-body-text :global(td) { border: 1px solid #ddd; padding: 12px; }
   .info-body-text :global(th) { background-color: #f8f9fa; width: 30%; text-align: left; }
   
-  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } h1 { font-size: 1.4rem; } }
+  /* スマホ表示時の調整：少しだけ小さくして画面に収まりやすくします */
+  @media (max-width: 640px) { 
+    .info-content-card { padding: 25px 15px; } 
+    h1 { font-size: 1.3rem; } 
+    .info-body-text { font-size: 0.95rem; }
+    .info-body-text :global(h2) { font-size: 1.1rem; }
+  }
 </style>
 
 <script define:vars={{ pageData: aboutData }}>
   (function() {
-    // データファイルから色が消えたため、ここで各言語のテーマ色を設定します
     const themeColors = {
       ja: '#872732', en: '#0033a0', 'zh-cn': '#e60012', 'zh-tw': '#000095',
       es: '#aa151b', de: '#000000', fr: '#002395', ru: '#d52b1e'
@@ -36,7 +46,7 @@ import { aboutData } from '../../lib/info/aboutData.ts';
 
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
     
-    // ★現在は日本語(ja)のデータしか用意していないため、英語環境の人にも一旦日本語が表示されるように「ja」を基準にしています
+    // 現在は日本語(ja)のデータのみのため、見つからない場合は「ja」を表示します
     const lang = pageData[browserLang] ? browserLang : 'ja'; 
     const t = pageData[lang];
     const theme = themeColors[lang] || '#872732';
@@ -44,7 +54,7 @@ import { aboutData } from '../../lib/info/aboutData.ts';
     document.title = t.title + ' | 24Watchin';
     document.getElementById('info-title').textContent = t.title;
     
-    // データの中にHTMLタグ（<p>など）が含まれているため、textContentではなく innerHTML を使います
+    // HTMLタグを反映させるため innerHTML を使用します
     document.getElementById('info-body').innerHTML = t.content;
     
     document.body.style.setProperty('--theme-color', theme);
