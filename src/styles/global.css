@@ -44,7 +44,8 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
-	font-size: 20px;
+	/* パソコン版の基本サイズを 20px から 16px に修正しました */
+	font-size: 16px;
 	line-height: 1.7;
 }
 
@@ -164,6 +165,7 @@ hr {
 
 @media (max-width: 720px) {
 	body {
+		/* スマホ版（720px以下）のサイズは、ご希望通り現在の 18px のまま維持します */
 		font-size: 18px;
 	}
 
