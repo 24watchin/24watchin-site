@@ -1,0 +1,28 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ContactBody from '../../../components/info/ContactBody.astro';
+import { langCountryPairs, getBlogId } from '../../../lib/siteRoutes.ts';
+
+export async function getStaticPaths() {
+  const langs = [...new Set(langCountryPairs.map(pair => pair.lang))];
+  return langs.map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = getBlogId(lang);
+
+if (!globalThis.bloggerApiCache) { globalThis.bloggerApiCache = {}; }
+let allPosts = [];
+if (API_KEY && BLOG_ID) {
+  if (!globalThis.bloggerApiCache[BLOG_ID]) {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+    globalThis.bloggerApiCache[BLOG_ID] = fetch(url).then(res => res.ok ? res.json() : null).then(data => data?.items || []).catch(() => []);
+  }
+  allPosts = await globalThis.bloggerApiCache[BLOG_ID];
+}
+---
+
+<Layout title="Contact Us" allPosts={allPosts}>
+  <ContactBody />
+</Layout>
