@@ -93,6 +93,7 @@ function getThumbnail(content) {
 
   <div class="m-sequence" id="m-sequence">
     <div class="m-split-stage">
+      
       <div class="m-top-track">
         <div class="m-panel m-p1">
           <div class="m-bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
@@ -271,10 +272,12 @@ function getThumbnail(content) {
 </div>
 
 <style>
+  /* ▼ 画面幅に関わらず、PCなどのマウス操作端末ではスマホ版を完全に隠す ▼ */
   @media (hover: hover), (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
 
+  /* ▼ 指でタッチする実際のスマホの時だけ適用されるバリア ▼ */
   @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
@@ -283,6 +286,9 @@ function getThumbnail(content) {
       position: relative;
       z-index: 9999;
       background: #010411;
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
     }
     
     html.m-is-locked, body.m-is-locked { overflow: hidden !important; }
@@ -307,12 +313,12 @@ function getThumbnail(content) {
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    /* ▼ 黒マスクのフェードバグを修正：visibility のタイミングを正しく設定 ▼ */
+    /* ▼ 黒マスクのフェードバグを修正：確実に黒くなるように設定 ▼ */
     .m-transition-mask { position: fixed; inset: 0; z-index: 10050; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease, visibility 0s linear 0.6s; }
     .m-transition-mask.is-visible { opacity: 1; visibility: visible; transition: opacity 0.6s ease, visibility 0s linear 0s; }
     
-    .m-sequence { position: fixed; inset: 0; z-index: 9999; opacity: 1; visibility: visible; height: 100vh; height: 100dvh; }
-    .m-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; }
+    /* ▼ スマホ版の親箱（m-sequence）は常に表示し、隠れないようにしました ▼ */
+    .m-sequence { position: fixed; inset: 0; z-index: 9999; height: 100vh; height: 100dvh; background: #010411; }
     
     .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
@@ -330,12 +336,12 @@ function getThumbnail(content) {
     
     .m-panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
     
-    /* ▼ 帯の幅を画面の半分（50%）に固定 ▼ */
+    /* ▼ 帯を「画面の半分（width: 50%）」に変更し、位置を下寄りに設定 ▼ */
     .m-word-band-container { position: absolute; top: 65%; width: 50%; z-index: 10; overflow: hidden; }
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
     
-    /* ▼ 帯を細くし、透明度を上げた基本設定 ▼ */
+    /* ▼ 帯の透明度を上げ（0.1）、幅を細く（paddingを縮小） ▼ */
     .m-word-band { 
       background: rgba(255, 255, 255, 0.1); 
       backdrop-filter: blur(2px); 
@@ -450,6 +456,7 @@ function getThumbnail(content) {
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
+    // 指でタッチする端末（スマホ）以外はプログラムを動かさない
     if (!window.matchMedia('(pointer: coarse)').matches) return;
 
     try {
@@ -502,7 +509,6 @@ function getThumbnail(content) {
         const diffY = startY - endY;
 
         if (Math.abs(diffX) > Math.abs(diffY)) return;
-
         if (isAnimating) return;
         
         if (diffY > SWIPE_THRESHOLD) moveNext();
@@ -515,26 +521,16 @@ function getThumbnail(content) {
       }
       
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
-      
       function showMask() { transitionMask?.classList.add('is-visible'); }
       function hideMask() { transitionMask?.classList.remove('is-visible'); }
+      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
       
-      function clearSectionVisibility() { 
-        screen5?.classList.remove('is-visible'); 
-        screen6?.classList.remove('is-visible'); 
-      }
-      function showSection(step) { 
-        clearSectionVisibility(); 
-        if (step === 4) screen5?.classList.add('is-visible'); 
-        if (step === 5) screen6?.classList.add('is-visible'); 
-      }
       function resetBrandPanel() { 
         brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); 
         brandTextTarget?.classList.remove('is-visible'); 
       }
       
       function showBrandAnimated() {
-        sequence?.classList.remove('is-hidden');
         resetBrandPanel();
         brandPanel?.classList.add('is-visible', 'is-night');
         window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, 500);
@@ -565,75 +561,42 @@ function getThumbnail(content) {
         isAnimating = true;
         updateIndicator(step);
 
-        // ▼ 全ての「戻る（上る）」操作は、黒いフェードで完全に隠してから一瞬で切り替える ▼
-        if (previousStep > step) {
-           showMask();
-           window.setTimeout(() => {
-              resetBrandPanel();
-              clearSectionVisibility();
-              
-              // CSSアニメーションを一時的に停止して、裏で一瞬で画像を切り替える
-              topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-              bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-              
-              if (step <= 2) {
-                  sequence?.classList.remove('is-hidden');
-                  if (step >= 1) { topPanels[1]?.classList.add('is-open', 'is-active'); bottomPanels[1]?.classList.add('is-open', 'is-active'); }
-                  if (step >= 2) { topPanels[2]?.classList.add('is-open', 'is-active'); bottomPanels[2]?.classList.add('is-open', 'is-active'); }
-                  if (step >= 0) { topPanels[0]?.classList.add('is-active'); bottomPanels[0]?.classList.add('is-active'); }
-              }
-              if (step === 3) {
-                  sequence?.classList.remove('is-hidden');
-                  brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-                  brandTextTarget?.classList.add('is-visible');
-                  // ブランドパネルの裏にあるHero画像も準備しておく
-                  if (topPanels[2]) topPanels[2].classList.add('is-open', 'is-active');
-                  if (bottomPanels[2]) bottomPanels[2].classList.add('is-open', 'is-active');
-              }
-              if (step === 4) { screen5?.classList.add('is-visible'); sequence?.classList.add('is-hidden'); }
-              if (step === 5) { screen6?.classList.add('is-visible'); sequence?.classList.add('is-hidden'); }
+        // ▼ 全ての画面移動で「黒いフェード」を使って完全に画面を暗くしてから切り替える（重なり防止） ▼
+        showMask();
+        
+        window.setTimeout(() => {
+          // 画面が真っ暗になったタイミングで裏側を切り替える
+          resetBrandPanel();
+          clearSectionVisibility();
+          
+          topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
+          bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
+          
+          if (step <= 2) {
+              if (step >= 1) { topPanels[1]?.classList.add('is-open', 'is-active'); bottomPanels[1]?.classList.add('is-open', 'is-active'); }
+              if (step >= 2) { topPanels[2]?.classList.add('is-open', 'is-active'); bottomPanels[2]?.classList.add('is-open', 'is-active'); }
+              if (step >= 0) { topPanels[0]?.classList.add('is-active'); bottomPanels[0]?.classList.add('is-active'); }
+          }
+          if (step === 3) {
+              brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
+              brandTextTarget?.classList.add('is-visible');
+              if (topPanels[2]) topPanels[2].classList.add('is-open', 'is-active');
+              if (bottomPanels[2]) bottomPanels[2].classList.add('is-open', 'is-active');
+          }
+          if (step === 4) { screen5?.classList.add('is-visible'); }
+          if (step === 5) { screen6?.classList.add('is-visible'); }
 
-              // 切り替えを確定させるためのおまじない（強制リフロー）
-              void document.body.offsetHeight;
+          // 切り替えを確定させるためのおまじない
+          void document.body.offsetHeight;
 
-              // アニメーション設定を元に戻す
-              topPanels.forEach(panel => { panel.style.transition = ''; });
-              bottomPanels.forEach(panel => { panel.style.transition = ''; });
+          topPanels.forEach(panel => { panel.style.transition = ''; });
+          bottomPanels.forEach(panel => { panel.style.transition = ''; });
 
-              // フェード解除
-              hideMask();
-              window.setTimeout(() => { isAnimating = false; }, 600); // 画面が明るくなるまで待つ
-           }, 600); // 画面が完全に暗くなるまで待つ
-           return;
-        }
-
-        // ▼ 以降は「進む（下る）」操作の処理 ▼
-        if (step <= 2) {
-          setBodyLocked(true);
-          sequence?.classList.remove('is-hidden');
-          window.scrollTo(0,0);
-          hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return;
-        }
-
-        if (step === 3) {
-          setBodyLocked(true);
-          window.scrollTo(0,0);
-          hideMask(); clearSectionVisibility(); sequence?.classList.remove('is-hidden');
-          showBrandAnimated();
-          return;
-        }
-
-        // ニュース(4) または フッター(5) へ進む場合も、進む時専用のフェードを挟む
-        if (step === 4 || step === 5) {
-          showMask();
-          window.setTimeout(() => {
-            sequence?.classList.add('is-hidden');
-            showSection(step);
-            hideMask();
-            window.setTimeout(() => { isAnimating = false; }, 600);
-          }, 600);
-          return;
-        }
+          // 裏側の準備が終わったら、フェードを解除して明るくする
+          hideMask();
+          window.setTimeout(() => { isAnimating = false; }, 600);
+          
+        }, 600); // 完全に真っ暗になるまで待つ
       }
 
       function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
@@ -667,7 +630,6 @@ function getThumbnail(content) {
       setupObserver('m-lang-carousel', '#m-lang-carousel .m-observer-card', 'm-lang-carousel-dots');
 
       setBodyLocked(true); 
-      if(sequence) sequence.classList.remove('is-hidden'); 
       hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
       window.setTimeout(() => { 
         if(topPanels.length > 0) topPanels[0].classList.add('is-active'); 
