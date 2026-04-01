@@ -1,0 +1,46 @@
+---
+// src/components/info/CorrectionsBody.astro
+---
+
+<div class="info-content-card">
+  <h1 id="info-title">Corrections Policy</h1>
+  <div id="info-body" class="info-body-text">
+    Loading...
+  </div>
+</div>
+
+<style>
+  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
+  h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
+  .info-body-text { line-height: 1.8; color: #444; white-space: pre-wrap; }
+  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } h1 { font-size: 1.4rem; } }
+</style>
+
+<script is:inline>
+  (function() {
+    const translations = {
+      ja: {
+        title: '訂正に関する方針',
+        body: '24Watchinは、正確な情報の提供に努めています。万が一、掲載内容に誤りがあった場合は、速やかに確認を行い、適切な訂正を行います。\n\n1. 訂正の告知\n事実関係の誤りなど、重大な訂正が必要な場合は、当該記事内に訂正箇所を明記し、更新日時を更新します。\n\n2. お問い合わせ\n情報の誤りにお気づきの際は、「お問い合わせ」ページよりご連絡いただけますようお願い申し上げます。',
+        theme: '#872732'
+      },
+      en: {
+        title: 'Corrections Policy',
+        body: '24Watchin is committed to providing accurate information. In the event of an error, we will promptly verify and make appropriate corrections.\n\n1. Notification of Corrections\nFor significant errors involving facts, we will clearly indicate the correction within the article and update the timestamp.\n\n2. Contact Us\nIf you notice any inaccuracies, please let us know via the "Contact" page.',
+        theme: '#0033a0'
+      },
+      'zh-cn': {
+        title: '更正政策',
+        body: '24Watchin 致力于提供准确的信息。如果发布的内容有误，我们将迅速进行核实并做出相应的更正。\n\n1. 更正通知\n对于涉及事实的重大更正，我们将在相关文章中明确标出更正部分，并更新发布时间。\n\n2. 联系我们\n如果您发现任何错误，请通过“联系我们”页面通知我们。',
+        theme: '#e60012'
+      }
+    };
+    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+    const lang = translations[browserLang] ? browserLang : 'en';
+    const t = translations[lang];
+    document.title = t.title + ' | 24Watchin';
+    document.getElementById('info-title').textContent = t.title;
+    document.getElementById('info-body').textContent = t.body;
+    document.body.style.setProperty('--theme-color', t.theme);
+  })();
+</script>
