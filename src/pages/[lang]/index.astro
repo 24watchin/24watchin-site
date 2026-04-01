@@ -2,6 +2,7 @@
 import LanguageTopLayout from '../../layouts/LanguageTopLayout.astro';
 import LanguageTopMainNews from '../../components/LanguageTopMainNews.astro';
 import GlobalRegionNews from '../../components/GlobalRegionNews.astro';
+import CookieBanner from '../../components/CookieBanner.astro';
 import { langCountryPairs, getBlogId } from '../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
@@ -10,26 +11,22 @@ export async function getStaticPaths() {
 }
 
 const { lang } = Astro.params;
-
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId(lang);
 
-// ▼ 【超強力な修正】複数ページからの同時アクセスによるパンクを防ぐ「プロミス・キャッシュ」
 if (!globalThis.bloggerApiCache) {
   globalThis.bloggerApiCache = {};
 }
 
 let allPosts = [];
 if (API_KEY && BLOG_ID) {
-  // まだその言語のブログIDでデータ取得が始まっていなければ、取得を開始する
   if (!globalThis.bloggerApiCache[BLOG_ID]) {
     const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
     globalThis.bloggerApiCache[BLOG_ID] = fetch(url)
       .then(res => res.ok ? res.json() : null)
       .then(data => data && data.items ? data.items : [])
-      .catch(() => []); // エラーが起きても画面が壊れないように空っぽの箱を返す
+      .catch(() => []);
   }
-  // 取得完了を待つ（すでに他のページが取得済みの場合は、通信せずにそのデータをもらいます）
   allPosts = await globalThis.bloggerApiCache[BLOG_ID];
 }
 
@@ -60,6 +57,7 @@ const pageTitle = langLabels[lang] || 'Latest Global News';
     </div>
 
   </main>
+  <CookieBanner />
 </LanguageTopLayout>
 
 <style>
