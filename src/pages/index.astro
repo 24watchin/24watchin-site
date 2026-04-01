@@ -1,52 +1,88 @@
 ---
-import DesktopView from '../components/DesktopView.astro';
-import MobileView from '../components/MobileView.astro';
+import LanguageTopLayout from '../../layouts/LanguageTopLayout.astro';
+import LanguageTopMainNews from '../../components/LanguageTopMainNews.astro';
+import GlobalRegionNews from '../../components/GlobalRegionNews.astro';
 // ▼ クッキーバナーの部品を読み込む指示を追加しました ▼
-import CookieBanner from '../components/CookieBanner.astro';
-import { getBlogId } from '../lib/siteRoutes.ts';
+import CookieBanner from '../../components/CookieBanner.astro';
+import { langCountryPairs, getBlogId } from '../../lib/siteRoutes.ts';
 
+export async function getStaticPaths() {
+  const langs = [...new Set(langCountryPairs.map(pair => pair.lang))];
+  return langs.map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
 const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = getBlogId('en');
+const BLOG_ID = getBlogId(lang);
 
 if (!globalThis.bloggerApiCache) {
   globalThis.bloggerApiCache = {};
 }
 
-let englishPosts = [];
+let allPosts = [];
 if (API_KEY && BLOG_ID) {
   if (!globalThis.bloggerApiCache[BLOG_ID]) {
-    // 確実にデータが取れるように少し多め（10件）に取得リクエストを出します
-    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
     globalThis.bloggerApiCache[BLOG_ID] = fetch(url)
       .then(res => res.ok ? res.json() : null)
       .then(data => data && data.items ? data.items : [])
-      .catch(() => []); // エラーが起きたら「空の箱（0件）」を返す安全装置
+      .catch(() => []);
   }
-  englishPosts = await globalThis.bloggerApiCache[BLOG_ID];
+  allPosts = await globalThis.bloggerApiCache[BLOG_ID];
 }
 
-// 取得した中から最新5件を切り出します
-const topStories = englishPosts.slice(0, 5);
+const themeColors: Record<string, string> = {
+  ja: '#872732', en: '#0033a0', 'zh-cn': '#e60012', 'zh-tw': '#000095',
+  es: '#aa151b', fr: '#002395', de: '#000000', ru: '#d52b1e',
+};
+const themeColor = themeColors[lang] || '#872732';
+
+const langLabels: Record<string, string> = {
+  ja: '最新ニュース一覧', en: 'Latest Global News', 'zh-cn': '最新全球新闻', 'zh-tw': '最新全球新聞',
+  es: 'Últimas Noticias Globales', fr: 'Dernières Actualités Globales', de: 'Aktuelle Globale Nachrichten', ru: 'Последние Глобальные Новости',
+};
+const pageTitle = langLabels[lang] || 'Latest Global News';
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>24watchin | Global Gateway</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
-    <style is:global>
-      :root { --bg-color: #0d0d0d; --text-main: #f0f0f0; --font-sans: 'Noto Sans', sans-serif; }
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-sans); margin: 0; }
-      body.is-locked { overflow: hidden; }
-      @media (max-width: 768px) { body.is-locked { overflow: auto; } }
-    </style>
-  </head>
+<LanguageTopLayout title={pageTitle}>
+  <main class="lang-top-page" style={`--theme-color: ${themeColor};`}>
+    
+    <div class="lang-page-content">
+      <LanguageTopMainNews lang={lang} posts={allPosts} />
+      
+      <div class="ad-space-horizontal">
+        <span class="ad-label">Advertisement</span>
+      </div>
 
-  <body class="is-locked">
-    <DesktopView latestStories={topStories} />
-    <MobileView latestStories={topStories} />
-    <CookieBanner />
-  </body>
-</html>
+      <GlobalRegionNews lang={lang} allPosts={allPosts} />
+    </div>
+
+  </main>
+  <CookieBanner />
+</LanguageTopLayout>
+
+<style>
+  .lang-top-page { max-width: 1200px; margin: 0 auto; padding: 0 0 40px 0; }
+  .lang-page-content { display: flex; flex-direction: column; gap: 15px; }
+  
+  .ad-space-horizontal {
+    width: 100%;
+    min-height: 90px;
+    background-color: #f8f9fa;
+    border: 1px dashed #cccccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999999;
+    font-size: 14px;
+    margin: 0;
+    overflow: hidden;
+  }
+  .ad-label { letter-spacing: 1px; }
+
+  @media (max-width: 768px) {
+    .lang-top-page { padding: 0 0 20px 0; }
+    .lang-page-content { gap: 10px; }
+    .ad-space-horizontal { min-height: 50px; }
+  }
+</style>
