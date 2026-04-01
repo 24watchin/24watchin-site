@@ -1,0 +1,46 @@
+---
+// src/components/info/CopyrightBody.astro
+---
+
+<div class="info-content-card">
+  <h1 id="info-title">Copyright / Reuse</h1>
+  <div id="info-body" class="info-body-text">
+    Loading...
+  </div>
+</div>
+
+<style>
+  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
+  h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
+  .info-body-text { line-height: 1.8; color: #444; white-space: pre-wrap; }
+  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } h1 { font-size: 1.4rem; } }
+</style>
+
+<script is:inline>
+  (function() {
+    const translations = {
+      ja: {
+        title: '著作権・再利用について',
+        body: '24Watchinに掲載されているすべてのコンテンツ（記事、画像、デザイン等）の著作権は、The Dexent Media Enterprisesまたは情報提供者に帰属します。\n\n私的使用の範囲を超えて、無断で転載、複製、放送等を行うことは禁止されています。記事の引用については、著作権法に基づき適切な範囲で行ってください。',
+        theme: '#872732'
+      },
+      en: {
+        title: 'Copyright / Reuse',
+        body: 'All content (articles, images, designs, etc.) published on 24Watchin is the property of The Dexent Media Enterprises or its content providers.\n\nUnauthorized reproduction, distribution, or broadcasting beyond personal use is prohibited. Please ensure any citations comply with copyright laws.',
+        theme: '#0033a0'
+      },
+      'zh-cn': {
+        title: '版权 / 再利用',
+        body: '24Watchin 上发布的所有内容（文章、图像、设计等）均属于 The Dexent Media Enterprises 或其内容提供商所有。\n\n严禁超出个人使用范围的擅自转载、复制或广播。引用文章时，请确保符合版权法的相关规定。',
+        theme: '#e60012'
+      }
+    };
+    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+    const lang = translations[browserLang] ? browserLang : 'en';
+    const t = translations[lang];
+    document.title = t.title + ' | 24Watchin';
+    document.getElementById('info-title').textContent = t.title;
+    document.getElementById('info-body').textContent = t.body;
+    document.body.style.setProperty('--theme-color', t.theme);
+  })();
+</script>
