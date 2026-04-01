@@ -1,5 +1,7 @@
 ---
 // src/components/info/AboutBody.astro
+// 手順1で作った「まとめファイル」を読み込みます
+import { aboutData } from '../../lib/info/aboutData.ts';
 ---
 
 <div class="info-content-card">
@@ -10,59 +12,41 @@
 </div>
 
 <style>
-  .info-content-card {
-    background: #fff;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    min-height: 500px;
-  }
-  h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 4px solid var(--theme-color);
-    color: #1a1a1a;
-  }
-  .info-body-text {
-    line-height: 1.8;
-    color: #444;
-    white-space: pre-wrap;
-  }
-  @media (max-width: 640px) {
-    .info-content-card { padding: 25px 15px; }
-    h1 { font-size: 1.4rem; }
-  }
+  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
+  h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
+  
+  /* 本物のデータに含まれる <h2> や <table> などを綺麗に表示するための設定です */
+  .info-body-text { line-height: 1.8; color: #444; }
+  .info-body-text :global(h2) { font-size: 1.4rem; margin-top: 30px; border-left: 4px solid var(--theme-color); padding-left: 10px; }
+  .info-body-text :global(section) { margin-bottom: 30px; }
+  .info-body-text :global(table.info-table) { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  .info-body-text :global(th), .info-body-text :global(td) { border: 1px solid #ddd; padding: 12px; }
+  .info-body-text :global(th) { background-color: #f8f9fa; width: 30%; text-align: left; }
+  
+  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } h1 { font-size: 1.4rem; } }
 </style>
 
-<script is:inline>
+<script define:vars={{ pageData: aboutData }}>
   (function() {
-    const translations = {
-      ja: {
-        title: '24Watchinについて',
-        body: '24Watchinは、世界各地で暮らす方々に現地の最新ニュースを母国語で届けるグローバルニュースメディアです。',
-        theme: '#872732'
-      },
-      en: {
-        title: 'About 24Watchin',
-        body: '24Watchin is a global news media outlet providing local news to residents worldwide in their native languages.',
-        theme: '#0033a0'
-      },
-      'zh-cn': {
-        title: '关于 24Watchin',
-        body: '24Watchin 是一家全球新闻媒体，致力于用您的母语为您提供世界各地的本地新闻。',
-        theme: '#e60012'
-      }
+    // データファイルから色が消えたため、ここで各言語のテーマ色を設定します
+    const themeColors = {
+      ja: '#872732', en: '#0033a0', 'zh-cn': '#e60012', 'zh-tw': '#000095',
+      es: '#aa151b', de: '#000000', fr: '#002395', ru: '#d52b1e'
     };
 
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    const lang = translations[browserLang] ? browserLang : 'en';
-    const t = translations[lang];
+    
+    // ★現在は日本語(ja)のデータしか用意していないため、英語環境の人にも一旦日本語が表示されるように「ja」を基準にしています
+    const lang = pageData[browserLang] ? browserLang : 'ja'; 
+    const t = pageData[lang];
+    const theme = themeColors[lang] || '#872732';
 
     document.title = t.title + ' | 24Watchin';
     document.getElementById('info-title').textContent = t.title;
-    document.getElementById('info-body').textContent = t.body;
-    document.body.style.setProperty('--theme-color', t.theme);
+    
+    // データの中にHTMLタグ（<p>など）が含まれているため、textContentではなく innerHTML を使います
+    document.getElementById('info-body').innerHTML = t.content;
+    
+    document.body.style.setProperty('--theme-color', theme);
   })();
 </script>
