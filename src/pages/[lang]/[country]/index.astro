@@ -5,13 +5,12 @@ import MainNewsLayout from '../../../components/MainNewsLayout.astro';
 import TrendScroll from '../../../components/TrendScroll.astro';
 import GoogleAdBanner from '../../../components/GoogleAdBanner.astro';
 import GlobalRegionNews from '../../../components/GlobalRegionNews.astro';
+import CookieBanner from '../../../components/CookieBanner.astro';
 import { categoryLabelMap } from '../../../lib/categoryLabels.ts';
-// ▼ カンペとマスターリストを読み込み
 import { langCountryPairs, getBlogId } from '../../../lib/siteRoutes.ts';
 import { getCountryLabel } from '../../../lib/countryData.ts';
 
 export async function getStaticPaths() {
-  // カンペから自動生成
   return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
@@ -39,7 +38,6 @@ const langKey = langKeyMap[lang] || 'jp';
 const categoryData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
 
 const displayCategories = ['politics', 'society', 'international', 'economy', 'environment-energy', 'business', 'technology-ai', 'entertainment', 'sports', 'health-life', 'weather', 'traffic'];
-
 const categoryItems = displayCategories.map(slug => {
   const catData = categoryData.allCategories.find(c => c.slug === slug);
   const keywords = catData ? catData.keywords : [slug];
@@ -50,7 +48,6 @@ const categoryItems = displayCategories.map(slug => {
   };
 });
 
-// ▼ マスターリストから「〇〇のニュース」というタイトルを動的に作成
 const countryLabel = getCountryLabel(country, lang);
 const titleSuffixMap: Record<string, string> = {
   ja: 'のニュース', en: ' News', 'zh-cn': '新闻', 'zh-tw': '新聞', es: ' Noticias', fr: ' Actualités', de: ' Nachrichten', ru: ' Новости'
@@ -73,6 +70,7 @@ const pageTitle = countryLabel + (titleSuffixMap[lang] || titleSuffixMap['en']);
   <div slot="bottom-wide">
     <GlobalRegionNews lang={lang} country={country} allPosts={allPosts} />
   </div>
+  <CookieBanner />
 </Layout>
 
 <style>
