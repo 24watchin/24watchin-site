@@ -1,0 +1,68 @@
+---
+// src/components/info/AboutBody.astro
+---
+
+<div class="info-content-card">
+  <h1 id="info-title">About 24Watchin</h1>
+  <div id="info-body" class="info-body-text">
+    Loading...
+  </div>
+</div>
+
+<style>
+  .info-content-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    min-height: 500px;
+  }
+  h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 4px solid var(--theme-color);
+    color: #1a1a1a;
+  }
+  .info-body-text {
+    line-height: 1.8;
+    color: #444;
+    white-space: pre-wrap;
+  }
+  @media (max-width: 640px) {
+    .info-content-card { padding: 25px 15px; }
+    h1 { font-size: 1.4rem; }
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    const translations = {
+      ja: {
+        title: '24Watchinについて',
+        body: '24Watchinは、世界各地で暮らす方々に現地の最新ニュースを母国語で届けるグローバルニュースメディアです。',
+        theme: '#872732'
+      },
+      en: {
+        title: 'About 24Watchin',
+        body: '24Watchin is a global news media outlet providing local news to residents worldwide in their native languages.',
+        theme: '#0033a0'
+      },
+      'zh-cn': {
+        title: '关于 24Watchin',
+        body: '24Watchin 是一家全球新闻媒体，致力于用您的母语为您提供世界各地的本地新闻。',
+        theme: '#e60012'
+      }
+    };
+
+    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+    const lang = translations[browserLang] ? browserLang : 'en';
+    const t = translations[lang];
+
+    document.title = t.title + ' | 24Watchin';
+    document.getElementById('info-title').textContent = t.title;
+    document.getElementById('info-body').textContent = t.body;
+    document.body.style.setProperty('--theme-color', t.theme);
+  })();
+</script>
