@@ -1,6 +1,8 @@
 ---
 import DesktopView from '../components/DesktopView.astro';
 import MobileView from '../components/MobileView.astro';
+// ▼ クッキーバナーの部品を読み込む指示を追加しました ▼
+import CookieBanner from '../components/CookieBanner.astro';
 import { getBlogId } from '../lib/siteRoutes.ts';
 
 const API_KEY = import.meta.env.API_KEY;
@@ -45,5 +47,6 @@ const topStories = englishPosts.slice(0, 5);
   <body class="is-locked">
     <DesktopView latestStories={topStories} />
     <MobileView latestStories={topStories} />
+    <CookieBanner />
   </body>
 </html>
