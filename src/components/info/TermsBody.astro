@@ -1,0 +1,46 @@
+---
+// src/components/info/TermsBody.astro
+---
+
+<div class="info-content-card">
+  <h1 id="info-title">Terms of Use</h1>
+  <div id="info-body" class="info-body-text">
+    Loading...
+  </div>
+</div>
+
+<style>
+  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
+  h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
+  .info-body-text { line-height: 1.8; color: #444; white-space: pre-wrap; }
+  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } h1 { font-size: 1.4rem; } }
+</style>
+
+<script is:inline>
+  (function() {
+    const translations = {
+      ja: {
+        title: '利用規約',
+        body: '本規約は、The Dexent Media Enterprisesが運営する24Watchinの利用条件を定めるものです。\n\n1. 禁止事項\n利用者は、本サービスの利用にあたり、公序良俗に反する行為や、他者の著作権を侵害する行為を行ってはなりません。\n\n2. 免責事項\n当サイトの情報は、正確を期しておりますが、その内容を保証するものではありません。本サービスの利用により生じた損害について、当社は一切の責任を負いません。',
+        theme: '#872732'
+      },
+      en: {
+        title: 'Terms of Use',
+        body: 'These terms set forth the conditions for using 24Watchin, operated by The Dexent Media Enterprises.\n\n1. Prohibited Acts\nUsers shall not engage in acts that violate public order or infringe upon the copyrights of others.\n\n2. Disclaimer\nWhile we strive for accuracy, we do not guarantee the content. We assume no responsibility for any damage resulting from the use of this service.',
+        theme: '#0033a0'
+      },
+      'zh-cn': {
+        title: '使用条款',
+        body: '本条款规定了由 The Dexent Media Enterprises 运营的 24Watchin 的使用条件。\n\n1. 禁止行为\n用户在使用本服务时，不得从事违反公序良俗或侵犯他人版权的行为。\n\n2. 免责声明\n虽然我们力求准确，但并不保证内容的完整性。对于因使用本服务而产生的任何损害，本公司不承担任何责任。',
+        theme: '#e60012'
+      }
+    };
+    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+    const lang = translations[browserLang] ? browserLang : 'en';
+    const t = translations[lang];
+    document.title = t.title + ' | 24Watchin';
+    document.getElementById('info-title').textContent = t.title;
+    document.getElementById('info-body').textContent = t.body;
+    document.body.style.setProperty('--theme-color', t.theme);
+  })();
+</script>
