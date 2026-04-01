@@ -1,9 +1,9 @@
 // src/lib/info/aboutData.ts
 
-// 1. jaフォルダに入れた日本語データを呼び出します
+// 1. jaフォルダに移動した日本語データを呼び出します
 import { ja } from './ja/about.ts';
 
-// ▼ 他の言語ファイルを作ったら、先頭の「//」を消して有効にします
+// ▼ 今後、英語などのファイルを作ったら、先頭の「//」を消して追加していきます
 // import { en } from './en/about.ts';
 // import { zhCn } from './zh-cn/about.ts';
 
