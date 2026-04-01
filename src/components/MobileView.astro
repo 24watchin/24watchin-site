@@ -149,6 +149,7 @@ function getThumbnail(content) {
       <div class="m-carousel-wrapper">
         <div class="m-carousel-container" id="m-story-carousel">
           <div class="m-carousel-spacer"></div>
+          
           {displayStories.map((post) => {
             let bgImage = '';
             let categoryName = 'News';
@@ -160,7 +161,9 @@ function getThumbnail(content) {
               const countryTag = post.labels.find(l => l.startsWith('en-'));
               if (countryTag) {
                 countryCode = countryTag.replace('en-', '');
-                if (countryNameMap[countryCode]) { countryName = countryNameMap[countryCode]; }
+                if (countryNameMap[countryCode]) {
+                  countryName = countryNameMap[countryCode];
+                }
               }
               const foundCat = enCategories.find(cat => 
                 post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
@@ -231,43 +234,41 @@ function getThumbnail(content) {
           </div>
         </div>
       </div>
+      
+      <footer class="m-top-footer">
+        <div class="m-top-footer-inner">
+          <div class="m-top-footer-logo">
+            <a href="https://24watchin.com">
+              <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
+            </a>
+          </div>
+          <div class="m-top-footer-center">
+            <div class="m-top-footer-links">
+              <a href="/info/about/">ABOUT 24WATCHIN</a>
+              <a href="/info/privacy/">PRIVACY POLICY</a>
+              <a href="/info/terms/">TERMS OF USE</a>
+              <a href="/info/contact/">CONTACT</a>
+              <a href="/info/corrections/">CORRECTIONS POLICY</a>
+              <a href="/info/copyright/">COPYRIGHT / REUSE</a>
+            </div>
+            <div class="m-top-footer-copy">
+              <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
+              <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
+              <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
-
-    <footer class="m-top-footer">
-      <div class="m-top-footer-inner">
-        <div class="m-top-footer-logo">
-          <a href="https://24watchin.com">
-            <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
-          </a>
-        </div>
-        <div class="m-top-footer-center">
-          <div class="m-top-footer-links">
-            <a href="/info/about/">ABOUT 24WATCHIN</a>
-            <a href="/info/privacy/">PRIVACY POLICY</a>
-            <a href="/info/terms/">TERMS OF USE</a>
-            <a href="/info/contact/">CONTACT</a>
-            <a href="/info/corrections/">CORRECTIONS POLICY</a>
-            <a href="/info/copyright/">COPYRIGHT / REUSE</a>
-          </div>
-          <div class="m-top-footer-copy">
-            <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
-            <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
-            <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
-          </div>
-        </div>
-      </div>
-    </footer>
   </section>
 
 </div>
 
 <style>
-  /* 画面幅に関わらず、PCなどのマウス操作端末ではスマホ版を完全に隠す */
   @media (hover: hover), (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
 
-  /* 指でタッチする実際のスマホの時だけ適用される設定 */
   @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
@@ -337,15 +338,10 @@ function getThumbnail(content) {
     
     .m-bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
     
-    /* ▼ 帯の幅を文字の長さに合わせて自動調整（最大90%まで） ▼ */
-    .m-word-band-container { 
-      position: absolute; top: 65%; z-index: 10; 
-      display: flex; width: auto; max-width: 90%; 
-    }
+    .m-word-band-container { position: absolute; top: 65%; width: auto; max-width: 90%; z-index: 10; display: flex; }
     .m-top-track .m-word-band-container { left: 0; justify-content: flex-start; }
     .m-bottom-track .m-word-band-container { right: 0; justify-content: flex-end; }
     
-    /* ▼ 帯の設定（余白でグラデーションの長さを調整） ▼ */
     .m-word-band { 
       backdrop-filter: blur(2px); 
       display: flex; 
@@ -353,21 +349,19 @@ function getThumbnail(content) {
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
     
-    /* ▼ 上部画像：右側に余白を持たせ、徐々に透明になって完全に消えるグラデーション ▼ */
+    /* ▼ より滑らかに、中央寄りで若干透明になるように細かく設定したグラデーション ▼ */
     .m-top-track .m-word-band { 
       padding: 6px 50px 6px 15px; 
       transform: translateX(-100%); 
-      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.1) 85%, rgba(255,255,255,0) 100%);
+      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
     }
 
-    /* ▼ 下部画像：左側に余白を持たせ、徐々に透明になって完全に消えるグラデーション ▼ */
     .m-bottom-track .m-word-band { 
       padding: 6px 15px 6px 50px; 
       transform: translateX(100%); 
-      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.1) 85%, rgba(255,255,255,0) 100%);
+      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
     }
     
-    /* ▼ 文字サイズ1.1rem、文字間隔をギュッと狭く(-0.05em)。折り返さない（nowrap） ▼ */
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; white-space: nowrap; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
@@ -399,8 +393,8 @@ function getThumbnail(content) {
     
     #m-screen-5 .m-seq-inner { justify-content: center; padding-bottom: 80px; }
     
-    /* ▼ 画面6のフッターと重ならないように、下部の余白を広げました ▼ */
-    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 350px; } 
+    /* ▼ 画面6のフッターを下に配置するため、justify-content を変更 ▼ */
+    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 0; } 
 
     .m-section-header { text-align: center; margin-bottom: 30px; }
     .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
@@ -409,7 +403,9 @@ function getThumbnail(content) {
     .m-no-link-color { color: inherit !important; text-decoration: none !important; }
     
     .m-observer-card { 
-      scroll-snap-align: center; flex: 0 0 75vw; height: 45vh; margin: 0 3vw;
+      scroll-snap-align: center; 
+      scroll-snap-stop: always; /* ▼ スワイプ時に必ず1枚ずつ止まるブレーキ設定 ▼ */
+      flex: 0 0 75vw; height: 45vh; margin: 0 3vw;
       position: relative; border-radius: 8px; overflow: hidden; 
       transition: all 0.4s ease; opacity: 0.5; transform: scale(0.9);
       display: flex; flex-direction: column; 
@@ -426,15 +422,15 @@ function getThumbnail(content) {
     .m-card-date { color: #888; font-size: 10px; margin-bottom: 6px; }
     .m-card-title { font-size: 1.1rem; font-weight: 400; line-height: 1.3; margin: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     
-    .m-lang-card { flex: 0 0 70vw; height: 35vh; display: flex; align-items: center; justify-content: center; }
+    /* ▼ 言語カードを横長の四角形（height: 15vh）に変更 ▼ */
+    .m-lang-card { flex: 0 0 80vw; height: 15vh; display: flex; align-items: center; justify-content: center; }
     .m-lang-card::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 5; pointer-events: none; transition: all 0.4s ease; }
     .m-lang-card.is-center::before { top: 15px; left: 15px; right: 15px; bottom: 15px; border-color: rgba(255, 255, 255, 0.6); }
     .m-lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
     .m-lang-card.is-center .m-lang-bg { opacity: 0.8; }
     .m-lang-content { position: relative; z-index: 2; text-align: center; }
-    .m-lang-name { font-size: 1.8rem; font-weight: 300; letter-spacing: 0.05em; color: #fff; }
-    .m-lang-border { width: 0; height: 1px; background: #fff; margin: 15px auto 0; transition: width 0.6s ease; opacity: 0.5; }
-    .m-lang-card.is-center .m-lang-border { width: 30px; }
+    .m-lang-name { font-size: 1.8rem; font-weight: 300; letter-spacing: 0.05em; color: #fff; margin: 0; }
+    .m-lang-border { display: none; } /* 横長にすると線が邪魔になるため非表示に */
     
     .m-carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; touch-action: pan-x; }
     .m-carousel-container::-webkit-scrollbar { display: none; }
@@ -444,7 +440,8 @@ function getThumbnail(content) {
     .m-c-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-c-dot.active { background: #fff; transform: scale(1.5); }
     
-    .m-top-footer { position: absolute; bottom: 0; left: 0; width: 100%; background: #393737; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 20px; box-sizing: border-box; z-index: 100; }
+    /* ▼ フッターを絶対配置から変更し、言語カードの下に自然に続くように配置 ▼ */
+    .m-top-footer { position: relative; width: 100%; background: #393737; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 40px 20px; box-sizing: border-box; margin-top: auto; }
     .m-top-footer-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
     .m-top-footer-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
     .m-top-footer-center { width: 100%; }
@@ -460,7 +457,6 @@ function getThumbnail(content) {
     if (!window.matchMedia('(pointer: coarse)').matches) return;
 
     try {
-      const HERO_ANIM_MS = 1200;
       const SWIPE_THRESHOLD = 40; 
 
       let currentStep = 0;
@@ -533,7 +529,6 @@ function getThumbnail(content) {
       
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
       
-      // 画面切り替えの完璧なフェードプログラム
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
