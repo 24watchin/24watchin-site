@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CorrectionsBody from '../../components/info/CorrectionsBody.astro';
+import { getBlogId } from '../../lib/siteRoutes.ts';
+
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = getBlogId('en');
+
+if (!globalThis.bloggerApiCache) { globalThis.bloggerApiCache = {}; }
+let allPosts = [];
+if (API_KEY && BLOG_ID) {
+  if (!globalThis.bloggerApiCache[BLOG_ID]) {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+    globalThis.bloggerApiCache[BLOG_ID] = fetch(url).then(res => res.ok ? res.json() : null).then(data => data?.items || []).catch(() => []);
+  }
+  allPosts = await globalThis.bloggerApiCache[BLOG_ID];
+}
+---
+<Layout title="Corrections Policy" allPosts={allPosts}>
+  <CorrectionsBody />
+</Layout>
