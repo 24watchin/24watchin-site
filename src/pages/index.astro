@@ -7,22 +7,23 @@ import { getBlogId } from '../lib/siteRoutes.ts';
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId('en');
 
-if (!globalThis.bloggerApiCache) {
-  globalThis.bloggerApiCache = {};
+// ▼ 【修正】キャッシュを無視して確実に最新の記事を取得するように変更（3indexと同じ仕組み） ▼
+const cacheKey = 'bloggerPostsCache_top_en';
+if (!globalThis[cacheKey]) {
+  // nocache=${Date.now()} を付けて、常に最新のデータを強制取得します
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10&nocache=${Date.now()}`;
+  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => data && data.items ? data.items : [])
+    .catch(() => []); // エラー時は空の配列を返す
 }
 
 let englishPosts = [];
 if (API_KEY && BLOG_ID) {
-  if (!globalThis.bloggerApiCache[BLOG_ID]) {
-    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
-    globalThis.bloggerApiCache[BLOG_ID] = fetch(url)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => data && data.items ? data.items : [])
-      .catch(() => []); 
-  }
-  englishPosts = await globalThis.bloggerApiCache[BLOG_ID];
+  englishPosts = await globalThis[cacheKey];
 }
 
+// 取得した中から最新5件を切り出します
 const topStories = englishPosts.slice(0, 5);
 ---
 
@@ -47,4 +48,3 @@ const topStories = englishPosts.slice(0, 5);
     <CookieBanner />
   </body>
 </html>
-
