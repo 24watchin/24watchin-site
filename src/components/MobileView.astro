@@ -93,7 +93,6 @@ function getThumbnail(content) {
 
   <div class="m-sequence" id="m-sequence">
     <div class="m-split-stage">
-      
       <div class="m-top-track">
         <div class="m-panel m-p1">
           <div class="m-bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
@@ -139,136 +138,135 @@ function getThumbnail(content) {
         </div>
       </div>
     </section>
-
-    <section class="m-seq-panel" id="m-screen-5">
-      <div class="m-seq-inner">
-        <div class="m-section-header"><h2>Latest Stories</h2></div>
-        
-        <div class="m-carousel-wrapper">
-          <div class="m-carousel-container" id="m-story-carousel">
-            <div class="m-carousel-spacer"></div>
-            
-            {displayStories.map((post) => {
-              let bgImage = '';
-              let categoryName = 'News';
-              let countryCode = 'world';
-              let countryName = '';
-              let dateText = '';
-              if (post.labels && Array.isArray(post.labels)) {
-                bgImage = getThumbnail(post.content);
-                const countryTag = post.labels.find(l => l.startsWith('en-'));
-                if (countryTag) {
-                  countryCode = countryTag.replace('en-', '');
-                  if (countryNameMap[countryCode]) {
-                    countryName = countryNameMap[countryCode];
-                  }
-                }
-                const foundCat = enCategories.find(cat => 
-                  post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
-                );
-                if (foundCat) categoryName = foundCat.label;
-                dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-              } else {
-                bgImage = post.image;
-                categoryName = post.category;
-                countryCode = post.countryCode;
-                countryName = post.country;
-                dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-              }
-
-              return (
-                <a href={`/en/${countryCode}/news/${post.id}`} class="m-story-card m-observer-card m-no-link-color">
-                  <div class="m-card-img-box">
-                    <div class="m-card-bg" style={`background-image: ${bgImage};`}></div>
-                  </div>
-                  <div class="m-card-text-box">
-                    <div class="m-card-meta">
-                      <span class="m-category">{categoryName}</span>
-                      {countryName && <span class="m-country-name">from {countryName}</span>}
-                    </div>
-                    <div class="m-card-date">{dateText}</div>
-                    <h3 class="m-card-title">{post.title}</h3>
-                  </div>
-                </a>
-              );
-            })}
-            <div class="m-carousel-spacer"></div>
-          </div>
+  </div> <section class="m-seq-panel" id="m-screen-5">
+    <div class="m-seq-inner">
+      <div class="m-section-header"><h2>Latest Stories</h2></div>
+      
+      <div class="m-carousel-wrapper">
+        <div class="m-carousel-container" id="m-story-carousel">
+          <div class="m-carousel-spacer"></div>
           
-          <div class="m-carousel-bottom-nav">
-            <div class="m-carousel-dots-wrapper" id="m-story-carousel-dots">
-              {displayStories.map((_, i) => (
-                <div class={`m-c-dot ${i === 0 ? 'active' : ''}`}></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+          {displayStories.map((post) => {
+            let bgImage = '';
+            let categoryName = 'News';
+            let countryCode = 'world';
+            let countryName = '';
+            let dateText = '';
+            if (post.labels && Array.isArray(post.labels)) {
+              bgImage = getThumbnail(post.content);
+              const countryTag = post.labels.find(l => l.startsWith('en-'));
+              if (countryTag) {
+                countryCode = countryTag.replace('en-', '');
+                if (countryNameMap[countryCode]) {
+                  countryName = countryNameMap[countryCode];
+                }
+              }
+              const foundCat = enCategories.find(cat => 
+                post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
+              );
+              if (foundCat) categoryName = foundCat.label;
+              dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+            } else {
+              bgImage = post.image;
+              categoryName = post.category;
+              countryCode = post.countryCode;
+              countryName = post.country;
+              dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
 
-    <section class="m-seq-panel" id="m-screen-6">
-      <div class="m-seq-inner">
-        <div class="m-section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
-        <div class="m-carousel-wrapper">
-          <div class="m-carousel-container" id="m-lang-carousel">
-            <div class="m-carousel-spacer"></div>
-            {languages.map((lang) => (
-              <a href={lang.url} class="m-lang-card m-observer-card m-no-link-color">
-                <div class="m-lang-bg" style={`background-color: ${lang.color};`}></div>
-                <div class="m-lang-content">
-                  <h3 class="m-lang-name" lang={lang.code}>{lang.name}</h3>
-                  <div class="m-lang-border"></div>
+            return (
+              <a href={`/en/${countryCode}/news/${post.id}`} class="m-story-card m-observer-card m-no-link-color">
+                <div class="m-card-img-box">
+                  <div class="m-card-bg" style={`background-image: ${bgImage};`}></div>
+                </div>
+                <div class="m-card-text-box">
+                  <div class="m-card-meta">
+                    <span class="m-category">{categoryName}</span>
+                    {countryName && <span class="m-country-name">from {countryName}</span>}
+                  </div>
+                  <div class="m-card-date">{dateText}</div>
+                  <h3 class="m-card-title">{post.title}</h3>
                 </div>
               </a>
+            );
+          })}
+          <div class="m-carousel-spacer"></div>
+        </div>
+        
+        <div class="m-carousel-bottom-nav">
+          <div class="m-carousel-dots-wrapper" id="m-story-carousel-dots">
+            {displayStories.map((_, i) => (
+              <div class={`m-c-dot ${i === 0 ? 'active' : ''}`}></div>
             ))}
-            <div class="m-carousel-spacer"></div>
-          </div>
-          
-          <div class="m-carousel-bottom-nav">
-            <div class="m-carousel-dots-wrapper" id="m-lang-carousel-dots">
-              {languages.map((_, i) => (
-                <div class={`m-c-dot ${i === 0 ? 'active' : ''}`}></div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <footer class="m-top-footer">
-        <div class="m-top-footer-inner">
-          <div class="m-top-footer-logo">
-            <a href="https://24watchin.com">
-              <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
+  <section class="m-seq-panel" id="m-screen-6">
+    <div class="m-seq-inner">
+      <div class="m-section-header"><h2>CHOOSE YOUR LANGUAGE</h2></div>
+      <div class="m-carousel-wrapper">
+        <div class="m-carousel-container" id="m-lang-carousel">
+          <div class="m-carousel-spacer"></div>
+          {languages.map((lang) => (
+            <a href={lang.url} class="m-lang-card m-observer-card m-no-link-color">
+              <div class="m-lang-bg" style={`background-color: ${lang.color};`}></div>
+              <div class="m-lang-content">
+                <h3 class="m-lang-name" lang={lang.code}>{lang.name}</h3>
+                <div class="m-lang-border"></div>
+              </div>
             </a>
-          </div>
-          <div class="m-top-footer-center">
-            <div class="m-top-footer-links">
-              <a href="/info/about/">ABOUT 24WATCHIN</a>
-              <a href="/info/privacy/">PRIVACY POLICY</a>
-              <a href="/info/terms/">TERMS OF USE</a>
-              <a href="/info/contact/">CONTACT</a>
-              <a href="/info/corrections/">CORRECTIONS POLICY</a>
-              <a href="/info/copyright/">COPYRIGHT / REUSE</a>
-            </div>
-            <div class="m-top-footer-copy">
-              <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
-              <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
-              <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
-            </div>
+          ))}
+          <div class="m-carousel-spacer"></div>
+        </div>
+        
+        <div class="m-carousel-bottom-nav">
+          <div class="m-carousel-dots-wrapper" id="m-lang-carousel-dots">
+            {languages.map((_, i) => (
+              <div class={`m-c-dot ${i === 0 ? 'active' : ''}`}></div>
+            ))}
           </div>
         </div>
-      </footer>
-    </section>
+      </div>
+    </div>
 
-  </div>
+    <footer class="m-top-footer">
+      <div class="m-top-footer-inner">
+        <div class="m-top-footer-logo">
+          <a href="https://24watchin.com">
+            <img src="/images/logo-24watchin-white.png" alt="24Watchin Logo" />
+          </a>
+        </div>
+        <div class="m-top-footer-center">
+          <div class="m-top-footer-links">
+            <a href="/info/about/">ABOUT 24WATCHIN</a>
+            <a href="/info/privacy/">PRIVACY POLICY</a>
+            <a href="/info/terms/">TERMS OF USE</a>
+            <a href="/info/contact/">CONTACT</a>
+            <a href="/info/corrections/">CORRECTIONS POLICY</a>
+            <a href="/info/copyright/">COPYRIGHT / REUSE</a>
+          </div>
+          <div class="m-top-footer-copy">
+            <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
+            <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
+            <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </section>
 
 </div>
 
 <style>
+  /* 画面幅に関わらず、PCなどのマウス操作端末ではスマホ版を完全に隠す */
   @media (hover: hover), (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
 
+  /* 指でタッチする実際のスマホの時だけ適用される設定 */
   @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
@@ -304,7 +302,6 @@ function getThumbnail(content) {
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    /* ▼ 画面切り替え時の黒フェード（これを使って完全に隠してから切り替える） ▼ */
     .m-transition-mask { position: fixed; inset: 0; z-index: 10050; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease, visibility 0s linear 0.6s; }
     .m-transition-mask.is-visible { opacity: 1; visibility: visible; transition: opacity 0.6s ease, visibility 0s linear 0s; }
     
@@ -327,7 +324,6 @@ function getThumbnail(content) {
     
     .m-panel.is-open { clip-path: inset(0 0 0 0) !important; }
     
-    /* ▼ 帯の設定 ▼ */
     .m-word-band-container { position: absolute; top: 65%; width: 50%; z-index: 10; overflow: hidden; }
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
@@ -341,27 +337,24 @@ function getThumbnail(content) {
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
     
-    /* ▼ 上部画像：始まり(0%)は不透明度0.95、文字が終わる(70%)から不透明度0.15へグラデーション ▼ */
+    /* 始まり(0%)は不透明度0.95、文字が終わる(70%)から不透明度0.15へグラデーション */
     .m-top-track .m-word-band { 
       justify-content: flex-start; 
       transform: translateX(-100%); 
       background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 70%, rgba(255,255,255,0.15) 100%);
     }
 
-    /* ▼ 下部画像：始まり(0%)は不透明度0.95、文字が終わる(70%)から不透明度0.15へグラデーション ▼ */
     .m-bottom-track .m-word-band { 
       justify-content: flex-end; 
       transform: translateX(100%); 
       background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 70%, rgba(255,255,255,0.15) 100%);
     }
     
-    /* ▼ 文字間隔をギュッと狭く(-0.05em)してはみ出しを防止 ▼ */
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
     
-    /* ▼ パネルが重ならないよう、アニメーション（transition）を完全に削除して「瞬間」で切り替える ▼ */
     .m-brand-panel { position: absolute; inset: 0; z-index: 30; opacity: 0; visibility: hidden; pointer-events: none; }
     .m-brand-panel.is-visible { opacity: 1; visibility: visible; pointer-events: auto; }
     
@@ -385,12 +378,10 @@ function getThumbnail(content) {
     .m-text-anim-target.is-visible .m-anim-desc2 { transition-delay: 1.8s; }
     .m-text-anim-target.is-visible .m-anim-desc3 { transition-delay: 2.4s; }
     
-    /* ▼ 画面5, 6も重なり防止のため transition を完全削除 ▼ */
     .m-seq-panel { position: absolute; inset: 0; z-index: 40; opacity: 0; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; overflow-y: auto; overflow-x: hidden; }
     #m-screen-6 { z-index: 50; padding-bottom: 220px; } 
     .m-seq-panel.is-visible { opacity: 1; visibility: visible; pointer-events: auto; }
     
-    /* マスクが明けた時に少し遅れて文字が出てくるフワッとした演出 */
     .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 40px; padding-bottom: 40px; }
     .m-seq-panel.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
     
@@ -541,7 +532,6 @@ function getThumbnail(content) {
         brandTextTarget?.classList.remove('is-visible'); 
       }
       
-      // ▼ ここが要です！進む時も戻る時も、必ず一瞬真っ暗になってから裏側で切り替える完璧なプログラム ▼
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
@@ -551,9 +541,8 @@ function getThumbnail(content) {
         isAnimating = true;
         updateIndicator(step);
 
+        // 1〜3画面目の「進む」時だけ、手前の画像を縮めて次を見せる（スライド）
         const isBackward = step < previousStep;
-
-        // 1〜3画面目の「進む」時だけ、画像をスライドさせる
         if (!isBackward && step <= 2 && previousStep <= 2) {
             if (step >= 1) { topPanels[step]?.classList.add('is-open'); bottomPanels[step]?.classList.add('is-open'); }
             window.setTimeout(() => {
@@ -566,55 +555,54 @@ function getThumbnail(content) {
             return;
         }
 
-        // ▼ それ以外（戻る時、画面3・4・5の全移動）は、全て黒いマスクで画面を覆い隠してから切り替える ▼
+        // ▼ 全ての画面移動で「黒いフェード」を使って完全に画面を暗くしてから切り替える ▼
         showMask();
         
         window.setTimeout(() => {
-            // ここで画面は完全に真っ黒。裏側で一瞬で画面をすり替える。
-            
-            resetBrandPanel();
-            clearSectionVisibility();
-            
-            // アニメーションをオフにして瞬間移動
-            topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-            bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-            
-            if (step <= 3) {
-                sequence?.classList.remove('is-hidden');
-                
-                if (step <= 2) {
-                    if (step >= 1) { topPanels[1]?.classList.add('is-open', 'is-active'); bottomPanels[1]?.classList.add('is-open', 'is-active'); }
-                    if (step >= 2) { topPanels[2]?.classList.add('is-open', 'is-active'); bottomPanels[2]?.classList.add('is-open', 'is-active'); }
-                    if (step >= 0) { topPanels[0]?.classList.add('is-active'); bottomPanels[0]?.classList.add('is-active'); }
-                }
-                else if (step === 3) {
-                    brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-                    brandTextTarget?.classList.add('is-visible');
-                    // ブランドパネルの裏が透けないように背景をセットしておく
-                    if (topPanels[1]) { topPanels[1].classList.add('is-open', 'is-active'); bottomPanels[1].classList.add('is-open', 'is-active'); }
-                    if (topPanels[2]) { topPanels[2].classList.add('is-open', 'is-active'); bottomPanels[2].classList.add('is-open', 'is-active'); }
-                    if (topPanels[0]) { topPanels[0].classList.add('is-active'); bottomPanels[0].classList.add('is-active'); }
-                }
-            } else {
-                sequence?.classList.add('is-hidden');
-                if (step === 4) screen5?.classList.add('is-visible');
-                if (step === 5) screen6?.classList.add('is-visible');
-            }
+          // 画面が完全に真っ暗になったタイミングで、裏側の画面を一瞬で切り替える
+          resetBrandPanel();
+          clearSectionVisibility();
+          
+          topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
+          bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
+          
+          if (step <= 2) {
+              sequence?.classList.remove('is-hidden');
+              if (step >= 1) { topPanels[1]?.classList.add('is-open', 'is-active'); bottomPanels[1]?.classList.add('is-open', 'is-active'); }
+              if (step >= 2) { topPanels[2]?.classList.add('is-open', 'is-active'); bottomPanels[2]?.classList.add('is-open', 'is-active'); }
+              if (step >= 0) { topPanels[0]?.classList.add('is-active'); bottomPanels[0]?.classList.add('is-active'); }
+          }
+          else if (step === 3) {
+              sequence?.classList.remove('is-hidden');
+              brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
+              brandTextTarget?.classList.add('is-visible');
+              if (topPanels[1]) { topPanels[1].classList.add('is-open', 'is-active'); bottomPanels[1].classList.add('is-open', 'is-active'); }
+              if (topPanels[2]) { topPanels[2].classList.add('is-open', 'is-active'); bottomPanels[2].classList.add('is-open', 'is-active'); }
+              if (topPanels[0]) { topPanels[0].classList.add('is-active'); bottomPanels[0].classList.add('is-active'); }
+          }
+          else if (step === 4) {
+              sequence?.classList.add('is-hidden');
+              screen5?.classList.add('is-visible');
+          }
+          else if (step === 5) {
+              sequence?.classList.add('is-hidden');
+              screen6?.classList.add('is-visible');
+          }
 
-            // HTMLに強制的に変更を認識させるおまじない
-            void document.body.offsetHeight;
+          // HTMLに強制的に変更を認識させるおまじない
+          void document.body.offsetHeight;
 
-            // アニメーションを元に戻す
-            topPanels.forEach(panel => { panel.style.transition = ''; });
-            bottomPanels.forEach(panel => { panel.style.transition = ''; });
+          // アニメーションを元に戻す
+          topPanels.forEach(panel => { panel.style.transition = ''; });
+          bottomPanels.forEach(panel => { panel.style.transition = ''; });
 
-            // 裏側のすり替えが完了！マスクを外して明るくする
-            hideMask();
+          // 裏側のすり替えが完了！マスクを外して明るくする
+          hideMask();
 
-            // 明るくなるまで待ってから操作できるようにする
-            window.setTimeout(() => { isAnimating = false; }, 600);
-            
-        }, 600); // 画面が完全に黒くなるまでの時間
+          // 画面が完全に明るくなるまで待ってから操作できるようにする
+          window.setTimeout(() => { isAnimating = false; }, 600);
+          
+        }, 600); // 画面が完全に真っ黒になるまで待つ時間（0.6秒）
       }
 
       function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
