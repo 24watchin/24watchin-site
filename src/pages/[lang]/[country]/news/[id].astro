@@ -69,12 +69,10 @@ const t = sizeLabels[lang] || sizeLabels['en'];
 
 const articleUrl = `https://24watchin.com/${lang}/${country}/news/${post.id}/`;
 
-// 記事サムネイル画像を本文から取得（なければデフォルトロゴ）
 const DEFAULT_OG_IMAGE = 'https://24watchin.com/images/logo-24watchin.png';
 const imageMatch = (post.content || '').match(/<img[^>]+src="([^">]+)"/);
 const articleOgImage = imageMatch ? imageMatch[1] : DEFAULT_OG_IMAGE;
 
-// NewsArticle 構造化データ
 const newsArticleJsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsArticle",
@@ -108,7 +106,6 @@ const newsArticleJsonLd = {
   ogImage={articleOgImage}
   ogType="article"
 >
-  <!-- NewsArticle 構造化データを <head> に差し込む -->
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(newsArticleJsonLd)} />
 
   <div class="article-breadcrumb-container">
@@ -156,13 +153,12 @@ const newsArticleJsonLd = {
           buttons.forEach(b => b.classList.remove('active'));
           this.classList.add('active');
 
-          // 記事エリア全体のフォントサイズを変える（見出しも連動するようになります）
           if (size === 'small') {
             contentArea.style.fontSize = '16px';
           } else if (size === 'medium') {
             contentArea.style.fontSize = '20px';
           } else if (size === 'large') {
-            contentArea.style.fontSize = '26px'; // 大は少し目立つように26pxにしました
+            contentArea.style.fontSize = '26px';
           }
         };
       });
@@ -181,32 +177,35 @@ const newsArticleJsonLd = {
   .post-title { font-size: 28px; line-height: 1.4; color: #1a1a1a; margin-bottom: 10px; }
   .post-date { color: #666; font-size: 14px; }
   
-  /* PCの基本設定 */
-  .post-content { font-size: 18px; line-height: 1.65; color: #1a1a1a; }
+  /* PCの基本設定：ここを 16px に修正しました */
+  .post-content { font-size: 16px; line-height: 1.65; color: #1a1a1a; }
+  
+  /* Blogger側の文字サイズ指定（spanなど）を無効化して 16px を強制します */
+  .post-content :global(span), 
+  .post-content :global(div), 
+  .post-content :global(p) { font-size: inherit !important; }
+
   /* PCの見出し(h4)サイズ固定 */
   .post-content :global(h4) { font-size: 1.1em; margin: 1.5em 0 0.5em; font-weight: bold; line-height: 1.3; }
   .post-content :global(img) { max-width: 100% !important; height: auto !important; border-radius: 4px; }
 
-  /* 画像説明：全デバイスで18pxに固定 */
-  .post-content :global(.tr-caption) { font-size: 18px !important; line-height: 1.4; color: #666; display: block; margin-top: 8px; }
+  /* 画像説明：本文に合わせて 16px に修正しました */
+  .post-content :global(.tr-caption) { font-size: 16px !important; line-height: 1.4; color: #666; display: block; margin-top: 8px; }
 
-  /* スマホ用の設定 */
+  /* スマホ用の設定（ご希望通り元のサイズを維持） */
   @media (max-width: 768px) {
     .article-breadcrumb-container { flex-direction: column; align-items: flex-start; }
     .text-size-selector-mobile { display: flex; gap: 5px; align-self: flex-end; }
     
     .size-btn { padding: 6px 12px; font-size: 14px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 4px; }
-    /* ボタンのテーマカラー化 (#872732) */
     .size-btn.active { background: #872732; color: #fff; border-color: #872732; }
 
     .post-container { padding: 20px 10px; border-radius: 0; }
     
-    /* スマホ記事エリア：基準を20px、行間を少し詰め気味に */
+    /* スマホ記事エリア：ご希望通り 20px を維持 */
     .post-content { font-size: 20px; line-height: 1.5; }
-    /* 見出しも本文のサイズに連動（emを使うことで連動させます） */
     .post-content :global(h4) { font-size: 1.15em; }
 
     .post-title { font-size: 22px; }
   }
 </style>
-
