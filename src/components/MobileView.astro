@@ -91,6 +91,8 @@ function getThumbnail(content) {
     <div class="m-dot"></div>
   </div>
 
+  <div class="m-transition-mask" id="m-transition-mask" aria-hidden="true"></div>
+
   <div class="m-step-target is-visible" id="m-stage-hero">
     <div class="m-split-stage">
       <div class="m-top-track">
@@ -158,9 +160,7 @@ function getThumbnail(content) {
               const countryTag = post.labels.find(l => l.startsWith('en-'));
               if (countryTag) {
                 countryCode = countryTag.replace('en-', '');
-                if (countryNameMap[countryCode]) {
-                  countryName = countryNameMap[countryCode];
-                }
+                if (countryNameMap[countryCode]) { countryName = countryNameMap[countryCode]; }
               }
               const foundCat = enCategories.find(cat => 
                 post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
@@ -262,10 +262,12 @@ function getThumbnail(content) {
 </div>
 
 <style>
+  /* 画面幅に関わらず、PCなどのマウス操作端末ではスマホ版を完全に隠す */
   @media (hover: hover), (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
 
+  /* 指でタッチする実際のスマホの時だけ適用される設定 */
   @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
@@ -335,40 +337,45 @@ function getThumbnail(content) {
     
     .m-bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
     
-    .m-word-band-container { position: absolute; top: 65%; width: 50%; z-index: 10; overflow: hidden; }
-    .m-top-track .m-word-band-container { left: 0; }
-    .m-bottom-track .m-word-band-container { right: 0; }
+    /* ▼ 帯の幅を文字の長さに合わせて自動調整（最大90%まで） ▼ */
+    .m-word-band-container { 
+      position: absolute; top: 65%; z-index: 10; 
+      display: flex; width: auto; max-width: 90%; 
+    }
+    .m-top-track .m-word-band-container { left: 0; justify-content: flex-start; }
+    .m-bottom-track .m-word-band-container { right: 0; justify-content: flex-end; }
     
+    /* ▼ 帯の設定（余白でグラデーションの長さを調整） ▼ */
     .m-word-band { 
       backdrop-filter: blur(2px); 
-      width: 100%; 
-      padding: 6px 12px; 
       display: flex; 
       align-items: center; 
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
     
-    /* ▼ グラデーション調整：15%まで0.95をキープし、徐々に透明度を変えて最後は0.15に ▼ */
+    /* ▼ 上部画像：右側に余白を持たせ、徐々に透明になって完全に消えるグラデーション ▼ */
     .m-top-track .m-word-band { 
-      justify-content: flex-start; 
+      padding: 6px 50px 6px 15px; 
       transform: translateX(-100%); 
-      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.15) 100%);
+      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.1) 85%, rgba(255,255,255,0) 100%);
     }
 
+    /* ▼ 下部画像：左側に余白を持たせ、徐々に透明になって完全に消えるグラデーション ▼ */
     .m-bottom-track .m-word-band { 
-      justify-content: flex-end; 
+      padding: 6px 15px 6px 50px; 
       transform: translateX(100%); 
-      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.15) 100%);
+      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.1) 85%, rgba(255,255,255,0) 100%);
     }
     
-    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
+    /* ▼ 文字サイズ1.1rem、文字間隔をギュッと狭く(-0.05em)。折り返さない（nowrap） ▼ */
+    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; white-space: nowrap; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
     
     .m-brand-night { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); transition: opacity 0.6s ease; }
     .m-brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.8; transform: scale(1.05); transition: all 1s ease; }
-    .m-brand-panel.is-visible .m-brand-bg { transform: scale(1); }
+    .m-step-target.is-visible .m-brand-bg { transform: scale(1); }
     .m-brand-bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
     .m-brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 20px; }
     .m-brand-logo-img { width: 160px; height: auto; margin-bottom: 20px; filter: brightness(0) invert(1); }
@@ -387,13 +394,13 @@ function getThumbnail(content) {
     
     .m-seq-panel { background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); overflow-y: auto; overflow-x: hidden; }
     
-    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; padding-bottom: 80px; }
+    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; }
     .m-step-target.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
     
-    #m-screen-5 .m-seq-inner { justify-content: center; }
+    #m-screen-5 .m-seq-inner { justify-content: center; padding-bottom: 80px; }
     
-    /* ▼ 画面6のフッターと重ならないように余白（padding-bottom）をさらに広げました ▼ */
-    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 300px; } 
+    /* ▼ 画面6のフッターと重ならないように、下部の余白を広げました ▼ */
+    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 350px; } 
 
     .m-section-header { text-align: center; margin-bottom: 30px; }
     .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
@@ -453,6 +460,7 @@ function getThumbnail(content) {
     if (!window.matchMedia('(pointer: coarse)').matches) return;
 
     try {
+      const HERO_ANIM_MS = 1200;
       const SWIPE_THRESHOLD = 40; 
 
       let currentStep = 0;
@@ -525,6 +533,7 @@ function getThumbnail(content) {
       
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
       
+      // 画面切り替えの完璧なフェードプログラム
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
