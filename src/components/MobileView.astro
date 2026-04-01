@@ -346,17 +346,16 @@ function getThumbnail(content) {
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
     
-    /* ▼ さらに滑らかに！中間(30%で0.75, 55%で0.4)を経由して徐々に消えるグラデーション ▼ */
     .m-top-track .m-word-band { 
       padding: 6px 50px 6px 15px; 
       transform: translateX(-100%); 
-      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 10%, rgba(255,255,255,0.75) 30%, rgba(255,255,255,0.4) 55%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
+      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
     }
 
     .m-bottom-track .m-word-band { 
       padding: 6px 15px 6px 50px; 
       transform: translateX(100%); 
-      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 10%, rgba(255,255,255,0.75) 30%, rgba(255,255,255,0.4) 55%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
+      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
     }
     
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; white-space: nowrap; }
@@ -383,13 +382,31 @@ function getThumbnail(content) {
     .m-step-target.is-visible .m-anim-desc2 { transition-delay: 1.2s; }
     .m-step-target.is-visible .m-anim-desc3 { transition-delay: 1.6s; }
     
-    .m-seq-panel { background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); overflow-y: auto; overflow-x: hidden; }
+    /* ▼ m-seq-panel に flex を復活させ、フッターを正しく配置します ▼ */
+    .m-seq-panel { 
+      background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); 
+      overflow-y: auto; 
+      overflow-x: hidden; 
+      display: flex !important; 
+      flex-direction: column !important; 
+    }
     
-    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; }
+    /* ▼ m-seq-inner を伸縮可能にし、コンテンツを中央に配置 ▼ */
+    .m-seq-inner { 
+      width: 100%; 
+      opacity: 0; 
+      transform: translateY(20px); 
+      transition: all 0.6s ease; 
+      flex: 1 0 auto; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      padding-top: 80px; 
+    }
     .m-step-target.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
     
     #m-screen-5 .m-seq-inner { justify-content: center; padding-bottom: 80px; }
-    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 0; } 
+    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 40px; } 
 
     .m-section-header { text-align: center; margin-bottom: 30px; }
     .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
@@ -434,7 +451,17 @@ function getThumbnail(content) {
     .m-c-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-c-dot.active { background: #fff; transform: scale(1.5); }
     
-    .m-top-footer { position: relative; width: 100%; background: #393737; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 40px 20px; box-sizing: border-box; margin-top: auto; }
+    /* ▼ フッターが潰れないように flex-shrink: 0; を設定 ▼ */
+    .m-top-footer { 
+      position: relative; 
+      width: 100%; 
+      background: #393737; 
+      border-top: 1px solid rgba(255, 255, 255, 0.05); 
+      padding: 40px 20px; 
+      box-sizing: border-box; 
+      margin-top: auto; 
+      flex-shrink: 0;
+    }
     .m-top-footer-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
     .m-top-footer-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
     .m-top-footer-center { width: 100%; }
