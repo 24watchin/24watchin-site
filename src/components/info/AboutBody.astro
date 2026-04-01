@@ -14,26 +14,26 @@ import { aboutData } from '../../lib/info/aboutData.ts';
 <style>
   .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
   
-  /* トップの大見出し：24px (1.5rem) に設定 */
-  h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
+  /* トップの大見出し：本文より目立つように少し大きめ（26px）に設定 */
+  h1 { font-size: 26px; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
   
-  /* 本文の基本サイズ：16px (1rem) に設定 */
-  .info-body-text { font-size: 1rem; line-height: 1.8; color: #444; }
+  /* ★本文の基本サイズ：記事と同じ 18px に設定 */
+  .info-body-text { font-size: 18px; line-height: 1.8; color: #444; }
   
-  /* セクションの中見出し：20px (1.25rem) に設定 */
-  .info-body-text :global(h2) { font-size: 1.25rem; margin-top: 30px; border-left: 4px solid var(--theme-color); padding-left: 10px; }
+  /* セクションの中見出し：本文より少し大きめ（22px）に設定 */
+  .info-body-text :global(h2) { font-size: 22px; margin-top: 30px; border-left: 4px solid var(--theme-color); padding-left: 10px; }
   
   .info-body-text :global(section) { margin-bottom: 30px; }
-  .info-body-text :global(table.info-table) { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 1rem; }
+  .info-body-text :global(table.info-table) { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
   .info-body-text :global(th), .info-body-text :global(td) { border: 1px solid #ddd; padding: 12px; }
   .info-body-text :global(th) { background-color: #f8f9fa; width: 30%; text-align: left; }
   
-  /* スマホ表示時の調整：少しだけ小さくして画面に収まりやすくします */
+  /* スマホ表示時の調整：スマホでは文字が大きすぎると読みにくいため少し小さくします */
   @media (max-width: 640px) { 
     .info-content-card { padding: 25px 15px; } 
-    h1 { font-size: 1.3rem; } 
-    .info-body-text { font-size: 0.95rem; }
-    .info-body-text :global(h2) { font-size: 1.1rem; }
+    h1 { font-size: 22px; } 
+    .info-body-text { font-size: 16px; }
+    .info-body-text :global(h2) { font-size: 18px; }
   }
 </style>
 
