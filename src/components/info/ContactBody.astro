@@ -1,80 +1,154 @@
 ---
 // src/components/info/ContactBody.astro
-// 「お問い合わせ」の内容が書かれたデータファイルを読み込みます
-import { contactData } from '../../lib/info/contactData.ts';
+// 成川様のルール通り、jaフォルダの中にあるデータを読み込むように修正しました
+import { contactData } from '../../lib/info/ja/contactData.ts';
 ---
 
 <div class="info-content-card">
   <h1 id="info-title">Contact</h1>
-  <div id="info-body" class="info-body-text">
-    Loading...
+  
+  <div class="info-body-text">
+    <p id="intro1"></p>
+    <p id="intro2"></p>
+
+    <div class="info-section-box">
+      <h2 id="before-title"></h2>
+      <ul class="info-list">
+        <li id="before1"></li>
+        <li id="before2"></li>
+        <li id="before3"></li>
+        <li id="before4"></li>
+      </ul>
+    </div>
+
+    <form class="contact-form" id="contact-form">
+      <h2 id="form-title"></h2>
+      
+      <div class="form-group">
+        <label><span id="type-label"></span> <span class="required-tag" id="req-1"></span></label>
+        <select name="type" required id="type-select">
+          <option value="" disabled selected id="type-placeholder"></option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><span id="name-label"></span> <span class="required-tag" id="req-2"></span></label>
+        <input type="text" name="name" required id="name-input">
+      </div>
+
+      <div class="form-group">
+        <label><span id="email-label"></span> <span class="required-tag" id="req-3"></span></label>
+        <input type="email" name="email" required id="email-input">
+      </div>
+
+      <div class="form-group">
+        <label><span id="subject-label"></span> <span class="required-tag" id="req-4"></span></label>
+        <input type="text" name="subject" required id="subject-input">
+      </div>
+
+      <div class="form-group">
+        <label><span id="message-label"></span> <span class="required-tag" id="req-5"></span></label>
+        <textarea name="message" rows="6" required id="message-input"></textarea>
+      </div>
+
+      <div class="form-agreement">
+        <input type="checkbox" id="agree" required>
+        <label for="agree" id="agreement-text"></label>
+      </div>
+
+      <button type="submit" id="submit-btn" class="submit-btn"></button>
+    </form>
   </div>
 </div>
 
 <style>
-  .info-content-card { 
-    background: #fff; 
-    padding: 40px; 
-    border-radius: 8px; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-    min-height: 500px; 
+  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 40px; }
+  h1 { font-size: 24px; font-weight: bold; margin-bottom: 30px; border-bottom: 4px solid var(--theme-color); padding-bottom: 15px; }
+  
+  /* パソコン版本文：16px */
+  .info-body-text { font-size: 16px; line-height: 1.8; color: #444; }
+  
+  .info-section-box { margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+  h2 { font-size: 20px; border-left: 4px solid var(--theme-color); padding-left: 10px; margin-bottom: 15px; }
+  .info-list { padding-left: 20px; }
+  .info-list li { margin-bottom: 10px; }
+
+  /* フォーム周りのデザイン */
+  .contact-form { margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-weight: bold; margin-bottom: 8px; }
+  .required-tag { color: #d52b1e; font-size: 12px; margin-left: 5px; }
+  
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box;
   }
   
-  /* 大見出し：24px (Aboutページと統一) */
-  h1 { 
-    font-size: 24px; 
-    font-weight: bold; 
-    margin-bottom: 30px; 
-    padding-bottom: 15px; 
-    border-bottom: 4px solid var(--theme-color); 
-    color: #1a1a1a; 
+  .form-agreement { margin: 25px 0; display: flex; align-items: flex-start; gap: 10px; }
+  .form-agreement input { margin-top: 5px; }
+
+  .submit-btn {
+    background: var(--theme-color); color: #fff; padding: 15px 40px; border: none; 
+    border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%;
   }
-  
-  /* ★パソコン版の本文：16px に設定 */
-  .info-body-text { 
-    font-size: 16px; 
-    line-height: 1.8; 
-    color: #444; 
-  }
-  
-  /* 中見出し：20px */
-  .info-body-text :global(h2) { 
-    font-size: 20px; 
-    margin-top: 30px; 
-    border-left: 4px solid var(--theme-color); 
-    padding-left: 10px; 
-  }
-  
-  .info-body-text :global(section) { margin-bottom: 30px; }
-  .info-body-text :global(table.info-table) { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 16px; }
-  .info-body-text :global(th), .info-body-text :global(td) { border: 1px solid #ddd; padding: 12px; }
-  .info-body-text :global(th) { background-color: #f8f9fa; width: 30%; text-align: left; }
-  
-  /* スマホ表示時の調整 */
-  @media (max-width: 640px) { 
-    .info-content-card { padding: 25px 15px; } 
-    h1 { font-size: 22px; } 
-    /* スマホ版はご希望に合わせて 18px を維持 */
+
+  /* スマホ版本文：18px */
+  @media (max-width: 640px) {
+    .info-content-card { padding: 25px 15px; }
     .info-body-text { font-size: 18px; }
-    .info-body-text :global(h2) { font-size: 20px; }
+    h2 { font-size: 20px; }
+    .form-group input, .form-group select, .form-group textarea { font-size: 18px; }
   }
 </style>
 
 <script define:vars={{ pageData: contactData }}>
   (function() {
-    const themeColors = {
-      ja: '#872732', en: '#0033a0', 'zh-cn': '#e60012', 'zh-tw': '#000095',
-      es: '#aa151b', de: '#000000', fr: '#002395', ru: '#d52b1e'
-    };
-
+    // ブラウザの言語設定を取得
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+    // 指定された言語のデータがあればそれを使用し、なければ日本語(ja)を使用
     const lang = pageData[browserLang] ? browserLang : 'ja'; 
     const t = pageData[lang];
-    const theme = themeColors[lang] || '#872732';
+    const theme = '#872732'; // 日本(ja)のテーマカラー
 
+    // データの反映
     document.title = t.title + ' | 24Watchin';
     document.getElementById('info-title').textContent = t.title;
-    document.getElementById('info-body').innerHTML = t.content;
+    document.getElementById('intro1').textContent = t.intro1;
+    document.getElementById('intro2').textContent = t.intro2;
+    document.getElementById('before-title').textContent = t.beforeTitle;
+    document.getElementById('before1').textContent = t.before1;
+    document.getElementById('before2').textContent = t.before2;
+    document.getElementById('before3').textContent = t.before3;
+    document.getElementById('before4').textContent = t.before4;
+    document.getElementById('form-title').textContent = t.formTitle;
+    document.getElementById('type-label').textContent = t.typeLabel;
+    document.getElementById('type-placeholder').textContent = t.typePlaceholder;
+    document.getElementById('name-label').textContent = t.nameLabel;
+    document.getElementById('email-label').textContent = t.emailLabel;
+    document.getElementById('subject-label').textContent = t.subjectLabel;
+    document.getElementById('message-label').textContent = t.messageLabel;
+    document.getElementById('agreement-text').textContent = t.agreementText;
+    document.getElementById('submit-btn').textContent = t.submitBtn;
+
+    // 「必須」ラベルの反映
+    ['req-1', 'req-2', 'req-3', 'req-4', 'req-5'].forEach(id => {
+      document.getElementById(id).textContent = `(${t.required})`;
+    });
+
+    // プレースホルダーの反映
+    document.getElementById('name-input').placeholder = t.namePlaceholder;
+    document.getElementById('email-input').placeholder = t.emailPlaceholder;
+    document.getElementById('subject-input').placeholder = t.subjectPlaceholder;
+    document.getElementById('message-input').placeholder = t.messagePlaceholder;
+
+    // セレクトボックスの選択肢を生成
+    const select = document.getElementById('type-select');
+    t.typeOptions.forEach(opt => {
+      const el = document.createElement('option');
+      el.value = opt;
+      el.textContent = opt;
+      select.appendChild(el);
+    });
+
     document.body.style.setProperty('--theme-color', theme);
   })();
 </script>
