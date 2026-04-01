@@ -1,48 +1,26 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
-import Breadcrumb from '../../../../components/Breadcrumb.astro';
-import { categoryLabelMap } from '../../../../lib/categoryLabels.ts';
-import { termsData } from '../../../../lib/info/termsData.ts';
-// ▼ カンペ（siteRoutes）を読み込む
-import { langCountryPairs } from '../../../../lib/siteRoutes.ts';
+import TermsBody from '../../../../components/info/TermsBody.astro';
+import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
   return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
-const { lang, country } = Astro.params;
-const currentTermsData = termsData[lang as keyof typeof termsData] || termsData['en'];
+const { lang } = Astro.params;
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = getBlogId(lang);
 
-const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
-  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
-};
-const langKey = langKeyMap[lang as keyof typeof langKeyMap] || 'jp';
-const themeData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
-const themeColor = themeData.themeColor;
+if (!globalThis.bloggerApiCache) { globalThis.bloggerApiCache = {}; }
+let allPosts = [];
+if (API_KEY && BLOG_ID) {
+  if (!globalThis.bloggerApiCache[BLOG_ID]) {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+    globalThis.bloggerApiCache[BLOG_ID] = fetch(url).then(res => res.ok ? res.json() : null).then(data => data?.items || []).catch(() => []);
+  }
+  allPosts = await globalThis.bloggerApiCache[BLOG_ID];
+}
 ---
-
-<Layout title={currentTermsData.title} description={currentTermsData.description} sidebarType="article">
-  <Breadcrumb lang={lang} country={country} categoryLabel={currentTermsData.title} />
-  
-  <div class="info-container">
-    <h1 class="info-title">{currentTermsData.title}</h1>
-    <div class="info-content">
-      <p class="update-date">{currentTermsData.lastUpdated}</p>
-      <div set:html={currentTermsData.content}></div>
-    </div>
-  </div>
+<Layout title="Terms of Use" allPosts={allPosts}>
+  <TermsBody />
 </Layout>
-
-<style define:vars={{ themeColor }}>
-  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 8px; padding-bottom: 12px; border-bottom: 3px solid var(--themeColor); }
-  .update-date { font-size: 13px; color: #888; margin: 0 0 24px; }
-  .info-content :global(section) { margin-bottom: 32px; }
-  .info-content :global(h2) { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--themeColor); }
-  .info-content :global(p), .info-content :global(ol) { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
-  .info-content :global(a) { color: var(--themeColor); text-decoration: underline; }
-  .info-content :global(.info-table) { width: 100%; border-collapse: collapse; font-size: 15px; }
-  .info-content :global(.info-table th) { width: 140px; padding: 10px 16px; background: #f8f4f4; border: 1px solid #e5e7eb; text-align: left; }
-  .info-content :global(.info-table td) { padding: 10px 16px; border: 1px solid #e5e7eb; }
-  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-content :global(.info-table th) { width: 100px; font-size: 13px; } }
-</style>
