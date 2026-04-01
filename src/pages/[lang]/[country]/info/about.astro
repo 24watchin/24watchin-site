@@ -1,48 +1,27 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
-import Breadcrumb from '../../../../components/Breadcrumb.astro';
-import { categoryLabelMap } from '../../../../lib/categoryLabels.ts';
-import { aboutData } from '../../../../lib/info/aboutData.ts';
-// ▼ カンペ（siteRoutes）を読み込む
-import { langCountryPairs } from '../../../../lib/siteRoutes.ts';
+import AboutBody from '../../../../components/info/AboutBody.astro';
+import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
-  // ▼ カンペを使って全ページを生成
   return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
-const { lang, country } = Astro.params;
-const currentAboutData = aboutData[lang as keyof typeof aboutData] || aboutData['en'];
+const { lang } = Astro.params;
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = getBlogId(lang);
 
-const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
-  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
-};
-const langKey = langKeyMap[lang as keyof typeof langKeyMap] || 'jp';
-const themeData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
-const themeColor = themeData.themeColor;
+if (!globalThis.bloggerApiCache) { globalThis.bloggerApiCache = {}; }
+let allPosts = [];
+if (API_KEY && BLOG_ID) {
+  if (!globalThis.bloggerApiCache[BLOG_ID]) {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+    globalThis.bloggerApiCache[BLOG_ID] = fetch(url).then(res => res.ok ? res.json() : null).then(data => data?.items || []).catch(() => []);
+  }
+  allPosts = await globalThis.bloggerApiCache[BLOG_ID];
+}
 ---
 
-<Layout title={currentAboutData.title} description={currentAboutData.description} sidebarType="article">
-  <Breadcrumb lang={lang} country={country} categoryLabel={currentAboutData.title} />
-  
-  <div class="info-container">
-    <h1 class="info-title">{currentAboutData.title}</h1>
-    <div class="info-content">
-      <div set:html={currentAboutData.content}></div>
-    </div>
-  </div>
+<Layout title="About Us" allPosts={allPosts}>
+  <AboutBody />
 </Layout>
-
-<style define:vars={{ themeColor }}>
-  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 24px; padding-bottom: 12px; border-bottom: 3px solid var(--themeColor); }
-  .info-content :global(.lead) { font-size: 17px; line-height: 1.8; color: #1a1a1a; background: #f8f4f4; border-left: 4px solid var(--themeColor); padding: 16px 20px; border-radius: 4px; margin-bottom: 32px; }
-  .info-content :global(section) { margin-bottom: 32px; }
-  .info-content :global(h2) { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--themeColor); }
-  .info-content :global(p) { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
-  .info-content :global(a) { color: var(--themeColor); text-decoration: underline; }
-  .info-content :global(.info-table) { width: 100%; border-collapse: collapse; font-size: 15px; }
-  .info-content :global(.info-table th) { width: 140px; padding: 10px 16px; background: #f8f4f4; color: #555; font-weight: bold; border: 1px solid #e5e7eb; text-align: left; white-space: nowrap; }
-  .info-content :global(.info-table td) { padding: 10px 16px; border: 1px solid #e5e7eb; color: #1a1a1a; }
-  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .info-content :global(.info-table th) { width: 100px; font-size: 13px; } }
-</style>
