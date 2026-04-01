@@ -89,6 +89,8 @@ function getThumbnail(content) {
     <div class="m-dot"></div>
   </div>
 
+  <div class="m-transition-mask" id="m-transition-mask" aria-hidden="true"></div>
+
   <div class="m-sequence" id="m-sequence">
     <div class="m-split-stage">
       
@@ -268,7 +270,7 @@ function getThumbnail(content) {
     .m-wrapper { display: none !important; }
   }
 
-  /* ▼ 指でタッチする実際のスマホの時だけ適用されるバリア ▼ */
+  /* ▼ 指でタッチする実際のスマホの時だけ適用される設定 ▼ */
   @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
@@ -304,10 +306,13 @@ function getThumbnail(content) {
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    /* 画面の土台 */
-    .m-sequence { position: fixed; inset: 0; z-index: 9999; height: 100vh; height: 100dvh; background: #010411; }
+    /* ▼ 画面切り替え時の黒フェード（マスク）のタイミングをPC版と同じに統一 ▼ */
+    .m-transition-mask { position: fixed; inset: 0; z-index: 10050; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.8s ease, visibility 0s linear 0.8s; }
+    .m-transition-mask.is-visible { opacity: 1; visibility: visible; transition: opacity 0.8s ease, visibility 0s linear 0s; }
     
-    /* 1〜3画面目（分割スライド） */
+    .m-sequence { position: fixed; inset: 0; z-index: 9999; height: 100vh; height: 100dvh; background: #010411; }
+    .m-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; }
+    
     .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
     
@@ -329,66 +334,41 @@ function getThumbnail(content) {
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
     
-    /* ▼ 帯の背景色を白にし、上下幅を細く（padding縮小） ▼ */
+    /* ▼ 帯のグラデーション設定：始まりは不透明度0.95(5%透明)、文字終わり(75%)から0.15(85%透明)へ ▼ */
     .m-word-band { 
-      background: rgba(255, 255, 255, 1); 
       backdrop-filter: blur(2px); 
       width: 100%; 
-      padding: 4px 12px; 
+      padding: 6px 12px; 
       display: flex; 
       align-items: center; 
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
-
-    /* ▼ 上部画像：始まり(0%)は不透明度0.95、文字が終わる(75%)から不透明度0.1へフェードアウト ▼ */
+    
     .m-top-track .m-word-band { 
       justify-content: flex-start; 
       transform: translateX(-100%); 
-      -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 75%, rgba(0,0,0,0.1) 100%);
-      mask-image: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 75%, rgba(0,0,0,0.1) 100%);
+      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 75%, rgba(255,255,255,0.15) 100%);
     }
 
-    /* ▼ 下部画像：始まり(0%)は不透明度0.95、文字が終わる(75%)から不透明度0.1へフェードアウト ▼ */
     .m-bottom-track .m-word-band { 
       justify-content: flex-end; 
       transform: translateX(100%); 
-      -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 75%, rgba(0,0,0,0.1) 100%);
-      mask-image: linear-gradient(to left, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 75%, rgba(0,0,0,0.1) 100%);
+      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 75%, rgba(255,255,255,0.15) 100%);
     }
     
-    /* ▼ 文字サイズは1.1rem、文字間隔を限界まで狭く（-0.05em）して長さを抑える ▼ */
+    /* ▼ 文字サイズ1.1rem、文字間隔をギュッと狭く(-0.05em)してはみ出しを防止 ▼ */
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
     
-    /* ▼ 4〜6画面目：クロスフェード（フワッと入れ替わる）するためのCSSアニメーション設定 ▼ */
-    .m-brand-panel { 
-      position: absolute; inset: 0; z-index: 30; 
-      opacity: 0; visibility: hidden; pointer-events: none; 
-      transition: opacity 0.8s ease, visibility 0s linear 0.8s; 
-    }
-    .m-brand-panel.is-visible { 
-      opacity: 1; visibility: visible; pointer-events: auto; 
-      transition: opacity 0.8s ease, visibility 0s linear 0s; 
-    }
-    
-    .m-seq-panel { 
-      position: absolute; inset: 0; z-index: 40; 
-      opacity: 0; visibility: hidden; pointer-events: none; 
-      background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); 
-      display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; 
-      transition: opacity 0.8s ease, visibility 0s linear 0.8s; 
-    }
-    #m-screen-6 { z-index: 50; padding-bottom: 220px; } 
-    .m-seq-panel.is-visible { 
-      opacity: 1; visibility: visible; pointer-events: auto; 
-      transition: opacity 0.8s ease, visibility 0s linear 0s; 
-    }
-
-    .m-brand-night { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); }
-    .m-brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.8; transform: scale(1.05); transition: transform 3s ease; }
-    .m-brand-panel.is-visible .m-brand-bg { transform: scale(1); }
+    /* 画面4・5・6用の設定：スクロール可能にし、フェードインで表示させる */
+    .m-brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
+    .m-brand-panel.is-visible { visibility: visible; }
+    .m-brand-night { position: absolute; inset: 0; opacity: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); transition: opacity 0.6s ease; }
+    .m-brand-panel.is-night .m-brand-night { opacity: 1; }
+    .m-brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transform: scale(1.05); transition: all 1s ease; }
+    .m-brand-panel.is-bg .m-brand-bg { opacity: 0.8; transform: scale(1); }
     .m-brand-bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
     .m-brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 20px; }
     .m-brand-logo-img { width: 160px; height: auto; margin-bottom: 20px; filter: brightness(0) invert(1); }
@@ -405,8 +385,18 @@ function getThumbnail(content) {
     .m-text-anim-target.is-visible .m-anim-desc2 { transition-delay: 1.8s; }
     .m-text-anim-target.is-visible .m-anim-desc3 { transition-delay: 2.4s; }
     
-    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease 0.2s; }
+    /* ▼ 画面5と6は縦にスクロールできるように変更 ▼ */
+    .m-seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; overflow-y: auto; overflow-x: hidden; }
+    
+    .m-seq-panel.is-visible { visibility: visible; pointer-events: auto; }
+    
+    /* ▼ 画面の中身を中央や上詰めに配置する設定 ▼ */
+    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 40px; padding-bottom: 40px; }
     .m-seq-panel.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); }
+    
+    #m-screen-5 .m-seq-inner { justify-content: center; }
+    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 220px; } 
+
     .m-section-header { text-align: center; margin-bottom: 30px; }
     .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
     
@@ -462,12 +452,15 @@ function getThumbnail(content) {
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-    // 指でタッチする端末（スマホ）以外はプログラムを動かさない
     if (!window.matchMedia('(pointer: coarse)').matches) return;
 
     try {
       const HERO_ANIM_MS = 1200;
       const SWIPE_THRESHOLD = 40; 
+      
+      // ▼ PC版と全く同じ切り替えタイミング（ミリ秒）に統一 ▼
+      const MASK_IN_MS = 800;   
+      const MASK_UNLOCK_MS = 100;
 
       let currentStep = 0;
       let isAnimating = false;
@@ -475,8 +468,10 @@ function getThumbnail(content) {
 
       const body = document.body;
       const html = document.documentElement;
+      const sequence = document.getElementById('m-sequence');
       const brandPanel = document.getElementById('m-brand-panel');
       const brandTextTarget = document.getElementById('m-brand-text-target');
+      const transitionMask = document.getElementById('m-transition-mask');
       const screen5 = document.getElementById('m-screen-5');
       const screen6 = document.getElementById('m-screen-6');
       const dots = document.querySelectorAll('#m-scroll-indicator .m-dot');
@@ -500,7 +495,7 @@ function getThumbnail(content) {
       window.addEventListener('touchmove', (e) => {
         if (sideMenu?.classList.contains('is-open')) return;
         if (!e.target.closest('.m-carousel-container')) {
-          e.preventDefault();
+          e.preventDefault(); // カルーセル以外でのバネのようなスクロールを防止
         }
       }, { passive: false });
 
@@ -512,8 +507,20 @@ function getThumbnail(content) {
         const diffX = startX - endX;
         const diffY = startY - endY;
 
-        if (Math.abs(diffX) > Math.abs(diffY)) return;
+        if (Math.abs(diffX) > Math.abs(diffY)) return; // 横スワイプは無視
         if (isAnimating) return;
+
+        // フッター画面（screen-6）にいて、一番上にいる時に下へスワイプしたら戻る
+        const visiblePanel = document.querySelector('.m-seq-panel.is-visible');
+        if (visiblePanel) {
+            if (diffY < -SWIPE_THRESHOLD && visiblePanel.scrollTop <= 10) {
+               movePrev();
+            }
+            else if (diffY > SWIPE_THRESHOLD && visiblePanel.scrollTop + visiblePanel.clientHeight >= visiblePanel.scrollHeight - 10) {
+               moveNext();
+            }
+            return;
+        }
         
         if (diffY > SWIPE_THRESHOLD) moveNext();
         else if (diffY < -SWIPE_THRESHOLD) movePrev();
@@ -525,8 +532,96 @@ function getThumbnail(content) {
       }
       
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
+      
+      function showMask() { transitionMask?.classList.add('is-visible'); }
+      function hideMask() { transitionMask?.classList.remove('is-visible'); }
+      
+      function clearSectionVisibility() { 
+        screen5?.classList.remove('is-visible'); 
+        screen6?.classList.remove('is-visible'); 
+      }
+      function showSection(step) { 
+        clearSectionVisibility(); 
+        if (step === 4) screen5?.classList.add('is-visible'); 
+        if (step === 5) screen6?.classList.add('is-visible'); 
+      }
+      function resetBrandPanel() { 
+        brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); 
+        brandTextTarget?.classList.remove('is-visible'); 
+      }
+      
+      // ▼ PC版と全く同じ、完璧なバトンタッチプログラムの移植 ▼
+      function revealBrandImmediate() {
+        sequence?.classList.remove('is-hidden');
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
+        requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
+      }
 
-      // ▼ 新しい画面切り替えシステム（マスクを使わずCSSクロスフェードに任せる） ▼
+      function showBrandAnimated() {
+        sequence?.classList.remove('is-hidden');
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night');
+        window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, 700);
+        window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, 1350);
+        window.setTimeout(() => { isAnimating = false; }, 2300);
+      }
+
+      function activateHeroSlide(index) {
+        topPanels.forEach((panel) => panel.classList.remove('is-active'));
+        bottomPanels.forEach((panel) => panel.classList.remove('is-active'));
+        
+        if (index === 0) { 
+          if(topPanels[1]) topPanels[1].classList.remove('is-open'); 
+          if(bottomPanels[1]) bottomPanels[1].classList.remove('is-open'); 
+          if(topPanels[2]) topPanels[2].classList.remove('is-open'); 
+          if(bottomPanels[2]) bottomPanels[2].classList.remove('is-open'); 
+        }
+        else if (index === 1) { 
+          if(topPanels[1]) topPanels[1].classList.add('is-open'); 
+          if(bottomPanels[1]) bottomPanels[1].classList.add('is-open'); 
+          if(topPanels[2]) topPanels[2].classList.remove('is-open'); 
+          if(bottomPanels[2]) bottomPanels[2].classList.remove('is-open'); 
+        }
+        else if (index === 2) { 
+          if(topPanels[1]) topPanels[1].classList.add('is-open'); 
+          if(bottomPanels[1]) bottomPanels[1].classList.add('is-open'); 
+          if(topPanels[2]) topPanels[2].classList.add('is-open'); 
+          if(bottomPanels[2]) bottomPanels[2].classList.add('is-open'); 
+        }
+        
+        window.setTimeout(() => { 
+          if(topPanels[index]) topPanels[index].classList.add('is-active'); 
+          if(bottomPanels[index]) bottomPanels[index].classList.add('is-active'); 
+          isAnimating = false; 
+        }, HERO_ANIM_MS);
+      }
+
+      function transitionBrandToStories() {
+        showMask();
+        window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+
+      function transitionStoriesToBrand() {
+        showMask();
+        window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+
+      function transitionBetweenSections(targetStep) {
+        showMask();
+        window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+
+      function transitionBrandToHero() {
+        showMask();
+        window.setTimeout(() => {
+          resetBrandPanel(); 
+          clearSectionVisibility();
+          activateHeroSlide(2); 
+          hideMask();
+        }, MASK_IN_MS);
+      }
+
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
@@ -536,78 +631,28 @@ function getThumbnail(content) {
         isAnimating = true;
         updateIndicator(step);
 
-        // 4画面目〜最後（クロスフェードで切り替わるエリア）
-        if (step >= 3) {
-            
-            // 下の画面から上がってきた場合、裏にあるHeroスライドの準備をしておく
-            if (previousStep < 3) {
-                topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-                bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-                if (topPanels[1]) topPanels[1].classList.add('is-open');
-                if (bottomPanels[1]) bottomPanels[1].classList.add('is-open');
-                if (topPanels[2]) topPanels[2].classList.add('is-open', 'is-active');
-                if (bottomPanels[2]) bottomPanels[2].classList.add('is-open', 'is-active');
-                void document.body.offsetHeight;
-                topPanels.forEach(panel => { panel.style.transition = ''; });
-                bottomPanels.forEach(panel => { panel.style.transition = ''; });
-            }
-
-            // 行き先の画面を表示し、それ以外の画面を隠す
-            if (step === 3) {
-                brandPanel?.classList.add('is-visible');
-                brandTextTarget?.classList.add('is-visible');
-            } else {
-                brandPanel?.classList.remove('is-visible');
-            }
-
-            if (step === 4) screen5?.classList.add('is-visible');
-            else screen5?.classList.remove('is-visible');
-
-            if (step === 5) screen6?.classList.add('is-visible');
-            else screen6?.classList.remove('is-visible');
-
-            window.setTimeout(() => { isAnimating = false; }, 800);
-            return;
-        }
-
-        // 1〜3画面目（上下にスライドするエリア）
         if (step <= 2) {
-            // 上の画面から降りてきた場合、手前の画面をクロスフェードで消す
-            if (previousStep >= 3) {
-                brandPanel?.classList.remove('is-visible');
-                screen5?.classList.remove('is-visible');
-                screen6?.classList.remove('is-visible');
-
-                topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-                bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-
-                if (step >= 1) { topPanels[1]?.classList.add('is-open'); bottomPanels[1]?.classList.add('is-open'); }
-                if (step >= 2) { topPanels[2]?.classList.add('is-open'); bottomPanels[2]?.classList.add('is-open'); }
-                if (step >= 0) { topPanels[step]?.classList.add('is-active'); bottomPanels[step]?.classList.add('is-active'); }
-
-                void document.body.offsetHeight;
-                topPanels.forEach(panel => { panel.style.transition = ''; });
-                bottomPanels.forEach(panel => { panel.style.transition = ''; });
-
-                window.setTimeout(() => { isAnimating = false; }, 800);
-                return;
-            }
-
-            // 通常の上下スライドアニメーション
-            if (step > previousStep) { // 進む
-                if (step >= 1) { topPanels[step]?.classList.add('is-open'); bottomPanels[step]?.classList.add('is-open'); }
-                window.setTimeout(() => {
-                    topPanels[step]?.classList.add('is-active'); bottomPanels[step]?.classList.add('is-active');
-                    topPanels[previousStep]?.classList.remove('is-active'); bottomPanels[previousStep]?.classList.remove('is-active');
-                    isAnimating = false;
-                }, 800); 
-            } else { // 戻る（これで重ならずに綺麗に戻ります）
-                topPanels[previousStep]?.classList.remove('is-open', 'is-active');
-                bottomPanels[previousStep]?.classList.remove('is-open', 'is-active');
-                topPanels[step]?.classList.add('is-active'); bottomPanels[step]?.classList.add('is-active');
-                window.setTimeout(() => { isAnimating = false; }, 1200); 
-            }
+          setBodyLocked(true);
+          sequence?.classList.remove('is-hidden');
+          if (previousStep === 3 && step === 2) { transitionBrandToHero(); return; }
+          hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return;
         }
+
+        if (step === 3) {
+          setBodyLocked(true);
+          if (previousStep === 4) { transitionStoriesToBrand(); return; }
+          hideMask(); clearSectionVisibility(); sequence?.classList.remove('is-hidden');
+          if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } 
+          else { showBrandAnimated(); }
+          return;
+        }
+
+        if (step === 4 && previousStep === 3) { transitionBrandToStories(); return; }
+        if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return; }
+        if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; }
+
+        showSection(step);
+        window.setTimeout(() => { isAnimating = false; }, 300);
       }
 
       function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
@@ -641,7 +686,8 @@ function getThumbnail(content) {
       setupObserver('m-lang-carousel', '#m-lang-carousel .m-observer-card', 'm-lang-carousel-dots');
 
       setBodyLocked(true); 
-      updateIndicator(0);
+      if(sequence) sequence.classList.remove('is-hidden'); 
+      hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
       window.setTimeout(() => { 
         if(topPanels.length > 0) topPanels[0].classList.add('is-active'); 
         if(bottomPanels.length > 0) bottomPanels[0].classList.add('is-active'); 
