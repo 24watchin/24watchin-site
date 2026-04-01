@@ -1,0 +1,88 @@
+---
+// src/components/info/PrivacyBody.astro
+// このファイルが「正解」のデータになります。
+// ここを直せば、サイト内のすべてのプライバシーポリシーが一斉に変わります。
+---
+
+<div class="info-content-card">
+  <h1 id="info-title">Privacy Policy</h1>
+  <div id="info-body" class="info-body-text">
+    Loading...
+  </div>
+</div>
+
+<style>
+  /* サブディレクトリの info ページと完全に一致させたスタイル */
+  .info-content-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    min-height: 500px;
+  }
+  h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 4px solid var(--theme-color);
+    color: #1a1a1a;
+  }
+  .info-body-text {
+    line-height: 1.8;
+    color: #444;
+    white-space: pre-wrap; /* 改行を有効にします */
+  }
+  
+  /* スマホ用の微調整 */
+  @media (max-width: 640px) {
+    .info-content-card {
+      padding: 25px 15px;
+    }
+    h1 {
+      font-size: 1.4rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    // ▼ ここに各言語の文章をまとめて管理します
+    const translations = {
+      ja: {
+        title: 'プライバシーポリシー',
+        body: 'ここに日本語のプライバシーポリシーの文章を記述します...',
+        theme: '#872732'
+      },
+      en: {
+        title: 'Privacy Policy',
+        body: 'Write your English privacy policy text here...',
+        theme: '#0033a0'
+      },
+      'zh-cn': {
+        title: '隐私政策',
+        body: '在此处编写中文隐私政策文本...',
+        theme: '#e60012'
+      },
+      // ...他の言語も同様に追加可能です
+    };
+
+    // ブラウザの言語を取得
+    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+    
+    // 翻訳がある言語ならそれを、なければ英語をデフォルトにします
+    const lang = translations[browserLang] ? browserLang : 'en';
+    const t = translations[lang];
+
+    // 画面の表示を書き換え
+    document.title = t.title + ' | 24Watchin';
+    const titleEl = document.getElementById('info-title');
+    const bodyEl = document.getElementById('info-body');
+    
+    if (titleEl) titleEl.textContent = t.title;
+    if (bodyEl) bodyEl.textContent = t.body;
+
+    // テーマカラー（赤や青など）も言語に合わせて自動変更
+    document.body.style.setProperty('--theme-color', t.theme);
+  })();
+</script>
