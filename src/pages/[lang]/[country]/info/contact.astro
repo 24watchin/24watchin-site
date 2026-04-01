@@ -1,100 +1,27 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
-import Breadcrumb from '../../../../components/Breadcrumb.astro';
-import { categoryLabelMap } from '../../../../lib/categoryLabels.ts';
-import { contactData } from '../../../../lib/info/contactData.ts';
-// ▼ カンペ（siteRoutes）を読み込む
-import { langCountryPairs } from '../../../../lib/siteRoutes.ts';
+import ContactBody from '../../../../components/info/ContactBody.astro';
+import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
 
 export async function getStaticPaths() {
   return langCountryPairs.map(({ lang, country }) => ({ params: { lang, country } }));
 }
 
-const { lang, country } = Astro.params;
-const tx = contactData[lang as keyof typeof contactData] || contactData['en'];
+const { lang } = Astro.params;
+const API_KEY = import.meta.env.API_KEY;
+const BLOG_ID = getBlogId(lang);
 
-const langKeyMap: Record<string, keyof typeof categoryLabelMap> = {
-  ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
-};
-const langKey = langKeyMap[lang as keyof typeof langKeyMap] || 'jp';
-const themeData = categoryLabelMap[langKey] || categoryLabelMap['jp'];
-const themeColor = themeData.themeColor;
+if (!globalThis.bloggerApiCache) { globalThis.bloggerApiCache = {}; }
+let allPosts = [];
+if (API_KEY && BLOG_ID) {
+  if (!globalThis.bloggerApiCache[BLOG_ID]) {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10`;
+    globalThis.bloggerApiCache[BLOG_ID] = fetch(url).then(res => res.ok ? res.json() : null).then(data => data?.items || []).catch(() => []);
+  }
+  allPosts = await globalThis.bloggerApiCache[BLOG_ID];
+}
 ---
 
-<Layout title={tx.title} description={tx.description} sidebarType="article">
-  <Breadcrumb lang={lang} country={country} categoryLabel={tx.title} />
-  
-  <div class="info-container">
-    <h1 class="info-title">{tx.title}</h1>
-    <div class="info-content">
-      <p>{tx.intro1}</p>
-      <p>{tx.intro2}</p>
-      <section>
-        <h2>{tx.beforeTitle}</h2>
-        <ul>
-          <li>{tx.before1}</li>
-          <li>{tx.before2}</li>
-          <li>{tx.before3}</li>
-          <li>{tx.before4}</li>
-        </ul>
-      </section>
-      <section>
-        <h2>{tx.privacyTitle}</h2>
-        <p>{tx.privacyText} <a href={`/${lang}/${country}/info/privacy/`}>{tx.privacyLink}</a>{tx.privacyEnd}</p>
-      </section>
-      <section>
-        <h2>{tx.formTitle}</h2>
-        <div id="form-success" class="form-success" style="display:none;"><p>✅ {tx.successTitle}</p><p>{tx.successText}</p></div>
-        <div id="form-error" class="form-error" style="display:none;"><p>⚠️ {tx.errorText}</p></div>
-        <form id="contact-form" class="contact-form">
-          <div class="form-group"><label class="form-label">{tx.typeLabel} <span class="required">{tx.required}</span></label><select name="type" required class="form-select"><option value="">{tx.typePlaceholder}</option>{tx.typeOptions.map((opt: string) => (<option value={opt}>{opt}</option>))}</select></div>
-          <div class="form-group"><label class="form-label">{tx.nameLabel} <span class="required">{tx.required}</span></label><input type="text" name="name" required placeholder={tx.namePlaceholder} class="form-input" /></div>
-          <div class="form-group"><label class="form-label">{tx.emailLabel} <span class="required">{tx.required}</span></label><input type="email" name="email" required placeholder={tx.emailPlaceholder} class="form-input" /></div>
-          <div class="form-group"><label class="form-label">{tx.companyLabel} <span class="optional">{tx.optional}</span></label><input type="text" name="company" placeholder={tx.companyPlaceholder} class="form-input" /></div>
-          <div class="form-group"><label class="form-label">{tx.subjectLabel} <span class="required">{tx.required}</span></label><input type="text" name="subject" required placeholder={tx.subjectPlaceholder} class="form-input" /></div>
-          <div class="form-group"><label class="form-label">{tx.urlLabel} <span class="optional">{tx.optional}</span></label><input type="url" name="pageUrl" placeholder={tx.urlPlaceholder} class="form-input" /><p class="form-note">{tx.urlNote}</p></div>
-          <div class="form-group"><label class="form-label">{tx.messageLabel} <span class="required">{tx.required}</span></label><textarea name="message" required rows={6} placeholder={tx.messagePlaceholder} class="form-textarea"></textarea></div>
-          <div class="form-group"><label class="form-checkbox"><input type="checkbox" name="agreement" required /><span>{tx.agreementText}</span></label></div>
-          <div class="form-submit"><button type="submit" class="submit-btn" id="submit-btn" data-send={tx.submitBtn} data-sending={tx.sending}>{tx.submitBtn}</button></div>
-        </form>
-      </section>
-    </div>
-  </div>
+<Layout title="Contact Us" allPosts={allPosts}>
+  <ContactBody />
 </Layout>
-
-<script>
-  const form = document.getElementById('contact-form') as HTMLFormElement;
-  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-  const successMsg = document.getElementById('form-success') as HTMLDivElement;
-  const errorMsg = document.getElementById('form-error') as HTMLDivElement;
-  const sendLabel = submitBtn.dataset.send || 'Send';
-  const sendingLabel = submitBtn.dataset.sending || 'Sending...';
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    submitBtn.disabled = true; submitBtn.textContent = sendingLabel;
-    successMsg.style.display = 'none'; errorMsg.style.display = 'none';
-    const formData = new FormData(form); const data = Object.fromEntries(formData.entries());
-    try {
-      const response = await fetch('https://contact-form.24watchin-news.workers.dev/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (response.ok) { form.reset(); successMsg.style.display = 'block'; successMsg.scrollIntoView({ behavior: 'smooth' }); } else { errorMsg.style.display = 'block'; }
-    } catch (error) { errorMsg.style.display = 'block'; } finally { submitBtn.disabled = false; submitBtn.textContent = sendLabel; }
-  });
-</script>
-
-<style define:vars={{ themeColor }}>
-  .info-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  .info-title { font-size: 26px; color: #1a1a1a; margin: 0 0 24px; padding-bottom: 12px; border-bottom: 3px solid var(--themeColor); }
-  .info-content section { margin-bottom: 32px; }
-  .info-content h2 { font-size: 18px; color: #1a1a1a; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--themeColor); }
-  .info-content p, .info-content ul { font-size: 15px; line-height: 1.9; color: #333; margin-bottom: 12px; }
-  .info-content a { color: var(--themeColor); text-decoration: underline; }
-  .contact-form { display: flex; flex-direction: column; gap: 20px; }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-label { font-size: 14px; font-weight: bold; }
-  .required { background: var(--themeColor); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; }
-  .form-input, .form-select, .form-textarea { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; width: 100%; box-sizing: border-box; }
-  .submit-btn { background: var(--themeColor); color: #fff; border: none; padding: 14px 48px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-  .form-success { background: #f0fdf4; border: 1px solid #86efac; padding: 16px; margin-bottom: 20px; }
-  @media (max-width: 600px) { .info-container { padding: 20px 16px; } .submit-btn { width: 100%; } }
-</style>
-
