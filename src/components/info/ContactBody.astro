@@ -1,5 +1,7 @@
 ---
 // src/components/info/ContactBody.astro
+// 「お問い合わせ」の内容が書かれたデータファイルを読み込みます
+import { contactData } from '../../lib/info/contactData.ts';
 ---
 
 <div class="info-content-card">
@@ -10,38 +12,69 @@
 </div>
 
 <style>
-  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
-  h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
-  .info-body-text { line-height: 1.8; color: #444; white-space: pre-wrap; }
-  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } h1 { font-size: 1.4rem; } }
+  .info-content-card { 
+    background: #fff; 
+    padding: 40px; 
+    border-radius: 8px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    min-height: 500px; 
+  }
+  
+  /* 大見出し：24px (Aboutページと統一) */
+  h1 { 
+    font-size: 24px; 
+    font-weight: bold; 
+    margin-bottom: 30px; 
+    padding-bottom: 15px; 
+    border-bottom: 4px solid var(--theme-color); 
+    color: #1a1a1a; 
+  }
+  
+  /* ★パソコン版の本文：16px に設定 */
+  .info-body-text { 
+    font-size: 16px; 
+    line-height: 1.8; 
+    color: #444; 
+  }
+  
+  /* 中見出し：20px */
+  .info-body-text :global(h2) { 
+    font-size: 20px; 
+    margin-top: 30px; 
+    border-left: 4px solid var(--theme-color); 
+    padding-left: 10px; 
+  }
+  
+  .info-body-text :global(section) { margin-bottom: 30px; }
+  .info-body-text :global(table.info-table) { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 16px; }
+  .info-body-text :global(th), .info-body-text :global(td) { border: 1px solid #ddd; padding: 12px; }
+  .info-body-text :global(th) { background-color: #f8f9fa; width: 30%; text-align: left; }
+  
+  /* スマホ表示時の調整 */
+  @media (max-width: 640px) { 
+    .info-content-card { padding: 25px 15px; } 
+    h1 { font-size: 22px; } 
+    /* スマホ版はご希望に合わせて 18px を維持 */
+    .info-body-text { font-size: 18px; }
+    .info-body-text :global(h2) { font-size: 20px; }
+  }
 </style>
 
-<script is:inline>
+<script define:vars={{ pageData: contactData }}>
   (function() {
-    const translations = {
-      ja: {
-        title: 'お問い合わせ',
-        body: 'ご意見、ご質問などがございましたら、以下のメールアドレスまでお問い合わせください。\n\nEmail: 24watchin.info@gmail.com',
-        theme: '#872732'
-      },
-      en: {
-        title: 'Contact Us',
-        body: 'If you have any questions or feedback, please contact us at the following email address.\n\nEmail: 24watchin.info@gmail.com',
-        theme: '#0033a0'
-      },
-      'zh-cn': {
-        title: '联系我们',
-        body: '如果您有任何问题或建议，请通过以下电子邮件地址与我们联系。\n\n电子邮箱: 24watchin.info@gmail.com',
-        theme: '#e60012'
-      }
+    const themeColors = {
+      ja: '#872732', en: '#0033a0', 'zh-cn': '#e60012', 'zh-tw': '#000095',
+      es: '#aa151b', de: '#000000', fr: '#002395', ru: '#d52b1e'
     };
+
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    const lang = translations[browserLang] ? browserLang : 'en';
-    const t = translations[lang];
+    const lang = pageData[browserLang] ? browserLang : 'ja'; 
+    const t = pageData[lang];
+    const theme = themeColors[lang] || '#872732';
+
     document.title = t.title + ' | 24Watchin';
     document.getElementById('info-title').textContent = t.title;
-    document.getElementById('info-body').textContent = t.body;
-    document.body.style.setProperty('--theme-color', t.theme);
+    document.getElementById('info-body').innerHTML = t.content;
+    document.body.style.setProperty('--theme-color', theme);
   })();
 </script>
-
