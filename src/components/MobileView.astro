@@ -93,7 +93,6 @@ function getThumbnail(content) {
 
   <div class="m-sequence" id="m-sequence">
     <div class="m-split-stage">
-      
       <div class="m-top-track">
         <div class="m-panel m-p1">
           <div class="m-bg-layer" style="background-image: url('/images/conflict.jpg');"></div>
@@ -272,12 +271,10 @@ function getThumbnail(content) {
 </div>
 
 <style>
-  /* ▼ 画面幅に関わらず、PCなどのマウス操作端末ではスマホ版を完全に隠す ▼ */
   @media (hover: hover), (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
 
-  /* ▼ 指でタッチする実際のスマホの時だけ適用されるバリア ▼ */
   @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
@@ -288,9 +285,7 @@ function getThumbnail(content) {
       background: #010411;
     }
     
-    html.m-is-locked, body.m-is-locked {
-      overflow: hidden !important;
-    }
+    html.m-is-locked, body.m-is-locked { overflow: hidden !important; }
     
     .m-global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 10000; pointer-events: none; }
     .m-header-band { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
@@ -312,8 +307,9 @@ function getThumbnail(content) {
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    .m-transition-mask { position: fixed; inset: 0; z-index: 10050; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease; }
-    .m-transition-mask.is-visible { opacity: 1; visibility: visible; }
+    /* ▼ 黒マスクのフェードバグを修正：visibility のタイミングを正しく設定 ▼ */
+    .m-transition-mask { position: fixed; inset: 0; z-index: 10050; opacity: 0; visibility: hidden; pointer-events: none; background: #010411; transition: opacity 0.6s ease, visibility 0s linear 0.6s; }
+    .m-transition-mask.is-visible { opacity: 1; visibility: visible; transition: opacity 0.6s ease, visibility 0s linear 0s; }
     
     .m-sequence { position: fixed; inset: 0; z-index: 9999; opacity: 1; visibility: visible; height: 100vh; height: 100dvh; }
     .m-sequence.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; }
@@ -334,34 +330,40 @@ function getThumbnail(content) {
     
     .m-panel.is-open { clip-path: inset(0 0 0 0) !important; -webkit-clip-path: inset(0 0 0 0) !important; }
     
-    /* ▼ 帯を「画面の半分（width: 50%）」に変更し、位置を下寄りに設定 ▼ */
+    /* ▼ 帯の幅を画面の半分（50%）に固定 ▼ */
     .m-word-band-container { position: absolute; top: 65%; width: 50%; z-index: 10; overflow: hidden; }
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
     
-    /* ▼ 帯の透明度を上げ（0.15）、幅を細く（paddingを縮小） ▼ */
+    /* ▼ 帯を細くし、透明度を上げた基本設定 ▼ */
     .m-word-band { 
-      background: rgba(255, 255, 255, 0.15); 
-      backdrop-filter: blur(4px); 
+      background: rgba(255, 255, 255, 0.1); 
+      backdrop-filter: blur(2px); 
       width: 100%; 
       padding: 6px 12px; 
       display: flex; 
       align-items: center; 
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
-    .m-top-track .m-word-band { justify-content: flex-start; transform: translateX(-100%); }
-    .m-bottom-track .m-word-band { justify-content: flex-end; transform: translateX(100%); }
-    
-    /* ▼ 文字サイズはそのまま（1.1rem）で、文字の間隔（letter-spacing）をギュッと狭く ▼ */
-    .m-word-band h2 { 
-      color: #000; 
-      font-weight: 600; 
-      font-size: 1.1rem; 
-      letter-spacing: 0.02em; 
-      margin: 0; 
-      opacity: 0; 
-      transition: opacity 0.3s ease; 
+
+    /* ▼ 上部画像（左側50%）：中央に向かって透明に消えていくグラデーション ▼ */
+    .m-top-track .m-word-band { 
+      justify-content: flex-start; 
+      transform: translateX(-100%); 
+      -webkit-mask-image: linear-gradient(to right, black 0%, transparent 100%);
+      mask-image: linear-gradient(to right, black 0%, transparent 100%);
     }
+
+    /* ▼ 下部画像（右側50%）：中央に向かって透明に消えていくグラデーション ▼ */
+    .m-bottom-track .m-word-band { 
+      justify-content: flex-end; 
+      transform: translateX(100%); 
+      -webkit-mask-image: linear-gradient(to left, black 0%, transparent 100%);
+      mask-image: linear-gradient(to left, black 0%, transparent 100%);
+    }
+    
+    /* ▼ 文字サイズは1.1rem、文字間隔をギュッと狭く（0.05em）して長さを抑える ▼ */
+    .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
@@ -456,7 +458,6 @@ function getThumbnail(content) {
 
       let currentStep = 0;
       let isAnimating = false;
-      let isFreeScroll = false;
       let startX = 0, startY = 0, endX = 0, endY = 0;
 
       const body = document.body;
@@ -486,7 +487,7 @@ function getThumbnail(content) {
       }, { passive: true });
 
       window.addEventListener('touchmove', (e) => {
-        if (sideMenu?.classList.contains('is-open') || isFreeScroll) return;
+        if (sideMenu?.classList.contains('is-open')) return;
         if (!e.target.closest('.m-carousel-container')) {
           e.preventDefault();
         }
@@ -502,13 +503,6 @@ function getThumbnail(content) {
 
         if (Math.abs(diffX) > Math.abs(diffY)) return;
 
-        if (isFreeScroll) {
-          if (diffY < -SWIPE_THRESHOLD && window.scrollY <= 10) {
-             leaveFooterMode();
-          }
-          return;
-        }
-
         if (isAnimating) return;
         
         if (diffY > SWIPE_THRESHOLD) moveNext();
@@ -521,19 +515,24 @@ function getThumbnail(content) {
       }
       
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
+      
       function showMask() { transitionMask?.classList.add('is-visible'); }
       function hideMask() { transitionMask?.classList.remove('is-visible'); }
-      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
-      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible'); }
-      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible'); }
       
-      function revealBrandImmediate() {
-        sequence?.classList.remove('is-hidden');
-        resetBrandPanel();
-        brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
-        requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
+      function clearSectionVisibility() { 
+        screen5?.classList.remove('is-visible'); 
+        screen6?.classList.remove('is-visible'); 
       }
-
+      function showSection(step) { 
+        clearSectionVisibility(); 
+        if (step === 4) screen5?.classList.add('is-visible'); 
+        if (step === 5) screen6?.classList.add('is-visible'); 
+      }
+      function resetBrandPanel() { 
+        brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); 
+        brandTextTarget?.classList.remove('is-visible'); 
+      }
+      
       function showBrandAnimated() {
         sequence?.classList.remove('is-hidden');
         resetBrandPanel();
@@ -541,12 +540,6 @@ function getThumbnail(content) {
         window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, 500);
         window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, 1000);
         window.setTimeout(() => { isAnimating = false; }, 1800);
-      }
-
-      function hideBrandAnimated() {
-        brandTextTarget?.classList.remove('is-visible');
-        brandPanel?.classList.remove('is-bg', 'is-night');
-        window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, 600);
       }
 
       function activateHeroSlide(index) {
@@ -563,31 +556,6 @@ function getThumbnail(content) {
         }, HERO_ANIM_MS);
       }
 
-      function transitionBrandToStories() {
-        showMask();
-        window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 800);
-      }
-
-      function transitionStoriesToBrand() {
-        showMask();
-        window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 800);
-      }
-
-      function transitionBetweenSections(targetStep) {
-        showMask();
-        window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 800);
-      }
-
-      function transitionBrandToHero() {
-        showMask();
-        window.setTimeout(() => {
-          resetBrandPanel(); 
-          clearSectionVisibility();
-          activateHeroSlide(2); 
-          hideMask();
-        }, 800);
-      }
-
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
@@ -597,78 +565,79 @@ function getThumbnail(content) {
         isAnimating = true;
         updateIndicator(step);
 
+        // ▼ 全ての「戻る（上る）」操作は、黒いフェードで完全に隠してから一瞬で切り替える ▼
+        if (previousStep > step) {
+           showMask();
+           window.setTimeout(() => {
+              resetBrandPanel();
+              clearSectionVisibility();
+              
+              // CSSアニメーションを一時的に停止して、裏で一瞬で画像を切り替える
+              topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
+              bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
+              
+              if (step <= 2) {
+                  sequence?.classList.remove('is-hidden');
+                  if (step >= 1) { topPanels[1]?.classList.add('is-open', 'is-active'); bottomPanels[1]?.classList.add('is-open', 'is-active'); }
+                  if (step >= 2) { topPanels[2]?.classList.add('is-open', 'is-active'); bottomPanels[2]?.classList.add('is-open', 'is-active'); }
+                  if (step >= 0) { topPanels[0]?.classList.add('is-active'); bottomPanels[0]?.classList.add('is-active'); }
+              }
+              if (step === 3) {
+                  sequence?.classList.remove('is-hidden');
+                  brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
+                  brandTextTarget?.classList.add('is-visible');
+                  // ブランドパネルの裏にあるHero画像も準備しておく
+                  if (topPanels[2]) topPanels[2].classList.add('is-open', 'is-active');
+                  if (bottomPanels[2]) bottomPanels[2].classList.add('is-open', 'is-active');
+              }
+              if (step === 4) { screen5?.classList.add('is-visible'); sequence?.classList.add('is-hidden'); }
+              if (step === 5) { screen6?.classList.add('is-visible'); sequence?.classList.add('is-hidden'); }
+
+              // 切り替えを確定させるためのおまじない（強制リフロー）
+              void document.body.offsetHeight;
+
+              // アニメーション設定を元に戻す
+              topPanels.forEach(panel => { panel.style.transition = ''; });
+              bottomPanels.forEach(panel => { panel.style.transition = ''; });
+
+              // フェード解除
+              hideMask();
+              window.setTimeout(() => { isAnimating = false; }, 600); // 画面が明るくなるまで待つ
+           }, 600); // 画面が完全に暗くなるまで待つ
+           return;
+        }
+
+        // ▼ 以降は「進む（下る）」操作の処理 ▼
         if (step <= 2) {
           setBodyLocked(true);
           sequence?.classList.remove('is-hidden');
           window.scrollTo(0,0);
-
-          // ▼ 戻り（上り）の時だけ、黒いフェードを挟んで裏側で画像を切り替える（重なり防止） ▼
-          if (previousStep > step) {
-             showMask();
-             window.setTimeout(() => {
-                resetBrandPanel();
-                clearSectionVisibility();
-
-                // 裏側で一瞬で画像を切り替える
-                topPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-                bottomPanels.forEach(panel => { panel.style.transition = 'none'; panel.classList.remove('is-active', 'is-open'); });
-
-                if (step >= 1) { topPanels[1]?.classList.add('is-open', 'is-active'); bottomPanels[1]?.classList.add('is-open', 'is-active'); }
-                if (step >= 2) { topPanels[2]?.classList.add('is-open', 'is-active'); bottomPanels[2]?.classList.add('is-open', 'is-active'); }
-                if (step >= 0) { topPanels[0]?.classList.add('is-active'); bottomPanels[0]?.classList.add('is-active'); }
-
-                // 少し待ってから元の設定に戻し、黒いフェードを解除する
-                window.setTimeout(() => {
-                  topPanels.forEach(panel => { panel.style.transition = ''; });
-                  bottomPanels.forEach(panel => { panel.style.transition = ''; });
-                  hideMask();
-                  window.setTimeout(() => { isAnimating = false; }, 400);
-                }, 50);
-             }, 600);
-             return;
-          }
-
           hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return;
         }
 
         if (step === 3) {
           setBodyLocked(true);
           window.scrollTo(0,0);
-          if (previousStep === 4) { 
-            showMask(); window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, 100); }, 600); return; 
-          }
           hideMask(); clearSectionVisibility(); sequence?.classList.remove('is-hidden');
-          if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 100); } 
-          else { showBrandAnimated(); }
+          showBrandAnimated();
           return;
         }
 
-        showMask();
-        window.setTimeout(() => {
-          showSection(step);
-          hideMask();
-          window.setTimeout(() => { isAnimating = false; }, 100);
-        }, 600);
+        // ニュース(4) または フッター(5) へ進む場合も、進む時専用のフェードを挟む
+        if (step === 4 || step === 5) {
+          showMask();
+          window.setTimeout(() => {
+            sequence?.classList.add('is-hidden');
+            showSection(step);
+            hideMask();
+            window.setTimeout(() => { isAnimating = false; }, 600);
+          }, 600);
+          return;
+        }
       }
 
-      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } else { enterFooterMode(); } }
+      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
       function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
-
-      function enterFooterMode() { 
-        if (isAnimating) return; 
-        isAnimating = true; 
-        isFreeScroll = true; 
-        setBodyLocked(false); 
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
-        window.setTimeout(() => { isAnimating = false; }, 500); 
-      }
-      
-      function leaveFooterMode() { 
-        if (isAnimating) return; 
-        isAnimating = true; 
-        window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        window.setTimeout(() => { isFreeScroll = false; setBodyLocked(true); goToStep(5); isAnimating = false; }, 400); 
-      }
 
       function setupObserver(containerId, cardsClass, dotsId) {
         const container = document.getElementById(containerId);
