@@ -158,7 +158,9 @@ function getThumbnail(content) {
               const countryTag = post.labels.find(l => l.startsWith('en-'));
               if (countryTag) {
                 countryCode = countryTag.replace('en-', '');
-                if (countryNameMap[countryCode]) { countryName = countryNameMap[countryCode]; }
+                if (countryNameMap[countryCode]) {
+                  countryName = countryNameMap[countryCode];
+                }
               }
               const foundCat = enCategories.find(cat => 
                 post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
@@ -260,12 +262,10 @@ function getThumbnail(content) {
 </div>
 
 <style>
-  /* 画面幅に関わらず、PCなどのマウス操作端末ではスマホ版を完全に隠す */
   @media (hover: hover), (min-width: 769px) {
     .m-wrapper { display: none !important; }
   }
 
-  /* 指でタッチする実際のスマホの時だけ適用される設定 */
   @media (max-width: 768px) and (pointer: coarse) {
     .m-wrapper {
       display: block;
@@ -273,12 +273,11 @@ function getThumbnail(content) {
       user-select: none;
     }
 
-    /* ▼ PC版を完全に封じ込める絶対的な壁 ▼ */
     .m-desktop-blocker {
       position: fixed;
       inset: 0;
       background: #010411;
-      z-index: 9998; /* PC版の要素より確実に上に配置 */
+      z-index: 9998; 
       pointer-events: all;
     }
     
@@ -304,7 +303,6 @@ function getThumbnail(content) {
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    /* ▼ スライドの重なりを完全防止！すべての画面を完全に独立した箱として扱い、CSSでクロスフェードさせる ▼ */
     .m-step-target {
       position: fixed;
       inset: 0;
@@ -312,7 +310,6 @@ function getThumbnail(content) {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-      /* 消える時は0.8秒かけてフワッと消える */
       transition: opacity 0.8s ease, visibility 0s linear 0.8s;
     }
     .m-step-target.is-visible {
@@ -320,15 +317,12 @@ function getThumbnail(content) {
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
-      /* 現れる時は0.8秒かけてフワッと現れる */
       transition: opacity 0.8s ease, visibility 0s linear 0s;
     }
 
-    /* 画面1〜3（上下分割） */
     .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
     
-    /* 画面1〜3もフワッと切り替わるように設定 */
     .m-panel { 
       position: absolute; inset: 0; overflow: hidden; 
       opacity: 0; visibility: hidden; 
@@ -341,14 +335,11 @@ function getThumbnail(content) {
     
     .m-bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
     
-    /* ▼ 帯の幅を画面の半分（50%）に固定 ▼ */
     .m-word-band-container { position: absolute; top: 65%; width: 50%; z-index: 10; overflow: hidden; }
     .m-top-track .m-word-band-container { left: 0; }
     .m-bottom-track .m-word-band-container { right: 0; }
     
-    /* ▼ 帯のベース設定：不透明度0.95（5%透明）の白 ▼ */
     .m-word-band { 
-      background: rgba(255, 255, 255, 0.95); 
       backdrop-filter: blur(2px); 
       width: 100%; 
       padding: 6px 12px; 
@@ -357,29 +348,24 @@ function getThumbnail(content) {
       transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
     }
     
-    /* ▼ 上部画像：始まりはそのまま(0.95)、文字終わり(75%)から透明(0.15)へ抜けるグラデーション ▼ */
+    /* ▼ グラデーション調整：15%まで0.95をキープし、徐々に透明度を変えて最後は0.15に ▼ */
     .m-top-track .m-word-band { 
       justify-content: flex-start; 
       transform: translateX(-100%); 
-      -webkit-mask-image: linear-gradient(to right, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
-      mask-image: linear-gradient(to right, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
+      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.15) 100%);
     }
 
-    /* ▼ 下部画像：始まりはそのまま(0.95)、文字終わり(75%)から透明(0.15)へ抜けるグラデーション ▼ */
     .m-bottom-track .m-word-band { 
       justify-content: flex-end; 
       transform: translateX(100%); 
-      -webkit-mask-image: linear-gradient(to left, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
-      mask-image: linear-gradient(to left, black 0%, black 75%, rgba(0,0,0,0.15) 100%);
+      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.15) 100%);
     }
     
-    /* ▼ 文字間隔を限界まで狭く(-0.05em)してはみ出しを防止 ▼ */
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; }
     
     .m-panel.is-active .m-word-band { transform: translateX(0); }
     .m-panel.is-active .m-word-band h2 { opacity: 1; transition: opacity 0.8s ease 0.6s; }
     
-    /* 画面4：ブランドパネル */
     .m-brand-night { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(5, 12, 32, 0.9) 0%, rgba(3, 7, 20, 1) 100%); transition: opacity 0.6s ease; }
     .m-brand-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.8; transform: scale(1.05); transition: all 1s ease; }
     .m-brand-panel.is-visible .m-brand-bg { transform: scale(1); }
@@ -399,14 +385,15 @@ function getThumbnail(content) {
     .m-step-target.is-visible .m-anim-desc2 { transition-delay: 1.2s; }
     .m-step-target.is-visible .m-anim-desc3 { transition-delay: 1.6s; }
     
-    /* 画面5と6 */
     .m-seq-panel { background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); overflow-y: auto; overflow-x: hidden; }
     
     .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; padding-bottom: 80px; }
     .m-step-target.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
     
     #m-screen-5 .m-seq-inner { justify-content: center; }
-    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 220px; } 
+    
+    /* ▼ 画面6のフッターと重ならないように余白（padding-bottom）をさらに広げました ▼ */
+    #m-screen-6 .m-seq-inner { justify-content: flex-start; padding-bottom: 300px; } 
 
     .m-section-header { text-align: center; margin-bottom: 30px; }
     .m-section-header h2 { font-size: 12px; letter-spacing: 2px; color: #888; }
@@ -538,7 +525,6 @@ function getThumbnail(content) {
       
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
       
-      // ▼ 全ての画面移動を統括する完璧なフェードプログラム ▼
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
@@ -546,17 +532,14 @@ function getThumbnail(content) {
         currentStep = step;
         updateIndicator(step);
 
-        // まず、大枠となるすべての画面（1〜6）をCSSの力でフェードアウトして隠す
         stageHero?.classList.remove('is-visible');
         brandPanel?.classList.remove('is-visible');
         screen5?.classList.remove('is-visible');
         screen6?.classList.remove('is-visible');
 
-        // 画面1〜3（上下分割）の中のパネルもすべてフェードアウトさせる
         topPanels.forEach(p => p.classList.remove('is-active'));
         bottomPanels.forEach(p => p.classList.remove('is-active'));
 
-        // 次に、行きたい画面だけをフェードインさせて表示する
         if (step <= 2) {
             stageHero?.classList.add('is-visible');
             if (topPanels[step]) topPanels[step].classList.add('is-active');
@@ -565,13 +548,12 @@ function getThumbnail(content) {
             brandPanel?.classList.add('is-visible');
         } else if (step === 4) {
             screen5?.classList.add('is-visible');
-            screen5.scrollTop = 0; // スクロール位置を一番上に戻しておく
+            screen5.scrollTop = 0; 
         } else if (step === 5) {
             screen6?.classList.add('is-visible');
-            screen6.scrollTop = 0; // スクロール位置を一番上に戻しておく
+            screen6.scrollTop = 0; 
         }
 
-        // アニメーションが完全に終わる（0.8秒）まで次の操作をロックする
         window.setTimeout(() => { isAnimating = false; }, 850);
       }
 
