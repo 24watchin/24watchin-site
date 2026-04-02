@@ -44,14 +44,8 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
-	/* メニューなどの基本サイズを元の大きめ(20px)に戻しました */
 	font-size: 20px;
 	line-height: 1.7;
-}
-
-/* ★追加：記事やAboutページが入るメインエリアだけを16pxにします */
-.content-area {
-	font-size: 16px;
 }
 
 main {
@@ -170,12 +164,7 @@ hr {
 
 @media (max-width: 720px) {
 	body {
-		/* スマホ版は元の 18px を維持します */
 		font-size: 18px;
-	}
-	/* スマホではメインエリアも body に合わせます */
-	.content-area {
-		font-size: inherit;
 	}
 
 	main {
