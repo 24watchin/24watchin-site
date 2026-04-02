@@ -25,7 +25,7 @@ export const en = {
     'Other'
   ],
   nameLabel: 'Name',
-  namePlaceholder: 'Example: Taro Yamada',
+  namePlaceholder: 'Example: John Smith',
   emailLabel: 'Contact Email Address',
   emailPlaceholder: 'Example: example@email.com',
   companyLabel: 'Company / Organization Name',
