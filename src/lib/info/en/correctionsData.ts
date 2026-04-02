@@ -80,7 +80,7 @@ export const en = {
       <h2>9. Contact Desk</h2>
       <table class="info-table">
         <tr><th>Operator</th><td>The Dexent Media Enterprises</td></tr>
-        <tr><th>Contact</th><td><a href="/en/us/info/contact/">Click here for the contact form</a></td></tr>
+        <tr><th>Contact</th><td><a href="../contact/">Click here for the contact form</a></td></tr>
       </table>
     </section>
   `
