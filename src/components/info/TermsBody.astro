@@ -1,17 +1,23 @@
 ---
 // src/components/info/TermsBody.astro
-// 直接「jaフォルダ」のデータを取りに行くシンプルで確実な仕組みにします
 import { ja } from '../../lib/info/ja/termsData.ts';
+import { en } from '../../lib/info/en/termsData.ts';
 
-// 日本語ページのテーマカラー
-const themeColor = '#872732';
+// 現在のURLから「ja」か「en」かを自動判別します
+const { pathname } = Astro.url;
+const isEnglish = pathname.startsWith('/en/');
+
+// URLに応じてデータを切り替え
+const data = isEnglish ? en : ja;
+// URLに応じてテーマカラーを切り替え（日本語：赤、英語：青）
+const themeColor = isEnglish ? '#0033a0' : '#872732';
 ---
 
 <div class="info-content-card">
-  <h1 id="info-title">{ja.title}</h1>
-  <p class="last-updated">{ja.lastUpdated}</p>
+  <h1 id="info-title">{data.title}</h1>
+  <p class="last-updated">{data.lastUpdated}</p>
   
-  <div class="info-body-text" set:html={ja.content}></div>
+  <div class="info-body-text" set:html={data.content}></div>
 </div>
 
 <style define:vars={{ themeColor }}>
@@ -39,19 +45,16 @@ const themeColor = '#872732';
     margin-bottom: 30px; 
   }
 
-  /* 本文（パソコンは16px） */
   .info-body-text { 
     font-size: 16px; 
     line-height: 1.8; 
     color: #444; 
   }
 
-  /* セクションごとの間隔 */
   .info-body-text :global(.info-section) { 
     margin-bottom: 35px; 
   }
 
-  /* 見出し（h2）：区切り線 */
   .info-body-text :global(h2) { 
     font-size: 20px; 
     margin-top: 30px; 
@@ -75,7 +78,6 @@ const themeColor = '#872732';
     color: #1a1a1a;
   }
 
-  /* 表（テーブル）のデザイン */
   .info-body-text :global(.info-table) { 
     width: 100%; 
     border-collapse: collapse; 
@@ -98,7 +100,6 @@ const themeColor = '#872732';
     font-weight: bold; 
   }
 
-  /* スマホ表示（文字を18pxに） */
   @media (max-width: 640px) { 
     .info-content-card { padding: 25px 15px; } 
     h1 { font-size: 22px; } 
