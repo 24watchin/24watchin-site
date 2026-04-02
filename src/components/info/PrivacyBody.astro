@@ -1,88 +1,94 @@
 ---
 // src/components/info/PrivacyBody.astro
-// このファイルが「正解」のデータになります。
-// ここを直せば、サイト内のすべてのプライバシーポリシーが一斉に変わります。
+// 成川様のルール通り、jaフォルダ内のデータファイルを読み込む設定にします
+import { privacyData } from '../../lib/info/ja/privacyData.ts';
 ---
 
 <div class="info-content-card">
   <h1 id="info-title">Privacy Policy</h1>
+  <p id="last-updated" class="last-updated"></p>
   <div id="info-body" class="info-body-text">
     Loading...
   </div>
 </div>
 
 <style>
-  /* サブディレクトリの info ページと完全に一致させたスタイル */
-  .info-content-card {
-    background: #fff;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    min-height: 500px;
-  }
-  h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 4px solid var(--theme-color);
-    color: #1a1a1a;
-  }
-  .info-body-text {
-    line-height: 1.8;
-    color: #444;
-    white-space: pre-wrap; /* 改行を有効にします */
+  .info-content-card { 
+    background: #fff; 
+    padding: 40px; 
+    border-radius: 8px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    margin-bottom: 40px; 
   }
   
-  /* スマホ用の微調整 */
-  @media (max-width: 640px) {
-    .info-content-card {
-      padding: 25px 15px;
-    }
-    h1 {
-      font-size: 1.4rem;
-    }
+  h1 { 
+    font-size: 24px; 
+    font-weight: bold; 
+    margin-bottom: 10px; 
+    padding-bottom: 15px; 
+    border-bottom: 4px solid var(--theme-color); 
+    color: #1a1a1a; 
+  }
+
+  .last-updated {
+    text-align: right;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+  }
+
+  /* パソコン版本文：16px */
+  .info-body-text { 
+    font-size: 16px; 
+    line-height: 1.8; 
+    color: #444; 
+  }
+
+  /* データ内のHTMLタグ（section, h2, table等）のデザイン */
+  .info-body-text :global(section) { margin-bottom: 35px; }
+  .info-body-text :global(h2) { 
+    font-size: 20px; 
+    border-left: 4px solid var(--theme-color); 
+    padding-left: 10px; 
+    margin-bottom: 15px; 
+    color: #1a1a1a; 
+  }
+  .info-body-text :global(h3) { font-size: 18px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
+  .info-body-text :global(ul), .info-body-text :global(ol) { padding-left: 20px; margin-bottom: 15px; }
+  .info-body-text :global(li) { margin-bottom: 8px; }
+  .info-body-text :global(strong) { font-weight: bold; color: #1a1a1a; }
+
+  .info-body-text :global(.info-table) { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { border: 1px solid #ddd; padding: 12px; font-size: 16px; }
+  .info-body-text :global(.info-table th) { background-color: #f8f9fa; width: 30%; text-align: left; }
+  .info-body-text :global(a) { color: var(--theme-color); text-decoration: underline; font-weight: bold; }
+
+  /* スマホ表示：18px */
+  @media (max-width: 640px) { 
+    .info-content-card { padding: 25px 15px; } 
+    h1 { font-size: 22px; } 
+    .info-body-text { font-size: 18px; }
   }
 </style>
 
-<script is:inline>
+<script define:vars={{ pageData: privacyData }}>
   (function() {
-    // ▼ ここに各言語の文章をまとめて管理します
-    const translations = {
-      ja: {
-        title: 'プライバシーポリシー',
-        body: 'ここに日本語のプライバシーポリシーの文章を記述します...',
-        theme: '#872732'
-      },
-      en: {
-        title: 'Privacy Policy',
-        body: 'Write your English privacy policy text here...',
-        theme: '#0033a0'
-      },
-      'zh-cn': {
-        title: '隐私政策',
-        body: '在此处编写中文隐私政策文本...',
-        theme: '#e60012'
-      },
-      // ...他の言語も同様に追加可能です
-    };
-
-    // ブラウザの言語を取得
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    
-    // 翻訳がある言語ならそれを、なければ英語をデフォルトにします
-    const lang = translations[browserLang] ? browserLang : 'en';
-    const t = translations[lang];
+    const lang = pageData[browserLang] ? browserLang : 'ja'; 
+    const t = pageData[lang];
+    const theme = '#872732';
 
-    // 画面の表示を書き換え
+    // ここで .ts ファイルから読み込んだデータを画面に反映させます
     document.title = t.title + ' | 24Watchin';
-    const titleEl = document.getElementById('info-title');
-    const bodyEl = document.getElementById('info-body');
-    
-    if (titleEl) titleEl.textContent = t.title;
-    if (bodyEl) bodyEl.textContent = t.body;
+    document.getElementById('info-title').textContent = t.title;
 
-    // テーマカラー（赤や青など）も言語に合わせて自動変更
-    document.body.style.setProperty('--theme-color', t.theme);
+    if (t.lastUpdated) {
+      document.getElementById('last-updated').textContent = t.lastUpdated;
+    }
+
+    // デモ文章ではなく、.ts ファイルの content を HTML として流し込みます
+    document.getElementById('info-body').innerHTML = t.content;
+
+    document.body.style.setProperty('--theme-color', theme);
   })();
 </script>
