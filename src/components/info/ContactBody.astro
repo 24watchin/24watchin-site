@@ -2,15 +2,22 @@
 // src/components/info/ContactBody.astro
 import { ja } from '../../lib/info/ja/contactData.ts';
 import { en } from '../../lib/info/en/contactData.ts';
+import { zhTW } from '../../lib/info/zh-tw/contactData.ts';
 
-// 現在のURLから「ja」か「en」かを自動判別します
+// 現在のURLから「ja」か「en」か「zh-tw」かを自動判別します
 const { pathname } = Astro.url;
-const isEnglish = pathname.startsWith('/en/');
 
 // URLに応じてデータを切り替え
-const data = isEnglish ? en : ja;
-// URLに応じてテーマカラーを切り替え
-const themeColor = isEnglish ? '#0033a0' : '#872732';
+let data = ja;
+let themeColor = '#872732'; // 日本語 (デフォルト)
+
+if (pathname.startsWith('/en/')) {
+  data = en;
+  themeColor = '#001580'; // 英語
+} else if (pathname.startsWith('/zh-tw/')) {
+  data = zhTW;
+  themeColor = '#b33224'; // 中国語繁体字
+}
 
 // プライバシーポリシーへのリンク先をデータファイル（.ts）の設定に合わせます
 const privacyPath = data.privacyPath;
