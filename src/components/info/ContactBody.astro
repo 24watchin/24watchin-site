@@ -3,8 +3,9 @@
 import { ja } from '../../lib/info/ja/contactData.ts';
 import { en } from '../../lib/info/en/contactData.ts';
 import { zhTW } from '../../lib/info/zh-tw/contactData.ts';
+import { zhCN } from '../../lib/info/zh-cn/contactData.ts';
 
-// 現在のURLから「ja」か「en」か「zh-tw」かを自動判別します
+// 現在のURLから言語を自動判別します
 const { pathname } = Astro.url;
 
 // URLに応じてデータを切り替え
@@ -17,6 +18,9 @@ if (pathname.startsWith('/en/')) {
 } else if (pathname.startsWith('/zh-tw/')) {
   data = zhTW;
   themeColor = '#b33224'; // 中国語繁体字
+} else if (pathname.startsWith('/zh-cn/')) {
+  data = zhCN;
+  themeColor = '#0e7c7b'; // 中国語簡体字
 }
 
 // プライバシーポリシーへのリンク先をデータファイル（.ts）の設定に合わせます
