@@ -1,16 +1,22 @@
 ---
-// 履歴を緑のレ点に更新するためのコミットです
 // src/components/info/AboutBody.astro
-// バインダーを使わず、直接「jaフォルダ」のデータを取りに行きます
 import { ja } from '../../lib/info/ja/aboutData.ts';
+import { en } from '../../lib/info/en/aboutData.ts';
 
-// 日本語ページのテーマカラーを設定します
-const themeColor = '#872732';
+// 現在のURLから「ja」か「en」かを自動判別します
+const { pathname } = Astro.url;
+const isEnglish = pathname.startsWith('/en/');
+
+// 英語ならen、そうでなければjaのデータを使います
+const data = isEnglish ? en : ja;
+
+// テーマカラーも切り替えます（日本語：赤、英語：青）
+const themeColor = isEnglish ? '#0033a0' : '#872732';
 ---
 
 <div class="info-content-card">
-  <h1 id="info-title">{ja.title}</h1>
-  <div class="info-body-text" set:html={ja.content}></div>
+  <h1 id="info-title">{data.title}</h1>
+  <div class="info-body-text" set:html={data.content}></div>
 </div>
 
 <style define:vars={{ themeColor }}>
@@ -27,19 +33,17 @@ const themeColor = '#872732';
     font-weight: bold; 
     margin-bottom: 30px; 
     padding-bottom: 15px;
-    border-bottom: 4px solid var(--themeColor); /* テーマカラーの線 */
+    border-bottom: 4px solid var(--themeColor); 
     color: #1a1a1a; 
   }
   
-  /* 本文（パソコンは16px） */
   .info-body-text { 
     font-size: 16px;
     line-height: 1.8; 
     color: #444; 
   }
   
-  /* --- tsファイルから読み込まれる中身のデザイン --- */
-  
+  /* --- デザインの共通設定 --- */
   .info-body-text :global(.about-intro) {
     text-align: center;
     margin-bottom: 50px;
@@ -54,15 +58,10 @@ const themeColor = '#872732';
     line-height: 1.5;
   }
   
-  .info-body-text :global(.lead-text) {
-    color: #555;
-  }
-
   .info-body-text :global(.about-section) { 
     margin-bottom: 40px;
   }
 
-  /* 見出し：ご要望の「下部の区切り線」 */
   .info-body-text :global(h2) { 
     font-size: 20px; 
     margin-top: 30px;
@@ -72,7 +71,6 @@ const themeColor = '#872732';
     color: #1a1a1a;
   }
 
-  /* 強調したい部分（ハイライト） */
   .info-body-text :global(.highlight-text) {
     background: #f9f9f9;
     padding: 20px;
@@ -81,12 +79,10 @@ const themeColor = '#872732';
     margin-top: 20px;
   }
   
-  /* 運営者情報のテーブル */
   .info-body-text :global(table.info-table) { 
     width: 100%; 
     border-collapse: collapse; 
     margin-top: 20px; 
-    font-size: 16px;
   }
   .info-body-text :global(th), .info-body-text :global(td) { 
     border: 1px solid #ddd; 
@@ -103,32 +99,12 @@ const themeColor = '#872732';
     text-decoration: underline;
   }
   
-  /* スマホ表示（文字を18pxに変更） */
   @media (max-width: 640px) { 
-    .info-content-card { 
-      padding: 25px 15px;
-    } 
-    h1 { font-size: 22px; } 
-    
-    .info-body-text { 
-      font-size: 18px;
-    }
-    .info-body-text :global(h2) { 
-      font-size: 20px; 
-    }
-    .info-body-text :global(.catchphrase) {
-      font-size: 18px;
-    }
-    .info-body-text :global(table.info-table) {
-      font-size: 16px; 
-    }
+    .info-content-card { padding: 25px 15px; } 
+    .info-body-text { font-size: 18px; }
     .info-body-text :global(th), .info-body-text :global(td) {
       display: block;
       width: 100%;
-      box-sizing: border-box;
-    }
-    .info-body-text :global(th) {
-      border-bottom: none;
     }
   }
 </style>
