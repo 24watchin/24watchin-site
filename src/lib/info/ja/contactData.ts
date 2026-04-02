@@ -1,5 +1,5 @@
 // src/lib/info/ja/contactData.ts
-// お問い合わせページの日本語データです
+// お問い合わせページの日本語データ
 
 export const ja = {
   title: 'お問い合わせ',
@@ -40,7 +40,3 @@ export const ja = {
   successText: '内容を確認のうえ、必要に応じてご連絡いたします。',
   errorText: '送信に失敗しました。時間をおいて再度お試しください。',
 };
-
-// ⚠️ 一時的なエラー回避コード ⚠️
-// 次のステップで ContactBody.astro を更新するまで、古い仕組みがエラーを出さないようにするための橋渡しです。
-export const contactData = { ja };
