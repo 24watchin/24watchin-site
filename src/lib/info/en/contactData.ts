@@ -13,6 +13,7 @@ export const en = {
   privacyTitle: 'Handling of Personal Information',
   privacyText: 'The information you enter in the inquiry form will be used for responding to your inquiry, confirming its details, contacting you where necessary, and for other purposes incidental thereto. For details, please refer to our ',
   privacyLink: 'Privacy Policy',
+  privacyPath: '../privacy/',
   privacyEnd: '.',
   formTitle: 'Inquiry Form',
   typeLabel: 'Type of Inquiry',
