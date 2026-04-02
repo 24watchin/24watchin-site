@@ -55,7 +55,7 @@ export const en = {
         <tbody>
           <tr><th>Site Name</th><td>24Watchin</td></tr>
           <tr><th>Operator</th><td>The Dexent Media Enterprises</td></tr>
-          <tr><th>Contact</th><td><a href="../contact/">Contact</a></td></tr>
+          <tr><th>Contact</th><td><a href="../contact/">Click here for the contact form</a></td></tr>
         </tbody>
       </table>
     </section>
