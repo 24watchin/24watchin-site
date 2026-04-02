@@ -33,8 +33,12 @@ export const contactData = {
     messagePlaceholder: 'できるだけ具体的にご記入ください。',
     agreementText: 'ご入力いただいた情報の取り扱いについて、プライバシーポリシーを確認し、同意します。',
     submitBtn: '送信',
+    sending: '送信中...',
     required: '必須',
     optional: '任意',
+    successTitle: 'お問い合わせを受け付けました。',
+    successText: '内容を確認のうえ、必要に応じてご連絡いたします。',
+    errorText: '送信に失敗しました。時間をおいて再度お試しください。',
   },
   en: {
     title: 'Contact',
@@ -68,7 +72,11 @@ export const contactData = {
     messagePlaceholder: 'Describe your inquiry.',
     agreementText: 'I agree to the Privacy Policy.',
     submitBtn: 'Send',
+    sending: 'Sending...',
     required: 'Required',
     optional: 'Optional',
+    successTitle: 'Received',
+    successText: 'We will get back to you if needed.',
+    errorText: 'Failed to send.',
   }
 };
