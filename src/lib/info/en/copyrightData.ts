@@ -29,31 +29,31 @@ export const en = {
       <ul>
         <li>The quoted portion must be subordinate, and the user's own description must be primary</li>
         <li>There must be a necessity for the quotation</li>
-        <li>The quoted portion must be clearly distinguished from the other portions</li>
+        <li>The quoted portion and the other portions must be clearly distinguishable</li>
         <li>The source must be clearly indicated</li>
       </ul>
     </section>
 
     <section class="info-section">
-      <h2>3. Use of Photographs, Images, Charts, Videos, etc.</h2>
-      <p>With respect to photographs, images, charts, videos, audio, and other materials published on the Site, rights handling may be stricter than for the text of articles. <strong>Please do not use these materials without authorization.</strong></p>
+      <h2>3. Use of Photographs, Images, Charts, Videos, and Other Materials</h2>
+      <p>Photographs, images, charts, videos, audio, and other materials published on the Site may be subject to stricter rights clearance requirements than article text. <strong>Please do not use such materials without authorization.</strong></p>
     </section>
 
     <section class="info-section">
-      <h2>4. Prohibition of AI Training, Automated Acquisition, etc.</h2>
-      <p>The following acts are prohibited with respect to the Site Content without the prior permission of the operator of the Site or the rights holders:</p>
+      <h2>4. Prohibition of AI Training, Automated Acquisition, and Similar Acts</h2>
+      <p>With respect to the Site Content, the following acts are prohibited without the prior permission of the operator of the Site or the rights holders:</p>
       <ul>
-        <li>Use for the training or fine-tuning of AI models, generative AI, machine learning models, or similar technologies</li>
-        <li>Use for vectorization, embedding, RAG (Retrieval-Augmented Generation), or other similar purposes</li>
+        <li>Use for the training or additional training of AI models, generative AI, machine learning models, or similar technologies</li>
+        <li>Use for vectorization, embedding, RAG, or other similar purposes</li>
         <li>Text and data mining</li>
-        <li>Automated acquisition through scraping, crawling, robots, or similar methods</li>
-        <li>Dataset creation or use as a training corpus</li>
+        <li>Automated acquisition by scraping, crawling, robots, or similar means</li>
+        <li>Creation of datasets or training corpora</li>
       </ul>
     </section>
 
     <section class="info-section">
       <h2>5. Links</h2>
-      <p>Links to the Site are, in principle, freely permitted. However, links falling under any of the following categories are prohibited:</p>
+      <p>Links to the Site are, in principle, freely permitted. However, links falling under any of the following categories are not permitted:</p>
       <ul>
         <li>Links from sites containing illegal content or content contrary to public order and morals</li>
         <li>Links that may harm the credibility of the Site or any third party</li>
@@ -76,7 +76,7 @@ export const en = {
 
     <section class="info-section">
       <h2>7. Reporting Rights Infringement</h2>
-      <p>If you believe that the Site Content is being used without authorization, please contact us through the inquiry form. We will review the matter and take deletion, correction, or other necessary measures as appropriate.</p>
+      <p>If you believe that the Site Content is being used without authorization, please contact us through the inquiry form.</p>
     </section>
 
     <section class="info-section">
@@ -88,7 +88,7 @@ export const en = {
       <h2>9. Contact</h2>
       <table class="info-table">
         <tr><th>Operator</th><td>The Dexent Media Enterprises</td></tr>
-        <tr><th>Contact</th><td><a href="../contact/">Contact</a></td></tr>
+        <tr><th>Contact</th><td><a href="../contact/">Click here for the contact form</a></td></tr>
       </table>
     </section>
   `
