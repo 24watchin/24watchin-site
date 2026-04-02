@@ -1,16 +1,18 @@
 ---
 // src/components/info/AboutBody.astro
-import { aboutData } from '../../lib/info/aboutData.ts';
+// バインダーを使わず、直接「jaフォルダ」のデータを取りに行きます
+import { ja } from '../../lib/info/ja/aboutData.ts';
+
+// 日本語ページのテーマカラーを設定します
+const themeColor = '#872732';
 ---
 
 <div class="info-content-card">
-  <h1 id="info-title">About 24Watchin</h1>
-  <div id="info-body" class="info-body-text">
-    Loading...
-  </div>
+  <h1 id="info-title">{ja.title}</h1>
+  <div class="info-body-text" set:html={ja.content}></div>
 </div>
 
-<style>
+<style define:vars={{ themeColor }}>
   .info-content-card { 
     background: #fff;
     padding: 40px; 
@@ -24,7 +26,7 @@ import { aboutData } from '../../lib/info/aboutData.ts';
     font-weight: bold; 
     margin-bottom: 30px; 
     padding-bottom: 15px;
-    border-bottom: 4px solid var(--theme-color); 
+    border-bottom: 4px solid var(--themeColor); /* テーマカラーの線 */
     color: #1a1a1a; 
   }
   
@@ -46,7 +48,7 @@ import { aboutData } from '../../lib/info/aboutData.ts';
   
   .info-body-text :global(.catchphrase) {
     font-size: 20px;
-    color: var(--theme-color);
+    color: var(--themeColor);
     margin-bottom: 20px;
     line-height: 1.5;
   }
@@ -59,13 +61,13 @@ import { aboutData } from '../../lib/info/aboutData.ts';
     margin-bottom: 40px;
   }
 
-  /* 🌟 見出し：ご要望の「下部の区切り線」を追加しました */
+  /* 見出し：ご要望の「下部の区切り線」 */
   .info-body-text :global(h2) { 
     font-size: 20px; 
     margin-top: 30px;
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 2px solid var(--theme-color); /* ここが区切り線です */
+    border-bottom: 2px solid var(--themeColor); 
     color: #1a1a1a;
   }
 
@@ -74,7 +76,7 @@ import { aboutData } from '../../lib/info/aboutData.ts';
     background: #f9f9f9;
     padding: 20px;
     border-radius: 6px;
-    border-left: 4px solid var(--theme-color);
+    border-left: 4px solid var(--themeColor);
     margin-top: 20px;
   }
   
@@ -96,7 +98,7 @@ import { aboutData } from '../../lib/info/aboutData.ts';
     color: #374151;
   }
   .info-body-text :global(td a) {
-    color: var(--theme-color);
+    color: var(--themeColor);
     text-decoration: underline;
   }
   
@@ -107,7 +109,6 @@ import { aboutData } from '../../lib/info/aboutData.ts';
     } 
     h1 { font-size: 22px; } 
     
-    /* スマホは読みやすく18pxに */
     .info-body-text { 
       font-size: 18px;
     }
@@ -118,9 +119,8 @@ import { aboutData } from '../../lib/info/aboutData.ts';
       font-size: 18px;
     }
     .info-body-text :global(table.info-table) {
-      font-size: 16px; /* 表の中は少し小さめキープが見やすいです */
+      font-size: 16px; 
     }
-    /* スマホでは表を縦並びに崩して読みやすくします */
     .info-body-text :global(th), .info-body-text :global(td) {
       display: block;
       width: 100%;
@@ -131,20 +131,3 @@ import { aboutData } from '../../lib/info/aboutData.ts';
     }
   }
 </style>
-
-<script define:vars={{ pageData: aboutData }}>
-  (function() {
-    const themeColors = {
-      ja: '#872732', en: '#0033a0', 'zh-cn': '#e60012', 'zh-tw': '#000095',
-      es: '#aa151b', de: '#000000', fr: '#002395', ru: '#d52b1e'
-    };
-    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    const lang = pageData[browserLang] ? browserLang : 'ja'; 
-    const t = pageData[lang];
-    const theme = themeColors[lang] || '#872732';
-    document.title = t.title + ' | 24Watchin';
-    document.getElementById('info-title').textContent = t.title;
-    document.getElementById('info-body').innerHTML = t.content;
-    document.body.style.setProperty('--theme-color', theme);
-  })();
-</script>
