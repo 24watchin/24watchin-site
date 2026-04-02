@@ -1,6 +1,4 @@
 // src/lib/info/en/aboutData.ts
-// Aboutページの英語データ
-
 export const en = {
   title: 'About 24Watchin',
   description: 'Operating information and site overview of 24Watchin. A multilingual global news media for people living abroad.',
@@ -55,20 +53,9 @@ export const en = {
       <h2>Operator Information</h2>
       <table class="info-table">
         <tbody>
-          <tr>
-            <th>Site Name</th>
-            <td>24Watchin</td>
-          </tr>
-          <tr>
-            <th>Operator</th>
-            <td>The Dexent Media Enterprises</td>
-          </tr>
-          <tr>
-            <th>Contact</th>
-            <td>
-              <a href="/en/us/info/contact/">Click here for the contact form</a>
-            </td>
-          </tr>
+          <tr><th>Site Name</th><td>24Watchin</td></tr>
+          <tr><th>Operator</th><td>The Dexent Media Enterprises</td></tr>
+          <tr><th>Contact</th><td><a href="/en/us/info/contact/">Click here for the contact form</a></td></tr>
         </tbody>
       </table>
     </section>
