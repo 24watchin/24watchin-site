@@ -10,11 +10,19 @@ export default defineConfig({
   site: siteUrl,
   integrations: [mdx(), sitemap()],
   adapter: cloudflare(),
-  // ここから下を追加しました。/info/ へのアクセスを /en/info/ へ転送する設定です。
+  
+  // リダイレクト設定の強化版
   redirects: {
-    '/info': '/en/info',
+    // 旧 info 階層へのアクセスを、実体のある英語の About ページへ集約します
+    '/info': '/en/info/about',
+    '/info/': '/en/info/about/',
+    
+    // 英語階層の「中身のない info」へアクセスが来ても About へ飛ばします
+    '/en/info': '/en/info/about',
+    '/en/info/': '/en/info/about/',
+
+    // その他、各サブページへの直接アクセスも正しい英語階層へ
     '/info/contact': '/en/info/contact',
-    '/info/about': '/en/info/about',
     '/info/terms': '/en/info/terms',
     '/info/privacy': '/en/info/privacy',
     '/info/copyright': '/en/info/copyright',
