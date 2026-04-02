@@ -2,10 +2,10 @@
 // src/components/info/TermsBody.astro
 import { ja } from '../../lib/info/ja/termsData.ts';
 import { en } from '../../lib/info/en/termsData.ts';
-// 繁体字データを読み込みます
 import { zhTW } from '../../lib/info/zh-tw/termsData.ts';
+import { zhCN } from '../../lib/info/zh-cn/termsData.ts';
 
-// 現在のURLから「ja」か「en」か「zh-tw」かを自動判別します
+// 現在のURLから言語を自動判別します
 const { pathname } = Astro.url;
 
 // 言語判定とテーマカラーの設定
@@ -14,10 +14,13 @@ let themeColor = '#872732'; // 日本語 (デフォルト)
 
 if (pathname.startsWith('/en/')) {
   data = en;
-  themeColor = '#001580'; // 英語 (ご指定の色)
+  themeColor = '#001580'; // 英語
 } else if (pathname.startsWith('/zh-tw/')) {
   data = zhTW;
-  themeColor = '#b33224'; // 中国語繁体字 (ご指定の色)
+  themeColor = '#b33224'; // 中国語繁体字
+} else if (pathname.startsWith('/zh-cn/')) {
+  data = zhCN;
+  themeColor = '#0e7c7b'; // 中国語簡体字
 }
 ---
 
