@@ -1,138 +1,90 @@
-// src/lib/info/correctionsData.ts
+// src/lib/info/ja/correctionsData.ts
+// 訂正・修正ポリシーの日本語データ
 
-export const correctionsData = {
-  ja: {
-    title: '訂正・修正ポリシー',
-    description: '24Watchinの訂正・修正ポリシーです。記事の誤りや修正に関する対応方針を説明しています。',
-    lastUpdated: '最終更新日：2026年3月20日',
-    content: `
-      <p>24Watchin（以下「当サイト」といいます）は、正確でわかりやすい情報提供に努めています。記事の公開後に、事実関係の誤り、表記上の誤り、翻訳上の不正確さ、情報の更新その他の事情が判明する場合があります。当サイトは、そのような場合に適切な訂正、修正、更新または削除を行うため、以下のとおり訂正・修正ポリシーを定めます。</p>
+export const ja = {
+  title: '訂正・修正ポリシー',
+  description: '24Watchinの訂正・修正ポリシーです。記事の誤りや修正に関する対応方針を説明しています。',
+  lastUpdated: '最終更新日：2026年3月20日',
+  content: `
+    <p>24Watchin（以下「当サイト」といいます）は、正確でわかりやすい情報提供に努めています。記事の公開後に、事実関係の誤り、表記上の誤り、翻訳上の不正確さ、情報の更新その他の事情が判明する場合があります。当サイトは、そのような場合に適切な訂正、修正、更新または削除を行うため、以下のとおり訂正・修正ポリシーを定めます。</p>
 
-      <section>
-        <h2>1. 基本方針</h2>
-        <p>当サイトは、掲載情報の正確性および信頼性の確保に努めます。記事公開後に誤りや不適切な記載が判明した場合は、その内容や影響の程度に応じて、訂正、修正、追記、更新、削除その他の適切な対応を行います。</p>
-      </section>
+    <section class="info-section">
+      <h2>1. 基本方針</h2>
+      <p>当サイトは、掲載情報の正確性および信頼性の確保に努めます。記事公開後に誤りや不適切な記載が判明した場合は、その内容や影響の程度に応じて、訂正、修正、追記、更新、削除その他の適切な対応を行います。</p>
+    </section>
 
-      <section>
-        <h2>2. 訂正・修正の対象</h2>
-        <ul>
-          <li>事実関係に誤りがある場合</li>
-          <li>人名、地名、団体名、役職名、日時、数値等に誤記がある場合</li>
-          <li>引用、出典、リンク先、参照情報に誤りがある場合</li>
-          <li>翻訳記事において、原文の意味に影響する誤訳、不正確な表現がある場合</li>
-          <li>公開後の追加情報により、内容の補足または更新が必要と判断した場合</li>
-          <li>権利侵害、法令違反、不適切表現その他の問題が判明した場合</li>
-        </ul>
-      </section>
+    <section class="info-section">
+      <h2>2. 訂正・修正の対象</h2>
+      <ul>
+        <li>事実関係に誤りがある場合</li>
+        <li>人名、地名、団体名、役職名、日時、数値等に誤記がある場合</li>
+        <li>引用、出典、リンク先、参照情報に誤りがある場合</li>
+        <li>翻訳記事において、原文の意味に影響する誤訳、不正確な表現がある場合</li>
+        <li>公開後の追加情報により、内容の補足または更新が必要と判断した場合</li>
+        <li>権利侵害、法令違反、不適切表現その他の問題が判明した場合</li>
+      </ul>
+    </section>
 
-      <section>
-        <h2>3. 訂正・修正の方法</h2>
-        <h3>（1）軽微な修正</h3>
-        <p>誤字、脱字、表記ゆれ、リンク修正など、記事の趣旨や事実認識に大きな影響を与えない軽微な修正については、原則として個別の注記を付さずに修正する場合があります。</p>
-        <h3>（2）内容に影響する修正</h3>
-        <p>記事の意味、事実関係、読者の理解に一定の影響を与える修正については、必要に応じて記事内に修正または追記を明記します。</p>
-        <h3>（3）重要な訂正</h3>
-        <p>記事の核心部分に関わる誤り、誤解を生じさせる重大な誤記等については、記事内または当サイトが適切と判断する方法により、訂正の事実を明示します。</p>
-        <h3>（4）更新</h3>
-        <p>新たな情報や追加情報が判明した場合は、訂正ではなく「更新」または「追記」として反映する場合があります。</p>
-        <h3>（5）削除または非公開</h3>
-        <p>法的問題、権利侵害、重大な誤りその他の事情により、記事の公開継続が適切でないと判断した場合は、記事の全部または一部を削除、非公開または差し替えすることがあります。</p>
-      </section>
+    <section class="info-section">
+      <h2>3. 訂正・修正の方法</h2>
+      <h3>（1）軽微な修正</h3>
+      <p>誤字、脱字、表記ゆれ、リンク修正など、記事の趣旨や事実認識に大きな影響を与えない軽微な修正については、原則として個別の注記を付さずに修正する場合があります。</p>
+      <h3>（2）内容に影響する修正</h3>
+      <p>記事の意味、事実関係、読者の理解に一定の影響を与える修正については、必要に応じて記事内に修正または追記を明記します。</p>
+      <h3>（3）重要な訂正</h3>
+      <p>記事の核心部分に関わる誤り、誤解を生じさせる重大な誤記等については、記事内または当サイトが適切と判断する方法により、訂正の事実を明示します。</p>
+      <h3>（4）更新</h3>
+      <p>新たな情報や追加情報が判明した場合は、訂正ではなく「更新」または「追記」として反映する場合があります。</p>
+      <h3>（5）削除または非公開</h3>
+      <p>法的問題、権利侵害、重大な誤りその他の事情により、記事の公開継続が適切でないと判断した場合は、記事の全部または一部を削除、非公開または差し替えすることがあります。</p>
+    </section>
 
-      <section>
-        <h2>4. 翻訳記事に関する取り扱い</h2>
-        <p>当サイトでは、外国語情報をもとに記事を作成または翻訳掲載する場合があります。翻訳記事については、次のような事情により修正を行う場合があります。</p>
-        <ul>
-          <li>原文の更新や差し替えが行われた場合</li>
-          <li>初出時の翻訳表現が不正確であった場合</li>
-          <li>地域差、制度差、文化差等により補足説明が必要と判断した場合</li>
-        </ul>
-      </section>
+    <section class="info-section">
+      <h2>4. 翻訳記事に関する取り扱い</h2>
+      <p>当サイトでは、外国語情報をもとに記事を作成または翻訳掲載する場合があります。翻訳記事については、次のような事情により修正を行う場合があります。</p>
+      <ul>
+        <li>原文の更新や差し替えが行われた場合</li>
+        <li>初出時の翻訳表現が不正確であった場合</li>
+        <li>地域差、制度差、文化差等により補足説明が必要と判断した場合</li>
+      </ul>
+    </section>
 
-      <section>
-        <h2>5. 削除依頼・訂正依頼について</h2>
-        <p>記事内容に関するご指摘、訂正のご連絡、削除依頼等はお問い合わせフォームよりお送りください。ご連絡の際は、できるだけ次の情報をご記載ください。</p>
-        <ul>
-          <li>対象記事のURL</li>
-          <li>記事タイトル</li>
-          <li>問題箇所とご指摘内容</li>
-          <li>根拠となる情報または資料</li>
-          <li>ご連絡先</li>
-        </ul>
-      </section>
+    <section class="info-section">
+      <h2>5. 削除依頼・訂正依頼について</h2>
+      <p>記事内容に関するご指摘、訂正のご連絡、削除依頼等はお問い合わせフォームよりお送りください。ご連絡の際は、できるだけ次の情報をご記載ください。</p>
+      <ul>
+        <li>対象記事のURL</li>
+        <li>記事タイトル</li>
+        <li>問題箇所とご指摘内容</li>
+        <li>根拠となる情報または資料</li>
+        <li>ご連絡先</li>
+      </ul>
+    </section>
 
-      <section>
-        <h2>6. 対応の判断について</h2>
-        <p>当サイトは、寄せられたご指摘やご意見を参考に確認を行いますが、すべてのご連絡に対して個別に回答または修正を行うことを保証するものではありません。対応の要否、方法、時期については、編集上および運営上の判断に基づき決定します。</p>
-      </section>
+    <section class="info-section">
+      <h2>6. 対応の判断について</h2>
+      <p>当サイトは、寄せられたご指摘やご意見を参考に確認を行いますが、すべてのご連絡に対して個別に回答または修正を行うことを保証するものではありません。対応の要否、方法、時期については、編集上および運営上の判断に基づき決定します。</p>
+    </section>
 
-      <section>
-        <h2>7. 過去記事の取り扱い</h2>
-        <p>過去記事については、掲載後の事情変更により、現在の状況と一致しない場合があります。過去記事のすべてについて、常に最新情報へ更新することを保証するものではありません。</p>
-      </section>
+    <section class="info-section">
+      <h2>7. 過去記事の取り扱い</h2>
+      <p>過去記事については、掲載後の事情変更により、現在の状況と一致しない場合があります。過去記事のすべてについて、常に最新情報へ更新することを保証するものではありません。</p>
+    </section>
 
-      <section>
-        <h2>8. 本ポリシーの変更</h2>
-        <p>当サイト運営者は、必要に応じて本ページの内容を改定することがあります。変更後の内容は、当サイト上に掲載した時点から適用されるものとします。</p>
-      </section>
+    <section class="info-section">
+      <h2>8. 本ポリシーの変更</h2>
+      <p>当サイト運営者は、必要に応じて本ページの内容を改定することがあります。変更後の内容は、当サイト上に掲載した時点から適用されるものとします。</p>
+    </section>
 
-      <section>
-        <h2>9. お問い合わせ窓口</h2>
-        <table class="info-table">
-          <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
-          <tr><th>お問い合わせ</th><td><a href="/ja/jp/contact/">お問い合わせフォームはこちら</a></td></tr>
-        </table>
-      </section>
-    `
-  },
-  en: {
-    title: 'Corrections Policy',
-    description: 'Corrections Policy of 24Watchin. This page explains our approach to correcting errors in articles.',
-    lastUpdated: 'Last Updated: March 20, 2026',
-    content: `
-      <p>This is a dummy text for the Corrections Policy. The actual translated text will be inserted here later.</p>
-      <section>
-        <h2>1. Basic Policy</h2>
-        <p>Dummy text...</p>
-      </section>
-    `
-  },
-  'zh-cn': {
-    title: '更正政策',
-    description: '24Watchin的更正政策。本页说明我们处理文章错误的方针。',
-    lastUpdated: '最后更新：2026年3月20日',
-    content: `<p>这是更正政策的占位符文本。</p>`
-  },
-  'zh-tw': {
-    title: '更正政策',
-    description: '24Watchin的更正政策。本頁說明我們處理文章錯誤的方針。',
-    lastUpdated: '最後更新：2026年3月20日',
-    content: `<p>這是更正政策的佔位符文本。</p>`
-  },
-  es: {
-    title: 'Política de correcciones',
-    description: 'Política de correcciones de 24Watchin. Esta página explica nuestro enfoque para corregir errores.',
-    lastUpdated: 'Última actualización: 20 de marzo de 2026',
-    content: `<p>Este es un texto simulado para la política de correcciones.</p>`
-  },
-  de: {
-    title: 'Korrekturen',
-    description: 'Korrekturen-Richtlinie von 24Watchin. Diese Seite erklärt unseren Umgang mit Fehlerkorrekturen.',
-    lastUpdated: 'Zuletzt aktualisiert: 20. März 2026',
-    content: `<p>Dies ist ein Blindtext für die Korrekturen-Richtlinie.</p>`
-  },
-  fr: {
-    title: 'Politique de corrections',
-    description: 'Politique de corrections de 24Watchin. Cette page explique notre approche pour corriger les erreurs.',
-    lastUpdated: 'Dernière mise à jour : 20 mars 2026',
-    content: `<p>Ceci est un texte factice pour la politique de corrections.</p>`
-  },
-  ru: {
-    title: 'Политика исправлений',
-    description: 'Политика исправлений 24Watchin. На этой странице объясняется наш подход к исправлению ошибок.',
-    lastUpdated: 'Последнее обновление: 20 марта 2026 г.',
-    content: `<p>Это фиктивный текст для политики исправлений.</p>`
-  }
-} as const;
+    <section class="info-section">
+      <h2>9. お問い合わせ窓口</h2>
+      <table class="info-table">
+        <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
+        <tr><th>お問い合わせ</th><td><a href="/ja/jp/info/contact/">お問い合わせフォームはこちら</a></td></tr>
+      </table>
+    </section>
+  `
+};
 
-export type CorrectionsDataKey = keyof typeof correctionsData;
+// ⚠️ 一時的なエラー回避コード（橋渡し）
+export const correctionsData = { ja };
