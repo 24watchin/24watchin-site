@@ -13,6 +13,7 @@ export const ja = {
   privacyTitle: '個人情報の取り扱いについて',
   privacyText: 'お問い合わせフォームにご入力いただいた情報は、お問い合わせへの対応、内容の確認、必要なご連絡その他これらに付随する目的のために利用します。詳細については',
   privacyLink: 'プライバシーポリシー',
+  privacyPath: '../privacy/',
   privacyEnd: 'をご確認ください。',
   formTitle: 'お問い合わせフォーム',
   typeLabel: 'お問い合わせの種類',
