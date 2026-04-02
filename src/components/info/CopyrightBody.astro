@@ -1,18 +1,20 @@
 ---
 // src/components/info/CopyrightBody.astro
-// 成川様が作成されたデータファイル（jaフォルダ内）を読み込みます
-import { copyrightData } from '../../lib/info/ja/copyrightData.ts';
+// 直接「jaフォルダ」のデータを取りに行く仕組みに統一します
+import { ja } from '../../lib/info/ja/copyrightData.ts';
+
+// 日本語ページのテーマカラー
+const themeColor = '#872732';
 ---
 
 <div class="info-content-card">
-  <h1 id="info-title">Copyright / Reuse</h1>
-  <p id="last-updated" class="last-updated"></p>
-  <div id="info-body" class="info-body-text">
-    Loading...
-  </div>
+  <h1 id="info-title">{ja.title}</h1>
+  <p class="last-updated">{ja.lastUpdated}</p>
+  
+  <div class="info-body-text" set:html={ja.content}></div>
 </div>
 
-<style>
+<style define:vars={{ themeColor }}>
   .info-content-card { 
     background: #fff; 
     padding: 40px; 
@@ -21,78 +23,92 @@ import { copyrightData } from '../../lib/info/ja/copyrightData.ts';
     margin-bottom: 40px; 
   }
   
-  /* 大見出し：24px */
   h1 { 
     font-size: 24px; 
     font-weight: bold; 
     margin-bottom: 10px; 
     padding-bottom: 15px; 
-    border-bottom: 4px solid var(--theme-color); 
+    border-bottom: 4px solid var(--themeColor); 
     color: #1a1a1a; 
   }
 
-  .last-updated {
-    text-align: right;
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 30px;
+  .last-updated { 
+    text-align: right; 
+    color: #666; 
+    font-size: 14px; 
+    margin-bottom: 30px; 
   }
 
-  /* パソコン版の本文件サイズ：16px */
+  /* 本文（パソコンは16px） */
   .info-body-text { 
     font-size: 16px; 
     line-height: 1.8; 
     color: #444; 
   }
 
-  /* データ内に書き込まれたHTMLタグのデザイン調整 */
-  .info-body-text :global(section) { margin-bottom: 35px; }
+  /* セクションごとの間隔 */
+  .info-body-text :global(.info-section), .info-body-text :global(section) { 
+    margin-bottom: 35px; 
+  }
+
+  /* 見出し（h2）：区切り線 */
   .info-body-text :global(h2) { 
     font-size: 20px; 
-    border-left: 4px solid var(--theme-color); 
-    padding-left: 10px; 
-    margin-bottom: 15px; 
+    margin-top: 30px; 
+    margin-bottom: 20px; 
+    padding-bottom: 10px; 
+    border-bottom: 2px solid var(--themeColor); 
     color: #1a1a1a; 
   }
-  .info-body-text :global(h3) { font-size: 18px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
-  .info-body-text :global(ul) { padding-left: 20px; margin-bottom: 15px; }
-  .info-body-text :global(li) { margin-bottom: 8px; }
 
-  /* テーブル（お問い合わせ窓口）のデザイン */
-  .info-body-text :global(.info-table) { width: 100%; border-collapse: collapse; margin-top: 15px; }
-  .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { border: 1px solid #ddd; padding: 12px; font-size: 16px; }
-  .info-body-text :global(.info-table th) { background-color: #f8f9fa; width: 30%; text-align: left; }
-  .info-body-text :global(a) { color: var(--theme-color); text-decoration: underline; font-weight: bold; }
+  .info-body-text :global(ul) { 
+    padding-left: 20px; 
+    margin-bottom: 15px; 
+  }
 
-  /* スマホ表示時の設定：18px */
+  .info-body-text :global(li) { 
+    margin-bottom: 8px; 
+  }
+
+  .info-body-text :global(strong) {
+    font-weight: bold;
+    color: #1a1a1a;
+  }
+
+  /* 表（テーブル）のデザイン */
+  .info-body-text :global(.info-table) { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 15px; 
+  }
+  .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { 
+    border: 1px solid #ddd; 
+    padding: 12px; 
+  }
+  .info-body-text :global(.info-table th) { 
+    background-color: #f8f9fa; 
+    width: 30%; 
+    text-align: left; 
+    color: #374151; 
+  }
+
+  .info-body-text :global(a) { 
+    color: var(--themeColor); 
+    text-decoration: underline; 
+    font-weight: bold; 
+  }
+
+  /* スマホ表示（文字を18pxに） */
   @media (max-width: 640px) { 
     .info-content-card { padding: 25px 15px; } 
     h1 { font-size: 22px; } 
     .info-body-text { font-size: 18px; }
-    .info-body-text :global(h2) { font-size: 20px; }
-    .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { font-size: 16px; padding: 8px; }
+    
+    .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { 
+      display: block; 
+      width: 100%; 
+      box-sizing: border-box; 
+    }
+    .info-body-text :global(.info-table th) { border-bottom: none; }
   }
 </style>
-
-<script define:vars={{ pageData: copyrightData }}>
-  (function() {
-    const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    const lang = pageData[browserLang] ? browserLang : 'ja'; 
-    const t = pageData[lang];
-    const theme = '#872732'; // 日本語のテーマカラーに設定
-
-    // タイトルの反映
-    document.title = t.title + ' | 24Watchin';
-    document.getElementById('info-title').textContent = t.title;
-
-    // 最終更新日の反映
-    if (t.lastUpdated) {
-      document.getElementById('last-updated').textContent = t.lastUpdated;
-    }
-
-    // HTMLとして構成された本文（content）を流し込みます
-    document.getElementById('info-body').innerHTML = t.content;
-
-    document.body.style.setProperty('--theme-color', theme);
-  })();
-</script>
