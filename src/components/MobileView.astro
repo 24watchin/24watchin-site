@@ -3,7 +3,6 @@ import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
 // 司令塔から記事データを受け取ります
 const { latestStories = [] } = Astro.props;
-
 // 英語のカテゴリ翻訳ルール
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
@@ -14,7 +13,6 @@ const countryNameMap = {
   tw: 'Taiwan', es: 'Spain', fr: 'France', de: 'Germany',
   br: 'Brazil', kr: 'South Korea'
 };
-
 const backupStories = [
   { id: 1, category: 'Politics', countryCode: 'jp', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
   { id: 2, category: 'Economy', countryCode: 'us', country: 'USA', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
@@ -22,9 +20,7 @@ const backupStories = [
   { id: 4, category: 'Environment', countryCode: 'br', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
   { id: 5, category: 'Technology', countryCode: 'kr', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
 ];
-
 const displayStories = latestStories.length > 0 ? latestStories : backupStories;
-
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -35,7 +31,6 @@ const languages = [
   { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
-
 function stripHtml(html) {
   if (!html) return '';
   const text = html.replace(/<[^>]*>?/gm, '');
@@ -242,12 +237,12 @@ function getThumbnail(content) {
         </div>
         <div class="m-top-footer-center">
           <div class="m-top-footer-links">
-            <a href="/info/about/">ABOUT 24WATCHIN</a>
-            <a href="/info/privacy/">PRIVACY POLICY</a>
-            <a href="/info/terms/">TERMS OF USE</a>
-            <a href="/info/contact/">CONTACT</a>
-            <a href="/info/corrections/">CORRECTIONS POLICY</a>
-            <a href="/info/copyright/">COPYRIGHT / REUSE</a>
+            <a href="/en/info/about/">ABOUT 24WATCHIN</a>
+            <a href="/en/info/privacy/">PRIVACY POLICY</a>
+            <a href="/en/info/terms/">TERMS OF USE</a>
+            <a href="/en/info/contact/">CONTACT</a>
+            <a href="/en/info/corrections/">CORRECTIONS POLICY</a>
+            <a href="/en/info/copyright/">COPYRIGHT / REUSE</a>
           </div>
           <div class="m-top-footer-copy">
             <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
@@ -303,35 +298,14 @@ function getThumbnail(content) {
     .m-scroll-indicator .m-dot { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-scroll-indicator .m-dot.active { height: 20px; background: rgba(255, 255, 255, 0.9); }
     
-    .m-step-target {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.8s ease, visibility 0s linear 0.8s;
-    }
-    .m-step-target.is-visible {
-      z-index: 10000;
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-      transition: opacity 0.8s ease, visibility 0s linear 0s;
-    }
+    .m-step-target { position: fixed; inset: 0; z-index: 9999; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.8s ease, visibility 0s linear 0.8s; }
+    .m-step-target.is-visible { z-index: 10000; opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.8s ease, visibility 0s linear 0s; }
 
     .m-split-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .m-top-track, .m-bottom-track { width: 100vw; height: 50vh; height: 50dvh; position: relative; overflow: hidden; }
     
-    .m-panel { 
-      position: absolute; inset: 0; overflow: hidden; 
-      opacity: 0; visibility: hidden; 
-      transition: opacity 0.8s ease, visibility 0s linear 0.8s; 
-    }
-    .m-panel.is-active { 
-      opacity: 1; visibility: visible; 
-      transition: opacity 0.8s ease, visibility 0s linear 0s; 
-    }
+    .m-panel { position: absolute; inset: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, visibility 0s linear 0.8s; }
+    .m-panel.is-active { opacity: 1; visibility: visible; transition: opacity 0.8s ease, visibility 0s linear 0s; }
     
     .m-bg-layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
     
@@ -339,24 +313,11 @@ function getThumbnail(content) {
     .m-top-track .m-word-band-container { left: 0; justify-content: flex-start; }
     .m-bottom-track .m-word-band-container { right: 0; justify-content: flex-end; }
     
-    .m-word-band { 
-      backdrop-filter: blur(2px); 
-      display: flex; 
-      align-items: center; 
-      transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
-    }
+    .m-word-band { backdrop-filter: blur(2px); display: flex; align-items: center; transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
     
-    .m-top-track .m-word-band { 
-      padding: 6px 50px 6px 15px; 
-      transform: translateX(-100%); 
-      background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
-    }
+    .m-top-track .m-word-band { padding: 6px 50px 6px 15px; transform: translateX(-100%); background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%); }
 
-    .m-bottom-track .m-word-band { 
-      padding: 6px 15px 6px 50px; 
-      transform: translateX(100%); 
-      background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%);
-    }
+    .m-bottom-track .m-word-band { padding: 6px 15px 6px 50px; transform: translateX(100%); background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%); }
     
     .m-word-band h2 { color: #000; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.05em; margin: 0; opacity: 0; transition: opacity 0.3s ease; white-space: nowrap; }
     
@@ -382,27 +343,9 @@ function getThumbnail(content) {
     .m-step-target.is-visible .m-anim-desc2 { transition-delay: 1.2s; }
     .m-step-target.is-visible .m-anim-desc3 { transition-delay: 1.6s; }
     
-    /* ▼ m-seq-panel に flex を復活させ、フッターを正しく配置します ▼ */
-    .m-seq-panel { 
-      background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); 
-      overflow-y: auto; 
-      overflow-x: hidden; 
-      display: flex !important; 
-      flex-direction: column !important; 
-    }
+    .m-seq-panel { background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); overflow-y: auto; overflow-x: hidden; display: flex !important; flex-direction: column !important; }
     
-    /* ▼ m-seq-inner を伸縮可能にし、コンテンツを中央に配置 ▼ */
-    .m-seq-inner { 
-      width: 100%; 
-      opacity: 0; 
-      transform: translateY(20px); 
-      transition: all 0.6s ease; 
-      flex: 1 0 auto; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      padding-top: 80px; 
-    }
+    .m-seq-inner { width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; }
     .m-step-target.is-visible .m-seq-inner { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
     
     #m-screen-5 .m-seq-inner { justify-content: center; padding-bottom: 80px; }
@@ -414,15 +357,7 @@ function getThumbnail(content) {
     .m-carousel-wrapper { position: relative; width: 100%; }
     .m-no-link-color { color: inherit !important; text-decoration: none !important; }
     
-    .m-observer-card { 
-      scroll-snap-align: center; 
-      scroll-snap-stop: always; 
-      flex: 0 0 75vw; height: 45vh; margin: 0 3vw;
-      position: relative; border-radius: 8px; overflow: hidden; 
-      transition: all 0.4s ease; opacity: 0.5; transform: scale(0.9);
-      display: flex; flex-direction: column; 
-      border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111;
-    }
+    .m-observer-card { scroll-snap-align: center; scroll-snap-stop: always; flex: 0 0 75vw; height: 45vh; margin: 0 3vw; position: relative; border-radius: 8px; overflow: hidden; transition: all 0.4s ease; opacity: 0.5; transform: scale(0.9); display: flex; flex-direction: column; border: 1px solid rgba(255, 255, 255, 0.15); background-color: #111; }
     .m-observer-card.is-center { opacity: 1; transform: scale(1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); z-index: 10; }
     
     .m-card-img-box { width: 100%; height: 60%; position: relative; overflow: hidden; }
@@ -435,7 +370,7 @@ function getThumbnail(content) {
     .m-card-title { font-size: 1.1rem; font-weight: 400; line-height: 1.3; margin: 0; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     
     .m-lang-card { flex: 0 0 80vw; height: 15vh; display: flex; align-items: center; justify-content: center; }
-    .m-lang-card::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 5; pointer-events: none; transition: all 0.4s ease; }
+    .m-lang-card::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; z-index: 5; pointer-events: none; transition: all 0.4s ease; }
     .m-lang-card.is-center::before { top: 15px; left: 15px; right: 15px; bottom: 15px; border-color: rgba(255, 255, 255, 0.6); }
     .m-lang-bg { position: absolute; inset: 0; opacity: 0.15; transition: opacity 0.4s ease; }
     .m-lang-card.is-center .m-lang-bg { opacity: 0.8; }
@@ -451,17 +386,7 @@ function getThumbnail(content) {
     .m-c-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
     .m-c-dot.active { background: #fff; transform: scale(1.5); }
     
-    /* ▼ フッターが潰れないように flex-shrink: 0; を設定 ▼ */
-    .m-top-footer { 
-      position: relative; 
-      width: 100%; 
-      background: #393737; 
-      border-top: 1px solid rgba(255, 255, 255, 0.05); 
-      padding: 40px 20px; 
-      box-sizing: border-box; 
-      margin-top: auto; 
-      flex-shrink: 0;
-    }
+    .m-top-footer { position: relative; width: 100%; background: #393737; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 40px 20px; box-sizing: border-box; margin-top: auto; flex-shrink: 0; }
     .m-top-footer-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
     .m-top-footer-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
     .m-top-footer-center { width: 100%; }
@@ -475,14 +400,11 @@ function getThumbnail(content) {
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
     if (!window.matchMedia('(pointer: coarse)').matches) return;
-
     try {
       const SWIPE_THRESHOLD = 40; 
-
       let currentStep = 0;
       let isAnimating = false;
       let startX = 0, startY = 0, endX = 0, endY = 0;
-
       const body = document.body;
       const html = document.documentElement;
       const stageHero = document.getElementById('m-stage-hero');
@@ -490,41 +412,32 @@ function getThumbnail(content) {
       const screen5 = document.getElementById('m-screen-5');
       const screen6 = document.getElementById('m-screen-6');
       const dots = document.querySelectorAll('#m-scroll-indicator .m-dot');
-      
       const topPanels = document.querySelectorAll('.m-top-track .m-panel');
       const bottomPanels = document.querySelectorAll('.m-bottom-track .m-panel');
-
       const menuOpenBtn = document.getElementById('m-menu-open');
       const menuCloseBtn = document.getElementById('m-menu-close');
       const sideMenu = document.getElementById('m-side-menu');
-
       menuOpenBtn?.addEventListener('click', () => { sideMenu?.classList.add('is-open'); });
       menuCloseBtn?.addEventListener('click', () => { sideMenu?.classList.remove('is-open'); });
-
       window.addEventListener('touchstart', (e) => {
         if (sideMenu?.classList.contains('is-open')) return;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
       }, { passive: true });
-
       window.addEventListener('touchmove', (e) => {
         if (sideMenu?.classList.contains('is-open')) return;
         if (!e.target.closest('.m-carousel-container')) {
           e.preventDefault();
         }
       }, { passive: false });
-
       window.addEventListener('touchend', (e) => {
         if (sideMenu?.classList.contains('is-open')) return;
         endX = e.changedTouches[0].clientX;
         endY = e.changedTouches[0].clientY;
-        
         const diffX = startX - endX;
         const diffY = startY - endY;
-
         if (Math.abs(diffX) > Math.abs(diffY)) return;
         if (isAnimating) return;
-
         const visiblePanel = document.querySelector('.m-step-target.is-visible');
         if (visiblePanel && (currentStep === 4 || currentStep === 5)) {
             if (diffY < -SWIPE_THRESHOLD && visiblePanel.scrollTop <= 10) {
@@ -537,33 +450,26 @@ function getThumbnail(content) {
             }
             return;
         }
-        
         if (diffY > SWIPE_THRESHOLD) moveNext();
         else if (diffY < -SWIPE_THRESHOLD) movePrev();
       }, { passive: true });
-
       function setBodyLocked(locked) { 
         body.classList.toggle('m-is-locked', locked); 
         html.classList.toggle('m-is-locked', locked);
       }
-      
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
-      
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
         isAnimating = true;
         currentStep = step;
         updateIndicator(step);
-
         stageHero?.classList.remove('is-visible');
         brandPanel?.classList.remove('is-visible');
         screen5?.classList.remove('is-visible');
         screen6?.classList.remove('is-visible');
-
         topPanels.forEach(p => p.classList.remove('is-active'));
         bottomPanels.forEach(p => p.classList.remove('is-active'));
-
         if (step <= 2) {
             stageHero?.classList.add('is-visible');
             if (topPanels[step]) topPanels[step].classList.add('is-active');
@@ -577,19 +483,15 @@ function getThumbnail(content) {
             screen6?.classList.add('is-visible');
             screen6.scrollTop = 0; 
         }
-
         window.setTimeout(() => { isAnimating = false; }, 850);
       }
-
       function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
       function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
-
       function setupObserver(containerId, cardsClass, dotsId) {
         const container = document.getElementById(containerId);
         const cards = document.querySelectorAll(`${cardsClass}`);
         const dots = document.querySelectorAll(`#${dotsId} .m-c-dot`);
         if(!container || cards.length === 0) return;
-
         const observer = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
@@ -604,14 +506,11 @@ function getThumbnail(content) {
             }
           });
         }, { root: container, rootMargin: '0px -30% 0px -30%', threshold: 0 });
-        
         cards.forEach(card => observer.observe(card));
       }
-
       setupObserver('m-story-carousel', '#m-story-carousel .m-observer-card', 'm-story-carousel-dots');
       setupObserver('m-lang-carousel', '#m-lang-carousel .m-observer-card', 'm-lang-carousel-dots');
-
-      setBodyLocked(true); 
+      setBodyLocked(true);
     } catch (error) {
       console.error("スマホ版プログラムエラー:", error);
     }
