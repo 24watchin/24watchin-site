@@ -166,6 +166,3 @@ export const ja = {
     </section>
   `
 };
-
-// ⚠️ 一時的なエラー回避コード
-export const privacyData = { ja };
