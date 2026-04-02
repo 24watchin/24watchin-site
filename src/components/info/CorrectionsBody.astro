@@ -2,8 +2,9 @@
 // src/components/info/CorrectionsBody.astro
 import { ja } from '../../lib/info/ja/correctionsData.ts';
 import { en } from '../../lib/info/en/correctionsData.ts';
-// 繁体字データを読み込みます
 import { zhTW } from '../../lib/info/zh-tw/correctionsData.ts';
+// 簡体字データを新しく読み込みます
+import { zhCN } from '../../lib/info/zh-cn/correctionsData.ts';
 
 // 現在のURLを取得します
 const { pathname } = Astro.url;
@@ -14,10 +15,13 @@ let themeColor = '#872732'; // 日本語 (デフォルト)
 
 if (pathname.startsWith('/en/')) {
   data = en;
-  themeColor = '#001580'; // 英語 (ご指定の色)
+  themeColor = '#001580'; // 英語
 } else if (pathname.startsWith('/zh-tw/')) {
   data = zhTW;
-  themeColor = '#b33224'; // 中国語繁体字 (ご指定の色)
+  themeColor = '#b33224'; // 中国語繁体字
+} else if (pathname.startsWith('/zh-cn/')) {
+  data = zhCN;
+  themeColor = '#0e7c7b'; // 中国語簡体字
 }
 ---
 
