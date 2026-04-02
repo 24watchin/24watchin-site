@@ -65,7 +65,7 @@ export const ja = {
           <tr>
             <th>お問い合わせ</th>
             <td>
-              <a href="/ja/jp/info/contact/">お問い合わせフォームはこちら</a>
+              <a href="../contact/">お問い合わせフォームはこちら</a>
             </td>
           </tr>
         </tbody>
@@ -74,7 +74,7 @@ export const ja = {
 
     <section class="about-section">
       <h2>免責事項</h2>
-      <p>掲載情報については、できる限り正確性・最新性に配慮しています。詳細については、<a href="/ja/jp/info/terms/">利用規約</a>、<a href="/ja/jp/info/privacy/">プライバシーポリシー</a>、<a href="/ja/jp/info/corrections/">訂正・修正ポリシー</a>をご確認ください。</p>
+      <p>掲載情報については、できる限り正確性・最新性に配慮しています。詳細については、<a href="../terms/">利用規約</a>、<a href="../privacy/">プライバシーポリシー</a>、<a href="../corrections/">訂正・修正ポリシー</a>をご確認ください。</p>
     </section>
   `
 };
