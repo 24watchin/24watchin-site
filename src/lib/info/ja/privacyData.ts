@@ -17,7 +17,7 @@ export const ja = {
       <h2>2. 事業者情報</h2>
       <table class="info-table">
         <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
-        <tr><th>お問い合わせ</th><td><a href="/ja/jp/info/contact/">お問い合わせフォームはこちら</a></td></tr>
+        <tr><th>お問い合わせ</th><td><a href="../contact/">お問い合わせフォームはこちら</a></td></tr>
       </table>
     </section>
 
@@ -161,7 +161,7 @@ export const ja = {
       <h2>16. お問い合わせ窓口</h2>
       <table class="info-table">
         <tr><th>運営者</th><td>The Dexent Media Enterprises</td></tr>
-        <tr><th>お問い合わせ</th><td><a href="/ja/jp/info/contact/">お問い合わせフォームはこちら</a></td></tr>
+        <tr><th>お問い合わせ</th><td><a href="../contact/">お問い合わせフォームはこちら</a></td></tr>
       </table>
     </section>
   `
