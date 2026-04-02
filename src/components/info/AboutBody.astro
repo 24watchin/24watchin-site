@@ -3,14 +3,12 @@
 import { ja } from '../../lib/info/ja/aboutData.ts';
 import { en } from '../../lib/info/en/aboutData.ts';
 
-// 現在のURLから「ja」か「en」かを自動判別します
 const { pathname } = Astro.url;
 const isEnglish = pathname.startsWith('/en/');
 
-// 英語ならen、そうでなければjaのデータを使います
+// URLに応じてデータを切り替え
 const data = isEnglish ? en : ja;
-
-// テーマカラーも切り替えます（日本語：赤、英語：青）
+// URLに応じてテーマカラーを切り替え（日:赤、英:青）
 const themeColor = isEnglish ? '#0033a0' : '#872732';
 ---
 
@@ -21,62 +19,61 @@ const themeColor = isEnglish ? '#0033a0' : '#872732';
 
 <style define:vars={{ themeColor }}>
   .info-content-card { 
-    background: #fff;
+    background: #fff; 
     padding: 40px; 
     border-radius: 8px; 
     box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-    min-height: 500px;
+    min-height: 500px; 
   }
   
   h1 { 
     font-size: 24px; 
     font-weight: bold; 
     margin-bottom: 30px; 
-    padding-bottom: 15px;
+    padding-bottom: 15px; 
     border-bottom: 4px solid var(--themeColor); 
     color: #1a1a1a; 
   }
   
   .info-body-text { 
-    font-size: 16px;
+    font-size: 16px; 
     line-height: 1.8; 
     color: #444; 
   }
   
-  /* --- デザインの共通設定 --- */
-  .info-body-text :global(.about-intro) {
-    text-align: center;
-    margin-bottom: 50px;
-    padding-bottom: 30px;
-    border-bottom: 1px solid #eaeaea;
+  .info-body-text :global(.about-intro) { 
+    text-align: center; 
+    margin-bottom: 50px; 
+    padding-bottom: 30px; 
+    border-bottom: 1px solid #eaeaea; 
   }
   
-  .info-body-text :global(.catchphrase) {
-    font-size: 20px;
-    color: var(--themeColor);
-    margin-bottom: 20px;
-    line-height: 1.5;
+  .info-body-text :global(.catchphrase) { 
+    font-size: 20px; 
+    color: var(--themeColor); 
+    margin-bottom: 20px; 
+    line-height: 1.5; 
   }
   
   .info-body-text :global(.about-section) { 
-    margin-bottom: 40px;
+    margin-bottom: 40px; 
   }
 
   .info-body-text :global(h2) { 
     font-size: 20px; 
-    margin-top: 30px;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
+    margin-top: 30px; 
+    margin-bottom: 20px; 
+    padding-bottom: 10px; 
     border-bottom: 2px solid var(--themeColor); 
-    color: #1a1a1a;
+    color: #1a1a1a; 
   }
 
-  .info-body-text :global(.highlight-text) {
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 6px;
-    border-left: 4px solid var(--themeColor);
-    margin-top: 20px;
+  .info-body-text :global(.highlight-text) { 
+    background: #f9f9f9; 
+    padding: 20px; 
+    border-radius: 6px; 
+    border-left: 4px solid var(--themeColor); 
+    margin-top: 20px; 
   }
   
   .info-body-text :global(table.info-table) { 
@@ -89,22 +86,22 @@ const themeColor = isEnglish ? '#0033a0' : '#872732';
     padding: 12px; 
   }
   .info-body-text :global(th) { 
-    background-color: #f8f9fa;
+    background-color: #f8f9fa; 
     width: 30%; 
     text-align: left; 
-    color: #374151;
+    color: #374151; 
   }
-  .info-body-text :global(td a) {
-    color: var(--themeColor);
-    text-decoration: underline;
+  .info-body-text :global(td a) { 
+    color: var(--themeColor); 
+    text-decoration: underline; 
   }
   
   @media (max-width: 640px) { 
     .info-content-card { padding: 25px 15px; } 
-    .info-body-text { font-size: 18px; }
-    .info-body-text :global(th), .info-body-text :global(td) {
-      display: block;
-      width: 100%;
-    }
+    .info-body-text { font-size: 18px; } 
+    .info-body-text :global(th), .info-body-text :global(td) { 
+      display: block; 
+      width: 100%; 
+    } 
   }
 </style>
