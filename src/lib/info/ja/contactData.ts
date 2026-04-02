@@ -80,3 +80,4 @@ export const contactData = {
     errorText: 'Failed to send.',
   }
 };
+
