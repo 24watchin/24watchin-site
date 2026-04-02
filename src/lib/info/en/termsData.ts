@@ -5,7 +5,8 @@ export const en = {
   title: 'Terms of Use',
   lastUpdated: 'Last Updated: March 20, 2026',
   content: `
-    <p>These Terms of Use (hereinafter referred to as the "Terms") set forth the conditions for the use of the news website "24Watchin" operated by The Dexent Media Enterprises (hereinafter referred to as the "Site Operator"), as well as all related websites, subdomains, pages, and any other services (hereinafter collectively referred to as the "Service"). Users shall use the Service only after agreeing to these Terms.</p>
+    <p>These Terms of Use (hereinafter referred to as the "Terms") set forth the conditions for the use of the news website "24Watchin" operated by The Dexent Media Enterprises (hereinafter referred to as the "Site Operator"), as well as all related websites, subdomains, pages, and any other services (hereinafter collectively referred to as the "Service").</p>
+    <p>Users shall use the Service only after agreeing to these Terms.</p>
 
     <section class="info-section">
       <h2>Article 1 (Application)</h2>
@@ -76,7 +77,7 @@ export const en = {
     <section class="info-section">
       <h2>Article 7 (Quotation and Republishing)</h2>
       <ol>
-        <li>If a user quotes the Site Content, such quotation shall be made in accordance with copyright law and within the scope of lawful quotation.</li>
+        <li>If a user quotes the Site Content, such quotation shall be made in accordance with copyright law and other applicable laws and regulations, and within the scope of lawful quotation.</li>
         <li>In making a quotation, the source must be indicated and the quoted portion must be clearly distinguished from the other portions.</li>
         <li>Republishing the full text of an article or substantially all of it, unauthorized republication of images, and any other use deemed inappropriate by the Site Operator are prohibited.</li>
         <li>If a user wishes to make use of the Site Content beyond the scope of quotation, the user must obtain the prior permission of the Site Operator.</li>
@@ -121,6 +122,7 @@ export const en = {
         <li>The Site Operator does not guarantee the accuracy, completeness, timeliness, usefulness, safety, or any other aspect of the Service or the Site Content.</li>
         <li>Users shall use the Service based on their own judgment and responsibility, and the Site Operator shall not be liable for any judgments, actions, or any other results based on the Site Content.</li>
         <li>The Site Operator shall not be liable for any damages incurred by users or third parties due to the use or inability to use the Service, except where such damages are caused by the intentional misconduct or gross negligence of the Site Operator.</li>
+        <li>The provisions of the preceding paragraph shall apply only to the extent permitted by applicable law.</li>
       </ol>
     </section>
 
@@ -141,6 +143,7 @@ export const en = {
         <li>If the Site Operator deems it necessary, it may amend these Terms without prior notice to users.</li>
         <li>The amended Terms shall become effective from the time they are posted on the Service.</li>
         <li>If a user uses the Service after the amendment, such user shall be deemed to have agreed to the amended Terms.</li>
+        <li>Where applicable law requires notice to users, obtaining consent, or any other procedures, such requirements shall be followed in accordance with such law.</li>
       </ol>
     </section>
 
@@ -150,15 +153,22 @@ export const en = {
     </section>
 
     <section class="info-section">
-      <h2>Article 15 (Governing Law and Jurisdiction)</h2>
+      <h2>Article 15 (Region-Specific Governing Law and Dispute Resolution)</h2>
       <ol>
-        <li>These Terms and the use of the Service shall be governed by the laws of Japan.</li>
-        <li>In the event of any dispute between the Site Operator and a user in connection with these Terms or the Service, the Tokyo District Court shall have exclusive agreed jurisdiction as the court of first instance.</li>
+        <li>These Terms and the use of the Service shall be interpreted in accordance with the laws applicable to the user's place of residence and any other applicable laws and regulations.</li>
+        <li><strong>Residents of Japan</strong><br>
+        These Terms and the use of the Service shall be governed by the laws of Japan. In the event of any dispute between the Site Operator and a user in connection with these Terms or the Service, the Tokyo District Court shall have exclusive agreed jurisdiction as the court of first instance.</li>
+        <li><strong>Residents of the EEA and the United Kingdom</strong><br>
+        Nothing in these Terms shall limit any rights granted to such users under mandatory consumer protection laws applicable in their place of residence. In the event of any dispute in connection with these Terms or the Service, the governing law and jurisdiction shall be determined in accordance with such laws.</li>
+        <li><strong>Residents of the United States</strong><br>
+        Nothing in these Terms shall limit any rights granted to users under applicable federal or state law. In the event of any dispute in connection with these Terms or the Service, the governing law and jurisdiction shall be determined in accordance with applicable law.</li>
+        <li><strong>Residents of Other Regions</strong><br>
+        Nothing in these Terms shall limit any rights granted to users under mandatory laws applicable in their respective regions. In the event of any dispute in connection with these Terms or the Service, the governing law and jurisdiction shall be determined in accordance with applicable law.</li>
       </ol>
     </section>
 
     <section class="info-section">
-      <h2>Article 16 (Contact Desk)</h2>
+      <h2>Article 16 (Contact)</h2>
       <table class="info-table">
         <tr><th>Operator</th><td>The Dexent Media Enterprises</td></tr>
         <tr><th>Site Name</th><td>24Watchin</td></tr>
