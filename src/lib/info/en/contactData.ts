@@ -1,0 +1,48 @@
+// src/lib/info/en/contactData.ts
+// Contact Us English Data
+
+export const en = {
+  title: 'Contact Us',
+  intro1: 'Thank you for using 24Watchin. If you have any comments, feedback, or inquiries regarding this site, please contact us using the form below.',
+  intro2: 'We accept comments and suggestions regarding article content, notices of corrections, inquiries regarding copyright and republication, and consultations regarding advertising and partnerships.',
+  beforeTitle: 'Please review the following before contacting us',
+  before1: 'Depending on the nature and volume of inquiries, confirmation status, and other circumstances, it may take time for us to respond, or we may be unable to provide a response.',
+  before2: 'Inquiries received on Saturdays, Sundays, public holidays, or during the year-end and New Year holiday period may be reviewed on or after the next business day.',
+  before3: 'Please refrain from reproducing, quoting, or redistributing our response without authorization.',
+  before4: 'We may be unable to respond to messages sent solely for sales, solicitation, or promotional purposes.',
+  privacyTitle: 'Handling of Personal Information',
+  privacyText: 'The information you enter in the inquiry form will be used for responding to your inquiry, confirming its details, contacting you where necessary, and for other purposes incidental thereto. For details, please refer to our ',
+  privacyLink: 'Privacy Policy',
+  privacyEnd: '.',
+  formTitle: 'Inquiry Form',
+  typeLabel: 'Type of Inquiry',
+  typePlaceholder: 'Please select',
+  typeOptions: [
+    'Feedback or comments on article content',
+    'Correction request',
+    'Copyright or republication inquiry',
+    'Advertising or partnership inquiry',
+    'Other'
+  ],
+  nameLabel: 'Name',
+  namePlaceholder: 'Example: Taro Yamada',
+  emailLabel: 'Contact Email Address',
+  emailPlaceholder: 'Example: example@email.com',
+  companyLabel: 'Company / Organization Name',
+  companyPlaceholder: 'Example: ABC Co., Ltd.',
+  subjectLabel: 'Subject',
+  subjectPlaceholder: 'Example: Regarding an article',
+  urlLabel: 'Relevant Page URL',
+  urlPlaceholder: 'Example: https://24watchin.com/...',
+  urlNote: 'If your inquiry concerns an article or page, please provide the relevant URL.',
+  messageLabel: 'Inquiry Details',
+  messagePlaceholder: 'Please provide as much detail as possible.',
+  agreementText: 'I have read and agree to the Privacy Policy regarding the handling of my personal information.',
+  submitBtn: 'Send',
+  sending: 'Sending...',
+  required: 'Required',
+  optional: 'Optional',
+  successTitle: 'Inquiry received.',
+  successText: 'We have received your message and will get back to you if needed.',
+  errorText: 'Failed to send. Please try again later.'
+};
