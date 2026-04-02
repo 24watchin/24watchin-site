@@ -2,15 +2,23 @@
 // src/components/info/PrivacyBody.astro
 import { ja } from '../../lib/info/ja/privacyData.ts';
 import { en } from '../../lib/info/en/privacyData.ts';
+// 繁体字データを読み込みます
+import { zhTW } from '../../lib/info/zh-tw/privacyData.ts';
 
-// 現在のURLから「ja」か「en」かを自動判別します
+// 現在のURLを取得します
 const { pathname } = Astro.url;
-const isEnglish = pathname.startsWith('/en/');
 
-// URLに応じてデータを切り替え
-const data = isEnglish ? en : ja;
-// URLに応じてテーマカラーを切り替え（日本語：赤、英語：青）
-const themeColor = isEnglish ? '#0033a0' : '#872732';
+// 言語判定とテーマカラーの設定
+let data = ja;
+let themeColor = '#872732'; // 日本語 (デフォルト)
+
+if (pathname.startsWith('/en/')) {
+  data = en;
+  themeColor = '#001580'; // 英語 (ご指定の色)
+} else if (pathname.startsWith('/zh-tw/')) {
+  data = zhTW;
+  themeColor = '#b33224'; // 中国語繁体字 (ご指定の色)
+}
 ---
 
 <div class="info-content-card">
@@ -22,18 +30,18 @@ const themeColor = isEnglish ? '#0033a0' : '#872732';
 
 <style define:vars={{ themeColor }}>
   .info-content-card { 
-    background: #fff; 
+    background: #fff;
     padding: 40px; 
     border-radius: 8px; 
     box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-    margin-bottom: 40px; 
+    margin-bottom: 40px;
   }
   
   h1 { 
     font-size: 24px; 
     font-weight: bold; 
     margin-bottom: 10px; 
-    padding-bottom: 15px; 
+    padding-bottom: 15px;
     border-bottom: 4px solid var(--themeColor); 
     color: #1a1a1a; 
   }
@@ -41,66 +49,66 @@ const themeColor = isEnglish ? '#0033a0' : '#872732';
   .last-updated { 
     text-align: right; 
     color: #666; 
-    font-size: 14px; 
+    font-size: 14px;
     margin-bottom: 30px; 
   }
 
   .info-body-text { 
     font-size: 16px; 
     line-height: 1.8; 
-    color: #444; 
+    color: #444;
   }
 
   .info-body-text :global(.info-section) { 
-    margin-bottom: 35px; 
+    margin-bottom: 35px;
   }
 
   .info-body-text :global(h2) { 
     font-size: 20px; 
     margin-top: 30px; 
     margin-bottom: 20px; 
-    padding-bottom: 10px; 
+    padding-bottom: 10px;
     border-bottom: 2px solid var(--themeColor); 
     color: #1a1a1a; 
   }
 
   .info-body-text :global(h3) { 
     font-size: 18px; 
-    margin-top: 25px; 
+    margin-top: 25px;
     margin-bottom: 15px; 
     font-weight: bold; 
     color: #333; 
   }
 
   .info-body-text :global(ul), .info-body-text :global(ol) { 
-    padding-left: 20px; 
+    padding-left: 20px;
     margin-bottom: 15px; 
   }
 
   .info-body-text :global(li) { 
-    margin-bottom: 8px; 
+    margin-bottom: 8px;
   }
 
   .info-body-text :global(.info-table) { 
     width: 100%; 
     border-collapse: collapse; 
-    margin-top: 15px; 
+    margin-top: 15px;
   }
   .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { 
     border: 1px solid #ddd; 
-    padding: 12px; 
+    padding: 12px;
   }
   .info-body-text :global(.info-table th) { 
     background-color: #f8f9fa; 
     width: 30%; 
     text-align: left; 
-    color: #374151; 
+    color: #374151;
   }
 
   .info-body-text :global(a) { 
     color: var(--themeColor); 
     text-decoration: underline; 
-    font-weight: bold; 
+    font-weight: bold;
   }
 
   @media (max-width: 640px) { 
@@ -109,7 +117,7 @@ const themeColor = isEnglish ? '#0033a0' : '#872732';
     .info-body-text { font-size: 18px; }
     
     .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { 
-      display: block; 
+      display: block;
       width: 100%; 
       box-sizing: border-box; 
     }
