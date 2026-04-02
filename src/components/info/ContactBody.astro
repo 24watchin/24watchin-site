@@ -10,10 +10,11 @@ const isEnglish = pathname.startsWith('/en/');
 // URLに応じてデータを切り替え
 const data = isEnglish ? en : ja;
 // URLに応じてテーマカラーを切り替え
-const themeColor = isEnglish ? '#0033a0' : '#872732';
+const themeColor = isEnglish ?
+'#0033a0' : '#872732';
 
-// プライバシーポリシーへのリンク先をURLに合わせて変更します
-const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
+// プライバシーポリシーへのリンク先をデータファイル（.ts）の設定に合わせます
+const privacyPath = data.privacyPath;
 ---
 
 <div class="info-content-card">
@@ -36,7 +37,8 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
     <div class="info-section-box">
       <h2>{data.privacyTitle}</h2>
       <p>
-        {data.privacyText}
+      
+  {data.privacyText}
         <a href={privacyPath} class="theme-link">{data.privacyLink}</a>{data.privacyEnd}
       </p>
     </div>
@@ -52,7 +54,8 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
         <p>⚠️ <span>{data.errorText}</span></p>
       </div>
 
-      <form class="contact-form" id="contact-form">
+     
+  <form class="contact-form" id="contact-form">
         <div class="form-group">
           <label>{data.typeLabel} <span class="required-tag">{data.required}</span></label>
           <select name="type" required>
@@ -60,7 +63,8 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
             {data.typeOptions.map((opt) => (
               <option value={opt}>{opt}</option>
             ))}
-          </select>
+        
+   </select>
         </div>
 
         <div class="form-group">
@@ -73,7 +77,8 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
           <input type="email" name="email" required placeholder={data.emailPlaceholder}>
         </div>
 
-        <div class="form-group">
+    
+     <div class="form-group">
           <label>{data.companyLabel} <span class="optional-tag">{data.optional}</span></label>
           <input type="text" name="company" placeholder={data.companyPlaceholder}>
         </div>
@@ -84,7 +89,8 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
         </div>
 
         <div class="form-group">
-          <label>{data.urlLabel} <span class="optional-tag">{data.optional}</span></label>
+          
+<label>{data.urlLabel} <span class="optional-tag">{data.optional}</span></label>
           <input type="url" name="url" placeholder={data.urlPlaceholder}>
           <p class="form-note">{data.urlNote}</p>
         </div>
@@ -96,6 +102,7 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
 
         <div class="form-agreement">
           <input type="checkbox" id="agree" required>
+ 
           <label for="agree">{data.agreementText}</label>
         </div>
 
@@ -106,35 +113,55 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
 </div>
 
 <style define:vars={{ themeColor }}>
-  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 40px; }
-  h1 { font-size: 24px; font-weight: bold; margin-bottom: 30px; border-bottom: 4px solid var(--themeColor); padding-bottom: 15px; }
-  .info-body-text { font-size: 16px; line-height: 1.8; color: #444; }
-  .info-section-box { margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
-  h2 { font-size: 20px; border-left: 4px solid var(--themeColor); padding-left: 10px; margin-bottom: 15px; color: #1a1a1a; }
+  .info-content-card { background: #fff;
+ padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 40px; }
+  h1 { font-size: 24px; font-weight: bold;
+ margin-bottom: 30px; border-bottom: 4px solid var(--themeColor); padding-bottom: 15px; }
+  .info-body-text { font-size: 16px; line-height: 1.8; color: #444;
+ }
+  .info-section-box { margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee;
+ }
+  h2 { font-size: 20px; border-left: 4px solid var(--themeColor); padding-left: 10px; margin-bottom: 15px; color: #1a1a1a;
+ }
   .info-list { padding-left: 20px; }
   .info-list li { margin-bottom: 8px; }
-  .theme-link { color: var(--themeColor); text-decoration: underline; font-weight: bold; }
-  .contact-form-wrapper { margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px; }
+  .theme-link { color: var(--themeColor);
+ text-decoration: underline; font-weight: bold; }
+  .contact-form-wrapper { margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px;
+ }
   .form-group { margin-bottom: 25px; }
-  .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #1a1a1a; }
-  .required-tag { color: #fff; background-color: #d52b1e; font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
-  .optional-tag { color: #fff; background-color: #888; font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
-  .form-note { font-size: 14px; color: #666; margin-top: 5px; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
-  .form-agreement { margin: 30px 0; display: flex; align-items: flex-start; gap: 10px; padding: 15px; background-color: #f5f5f5; border-radius: 4px; }
+  .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #1a1a1a;
+ }
+  .required-tag { color: #fff; background-color: #d52b1e; font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px;
+ }
+  .optional-tag { color: #fff; background-color: #888; font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px;
+ }
+  .form-note { font-size: 14px; color: #666; margin-top: 5px;
+ }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px;
+ font-size: 16px; box-sizing: border-box; }
+  .form-agreement { margin: 30px 0; display: flex; align-items: flex-start; gap: 10px; padding: 15px;
+ background-color: #f5f5f5; border-radius: 4px; }
   .form-agreement input { margin-top: 5px; cursor: pointer; }
-  .form-agreement label { cursor: pointer; font-weight: bold; }
-  .submit-btn { background: var(--themeColor); color: #fff; padding: 16px 40px; border: none; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; }
+  .form-agreement label { cursor: pointer;
+ font-weight: bold; }
+  .submit-btn { background: var(--themeColor); color: #fff; padding: 16px 40px; border: none; border-radius: 4px; font-size: 18px;
+ font-weight: bold; cursor: pointer; width: 100%; }
   .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .form-success { background: #f0fdf4; border: 1px solid #86efac; padding: 16px; margin-bottom: 20px; border-radius: 4px; color: #166534; }
-  .form-error { background: #fef2f2; border: 1px solid #fca5a5; padding: 16px; margin-bottom: 20px; border-radius: 4px; color: #991b1b; }
-  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } .info-body-text { font-size: 18px; } .form-group input, .form-group select, .form-group textarea { font-size: 18px; } }
+  .form-success { background: #f0fdf4;
+ border: 1px solid #86efac; padding: 16px; margin-bottom: 20px; border-radius: 4px; color: #166534; }
+  .form-error { background: #fef2f2;
+ border: 1px solid #fca5a5; padding: 16px; margin-bottom: 20px; border-radius: 4px; color: #991b1b;
+ }
+  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } .info-body-text { font-size: 18px;
+ } .form-group input, .form-group select, .form-group textarea { font-size: 18px;
+ } }
 </style>
 
 <script define:vars={{ sendingText: data.sending, submitText: data.submitBtn }}>
   const form = document.getElementById('contact-form');
   const successMsg = document.getElementById('form-success');
-  const errorMsg = document.getElementById('form-error');
+ const errorMsg = document.getElementById('form-error');
   const submitBtn = document.getElementById('submit-btn');
 
   if (form) {
@@ -149,7 +176,8 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
       const payload = Object.fromEntries(formData.entries());
       
       try {
-        const response = await fetch('https://contact-form.24watchin-news.workers.dev/', { 
+     
+    const response = await fetch('https://contact-form.24watchin-news.workers.dev/', { 
           method: 'POST', 
           headers: { 'Content-Type': 'application/json' }, 
           body: JSON.stringify(payload) 
@@ -158,6 +186,7 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
         if (response.ok) { 
           form.reset(); 
           successMsg.style.display = 'block'; 
+ 
           successMsg.scrollIntoView({ behavior: 'smooth' }); 
         } else { 
           errorMsg.style.display = 'block'; 
@@ -167,7 +196,7 @@ const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
       } finally { 
         submitBtn.disabled = false;
         submitBtn.textContent = submitText;
-      }
+ }
     });
   }
 </script>
