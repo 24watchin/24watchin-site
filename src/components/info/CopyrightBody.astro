@@ -1,46 +1,98 @@
 ---
 // src/components/info/CopyrightBody.astro
+// 成川様が作成されたデータファイル（jaフォルダ内）を読み込みます
+import { copyrightData } from '../../lib/info/ja/copyrightData.ts';
 ---
 
 <div class="info-content-card">
   <h1 id="info-title">Copyright / Reuse</h1>
+  <p id="last-updated" class="last-updated"></p>
   <div id="info-body" class="info-body-text">
     Loading...
   </div>
 </div>
 
 <style>
-  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
-  h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 4px solid var(--theme-color); color: #1a1a1a; }
-  .info-body-text { line-height: 1.8; color: #444; white-space: pre-wrap; }
-  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } h1 { font-size: 1.4rem; } }
+  .info-content-card { 
+    background: #fff; 
+    padding: 40px; 
+    border-radius: 8px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    margin-bottom: 40px; 
+  }
+  
+  /* 大見出し：24px */
+  h1 { 
+    font-size: 24px; 
+    font-weight: bold; 
+    margin-bottom: 10px; 
+    padding-bottom: 15px; 
+    border-bottom: 4px solid var(--theme-color); 
+    color: #1a1a1a; 
+  }
+
+  .last-updated {
+    text-align: right;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+  }
+
+  /* パソコン版の本文件サイズ：16px */
+  .info-body-text { 
+    font-size: 16px; 
+    line-height: 1.8; 
+    color: #444; 
+  }
+
+  /* データ内に書き込まれたHTMLタグのデザイン調整 */
+  .info-body-text :global(section) { margin-bottom: 35px; }
+  .info-body-text :global(h2) { 
+    font-size: 20px; 
+    border-left: 4px solid var(--theme-color); 
+    padding-left: 10px; 
+    margin-bottom: 15px; 
+    color: #1a1a1a; 
+  }
+  .info-body-text :global(h3) { font-size: 18px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
+  .info-body-text :global(ul) { padding-left: 20px; margin-bottom: 15px; }
+  .info-body-text :global(li) { margin-bottom: 8px; }
+
+  /* テーブル（お問い合わせ窓口）のデザイン */
+  .info-body-text :global(.info-table) { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { border: 1px solid #ddd; padding: 12px; font-size: 16px; }
+  .info-body-text :global(.info-table th) { background-color: #f8f9fa; width: 30%; text-align: left; }
+  .info-body-text :global(a) { color: var(--theme-color); text-decoration: underline; font-weight: bold; }
+
+  /* スマホ表示時の設定：18px */
+  @media (max-width: 640px) { 
+    .info-content-card { padding: 25px 15px; } 
+    h1 { font-size: 22px; } 
+    .info-body-text { font-size: 18px; }
+    .info-body-text :global(h2) { font-size: 20px; }
+    .info-body-text :global(.info-table th), .info-body-text :global(.info-table td) { font-size: 16px; padding: 8px; }
+  }
 </style>
 
-<script is:inline>
+<script define:vars={{ pageData: copyrightData }}>
   (function() {
-    const translations = {
-      ja: {
-        title: '著作権・再利用について',
-        body: '24Watchinに掲載されているすべてのコンテンツ（記事、画像、デザイン等）の著作権は、The Dexent Media Enterprisesまたは情報提供者に帰属します。\n\n私的使用の範囲を超えて、無断で転載、複製、放送等を行うことは禁止されています。記事の引用については、著作権法に基づき適切な範囲で行ってください。',
-        theme: '#872732'
-      },
-      en: {
-        title: 'Copyright / Reuse',
-        body: 'All content (articles, images, designs, etc.) published on 24Watchin is the property of The Dexent Media Enterprises or its content providers.\n\nUnauthorized reproduction, distribution, or broadcasting beyond personal use is prohibited. Please ensure any citations comply with copyright laws.',
-        theme: '#0033a0'
-      },
-      'zh-cn': {
-        title: '版权 / 再利用',
-        body: '24Watchin 上发布的所有内容（文章、图像、设计等）均属于 The Dexent Media Enterprises 或其内容提供商所有。\n\n严禁超出个人使用范围的擅自转载、复制或广播。引用文章时，请确保符合版权法的相关规定。',
-        theme: '#e60012'
-      }
-    };
     const browserLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    const lang = translations[browserLang] ? browserLang : 'en';
-    const t = translations[lang];
+    const lang = pageData[browserLang] ? browserLang : 'ja'; 
+    const t = pageData[lang];
+    const theme = '#872732'; // 日本語のテーマカラーに設定
+
+    // タイトルの反映
     document.title = t.title + ' | 24Watchin';
     document.getElementById('info-title').textContent = t.title;
-    document.getElementById('info-body').textContent = t.body;
-    document.body.style.setProperty('--theme-color', t.theme);
+
+    // 最終更新日の反映
+    if (t.lastUpdated) {
+      document.getElementById('last-updated').textContent = t.lastUpdated;
+    }
+
+    // HTMLとして構成された本文（content）を流し込みます
+    document.getElementById('info-body').innerHTML = t.content;
+
+    document.body.style.setProperty('--theme-color', theme);
   })();
 </script>
