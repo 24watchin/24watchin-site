@@ -3,6 +3,8 @@
 import { ja } from '../../lib/info/ja/copyrightData.ts';
 import { en } from '../../lib/info/en/copyrightData.ts';
 import { zhTW } from '../../lib/info/zh-tw/copyrightData.ts';
+// 簡体字データを新しく読み込みます
+import { zhCN } from '../../lib/info/zh-cn/copyrightData.ts';
 
 // 現在のURLから言語を自動判別します
 const { pathname } = Astro.url;
@@ -17,6 +19,9 @@ if (pathname.startsWith('/en/')) {
 } else if (pathname.startsWith('/zh-tw/')) {
   data = zhTW;
   themeColor = '#b33224'; // 中国語繁体字
+} else if (pathname.startsWith('/zh-cn/')) {
+  data = zhCN;
+  themeColor = '#0e7c7b'; // 中国語簡体字 (ご指定の色)
 }
 ---
 
