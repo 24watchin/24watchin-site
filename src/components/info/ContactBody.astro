@@ -1,241 +1,137 @@
 ---
 // src/components/info/ContactBody.astro
-// バインダーを使わず、直接「jaフォルダ」のデータを取りに行きます
 import { ja } from '../../lib/info/ja/contactData.ts';
+import { en } from '../../lib/info/en/contactData.ts';
 
-// 日本語ページのテーマカラーを設定します
-const themeColor = '#872732';
+// 現在のURLから「ja」か「en」かを自動判別します
+const { pathname } = Astro.url;
+const isEnglish = pathname.startsWith('/en/');
+
+// URLに応じてデータを切り替え
+const data = isEnglish ? en : ja;
+// URLに応じてテーマカラーを切り替え
+const themeColor = isEnglish ? '#0033a0' : '#872732';
+
+// プライバシーポリシーへのリンク先をURLに合わせて変更します
+const privacyPath = isEnglish ? '/en/us/info/privacy/' : '/ja/jp/info/privacy/';
 ---
 
 <div class="info-content-card">
-  <h1 id="info-title">{ja.title}</h1>
+  <h1 id="info-title">{data.title}</h1>
   
   <div class="info-body-text">
-    <p>{ja.intro1}</p>
-    <p>{ja.intro2}</p>
+    <p>{data.intro1}</p>
+    <p>{data.intro2}</p>
 
     <div class="info-section-box">
-      <h2>{ja.beforeTitle}</h2>
+      <h2>{data.beforeTitle}</h2>
       <ul class="info-list">
-        <li>{ja.before1}</li>
-        <li>{ja.before2}</li>
-        <li>{ja.before3}</li>
-        <li>{ja.before4}</li>
+        <li>{data.before1}</li>
+        <li>{data.before2}</li>
+        <li>{data.before3}</li>
+        <li>{data.before4}</li>
       </ul>
     </div>
 
     <div class="info-section-box">
-      <h2>{ja.privacyTitle}</h2>
+      <h2>{data.privacyTitle}</h2>
       <p>
-        {ja.privacyText}
-        <a href="/ja/jp/info/privacy/" class="theme-link">{ja.privacyLink}</a>{ja.privacyEnd}
+        {data.privacyText}
+        <a href={privacyPath} class="theme-link">{data.privacyLink}</a>{data.privacyEnd}
       </p>
     </div>
 
     <div class="contact-form-wrapper">
-      <h2>{ja.formTitle}</h2>
+      <h2>{data.formTitle}</h2>
       
       <div id="form-success" class="form-success" style="display:none;">
-        <p>✅ <span>{ja.successTitle}</span></p>
-        <p>{ja.successText}</p>
+        <p>✅ <span>{data.successTitle}</span></p>
+        <p>{data.successText}</p>
       </div>
       <div id="form-error" class="form-error" style="display:none;">
-        <p>⚠️ <span>{ja.errorText}</span></p>
+        <p>⚠️ <span>{data.errorText}</span></p>
       </div>
 
       <form class="contact-form" id="contact-form">
         <div class="form-group">
-          <label>{ja.typeLabel} <span class="required-tag">{ja.required}</span></label>
+          <label>{data.typeLabel} <span class="required-tag">{data.required}</span></label>
           <select name="type" required>
-            <option value="" disabled selected>{ja.typePlaceholder}</option>
-            {ja.typeOptions.map((opt) => (
+            <option value="" disabled selected>{data.typePlaceholder}</option>
+            {data.typeOptions.map((opt) => (
               <option value={opt}>{opt}</option>
             ))}
           </select>
         </div>
 
         <div class="form-group">
-          <label>{ja.nameLabel} <span class="required-tag">{ja.required}</span></label>
-          <input type="text" name="name" required placeholder={ja.namePlaceholder}>
+          <label>{data.nameLabel} <span class="required-tag">{data.required}</span></label>
+          <input type="text" name="name" required placeholder={data.namePlaceholder}>
         </div>
 
         <div class="form-group">
-          <label>{ja.emailLabel} <span class="required-tag">{ja.required}</span></label>
-          <input type="email" name="email" required placeholder={ja.emailPlaceholder}>
+          <label>{data.emailLabel} <span class="required-tag">{data.required}</span></label>
+          <input type="email" name="email" required placeholder={data.emailPlaceholder}>
         </div>
 
         <div class="form-group">
-          <label>{ja.companyLabel} <span class="optional-tag">{ja.optional}</span></label>
-          <input type="text" name="company" placeholder={ja.companyPlaceholder}>
+          <label>{data.companyLabel} <span class="optional-tag">{data.optional}</span></label>
+          <input type="text" name="company" placeholder={data.companyPlaceholder}>
         </div>
 
         <div class="form-group">
-          <label>{ja.subjectLabel} <span class="required-tag">{ja.required}</span></label>
-          <input type="text" name="subject" required placeholder={ja.subjectPlaceholder}>
+          <label>{data.subjectLabel} <span class="required-tag">{data.required}</span></label>
+          <input type="text" name="subject" required placeholder={data.subjectPlaceholder}>
         </div>
 
         <div class="form-group">
-          <label>{ja.urlLabel} <span class="optional-tag">{ja.optional}</span></label>
-          <input type="url" name="url" placeholder={ja.urlPlaceholder}>
-          <p class="form-note">{ja.urlNote}</p>
+          <label>{data.urlLabel} <span class="optional-tag">{data.optional}</span></label>
+          <input type="url" name="url" placeholder={data.urlPlaceholder}>
+          <p class="form-note">{data.urlNote}</p>
         </div>
 
         <div class="form-group">
-          <label>{ja.messageLabel} <span class="required-tag">{ja.required}</span></label>
-          <textarea name="message" rows="6" required placeholder={ja.messagePlaceholder}></textarea>
+          <label>{data.messageLabel} <span class="required-tag">{data.required}</span></label>
+          <textarea name="message" rows="6" required placeholder={data.messagePlaceholder}></textarea>
         </div>
 
         <div class="form-agreement">
           <input type="checkbox" id="agree" required>
-          <label for="agree">{ja.agreementText}</label>
+          <label for="agree">{data.agreementText}</label>
         </div>
 
-        <button type="submit" id="submit-btn" class="submit-btn">{ja.submitBtn}</button>
+        <button type="submit" id="submit-btn" class="submit-btn">{data.submitBtn}</button>
       </form>
     </div>
   </div>
 </div>
 
 <style define:vars={{ themeColor }}>
-  .info-content-card { 
-    background: #fff; 
-    padding: 40px; 
-    border-radius: 8px; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-    margin-bottom: 40px; 
-  }
-  h1 { 
-    font-size: 24px; 
-    font-weight: bold; 
-    margin-bottom: 30px; 
-    border-bottom: 4px solid var(--themeColor); 
-    padding-bottom: 15px; 
-  }
-  
-  .info-body-text { 
-    font-size: 16px; 
-    line-height: 1.8; 
-    color: #444; 
-  }
-  
-  .info-section-box { 
-    margin: 30px 0; 
-    padding: 20px; 
-    background: #f9f9f9; 
-    border-radius: 8px; 
-    border: 1px solid #eee; 
-  }
-  h2 { 
-    font-size: 20px; 
-    border-left: 4px solid var(--themeColor); 
-    padding-left: 10px; 
-    margin-bottom: 15px; 
-    color: #1a1a1a; 
-  }
-  .info-list { padding-left: 20px; margin-bottom: 0; }
+  .info-content-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 40px; }
+  h1 { font-size: 24px; font-weight: bold; margin-bottom: 30px; border-bottom: 4px solid var(--themeColor); padding-bottom: 15px; }
+  .info-body-text { font-size: 16px; line-height: 1.8; color: #444; }
+  .info-section-box { margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+  h2 { font-size: 20px; border-left: 4px solid var(--themeColor); padding-left: 10px; margin-bottom: 15px; color: #1a1a1a; }
+  .info-list { padding-left: 20px; }
   .info-list li { margin-bottom: 8px; }
   .theme-link { color: var(--themeColor); text-decoration: underline; font-weight: bold; }
-
-  .contact-form-wrapper { 
-    margin-top: 40px; 
-    border-top: 2px solid #eee; 
-    padding-top: 30px; 
-  }
+  .contact-form-wrapper { margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px; }
   .form-group { margin-bottom: 25px; }
-  .form-group label { 
-    display: block; 
-    font-weight: bold; 
-    margin-bottom: 8px; 
-    color: #1a1a1a; 
-  }
-  
-  .required-tag { 
-    color: #fff; 
-    background-color: #d52b1e; 
-    font-size: 12px; 
-    padding: 2px 6px; 
-    border-radius: 4px; 
-    margin-left: 8px; 
-    font-weight: normal; 
-  }
-  .optional-tag { 
-    color: #fff; 
-    background-color: #888; 
-    font-size: 12px; 
-    padding: 2px 6px; 
-    border-radius: 4px; 
-    margin-left: 8px; 
-    font-weight: normal; 
-  }
-  
-  .form-note { font-size: 14px; color: #666; margin-top: 5px; margin-bottom: 0; }
-
-  .form-group input, .form-group select, .form-group textarea {
-    width: 100%; 
-    padding: 12px; 
-    border: 1px solid #ccc; 
-    border-radius: 4px; 
-    font-size: 16px; 
-    box-sizing: border-box; 
-    font-family: inherit;
-  }
-  
-  .form-agreement { 
-    margin: 30px 0; 
-    display: flex; 
-    align-items: flex-start; 
-    gap: 10px; 
-    padding: 15px; 
-    background-color: #f5f5f5; 
-    border-radius: 4px; 
-  }
+  .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #1a1a1a; }
+  .required-tag { color: #fff; background-color: #d52b1e; font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+  .optional-tag { color: #fff; background-color: #888; font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+  .form-note { font-size: 14px; color: #666; margin-top: 5px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
+  .form-agreement { margin: 30px 0; display: flex; align-items: flex-start; gap: 10px; padding: 15px; background-color: #f5f5f5; border-radius: 4px; }
   .form-agreement input { margin-top: 5px; cursor: pointer; }
-  .form-agreement label { cursor: pointer; margin-bottom: 0; font-weight: bold; }
-
-  .submit-btn {
-    background: var(--themeColor); 
-    color: #fff; 
-    padding: 16px 40px; 
-    border: none; 
-    border-radius: 4px; 
-    font-size: 18px; 
-    font-weight: bold; 
-    cursor: pointer; 
-    width: 100%; 
-    transition: opacity 0.2s; 
-  }
-  .submit-btn:hover { opacity: 0.9; }
+  .form-agreement label { cursor: pointer; font-weight: bold; }
+  .submit-btn { background: var(--themeColor); color: #fff; padding: 16px 40px; border: none; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; }
   .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .form-success { 
-    background: #f0fdf4; 
-    border: 1px solid #86efac; 
-    padding: 16px; 
-    margin-bottom: 20px; 
-    border-radius: 4px; 
-    color: #166534; 
-  }
-  .form-success p { margin: 0 0 5px; }
-  .form-error { 
-    background: #fef2f2; 
-    border: 1px solid #fca5a5; 
-    padding: 16px; 
-    margin-bottom: 20px; 
-    border-radius: 4px; 
-    color: #991b1b; 
-  }
-  .form-error p { margin: 0; }
-
-  @media (max-width: 640px) {
-    .info-content-card { padding: 25px 15px; }
-    .info-body-text { font-size: 18px; }
-    h2 { font-size: 20px; }
-    .form-group input, .form-group select, .form-group textarea { font-size: 18px; }
-  }
+  .form-success { background: #f0fdf4; border: 1px solid #86efac; padding: 16px; margin-bottom: 20px; border-radius: 4px; color: #166534; }
+  .form-error { background: #fef2f2; border: 1px solid #fca5a5; padding: 16px; margin-bottom: 20px; border-radius: 4px; color: #991b1b; }
+  @media (max-width: 640px) { .info-content-card { padding: 25px 15px; } .info-body-text { font-size: 18px; } .form-group input, .form-group select, .form-group textarea { font-size: 18px; } }
 </style>
 
-<script define:vars={{ sendingText: ja.sending, submitText: ja.submitBtn }}>
-  // フォーム送信の裏側の仕組み（Cloudflare Workerとの通信）だけをここに残します
+<script define:vars={{ sendingText: data.sending, submitText: data.submitBtn }}>
   const form = document.getElementById('contact-form');
   const successMsg = document.getElementById('form-success');
   const errorMsg = document.getElementById('form-error');
@@ -244,20 +140,19 @@ const themeColor = '#872732';
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault(); 
-      
       submitBtn.disabled = true;
-      submitBtn.textContent = sendingText; // 「送信中...」に変更
+      submitBtn.textContent = sendingText;
       successMsg.style.display = 'none';
       errorMsg.style.display = 'none';
       
       const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
+      const payload = Object.fromEntries(formData.entries());
       
       try {
         const response = await fetch('https://contact-form.24watchin-news.workers.dev/', { 
           method: 'POST', 
           headers: { 'Content-Type': 'application/json' }, 
-          body: JSON.stringify(data) 
+          body: JSON.stringify(payload) 
         });
         
         if (response.ok) { 
@@ -271,7 +166,7 @@ const themeColor = '#872732';
         errorMsg.style.display = 'block'; 
       } finally { 
         submitBtn.disabled = false;
-        submitBtn.textContent = submitText; // 「送信」に戻す
+        submitBtn.textContent = submitText;
       }
     });
   }
