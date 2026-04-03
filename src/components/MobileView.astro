@@ -3,6 +3,7 @@ import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
 // 司令塔から記事データを受け取ります
 const { latestStories = [] } = Astro.props;
+
 // 英語のカテゴリ翻訳ルール
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
@@ -13,14 +14,15 @@ const countryNameMap = {
   tw: 'Taiwan', es: 'Spain', fr: 'France', de: 'Germany',
   br: 'Brazil', kr: 'South Korea'
 };
-const backupStories = [
-  { id: 1, category: 'Politics', countryCode: 'jp', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 2, category: 'Economy', countryCode: 'us', country: 'USA', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 3, category: 'Society', countryCode: 'fr', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 4, category: 'Environment', countryCode: 'br', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 5, category: 'Technology', countryCode: 'kr', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-];
-const displayStories = latestStories.length > 0 ? latestStories : backupStories;
+
+// en- から始まるラベル（タグ）を持っている記事だけを絞り込みます
+const displayStories = latestStories.filter(post => {
+  if (post.labels && Array.isArray(post.labels)) {
+    return post.labels.some(label => label.startsWith('en-'));
+  }
+  return false;
+});
+
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -31,6 +33,7 @@ const languages = [
   { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
+
 function stripHtml(html) {
   if (!html) return '';
   const text = html.replace(/<[^>]*>?/gm, '');
@@ -150,8 +153,10 @@ function getThumbnail(content) {
             let countryCode = 'world';
             let countryName = '';
             let dateText = '';
+
             if (post.labels && Array.isArray(post.labels)) {
               bgImage = getThumbnail(post.content);
+
               const countryTag = post.labels.find(l => l.startsWith('en-'));
               if (countryTag) {
                 countryCode = countryTag.replace('en-', '');
@@ -161,13 +166,8 @@ function getThumbnail(content) {
                 post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
               );
               if (foundCat) categoryName = foundCat.label;
+              
               dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-            } else {
-              bgImage = post.image;
-              categoryName = post.category;
-              countryCode = post.countryCode;
-              countryName = post.country;
-              dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             }
 
             return (
@@ -439,6 +439,7 @@ function getThumbnail(content) {
         if (Math.abs(diffX) > Math.abs(diffY)) return;
         if (isAnimating) return;
         const visiblePanel = document.querySelector('.m-step-target.is-visible');
+        
         if (visiblePanel && (currentStep === 4 || currentStep === 5)) {
             if (diffY < -SWIPE_THRESHOLD && visiblePanel.scrollTop <= 10) {
                movePrev();
@@ -457,7 +458,8 @@ function getThumbnail(content) {
         body.classList.toggle('m-is-locked', locked); 
         html.classList.toggle('m-is-locked', locked);
       }
-      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
+      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); });
+      }
       function goToStep(step) {
         if (step < 0 || step > 5) return;
         if (isAnimating) return;
