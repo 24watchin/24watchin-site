@@ -1,2 +1,9 @@
 /jp/jp/* /ja/jp/:splat 301
 /jp/* /ja/:splat 301
+
+/info /en/info/about/ 301
+/info/ /en/info/about/ 301
+/info/about /en/info/about/ 301
+/info/about/ /en/info/about/ 301
+/info/contact /en/info/contact/ 301
+/info/contact/ /en/info/contact/ 301
