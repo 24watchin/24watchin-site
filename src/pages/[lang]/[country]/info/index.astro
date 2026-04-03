@@ -1,0 +1,16 @@
+---
+// src/pages/[lang]/[country]/info/index.astro
+export function getStaticPaths() {
+  // ここには言語と国の組み合わせを記述します
+  // 本来は全組み合わせが必要ですが、まずは代表的なものを入れるか、
+  // すでに他のページ（about.astroなど）で使っている設定をコピーしてください
+  return [
+    { params: { lang: 'en', country: 'us' } },
+    { params: { lang: 'ru', country: 'ua' } }, // 例
+    // ...必要な分だけ追加
+  ];
+}
+
+const { lang, country } = Astro.params;
+return Astro.redirect(`/${lang}/${country}/info/about/`);
+---
