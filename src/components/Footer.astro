@@ -6,11 +6,21 @@ import { getCountryLabel } from '../lib/countryData.ts';
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
-const lang = pathParts[0] || 'ja';
-const country = pathParts[1] || 'jp';
+
+// 1. 言語の判定（404などのエラー対策）
+const supportedLangs = ['ja', 'en', 'zh-cn', 'zh-tw', 'es', 'fr', 'de', 'ru'];
+const lang = supportedLangs.includes(pathParts[0]) ? pathParts[0] : 'ja';
+
+// 2. 国コードの判定（'info'を国として誤認するのを防ぐ）
+const country = (pathParts.length > 1 && pathParts[1] !== 'info') ? pathParts[1] : '';
+
+// 3. リンク用のベースURLを組み立てる
+const infoBasePath = country ? `/${lang}/${country}/info` : `/${lang}/info`;
+const homePath = country ? `/${lang}/${country}/` : `/${lang}/`;
 
 let { allPosts = [] } = Astro.props;
 const cacheKey = 'bloggerPostsCache_' + lang;
+
 if ((!allPosts || allPosts.length === 0) && globalThis[cacheKey]) {
   allPosts = await globalThis[cacheKey];
 }
@@ -30,9 +40,9 @@ const globalRegionsRaw = [
 const regionNames: Record<string, Record<string, string>> = {
   asia:     { ja: 'アジア', en: 'Asia', 'zh-cn': '亚洲', 'zh-tw': '亞洲', es: 'Asia', fr: 'Asie', de: 'Asien', ru: 'Азия' },
   europe:   { ja: 'ヨーロッパ', en: 'Europe', 'zh-cn': '欧洲', 'zh-tw': '歐洲', es: 'Europa', fr: 'Europe', de: 'Europa', ru: 'Европа' },
-  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Аメリka' },
-  mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中東与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
-  oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'オセアニア' },
+  americas: { ja: '南北アメリカ', en: 'Americas', 'zh-cn': '美洲', 'zh-tw': '美洲', es: 'Américas', fr: 'Amériques', de: 'Amerika', ru: 'Америка' },
+  mideast:  { ja: '中東・アフリカ', en: 'Middle East & Africa', 'zh-cn': '中东与非洲', 'zh-tw': '中東與非洲', es: 'Oriente Medio y África', fr: 'Moyen-Orient & Afrique', de: 'Nahost & Afrika', ru: 'Ближний Восток и Африка' },
+  oceania:  { ja: 'オセアニア', en: 'Oceania', 'zh-cn': '大洋洲', 'zh-tw': '大洋洲', es: 'Oceanía', fr: 'Océanie', de: 'Ozeanien', ru: 'Океания' },
 };
 
 const globalRegions = globalRegionsRaw.map(region => {
@@ -55,28 +65,29 @@ const globalRegions = globalRegionsRaw.map(region => {
 
 const infoMenus: Record<string, { label: string; href: string }[]> = {
   ja: [
-    { label: 'About 24Watchin',           href: `/${lang}/${country}/info/about/` },
-    { label: 'プライバシーポリシー',       href: `/${lang}/${country}/info/privacy/` },
-    { label: '利用規約',                   href: `/${lang}/${country}/info/terms/` },
-    { label: 'お問い合わせ',               href: `/${lang}/${country}/info/contact/` },
-    { label: '訂正・修正ポリシー',         href: `/${lang}/${country}/info/corrections/` },
-    { label: '著作権・転載・引用について', href: `/${lang}/${country}/info/copyright/` },
+    { label: 'About 24Watchin',           href: `${infoBasePath}/about/` },
+    { label: 'プライバシーポリシー',       href: `${infoBasePath}/privacy/` },
+    { label: '利用規約',                   href: `${infoBasePath}/terms/` },
+    { label: 'お問い合わせ',               href: `${infoBasePath}/contact/` },
+    { label: '訂正・修正ポリシー',         href: `${infoBasePath}/corrections/` },
+    { label: '著作権・転載・引用について', href: `${infoBasePath}/copyright/` },
   ],
   en: [
-    { label: 'About 24Watchin', href: `/${lang}/${country}/info/about/` },
-    { label: 'Privacy Policy', href: `/${lang}/${country}/info/privacy/` },
-    { label: 'Terms of Use', href: `/${lang}/${country}/info/terms/` },
-    { label: 'Contact', href: `/${lang}/${country}/info/contact/` },
-    { label: 'Corrections Policy', href: `/${lang}/${country}/info/corrections/` },
-    { label: 'Copyright / Reuse', href: `/${lang}/${country}/info/copyright/` },
+    { label: 'About 24Watchin', href: `${infoBasePath}/about/` },
+    { label: 'Privacy Policy', href: `${infoBasePath}/privacy/` },
+    { label: 'Terms of Use', href: `${infoBasePath}/terms/` },
+    { label: 'Contact', href: `${infoBasePath}/contact/` },
+    { label: 'Corrections Policy', href: `${infoBasePath}/corrections/` },
+    { label: 'Copyright / Reuse', href: `${infoBasePath}/copyright/` },
   ],
-  'zh-cn': [ { label: '关于 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: '隐私政策', href: `/${lang}/${country}/info/privacy/` }, { label: '使用条款', href: `/${lang}/${country}/info/terms/` }, { label: '联系我们', href: `/${lang}/${country}/info/contact/` }, { label: '更正政策', href: `/${lang}/${country}/info/corrections/` }, { label: '版权声明', href: `/${lang}/${country}/info/copyright/` } ],
-  'zh-tw': [ { label: '關於 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: '隱私政策', href: `/${lang}/${country}/info/privacy/` }, { label: '使用條款', href: `/${lang}/${country}/info/terms/` }, { label: '聯絡我們', href: `/${lang}/${country}/info/contact/` }, { label: '更正政策', href: `/${lang}/${country}/info/corrections/` }, { label: '版權聲明', href: `/${lang}/${country}/info/copyright/` } ],
-  es: [ { label: 'Acerca de 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Política de privacidad', href: `/${lang}/${country}/info/privacy/` }, { label: 'Términos de uso', href: `/${lang}/${country}/info/terms/` }, { label: 'Contacto', href: `/${lang}/${country}/info/contact/` }, { label: 'Política de correcciones', href: `/${lang}/${country}/info/corrections/` }, { label: 'Derechos de autor', href: `/${lang}/${country}/info/copyright/` } ],
-  fr: [ { label: 'À propos de 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Politique de confidentialité', href: `/${lang}/${country}/info/privacy/` }, { label: "Conditions d'utilisation", href: `/${lang}/${country}/info/terms/` }, { label: 'Contact', href: `/${lang}/${country}/info/contact/` }, { label: 'Politique de corrections', href: `/${lang}/${country}/info/corrections/` }, { label: "Droits d'auteur", href: `/${lang}/${country}/info/copyright/` } ],
-  de: [ { label: 'Über 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Datenschutzrichtlinie', href: `/${lang}/${country}/info/privacy/` }, { label: 'Nutzungsbedingungen', href: `/${lang}/${country}/info/terms/` }, { label: 'Kontakt', href: `/${lang}/${country}/info/contact/` }, { label: 'Korrekturrichtlinie', href: `/${lang}/${country}/info/corrections/` }, { label: 'Urheberrecht', href: `/${lang}/${country}/info/copyright/` } ],
-  ru: [ { label: 'О 24Watchin', href: `/${lang}/${country}/info/about/` }, { label: 'Политика конфиденциальности', href: `/${lang}/${country}/info/privacy/` }, { label: 'Условия использования', href: `/${lang}/${country}/info/terms/` }, { label: 'Контакты', href: `/${lang}/${country}/info/contact/` }, { label: 'Поリチカ испраvleniy', href: `/${lang}/${country}/info/corrections/` }, { label: 'Авторские права', href: `/${lang}/${country}/info/copyright/` } ],
+  'zh-cn': [ { label: '关于 24Watchin', href: `${infoBasePath}/about/` }, { label: '隐私政策', href: `${infoBasePath}/privacy/` }, { label: '使用条款', href: `${infoBasePath}/terms/` }, { label: '联系我们', href: `${infoBasePath}/contact/` }, { label: '更正政策', href: `${infoBasePath}/corrections/` }, { label: '版权声明', href: `${infoBasePath}/copyright/` } ],
+  'zh-tw': [ { label: '關於 24Watchin', href: `${infoBasePath}/about/` }, { label: '隱私政策', href: `${infoBasePath}/privacy/` }, { label: '使用條款', href: `${infoBasePath}/terms/` }, { label: '聯絡我們', href: `${infoBasePath}/contact/` }, { label: '更正政策', href: `${infoBasePath}/corrections/` }, { label: '版權聲明', href: `${infoBasePath}/copyright/` } ],
+  es: [ { label: 'Acerca de 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Política de privacidad', href: `${infoBasePath}/privacy/` }, { label: 'Términos de uso', href: `${infoBasePath}/terms/` }, { label: 'Contacto', href: `${infoBasePath}/contact/` }, { label: 'Política de correcciones', href: `${infoBasePath}/corrections/` }, { label: 'Derechos de autor', href: `${infoBasePath}/copyright/` } ],
+  fr: [ { label: 'À propos de 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Politique de confidentialité', href: `${infoBasePath}/privacy/` }, { label: "Conditions d'utilisation", href: `${infoBasePath}/terms/` }, { label: 'Contact', href: `${infoBasePath}/contact/` }, { label: 'Politique de corrections', href: `${infoBasePath}/corrections/` }, { label: "Droits d'auteur", href: `${infoBasePath}/copyright/` } ],
+  de: [ { label: 'Über 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Datenschutzrichtlinie', href: `${infoBasePath}/privacy/` }, { label: 'Nutzungsbedingungen', href: `${infoBasePath}/terms/` }, { label: 'Kontakt', href: `${infoBasePath}/contact/` }, { label: 'Korrekturrichtlinie', href: `${infoBasePath}/corrections/` }, { label: 'Urheberrecht', href: `${infoBasePath}/copyright/` } ],
+  ru: [ { label: 'О 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Политика конфиденциальности', href: `${infoBasePath}/privacy/` }, { label: 'Условия использования', href: `${infoBasePath}/terms/` }, { label: 'Контакты', href: `${infoBasePath}/contact/` }, { label: 'Политика исправлений', href: `${infoBasePath}/corrections/` }, { label: 'Авторские права', href: `${infoBasePath}/copyright/` } ],
 };
+
 const currentMenu = infoMenus[lang] || infoMenus['en'];
 
 const footerTextMap = {
@@ -95,7 +106,7 @@ const footerText = footerTextMap[lang] || footerTextMap['en'];
 <footer class="site-footer" style={`--theme-color:${themeColor};`}>
   <div class="footer-inner">
     <div class="top-row">
-      <a href={`/${lang}/${country}/`} class="footer-logo"><img src="/images/logo-24watchin-white.png" alt="24Watchin" /></a>
+      <a href={homePath} class="footer-logo"><img src="/images/logo-24watchin-white.png" alt="24Watchin" /></a>
     </div>
     <hr class="divider" />
     <div class="accordion-list">
