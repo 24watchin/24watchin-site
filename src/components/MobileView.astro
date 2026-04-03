@@ -7,6 +7,10 @@ const { latestStories = [] } = Astro.props;
 // 英語のカテゴリ翻訳ルール
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
+// ▼ LanguageTopMainNews.astro を参考に、本物の国コードリストを追加しました
+const validCountries = ['jp', 'us', 'de', 'fr', 'gb', 'es', 'cn', 'tw', 'ae', 'au', 'sg', 'ca', 'nz', 'hk', 'in', 'my', 'ph', 'th', 'vn', 'id', 'kr', 'mx', 'br', 'za', 'eg', 'qa', 'om', 'sa', 'tr', 'ar', 'co'];
+const searchPrefix = 'en-';
+
 // 英語の国名辞書
 const countryNameMap = {
   jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
@@ -15,12 +19,17 @@ const countryNameMap = {
   br: 'Brazil', kr: 'South Korea'
 };
 
-// en- から始まるラベル（タグ）を持っている記事だけを絞り込みます
-const displayStories = latestStories.filter(post => {
-  if (post.labels && Array.isArray(post.labels)) {
-    return post.labels.some(label => label.startsWith('en-'));
-  }
-  return false;
+// ▼ LanguageTopMainNews.astro の仕組みを使って「en-」タグの記事だけを絞り込みます
+const displayStories = latestStories.filter((post) => {
+  if (!post.labels) return false;
+  const labelsArray = Array.isArray(post.labels) ? post.labels : [post.labels];
+  return labelsArray.some((label) => {
+    if (typeof label === 'string' && label.startsWith(searchPrefix)) {
+      const code = label.replace(searchPrefix, '');
+      return validCountries.includes(code); // 正しい国コードかどうかもチェックします
+    }
+    return false;
+  });
 });
 
 const languages = [
@@ -40,11 +49,25 @@ function stripHtml(html) {
   return text.length > 80 ? text.substring(0, 80) + '...' : text;
 }
 
-function getThumbnail(content) {
-  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
-  const match = content.match(/<img[^>]+src="([^">]+)"/);
+// ▼ LanguageTopMainNews.astro の安全対策を取り入れつつ、トップのデザインに合わせています
+const getThumbnail = (content) => {
+  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
-}
+};
+
+// ▼ ラベルから確実に国コードを抜き出す関数を新しく追加しました
+const getCountryFromLabels = (labels) => {
+  if (!labels) return 'world';
+  const labelsArray = Array.isArray(labels) ? labels : [labels];
+  const targetLabel = labelsArray.find((label) => {
+    if (typeof label === 'string' && label.startsWith(searchPrefix)) {
+      const code = label.replace(searchPrefix, '');
+      return validCountries.includes(code);
+    }
+    return false;
+  });
+  return targetLabel ? targetLabel.replace(searchPrefix, '') : 'world';
+};
 ---
 
 <div class="m-wrapper">
@@ -148,27 +171,20 @@ function getThumbnail(content) {
         <div class="m-carousel-container" id="m-story-carousel">
           <div class="m-carousel-spacer"></div>
           {displayStories.map((post) => {
-            let bgImage = '';
+            const bgImage = getThumbnail(post.content);
+            const countryCode = getCountryFromLabels(post.labels);
+            const countryName = countryNameMap[countryCode] || '';
+            
             let categoryName = 'News';
-            let countryCode = 'world';
-            let countryName = '';
-            let dateText = '';
-
-            if (post.labels && Array.isArray(post.labels)) {
-              bgImage = getThumbnail(post.content);
-
-              const countryTag = post.labels.find(l => l.startsWith('en-'));
-              if (countryTag) {
-                countryCode = countryTag.replace('en-', '');
-                if (countryNameMap[countryCode]) { countryName = countryNameMap[countryCode]; }
-              }
+            if (post.labels) {
+              const labelsArray = Array.isArray(post.labels) ? post.labels : [post.labels];
               const foundCat = enCategories.find(cat => 
-                post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
+                labelsArray.some(label => typeof label === 'string' && cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
               );
               if (foundCat) categoryName = foundCat.label;
-              
-              dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
             }
+
+            const dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
             return (
               <a href={`/en/${countryCode}/news/${post.id}`} class="m-story-card m-observer-card m-no-link-color">
