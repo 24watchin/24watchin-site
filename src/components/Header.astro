@@ -23,7 +23,7 @@ const isInfoPage = pathParts[1] === 'info';
 const urlCountry = (pathParts.length > 1 && !isInfoPage) ? pathParts[1] : '';
 const country = urlCountry || 'jp';
 
-// 3. 言語トップと同じ国リストを作成
+// 3. ドロップダウンパネル用の国リストを作成
 const availableCountries = langCountryPairs
   .filter(pair => pair.lang === lang)
   .map(pair => ({
@@ -70,7 +70,7 @@ const categoryItems = (labels.headerCategories || []).map((item) => {
   };
 });
 
-// カテゴリ振り分け（ビルドエラー修正のため、ここで mainItems と moreItems を定義）
+// カテゴリの振り分け定義
 const moreSlugsMap: Record<string, string[]> = { 
   jp: ['health-life', 'weather', 'traffic'], 
   en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
@@ -149,7 +149,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
         <form action={searchAction} method="get" class="search-form-animated" id="pc-search-form">
           <input type="text" name="q" class="search-input-animated" placeholder={labels.searchPlaceholder} id="pc-search-input" />
           <button type="button" class="search-icon-btn" id="pc-search-icon-btn">
-            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
           </button>
         </form>
 
@@ -209,11 +209,11 @@ const defaultWeatherData = cityDataForJs[0] || null;
       <form action={searchAction} method="get" class="search-form-animated sp-search-form" id="sp-search-form">
         <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
         <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn" aria-label="検索">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
         </button>
       </form>
       <button type="button" class="sp-reload-btn" onclick="window.location.reload();" aria-label="ページを更新">
-        <svg viewBox="0 0 24 24" class="reload-icon" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.32-9.83l5.67 5.67"/></svg>
+        <svg viewBox="0 0 24 24" class="reload-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.32-9.83l5.67 5.67"/></svg>
       </button>
       <button type="button" class="region-lang-open-btn sp-region-lang-btn" id="sp-region-lang-btn" data-current-lang={lang}>
         地域 / 言語 <span class="hamburger-icon">&#8803;</span>
@@ -268,6 +268,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   </header>
 </div>
 
+{/* パネル本体 */}
 <div id="cat-country-panel" class="cat-country-panel">
   <div class="cat-country-header">
     <span id="cat-country-title" class="cat-country-title">カテゴリ名</span>
@@ -281,92 +282,185 @@ const defaultWeatherData = cityDataForJs[0] || null;
 <RegionLangPanel currentLang={lang} currentCountry={country} themeColor={labels.themeColor || '#872732'} />
 
 <style>
+  /* Header 共通 */
   .header-pc-wrapper, .header-sp-wrapper { margin: 0; padding: 0; border-radius: 0; }
   .header-pc-wrapper { display: block; }
   .header-sp-wrapper { display: none; }
   @media (max-width: 768px) { .header-pc-wrapper { display: none; } .header-sp-wrapper { display: block; } }
+  
   .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; }
   .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
   .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
-  .pc-header-top { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 14px 15px; }
-  .pc-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
-  .search-form-animated { display: flex; align-items: center; justify-content: flex-end; }
-  .search-input-animated { width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent; transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0; height: 34px; box-sizing: border-box; }
-  .search-input-animated.active { width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; }
-  .search-icon-btn { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0; }
-  .search-icon { width: 14px; height: 14px; stroke: #333; fill: none; }
-  .region-lang-open-btn { background: none; border: none; color: #000; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0; }
-  .hamburger-icon { font-size: 22px; font-weight: bold; }
+  
   .site-header { width: 100%; background: #ffffff; }
-  .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; }
+  .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; padding: 20px 14px 15px; align-items: flex-end; }
   .logo-image { width: 200px; height: auto; }
+  
   .category-bar { background: #393737; width: 100%; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
-  .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
-  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; scrollbar-width: none; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; flex: 1; scrollbar-width: none; }
   .category-scroll::-webkit-scrollbar { display: none; }
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; background: transparent; border: none; cursor: pointer; }
+  
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
   .category-link.active { background: var(--theme-color); }
-  .category-link-text, .more-link-text { position: relative; display: inline-block; }
-  .category-link-text::after, .more-link-text::after { content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease; }
-  .category-link:hover .category-link-text::after, .more-link:hover .more-link-text::after { width: 100%; }
-  .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .more-btn.active { background: var(--theme-color); }
-  .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
-  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-  .more-wrapper:hover .more-dropdown { display: block; }
-  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
-  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; background: transparent; border: none; width: 100%; cursor: pointer; }
-  .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; }
-  .scroll-arrow.active { display: flex; }
-  .header-word-bar { background: #fff; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
-  .header-word-inner::-webkit-scrollbar { display: none; }
-  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
-  .bottom-line { height: 10px; }
-  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; }
-  .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
-  .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
-  .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; padding: 0; }
-  .reload-icon { width: 14px; height: 14px; color: #333; stroke-width: 2; }
-  .sp-search-input.active { width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1; }
-  .sp-search-btn { width: 28px !important; height: 28px !important; border-radius: 50%; background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; }
-  .sp-header-top { padding: 6px 14px; align-items: center; overflow: hidden; }
-  .sp-logo-image { width: 150px; }
-  .sp-right-area { gap: 8px; position: relative; flex: 1; min-width: 0; }
-  .sp-weather-widget { display: flex; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; max-width: 140px; }
-  .sp-weather-icon { width: 28px; flex-shrink: 0; }
-  .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; min-width: 0; }
-  .sp-category-bar::after { content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%; background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%); pointer-events: none; }
-  .sp-scroll { padding-left: 6px; scrollbar-width: none; }
-  .sp-scroll::-webkit-scrollbar { display: none; }
-  .sp-scroll-padding { width: 45px; flex-shrink: 0; }
+  .category-link-text { position: relative; }
+  .category-link-text::after { content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease; }
+  .category-link:hover .category-link-text::after { width: 100%; }
+  
+  .search-form-animated { display: flex; align-items: center; }
+  .search-input-animated { width: 0; opacity: 0; transition: all 0.4s ease; border-radius: 8px; height: 34px; border: 1px solid transparent; outline: none; }
+  .search-input-animated.active { width: 200px; opacity: 1; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; margin-right: 6px; }
+  .search-icon-btn { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .search-icon { width: 16px; height: 16px; stroke: #333; }
 
-  /* パネルスタイル（お手本LanguageTopHeaderから完全移植） */
+  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; }
+  .sp-top-actions { display: flex; gap: 10px; }
+  .sp-reload-btn { width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; }
+
+  /* ================================================= */
+  /* ▼▼▼ お手本(LanguageTopHeader)のデザインを完全移植 ▼▼▼ */
+  /* ================================================= */
   .cat-country-panel {
-    display: none; position: absolute; background: #ffffff; border: 1px solid #dddddd;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; z-index: 99999; width: 200px; overflow: hidden;
+    display: none;
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    z-index: 99999;
+    width: 200px;
+    overflow: hidden;
   }
-  .cat-country-panel.show { display: block; animation: fadeIn 0.2s ease; }
+  .cat-country-panel.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+  }
   .cat-country-header {
-    background-color: #f7f7f7; padding: 10px 14px; border-bottom: 2px solid var(--theme-color, #872732);
-    display: flex; justify-content: space-between; align-items: center;
+    background-color: #f7f7f7;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--theme-color, #872732);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-  .cat-country-title { font-size: 14px; font-weight: 800; color: #111; margin: 0; }
-  .cat-country-close { background: none; border: none; font-size: 20px; line-height: 1; color: #999; cursor: pointer; padding: 0; }
-  .cat-country-panel-inner { display: flex; flex-direction: column; padding: 4px 0; max-height: 50vh; overflow-y: auto; }
+  .cat-country-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #111;
+    margin: 0;
+  }
+  .cat-country-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+  }
+  .cat-country-panel-inner {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
   .cat-country-link {
-    display: flex; align-items: center; padding: 10px 14px; color: #333; text-decoration: none;
-    font-size: 13px; font-weight: bold; border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    color: #333;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    border-bottom: 1px solid #f0f0f0;
   }
-  .cat-country-link:hover { background: #fdfdfd; color: var(--theme-color, #872732); }
-  .cat-country-icon { font-size: 10px; color: #999; margin-right: 8px; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+  .cat-country-link:hover {
+    background: #fdfdfd;
+    color: var(--theme-color, #872732);
+  }
+  .cat-country-icon {
+    font-size: 10px;
+    color: #999;
+    margin-right: 8px;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 
 <script is:inline>
   window.addEventListener('load', function() {
+    // ドロップダウン制御（お手本LanguageTopHeaderから完全移植）
+    var catCountryPanel = document.getElementById('cat-country-panel');
+    var catCountryInner = document.getElementById('cat-country-panel-inner');
+    var catCountryTitle = document.getElementById('cat-country-title');
+    var catCountryClose = document.getElementById('cat-country-close');
+    var countriesDataEl = document.getElementById('lang-top-countries-data');
+    var currentPanelSlug = null;
+
+    if (catCountryPanel && countriesDataEl) {
+      var availableCountries = JSON.parse(countriesDataEl.textContent);
+      var currentLang = document.documentElement.lang || 'ja';
+
+      document.querySelectorAll('.cat-dropdown-trigger').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var slug = btn.getAttribute('data-slug');
+          var catName = btn.textContent.trim();
+
+          if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) {
+            catCountryPanel.classList.remove('show');
+            currentPanelSlug = null;
+            return;
+          }
+
+          currentPanelSlug = slug;
+          if (catCountryTitle) { catCountryTitle.textContent = catName; }
+          var rect = btn.getBoundingClientRect();
+          catCountryInner.innerHTML = ''; 
+
+          availableCountries.forEach(function(c) {
+            var a = document.createElement('a');
+            a.className = 'cat-country-link';
+            a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
+            a.innerHTML = '<span class="cat-country-icon">▶</span>' + c.name;
+            catCountryInner.appendChild(a);
+          });
+
+          var top = rect.bottom + window.scrollY + 8;
+          var left = rect.left + window.scrollX;
+
+          // お手本と同じ計算式
+          if (window.innerWidth <= 600) {
+             left = (window.innerWidth - 220) / 2;
+          } else if (left + 220 > window.innerWidth) {
+             left = window.innerWidth - 240;
+          }
+
+          catCountryPanel.style.top = top + 'px';
+          catCountryPanel.style.left = left + 'px';
+          catCountryPanel.classList.add('show');
+        });
+      });
+
+      catCountryClose?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        catCountryPanel.classList.remove('show');
+        currentPanelSlug = null;
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.cat-country-panel') && !e.target.closest('.cat-dropdown-trigger')) {
+           catCountryPanel.classList.remove('show');
+           currentPanelSlug = null;
+        }
+      });
+    }
+
+    // 検索窓・地域パネル等の既存機能
     function setupSearch(btnId, inputId, formId) {
       const btn = document.getElementById(btnId), input = document.getElementById(inputId), form = document.getElementById(formId);
       btn?.addEventListener('click', (e) => {
@@ -386,50 +480,5 @@ const defaultWeatherData = cityDataForJs[0] || null;
     };
     pcRegionBtn?.addEventListener('click', () => openRL(pcRegionBtn));
     spRegionBtn?.addEventListener('click', () => openRL(spRegionBtn));
-
-    const pcScroll = document.getElementById('pc-scroll'), pcBtnLeft = document.getElementById('pc-arrow-left'), pcBtnRight = document.getElementById('pc-arrow-right');
-    const updateArrows = () => {
-      if (!pcScroll || !pcBtnLeft || !pcBtnRight) return;
-      if (window.innerWidth > 1000 || window.innerWidth <= 768) { pcBtnLeft.classList.remove('active'); pcBtnRight.classList.remove('active'); }
-      else {
-        pcScroll.scrollLeft <= 5 ? pcBtnLeft.classList.remove('active') : pcBtnLeft.classList.add('active');
-        pcScroll.scrollLeft >= (pcScroll.scrollWidth - pcScroll.clientWidth - 5) ? pcBtnRight.classList.remove('active') : pcBtnRight.classList.add('active');
-      }
-    };
-    pcBtnLeft?.addEventListener('click', () => pcScroll.scrollBy({ left: -200, behavior: 'smooth' }));
-    pcBtnRight?.addEventListener('click', () => pcScroll.scrollBy({ left: 200, behavior: 'smooth' }));
-    pcScroll?.addEventListener('scroll', updateArrows);
-    window.addEventListener('resize', updateArrows);
-    updateArrows();
-
-    // ドロップダウンパネル制御（お手本LanguageTopHeaderから移植）
-    var catCountryPanel = document.getElementById('cat-country-panel'), catCountryInner = document.getElementById('cat-country-panel-inner'), catCountryTitle = document.getElementById('cat-country-title'), catCountryClose = document.getElementById('cat-country-close'), countriesDataEl = document.getElementById('lang-top-countries-data'), currentPanelSlug = null;
-    if (catCountryPanel && countriesDataEl) {
-      var availableCountries = JSON.parse(countriesDataEl.textContent);
-      var currentLang = document.documentElement.lang || 'ja';
-      document.querySelectorAll('.cat-dropdown-trigger').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault(); e.stopPropagation();
-          var slug = btn.getAttribute('data-slug'), catName = btn.textContent.trim();
-          if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) { catCountryPanel.classList.remove('show'); currentPanelSlug = null; return; }
-          currentPanelSlug = slug;
-          if (catCountryTitle) { catCountryTitle.textContent = catName; }
-          var rect = btn.getBoundingClientRect();
-          catCountryInner.innerHTML = ''; 
-          availableCountries.forEach(function(c) {
-            var a = document.createElement('a'); a.className = 'cat-country-link';
-            a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
-            a.innerHTML = '<span class="cat-country-icon">▶</span>' + c.name;
-            catCountryInner.appendChild(a);
-          });
-          var top = rect.bottom + window.scrollY + 8, left = rect.left + window.scrollX;
-          if (window.innerWidth <= 600) { left = (window.innerWidth - 200) / 2; }
-          else if (left + 200 > window.innerWidth) { left = window.innerWidth - 220; }
-          catCountryPanel.style.top = top + 'px'; catCountryPanel.style.left = left + 'px'; catCountryPanel.classList.add('show');
-        });
-      });
-      catCountryClose?.addEventListener('click', function(e) { e.stopPropagation(); catCountryPanel.classList.remove('show'); currentPanelSlug = null; });
-      document.addEventListener('click', function(e) { if (!e.target.closest('.cat-country-panel') && !e.target.closest('.cat-dropdown-trigger')) { catCountryPanel.classList.remove('show'); currentPanelSlug = null; } });
-    }
   });
 </script>
