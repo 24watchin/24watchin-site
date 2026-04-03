@@ -1,4 +1,20 @@
 ---
-// 英語のAboutページへ強制的に転送します
-return Astro.redirect('/en/info/about/');
+// src/pages/info/index.astro
+// 文字を表示させず、一瞬で転送するための設定です
+const target = "/en/info/about/";
 ---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <link rel="canonical" href={target} />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+  </head>
+  <body>
+    <script is:inline define:vars={{ target }}>
+      // メタタグが効かない場合のための予備のJavaScript転送です
+      window.location.href = target;
+    </script>
+  </body>
+</html>
