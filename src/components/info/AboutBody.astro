@@ -3,8 +3,9 @@
 import { ja } from '../../lib/info/ja/aboutData.ts';
 import { en } from '../../lib/info/en/aboutData.ts';
 import { zhTW } from '../../lib/info/zh-tw/aboutData.ts';
-// 簡体字データを新しく読み込みます
 import { zhCN } from '../../lib/info/zh-cn/aboutData.ts';
+// ロシア語データを新しく読み込みます
+import { ru } from '../../lib/info/ru/aboutData.ts';
 
 const { pathname } = Astro.url;
 
@@ -20,7 +21,10 @@ if (pathname.startsWith('/en/')) {
   themeColor = '#b33224'; // 中国語繁体字
 } else if (pathname.startsWith('/zh-cn/')) {
   data = zhCN;
-  themeColor = '#0e7c7b'; // 中国語簡体字 (ご指定の色)
+  themeColor = '#0e7c7b'; // 中国語簡体字
+} else if (pathname.startsWith('/ru/')) {
+  data = ru;
+  themeColor = '#500d80'; // ロシア語 (ご指定の色)
 }
 ---
 
