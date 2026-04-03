@@ -13,27 +13,10 @@ const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+const country = pathParts[1] || 'jp';
 
-// 1. 言語と info 階層の判定
-const supportedLangs = ['ja', 'en', 'zh-cn', 'zh-tw', 'es', 'fr', 'de', 'ru'];
-const lang = supportedLangs.includes(pathParts[0]) ? pathParts[0] : 'ja';
-const isInfoPage = pathParts[1] === 'info';
-
-// 2. URL内の国コードの判定 ('info'の場合は国指定なしとみなす)
-const urlCountry = (pathParts.length > 1 && !isInfoPage) ? pathParts[1] : '';
-
-// 3. カテゴリや天気用の「国」を設定
-const country = urlCountry || 'jp';
-
-// ▼ 追加：ドロップダウンパネル用の国リストを作成
-const availableCountries = langCountryPairs
-  .filter(pair => pair.lang === lang)
-  .map(pair => ({
-    code: pair.country,
-    name: getCountryLabel(pair.country, lang)
-  }));
-
-const SITE_ID = 'jp-ja';
+const SITE_ID = 'jp-ja'; 
 const SLOT = 'header_words';
 
 type HeaderWord = { label: string; url: string; displayOrder: number; };
@@ -56,24 +39,19 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
-
 const basePath = '/' + lang + '/' + country;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
-// カテゴリのリンク生成：infoページならスイッチ用に設定
 const categoryItems = (labels.headerCategories || []).map((item) => {
-  const href = isInfoPage ? 'javascript:void(0)' : basePath + '/category/' + item.slug + '/';
+  const href = basePath + '/category/' + item.slug + '/';
   return { href, label: item.label, isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), slug: item.slug };
 });
 
-// ロゴのリンク：infoページなら言語トップページへ
-const homeHref = isInfoPage ? `/${lang}/` : `/${lang}/${country}/`;
-
+const homeHref = basePath + '/';
 const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
 const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
-
 const languageOptions = [
   { code: 'ja', key: 'jp', label: '日本語', barStyle: 'background:#872732' },
   { code: 'en', key: 'en', label: 'English', barStyle: 'background:#001580' },
@@ -86,17 +64,14 @@ const languageOptions = [
 ].filter(opt => allowedLangs.includes(opt.code)).map(opt => ({ ...opt, href: '/' + opt.code + '/' + country + '/', linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option' }));
 
 const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
-
 const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
-
 const moreHasActive = moreItems.some(item => item.isActive);
 
 const weatherHref = basePath + '/weather/';
 
 const cities = countryCityMap[country] || countryCityMap['jp'];
-
 const { isImperial, tempUnit } = getUnitSystem(lang);
 
 if (!globalThis.weatherCache) globalThis.weatherCache = {};
@@ -105,22 +80,17 @@ const allCityWeather: Record<string, any> = {};
 for (const city of cities) {
   const cityKey = city.key;
   const now = Date.now();
-
   const CACHE = 30 * 60 * 1000;
   if (globalThis.weatherCache[cityKey] && (now - globalThis.weatherCache[cityKey].time < CACHE)) {
     allCityWeather[cityKey] = globalThis.weatherCache[cityKey].data;
-
   } else if (WEATHER_API_KEY) {
     try {
       const url = 'https://api.weatherapi.com/v1/current.json?key=' + WEATHER_API_KEY + '&q=' + cityKey + '&aqi=no';
-
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-
         allCityWeather[cityKey] = data;
         globalThis.weatherCache[cityKey] = { data, time: now };
-
       }
     } catch (e) {}
   }
@@ -140,7 +110,6 @@ const cityDataForJs = cities.map((city: any) => {
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
-
 const defaultWeatherData = cityDataForJs[0] || null;
 ---
 
@@ -176,7 +145,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
         <div class="pc-category-group">
           <div class="category-scroll pc-scroll" id="pc-scroll">
             {mainItems.map((item) => (
-              <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'} data-slug={item.slug} data-is-trigger={isInfoPage ? 'true' : 'false'}>
+              <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
                 <span class="category-link-text">{item.label}</span>
               </a>
             ))}
@@ -188,7 +157,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
                 <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </div>
               <div class="more-dropdown">
-                {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'} data-slug={item.slug} data-is-trigger={isInfoPage ? 'true' : 'false'}><span class="more-link-text">{item.label}</span></a>)}
+                {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}><span class="more-link-text">{item.label}</span></a>)}
               </div>
             </div>
           )}
@@ -269,7 +238,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
     <nav class="category-bar sp-category-bar">
       <div class="category-scroll sp-scroll" id="sp-scroll">
         {categoryItems.map((item) => (
-          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'} data-slug={item.slug} data-is-trigger={isInfoPage ? 'true' : 'false'}>
+          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
             <span class="category-link-text">{item.label}</span>
           </a>
         ))}
@@ -282,18 +251,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
-
-{/* ▼ 追加：ドロップダウンパネルのHTMLを一番下（安全な場所）に配置 */}
-<div id="cat-country-panel" class="cat-country-panel">
-  <div class="cat-country-header">
-    <span id="cat-country-title" class="cat-country-title">カテゴリ名</span>
-    <button id="cat-country-close" class="cat-country-close" aria-label="閉じる">&times;</button>
-  </div>
-  <div class="cat-country-panel-inner" id="cat-country-panel-inner"></div>
-</div>
-
-<script type="application/json" id="lang-top-countries-data" set:html={JSON.stringify(availableCountries)}></script>
-
 <RegionLangPanel currentLang={lang} currentCountry={country} themeColor={labels.themeColor || '#872732'} />
 
 <style>
@@ -320,12 +277,13 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .search-form-animated { 
     display: flex; 
     align-items: center; 
-    justify-content: flex-end;
+    justify-content: flex-end; 
   }
   .search-input-animated {
-    width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent; transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0;
+    width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
+    transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0;
     height: 34px; 
-    box-sizing: border-box;
+    box-sizing: border-box; 
   }
   .search-input-animated.active {
     width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; 
@@ -333,7 +291,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .search-icon-btn {
     width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff;
     cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0;
-    box-sizing: border-box;
+    box-sizing: border-box; 
   }
 
   .region-lang-open-btn {
@@ -348,7 +306,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .logo-image { width: 200px; height: auto; }
   
   .right-area { 
-    display: flex; flex-direction: column; 
+    display: flex; 
+    flex-direction: column; 
     align-items: flex-end; 
   }
   .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
@@ -393,14 +352,15 @@ const defaultWeatherData = cityDataForJs[0] || null;
   /* ================================================= */
   
   .sp-top-gray-bar { 
-    background-color: #e6e6e6; width: 100%; 
+    background-color: #e6e6e6; 
+    width: 100%; 
     height: 38px; 
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
     padding: 0 14px; 
     box-sizing: border-box; 
-    position: relative;
+    position: relative; 
   }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
   .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
@@ -413,30 +373,35 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
   .sp-search-form { position: relative; display: flex; align-items: center; }
   .sp-search-input { 
-    position: absolute; right: 34px; 
+    position: absolute; 
+    right: 34px; 
     top: 50%; 
     transform: translateY(-50%); 
     width: 0; 
     height: 30px !important; 
     padding: 0 !important; 
     background: #fff; 
-    border: 1px solid transparent; border-radius: 8px; 
+    border: 1px solid transparent; 
+    border-radius: 8px; 
     opacity: 0; 
     transition: all 0.3s ease; 
     box-sizing: border-box; 
     z-index: 10;
   }
   .sp-search-input.active { 
-    width: calc(100vw - 195px) !important; padding: 0 10px !important; 
+    /* ▼修正：左側に余白を作るため、180px -> 195px に変更しました */
+    width: calc(100vw - 195px) !important; 
+    padding: 0 10px !important; 
     border: 1px solid #ccc; 
-    opacity: 1;
+    opacity: 1; 
   }
   .sp-search-btn { 
     width: 28px !important; 
     height: 28px !important; 
     border-radius: 50%; 
     box-sizing: border-box; 
-    flex-shrink: 0; background: #fff; 
+    flex-shrink: 0; 
+    background: #fff; 
     border: 1px solid #ccc; 
     padding: 0; 
     display: flex; 
@@ -448,7 +413,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
 
   .sp-header-top { 
-    padding: 6px 14px; align-items: center; 
+    padding: 6px 14px; 
+    align-items: center; 
     overflow: hidden; 
   }
   
@@ -458,13 +424,15 @@ const defaultWeatherData = cityDataForJs[0] || null;
     gap: 8px; 
     position: relative; 
     flex: 1; 
-    min-width: 0; align-items: flex-end !important; 
+    min-width: 0; 
+    align-items: flex-end !important; 
   }
   
   .sp-weather-widget { 
     display: flex; 
     align-items: center; 
-    justify-content: flex-end; gap: 4px; 
+    justify-content: flex-end; 
+    gap: 4px; 
     text-decoration: none; 
     margin-top: 0; 
     overflow: hidden; 
@@ -485,7 +453,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
   .sp-category-bar { width: 100%; overflow: hidden; position: relative; }
   .sp-category-bar::after {
-    content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%; background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%);
+    content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%;
+    background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%);
     pointer-events: none;
   }
   .sp-scroll { padding-left: 6px; scrollbar-width: none; }
@@ -494,78 +463,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
   @media (max-width: 768px) { 
     .category-link { font-size: 14px; padding: 0 10px; height: 46px; }
-  }
-
-  /* ================================================= */
-  /* ▼▼▼ 追加：ドロップダウンパネルのスタイル ▼▼▼ */
-  /* ================================================= */
-  .cat-country-panel {
-    display: none;
-    position: absolute;
-    background: #ffffff;
-    border: 1px solid #dddddd;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    z-index: 99999;
-    width: 200px;
-    overflow: hidden;
-  }
-  .cat-country-panel.show {
-    display: block;
-    animation: fadeIn 0.2s ease;
-  }
-  .cat-country-header {
-    background-color: #f7f7f7;
-    padding: 10px 14px;
-    border-bottom: 2px solid var(--theme-color, #872732);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .cat-country-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #111;
-    margin: 0;
-  }
-  .cat-country-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    line-height: 1;
-    color: #999;
-    cursor: pointer;
-    padding: 0;
-  }
-  .cat-country-panel-inner {
-    display: flex;
-    flex-direction: column;
-    padding: 4px 0;
-    max-height: 50vh;
-    overflow-y: auto;
-  }
-  .cat-country-link {
-    display: flex;
-    align-items: center;
-    padding: 10px 14px;
-    color: #333;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  .cat-country-link:hover {
-    background: #fdfdfd;
-    color: var(--theme-color, #872732);
-  }
-  .cat-country-icon {
-    font-size: 10px;
-    color: #999;
-    margin-right: 8px;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 
@@ -579,7 +476,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
         btn.addEventListener('click', function(e) {
           if (!input.classList.contains('active')) {
             e.preventDefault();
-            
             input.classList.add('active');
             input.focus();
           } else {
@@ -588,7 +484,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
               input.classList.remove('active');
             } else {
               form.submit();
-    
             }
           }
         });
@@ -626,10 +521,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
         } else {
           var atLeftPC = pcScroll.scrollLeft <= 5;
           var atRightPC = pcScroll.scrollLeft >= (pcScroll.scrollWidth - pcScroll.clientWidth - 5);
-          if (!atLeftPC) { pcBtnLeft.classList.add('active'); } else { pcBtnLeft.classList.remove('active');
-          }
-          if (!atRightPC) { pcBtnRight.classList.add('active'); } else { pcBtnRight.classList.remove('active');
-          }
+          if (!atLeftPC) { pcBtnLeft.classList.add('active'); } else { pcBtnLeft.classList.remove('active'); }
+          if (!atRightPC) { pcBtnRight.classList.add('active'); } else { pcBtnRight.classList.remove('active'); }
         }
       }
     }
@@ -638,77 +531,5 @@ const defaultWeatherData = cityDataForJs[0] || null;
     if (pcScroll) pcScroll.addEventListener('scroll', updateArrows);
     window.addEventListener('resize', updateArrows);
     updateArrows();
-
-    // ▼ 追加：infoページ用ドロップダウンパネルの制御スクリプト
-    var catCountryPanel = document.getElementById('cat-country-panel');
-    var catCountryInner = document.getElementById('cat-country-panel-inner');
-    var catCountryTitle = document.getElementById('cat-country-title');
-    var catCountryClose = document.getElementById('cat-country-close');
-    var countriesDataEl = document.getElementById('lang-top-countries-data');
-    var currentPanelSlug = null;
-
-    if (catCountryPanel && countriesDataEl) {
-      var availableCountries = JSON.parse(countriesDataEl.textContent);
-      var currentLang = document.documentElement.lang || 'ja';
-
-      document.querySelectorAll('a[data-is-trigger="true"]').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var slug = btn.getAttribute('data-slug');
-          
-          // カテゴリ名を取得（中のテキストだけを安全に抽出）
-          var textSpan = btn.querySelector('.category-link-text, .more-link-text');
-          var catName = textSpan ? textSpan.textContent.trim() : btn.textContent.trim();
-
-          if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) {
-            catCountryPanel.classList.remove('show');
-            currentPanelSlug = null;
-            return;
-          }
-
-          currentPanelSlug = slug;
-          if (catCountryTitle) { catCountryTitle.textContent = catName; }
-          var rect = btn.getBoundingClientRect();
-          catCountryInner.innerHTML = ''; 
-
-          availableCountries.forEach(function(c) {
-            var a = document.createElement('a');
-            a.className = 'cat-country-link';
-            a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
-            a.innerHTML = '<span class="cat-country-icon">▶</span>' + c.name;
-            catCountryInner.appendChild(a);
-          });
-
-          var top = rect.bottom + window.scrollY + 8;
-          var left = rect.left + window.scrollX;
-
-          if (window.innerWidth <= 600) {
-             left = (window.innerWidth - 220) / 2;
-          } else if (left + 220 > window.innerWidth) {
-             left = window.innerWidth - 240;
-          }
-
-          catCountryPanel.style.top = top + 'px';
-          catCountryPanel.style.left = left + 'px';
-          catCountryPanel.classList.add('show');
-        });
-      });
-
-      if (catCountryClose) {
-        catCountryClose.addEventListener('click', function(e) {
-          e.stopPropagation();
-          catCountryPanel.classList.remove('show');
-          currentPanelSlug = null;
-        });
-      }
-
-      document.addEventListener('click', function(e) {
-        if (!e.target.closest('.cat-country-panel') && !e.target.closest('a[data-is-trigger="true"]')) {
-           catCountryPanel.classList.remove('show');
-           currentPanelSlug = null;
-        }
-      });
-    }
   });
 </script>
