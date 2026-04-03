@@ -1,7 +1,6 @@
 ---
 // src/pages/[lang]/info/index.astro
 export function getStaticPaths() {
-  // 現在対応している全言語をリストアップします
   return [
     { params: { lang: 'ja' } },
     { params: { lang: 'en' } },
@@ -15,6 +14,19 @@ export function getStaticPaths() {
 }
 
 const { lang } = Astro.params;
-// aboutページへリダイレクト（転送）します
-return Astro.redirect(`/${lang}/info/about/`);
+const target = `/${lang}/info/about/`;
 ---
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <link rel="canonical" href={target} />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+  </head>
+  <body>
+    <script is:inline define:vars={{ target }}>
+      window.location.href = target;
+    </script>
+  </body>
+</html>
