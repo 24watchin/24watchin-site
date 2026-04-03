@@ -2,7 +2,11 @@
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 import { langCountryPairs } from '../lib/siteRoutes.ts';
 import '../styles/global.css';
+
 import Header from '../components/Header.astro';
+// ▼ 【追加】infoページ用に、言語トップと同じヘッダーを読み込んでおきます
+import LanguageTopHeader from '../components/LanguageTopHeader.astro';
+
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 import CategorySidebar from '../components/CategorySidebar.astro';
@@ -24,16 +28,22 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/ogp.png`;
 
 const currentPath = Astro.url.pathname;
 const pathParts = currentPath.split('/').filter(Boolean);
+
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || '';
 
+// ▼ 【追加】現在開いているページが「info」ページかどうかを判定します
+const isInfoPage = pathParts[1] === 'info';
+
 const canonicalUrl = `${SITE_URL}${currentPath}`;
+
 const ogImageUrl = ogImage || DEFAULT_OG_IMAGE;
 
 const localeKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
   'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
+
 const localeKey = (localeKeyMap[lang as keyof typeof localeKeyMap] || 'jp') as keyof typeof categoryLabelMap;
 const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
 
@@ -48,6 +58,7 @@ const ogLocaleMap: Record<string, string> = {
   de: 'de_DE',
   ru: 'ru_RU',
 };
+
 const ogLocale = ogLocaleMap[lang] || 'ja_JP';
 
 const defaultDescriptions: Record<string, string> = {
@@ -63,6 +74,7 @@ const defaultDescriptions: Record<string, string> = {
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
 const metaTitle = title ? `${title} | 24Watchin` : '24Watchin';
+
 const bodyStyle = '--theme-color: ' + themeColor + ';';
 
 // hreflang タグ生成
@@ -140,15 +152,12 @@ const organizationJsonLd = {
     <meta name="description" content={metaDescription} />
     <meta name="google-site-verification" content="rCdn1xS0NRhpAQ2jHt2RMGu7wvh1FvF2ePGznFolTZU" />
 
-    <!-- favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
-    <!-- canonical -->
     <link rel="canonical" href={canonicalUrl} />
 
-    <!-- hreflang（多言語SEO） -->
     {hreflangLinks.map(link => (
       <link rel="alternate" hreflang={link.lang} href={link.url} />
     ))}
@@ -156,7 +165,6 @@ const organizationJsonLd = {
       <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
     )}
 
-    <!-- OGP -->
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={metaTitle} />
     <meta property="og:description" content={metaDescription} />
@@ -167,7 +175,6 @@ const organizationJsonLd = {
     <meta property="og:locale" content={ogLocale} />
     <meta property="og:site_name" content="24Watchin" />
 
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={metaTitle} />
     <meta name="twitter:description" content={metaDescription} />
@@ -175,7 +182,6 @@ const organizationJsonLd = {
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D9WC22D3LC"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -184,13 +190,10 @@ const organizationJsonLd = {
       gtag('config', 'G-D9WC22D3LC');
     </script>
 
-    <!-- WebSite 構造化データ（全ページ共通） -->
     <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
 
-    <!-- Organization 構造化データ（全ページ共通） -->
     <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
 
-    <!-- 各ページ固有の構造化データ（記事ページなど）をここに差し込む -->
     <slot name="head" />
 
     <style>
@@ -215,7 +218,10 @@ const organizationJsonLd = {
     </style>
   </head>
   <body style={bodyStyle}>
-    <Header />
+    
+    {/* ▼ 【変更】infoページならLanguageTopHeader、それ以外は通常のHeaderを表示します */}
+    {isInfoPage ? <LanguageTopHeader /> : <Header />}
+
     <div class="container page-shell">
       <slot name="top-full" />
       <div class="main-layout">
@@ -234,7 +240,6 @@ const organizationJsonLd = {
       </div>
     </div>
     <Footer allPosts={allPosts} />
-    <!-- クッキー同意バナー -->
     <CookieBanner />
     <script is:inline>
       document.addEventListener('contextmenu', e => e.preventDefault());
