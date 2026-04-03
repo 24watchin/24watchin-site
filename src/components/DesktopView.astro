@@ -3,6 +3,7 @@ import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
 // 司令塔から記事データを受け取ります
 const { latestStories = [] } = Astro.props;
+
 // 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
@@ -13,14 +14,15 @@ const countryNameMap = {
   tw: 'Taiwan', es: 'Spain', fr: 'France', de: 'Germany',
   br: 'Brazil', kr: 'South Korea'
 };
-const backupStories = [
-  { id: 1, category: 'Politics', countryCode: 'jp', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 2, category: 'Economy', countryCode: 'us', country: 'USA', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 3, category: 'Society', countryCode: 'fr', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 4, category: 'Environment', countryCode: 'br', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 5, category: 'Technology', countryCode: 'kr', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-];
-const displayStories = latestStories.length > 0 ? latestStories : backupStories;
+
+// en- から始まるラベル（タグ）を持っている記事だけを絞り込みます
+const displayStories = latestStories.filter(post => {
+  if (post.labels && Array.isArray(post.labels)) {
+    return post.labels.some(label => label.startsWith('en-'));
+  }
+  return false;
+});
+
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -31,6 +33,7 @@ const languages = [
   { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
+
 function stripHtml(html) {
   if (!html) return '';
   const text = html.replace(/<[^>]*>?/gm, '');
@@ -139,15 +142,17 @@ function getThumbnail(content) {
         <div class="carousel-wrapper">
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-            
+             
             {displayStories.map((post) => {
               let bgImage = '';
               let categoryName = 'News';
               let countryCode = 'world';
               let countryName = '';
               let dateText = '';
+
               if (post.labels && Array.isArray(post.labels)) {
                 bgImage = getThumbnail(post.content);
+
                 const countryTag = post.labels.find(l => l.startsWith('en-'));
                 if (countryTag) {
                   countryCode = countryTag.replace('en-', '');
@@ -163,13 +168,6 @@ function getThumbnail(content) {
 
                 dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
               } 
-              else {
-                bgImage = post.image;
-                categoryName = post.category;
-                countryCode = post.countryCode;
-                countryName = post.country;
-                dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-              }
 
               return (
                 <a href={`/en/${countryCode}/news/${post.id}`} class="story-card observer-card no-link-color">
@@ -252,7 +250,7 @@ function getThumbnail(content) {
               <a href="/en/info/copyright/">COPYRIGHT / REUSE</a>
             </div>
             <div class="top-footer-copy">
-              <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
+               <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
               <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
               <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
             </div>
@@ -438,6 +436,7 @@ function getThumbnail(content) {
       const BRAND_HIDE_MS = 600; 
       const MASK_IN_MS  = 800;   
       const MASK_UNLOCK_MS = 100;
+    
       let currentStep = 0;
       let isAnimating = false;
       const desktopSequence = document.getElementById('desktop-sequence');
@@ -462,25 +461,58 @@ function getThumbnail(content) {
         document.body.classList.toggle('is-locked', locked); 
         document.documentElement.classList.toggle('is-locked', locked);
       }
-      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
+      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); });
+      }
       function showMask() { transitionMask?.classList.add('is-visible'); }
-      function hideMask() { transitionMask?.classList.remove('is-visible'); }
-      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
-      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible'); }
-      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible'); }
-      function revealBrandImmediate() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night', 'is-bg'); requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); }); }
-      function showBrandAnimated() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night'); window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS); window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS); window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS); }
-      function hideBrandAnimated() { brandTextTarget?.classList.remove('is-visible'); brandPanel?.classList.remove('is-bg', 'is-night'); window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS); }
-      function activateHeroSlide(index) { leftPanels.forEach((panel) => panel.classList.remove('is-active')); rightPanels.forEach((panel) => panel.classList.remove('is-active')); if (index === 0) { l2?.classList.remove('is-open'); r2?.classList.remove('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 1) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 2) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.add('is-open'); r3?.classList.add('is-open'); } window.setTimeout(() => { if(leftPanels.length > index) leftPanels[index].classList.add('is-active'); if(rightPanels.length > index) rightPanels[index].classList.add('is-active'); isAnimating = false; }, HERO_ANIM_MS); }
-      function transitionBrandToStories() { showMask(); window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
-      function transitionStoriesToBrand() { showMask(); window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
-      function transitionBetweenSections(targetStep) { showMask(); window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
-      function transitionBrandToHero() { showMask(); window.setTimeout(() => { resetBrandPanel(); clearSectionVisibility(); activateHeroSlide(2); hideMask(); }, MASK_IN_MS); }
-      function goToStep(step) { if (step < 0 || step > 5) return; if (isAnimating) return; const previousStep = currentStep; currentStep = step; isAnimating = true; updateIndicator(step); if (step <= 2) { setBodyLocked(true); desktopSequence?.classList.remove('is-hidden'); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 3 && step === 2) { transitionBrandToHero(); return; } hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return; } if (step === 3) { setBodyLocked(true); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 4) { transitionStoriesToBrand(); return; } hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden'); if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } else { showBrandAnimated(); } return; } if (step === 4 && previousStep === 3) { transitionBrandToStories(); return; } if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return; } if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; } showSection(step); window.setTimeout(() => { isAnimating = false; }, 300); }
-      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
-      function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
+      function hideMask() { transitionMask?.classList.remove('is-visible');
+      }
+      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible');
+      }
+      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible');
+      }
+      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible');
+      }
+      function revealBrandImmediate() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night', 'is-bg'); requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
+      }
+      function showBrandAnimated() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night'); window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS);
+      window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS); window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS);
+      }
+      function hideBrandAnimated() { brandTextTarget?.classList.remove('is-visible'); brandPanel?.classList.remove('is-bg', 'is-night');
+      window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS); }
+      function activateHeroSlide(index) { leftPanels.forEach((panel) => panel.classList.remove('is-active'));
+      rightPanels.forEach((panel) => panel.classList.remove('is-active')); if (index === 0) { l2?.classList.remove('is-open'); r2?.classList.remove('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 1) { l2?.classList.add('is-open');
+      r2?.classList.add('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 2) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.add('is-open'); r3?.classList.add('is-open');
+      } window.setTimeout(() => { if(leftPanels.length > index) leftPanels[index].classList.add('is-active'); if(rightPanels.length > index) rightPanels[index].classList.add('is-active'); isAnimating = false; }, HERO_ANIM_MS);
+      }
+      function transitionBrandToStories() { showMask();
+      window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+      function transitionStoriesToBrand() { showMask();
+      window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+      function transitionBetweenSections(targetStep) { showMask();
+      window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
+      }
+      function transitionBrandToHero() { showMask(); window.setTimeout(() => { resetBrandPanel(); clearSectionVisibility(); activateHeroSlide(2); hideMask(); }, MASK_IN_MS);
+      }
+      function goToStep(step) { if (step < 0 || step > 5) return;
+      if (isAnimating) return; const previousStep = currentStep; currentStep = step; isAnimating = true; updateIndicator(step); if (step <= 2) { setBodyLocked(true);
+      desktopSequence?.classList.remove('is-hidden'); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 3 && step === 2) { transitionBrandToHero(); return;
+      } hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return; } if (step === 3) { setBodyLocked(true);
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 4) { transitionStoriesToBrand(); return; } hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden');
+      if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } else { showBrandAnimated(); } return;
+      } if (step === 4 && previousStep === 3) { transitionBrandToStories(); return;
+      } if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return;
+      } if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; } showSection(step);
+      window.setTimeout(() => { isAnimating = false; }, 300); }
+      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1);
+      } }
+      function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1);
+      } }
       window.addEventListener('wheel', (e) => { if (document.getElementById('side-menu')?.classList.contains('is-open')) return; e.preventDefault(); if (isAnimating) return; if (e.deltaY > WHEEL_THRESHOLD) moveNext(); else if (e.deltaY < -WHEEL_THRESHOLD) movePrev(); }, { passive: false });
-      function scrollCarouselByOneCard(container, direction) { if (!container) return; const cards = container.querySelectorAll('.observer-card'); if (cards.length === 0) return; const cardWidth = cards[0].offsetWidth; const style = window.getComputedStyle(cards[0]); const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight); const distance = (cardWidth + margin) * direction; container.scrollBy({ left: distance, behavior: 'smooth' }); }
+      function scrollCarouselByOneCard(container, direction) { if (!container) return; const cards = container.querySelectorAll('.observer-card'); if (cards.length === 0) return; const cardWidth = cards[0].offsetWidth;
+      const style = window.getComputedStyle(cards[0]); const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight); const distance = (cardWidth + margin) * direction;
+      container.scrollBy({ left: distance, behavior: 'smooth' }); }
       const storyCards = document.querySelectorAll('#story-carousel .observer-card');
       const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
       const storyPrevBtn = document.getElementById('story-carousel-prev');
@@ -499,7 +531,9 @@ function getThumbnail(content) {
       langNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, 1));
       const langObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-center'); const index = Array.from(langCards).indexOf(entry.target); if(index !== -1 && langDots[index]) { langDots.forEach(d => d.classList.remove('active')); langDots[index].classList.add('active'); } } else { entry.target.classList.remove('is-center'); } }); }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
       langCards.forEach(card => langObserver.observe(card));
-      setBodyLocked(true); if(desktopSequence) desktopSequence.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0); window.setTimeout(() => { if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); }, 400);
-    } catch (error) { console.error("プログラムでエラーが発生しました:", error); }
+      setBodyLocked(true); if(desktopSequence) desktopSequence.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
+      window.setTimeout(() => { if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); }, 400);
+    } catch (error) { console.error("プログラムでエラーが発生しました:", error);
+    }
   });
 </script>
