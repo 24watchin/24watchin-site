@@ -1,0 +1,20 @@
+---
+// src/pages/[lang]/info/index.astro
+export function getStaticPaths() {
+  // 現在対応している全言語をリストアップします
+  return [
+    { params: { lang: 'ja' } },
+    { params: { lang: 'en' } },
+    { params: { lang: 'ru' } },
+    { params: { lang: 'fr' } },
+    { params: { lang: 'de' } },
+    { params: { lang: 'es' } },
+    { params: { lang: 'zh-tw' } },
+    { params: { lang: 'zh-cn' } },
+  ];
+}
+
+const { lang } = Astro.params;
+// aboutページへリダイレクト（転送）します
+return Astro.redirect(`/${lang}/info/about/`);
+---
