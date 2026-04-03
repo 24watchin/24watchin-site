@@ -6,8 +6,9 @@ import { zhTW } from '../../lib/info/zh-tw/aboutData.ts';
 import { zhCN } from '../../lib/info/zh-cn/aboutData.ts';
 import { ru } from '../../lib/info/ru/aboutData.ts';
 import { fr } from '../../lib/info/fr/aboutData.ts';
-// ドイツ語データを新しく読み込みます
 import { de } from '../../lib/info/de/aboutData.ts';
+// スペイン語データを新しく読み込みます
+import { es } from '../../lib/info/es/aboutData.ts';
 
 const { pathname } = Astro.url;
 
@@ -32,7 +33,10 @@ if (pathname.startsWith('/en/')) {
   themeColor = '#3d3d99'; // フランス語
 } else if (pathname.startsWith('/de/')) {
   data = de;
-  themeColor = '#006600'; // ドイツ語 (ご指定の色)
+  themeColor = '#006600'; // ドイツ語
+} else if (pathname.startsWith('/es/')) {
+  data = es;
+  themeColor = '#b38000'; // スペイン語 (ご指定の色)
 }
 ---
 
