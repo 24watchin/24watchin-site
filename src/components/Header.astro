@@ -13,10 +13,25 @@ const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
-const lang = pathParts[0] || 'ja';
-const country = pathParts[1] || 'jp';
 
-const SITE_ID = 'jp-ja'; 
+// 1. 言語と info 階層の判定
+const supportedLangs = ['ja', 'en', 'zh-cn', 'zh-tw', 'es', 'fr', 'de', 'ru'];
+const lang = supportedLangs.includes(pathParts[0]) ? pathParts[0] : 'ja';
+const isInfoPage = pathParts[1] === 'info';
+
+// 2. 国コードの判定
+const urlCountry = (pathParts.length > 1 && !isInfoPage) ? pathParts[1] : '';
+const country = urlCountry || 'jp';
+
+// 3. ドロップダウンパネル用の国リスト
+const availableCountries = langCountryPairs
+  .filter(pair => pair.lang === lang)
+  .map(pair => ({
+    code: pair.country,
+    name: getCountryLabel(pair.country, lang)
+  }));
+
+const SITE_ID = 'jp-ja';
 const SLOT = 'header_words';
 
 type HeaderWord = { label: string; url: string; displayOrder: number; };
@@ -39,37 +54,41 @@ if (SPACE_ID && DELIVERY_TOKEN) {
 const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+
 const basePath = '/' + lang + '/' + country;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
+// カテゴリ設定
 const categoryItems = (labels.headerCategories || []).map((item) => {
-  const href = basePath + '/category/' + item.slug + '/';
-  return { href, label: item.label, isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), slug: item.slug };
+  const href = isInfoPage ? 'javascript:void(0)' : basePath + '/category/' + item.slug + '/';
+  return { 
+    href, 
+    label: item.label, 
+    isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), 
+    slug: item.slug,
+    className: isInfoPage ? 'category-link cat-dropdown-trigger' : 'category-link'
+  };
 });
 
-const homeHref = basePath + '/';
-const searchAction = basePath + '/search/';
-const countryLabel = getCountryLabel(country, lang);
-
-const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
-const languageOptions = [
-  { code: 'ja', key: 'jp', label: '日本語', barStyle: 'background:#872732' },
-  { code: 'en', key: 'en', label: 'English', barStyle: 'background:#001580' },
-  { code: 'zh-cn', key: 'zh-cn', label: '简体中文', barStyle: 'background:#0e7c7b' },
-  { code: 'zh-tw', key: 'zh-tw', label: '繁體中文', barStyle: 'background:#b33224' },
-  { code: 'es', key: 'es', label: 'Español', barStyle: 'background:#b38000' },
-  { code: 'fr', key: 'fr', label: 'Français', barStyle: 'background:#3d3d99' },
-  { code: 'de', key: 'de', label: 'Deutsch', barStyle: 'background:#006600' },
-  { code: 'ru', key: 'ru', label: 'Русский', barStyle: 'background:#500d80' },
-].filter(opt => allowedLangs.includes(opt.code)).map(opt => ({ ...opt, href: '/' + opt.code + '/' + country + '/', linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option' }));
-
-const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
+// カテゴリ振り分け定義
+const moreSlugsMap: Record<string, string[]> = { 
+  jp: ['health-life', 'weather', 'traffic'], 
+  en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 
+  'zh-cn': [], 'zh-tw': [] 
+};
 const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 const moreHasActive = moreItems.some(item => item.isActive);
 
+const homeHref = isInfoPage ? `/${lang}/` : `/${lang}/${country}/`;
+const searchAction = basePath + '/search/';
 const weatherHref = basePath + '/weather/';
+const countryLabel = getCountryLabel(country, lang);
 
 const cities = countryCityMap[country] || countryCityMap['jp'];
 const { isImperial, tempUnit } = getUnitSystem(lang);
@@ -99,7 +118,6 @@ for (const city of cities) {
 const cityDataForJs = cities.map((city: any) => {
   const wd = allCityWeather[city.key];
   const current = wd?.current;
-  const conditionCode = current?.condition?.code;
   const iconUrl = current?.condition?.icon ? 'https:' + current.condition.icon : '';
   return {
     key: city.key,
@@ -107,7 +125,7 @@ const cityDataForJs = cities.map((city: any) => {
     temp: current ? convertTemp(current.temp_c, isImperial) : null,
     feelsLike: current ? convertTemp(current.feelslike_c, isImperial) : null,
     iconUrl,
-    conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
+    conditionText: current?.condition?.code ? getWeatherCondition(current.condition.code, lang) : '',
   };
 });
 const defaultWeatherData = cityDataForJs[0] || null;
@@ -129,10 +147,9 @@ const defaultWeatherData = cityDataForJs[0] || null;
         <form action={searchAction} method="get" class="search-form-animated" id="pc-search-form">
           <input type="text" name="q" class="search-input-animated" placeholder={labels.searchPlaceholder} id="pc-search-input" />
           <button type="button" class="search-icon-btn" id="pc-search-icon-btn">
-            <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
           </button>
         </form>
-
         <button type="button" class="region-lang-open-btn" id="pc-region-lang-btn" data-current-lang={lang}>
           地域 / 言語 <span class="hamburger-icon">&#8803;</span>
         </button>
@@ -145,7 +162,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
         <div class="pc-category-group">
           <div class="category-scroll pc-scroll" id="pc-scroll">
             {mainItems.map((item) => (
-              <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+              <a href={item.href} class={item.isActive ? `${item.className} active` : item.className} data-slug={item.slug}>
                 <span class="category-link-text">{item.label}</span>
               </a>
             ))}
@@ -157,7 +174,11 @@ const defaultWeatherData = cityDataForJs[0] || null;
                 <svg class="more-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </div>
               <div class="more-dropdown">
-                {moreItems.map((item) => <a href={item.href} class={item.isActive ? 'more-link active' : 'more-link'}><span class="more-link-text">{item.label}</span></a>)}
+                {moreItems.map((item) => (
+                  <a href={item.href} class={item.isActive ? `${item.className} active` : item.className} data-slug={item.slug}>
+                    <span class="more-link-text">{item.label}</span>
+                  </a>
+                ))}
               </div>
             </div>
           )}
@@ -168,7 +189,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
     <div class="header-word-bar">
       <div class="header-word-inner">
-        {headerWords.map((item, index) => (
+        {headerWords.map((item) => (
           <a href={item.url} class="header-word-link">{item.label}</a>
         ))}
       </div>
@@ -181,20 +202,16 @@ const defaultWeatherData = cityDataForJs[0] || null;
 <div class="header-sp-wrapper">
   <div class="sp-top-gray-bar">
     <div class="sp-top-country">{countryLabel}</div>
-    
     <div class="sp-top-actions">
-      
       <form action={searchAction} method="get" class="search-form-animated sp-search-form" id="sp-search-form">
         <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
         <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn" aria-label="検索">
-          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
         </button>
       </form>
-
       <button type="button" class="sp-reload-btn" onclick="window.location.reload();" aria-label="ページを更新">
-        <svg viewBox="0 0 24 24" class="reload-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.32-9.83l5.67 5.67" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" class="reload-icon" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.32-9.83l5.67 5.67"/></svg>
       </button>
-      
       <button type="button" class="region-lang-open-btn sp-region-lang-btn" id="sp-region-lang-btn" data-current-lang={lang}>
         地域 / 言語 <span class="hamburger-icon">&#8803;</span>
       </button>
@@ -206,7 +223,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
       <div class="brand-area sp-brand-area">
         <a href={homeHref} class="logo-link"><img src="/images/logo-24watchin.png" alt="24Watchin" class="logo-image sp-logo-image" /></a>
       </div>
-      
       <div class="right-area sp-right-area">
         <a href={weatherHref} class="sp-weather-widget">
           {defaultWeatherData && defaultWeatherData.temp !== null ? (
@@ -220,316 +236,200 @@ const defaultWeatherData = cityDataForJs[0] || null;
               </div>
             </>
           ) : (
-            <>
-              <div class="sp-weather-icon">
-                <i class="fa-solid fa-cloud-sun" style="color: #6b7280; font-size: 20px; margin-top: 4px;"></i>
-              </div>
-              <div class="sp-weather-info">
-                <span class="sp-weather-loc">読込中... &gt;</span>
-                <span class="sp-weather-temp">-- / --</span>
-              </div>
-            </>
+            <div class="sp-weather-info"><span class="sp-weather-loc">読込中... &gt;</span></div>
           )}
         </a>
-
       </div>
     </div>
 
     <nav class="category-bar sp-category-bar">
       <div class="category-scroll sp-scroll" id="sp-scroll">
         {categoryItems.map((item) => (
-          <a href={item.href} class={item.isActive ? 'category-link active' : 'category-link'}>
+          <a href={item.href} class={item.isActive ? `${item.className} active` : item.className} data-slug={item.slug}>
             <span class="category-link-text">{item.label}</span>
           </a>
         ))}
         <div class="sp-scroll-padding"></div>
       </div>
     </nav>
-
     <div style="height: 10px; background-color: #ffffff; width: 100%;"></div>
-
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
+
+{/* ヘッダーの枠外（Wrapperの外）に配置して干渉を防ぐ */}
+<div id="cat-country-panel" class="cat-country-panel">
+  <div class="cat-country-header">
+    <span id="cat-country-title" class="cat-country-title">カテゴリ名</span>
+    <button id="cat-country-close" class="cat-country-close" aria-label="閉じる">&times;</button>
+  </div>
+  <div class="cat-country-panel-inner" id="cat-country-panel-inner"></div>
+</div>
+
+<script type="application/json" id="lang-top-countries-data" set:html={JSON.stringify(availableCountries)}></script>
+
 <RegionLangPanel currentLang={lang} currentCountry={country} themeColor={labels.themeColor || '#872732'} />
 
 <style>
-  /* === PC版とスマホ版の表示切り替えスイッチ === */
-  .header-pc-wrapper { display: block; margin: 0; padding: 0; border-radius: 0; }
-  .header-sp-wrapper { display: none; margin: 0; padding: 0; border-radius: 0; }
+  /* 基本レイアウト */
+  .header-pc-wrapper, .header-sp-wrapper { margin: 0; padding: 0; border-radius: 0; width: 100%; }
+  .header-pc-wrapper { display: block; }
+  .header-sp-wrapper { display: none; }
+  @media (max-width: 768px) { .header-pc-wrapper { display: none; } .header-sp-wrapper { display: block; } }
 
-  @media (max-width: 768px) { 
-    .header-pc-wrapper { display: none; } 
-    .header-sp-wrapper { display: block; }
-  }
-
-  /* ================================================= */
-  /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
-  /* ================================================= */
-
-  .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
+  .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; }
   .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
   .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
-  
-  .pc-header-top { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 14px 15px; }
-  .pc-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
 
-  .search-form-animated { 
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-end; 
-  }
-  .search-input-animated {
-    width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
-    transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0;
-    height: 34px; 
-    box-sizing: border-box; 
-  }
-  .search-input-animated.active {
-    width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; 
-  }
-  .search-icon-btn {
-    width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0;
-    box-sizing: border-box; 
-  }
+  .site-header { width: 100%; background: #ffffff; border-radius: 0; position: relative; z-index: 100; }
+  .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; padding: 20px 14px 15px; align-items: flex-end; }
+  .logo-image { width: 200px; height: auto; display: block; }
 
-  .region-lang-open-btn {
-    background: none; border: none; color: #000; font-size: 15px; font-weight: bold;
-    cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0;
-  }
-  .hamburger-icon { font-size: 22px; font-weight: bold; }
-
-  .site-header { width: 100%; background: #ffffff; border-radius: 0 !important; }
-  .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; }
-  .brand-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
-  .logo-image { width: 200px; height: auto; }
-  
-  .right-area { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: flex-end; 
-  }
-  .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
-  
   .category-bar { background: #393737; width: 100%; }
-  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
-  
-  .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
-  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; -webkit-overflow-scrolling: touch; }
+  .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; position: relative; }
+  .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; flex: 1; scrollbar-width: none; -ms-overflow-style: none; }
   .category-scroll::-webkit-scrollbar { display: none; }
 
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; background: transparent; border: none; cursor: pointer; position: relative; }
   .category-link.active { background: var(--theme-color); }
-  
-  .category-link-text, .more-link-text { position: relative; display: inline-block; }
-  .category-link-text::after, .more-link-text::after {
-    content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease;
+  .category-link-text { position: relative; z-index: 1; }
+  .category-link-text::after { content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease; }
+  .category-link:hover .category-link-text::after { width: 100%; }
+
+  .search-form-animated { display: flex; align-items: center; }
+  .search-input-animated { width: 0; opacity: 0; transition: all 0.4s ease; border-radius: 8px; height: 34px; border: 1px solid transparent; outline: none; padding: 0; }
+  .search-input-animated.active { width: 200px; opacity: 1; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; margin-right: 6px; }
+  .search-icon-btn { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .search-icon { width: 16px; height: 16px; stroke: #333; }
+
+  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; }
+  .sp-top-actions { display: flex; gap: 10px; align-items: center; }
+  .sp-reload-btn { width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; }
+
+  /* ================================================= */
+  /* ▼▼▼ お手本から移植した、絶対に広がらないパネルスタイル ▼▼▼ */
+  /* ================================================= */
+  .cat-country-panel {
+    display: none;
+    position: absolute; /* 絶対配置にして、他の要素を押し広げないようにする */
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    z-index: 99999;
+    width: 200px;
+    overflow: hidden;
   }
-  .category-link:hover .category-link-text::after, .more-link:hover .more-link-text::after { width: 100%; }
-  
-  .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .more-btn.active { background: var(--theme-color); }
-  .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
-  .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-  .more-wrapper:hover .more-dropdown { display: block; }
-  .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
-  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .cat-country-panel.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+  }
+  .cat-country-header {
+    background-color: #f7f7f7;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--theme-color, #872732);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cat-country-title { font-size: 14px; font-weight: 800; color: #111; margin: 0; }
+  .cat-country-close { background: none; border: none; font-size: 20px; color: #999; cursor: pointer; padding: 0; }
+  .cat-country-panel-inner { display: flex; flex-direction: column; padding: 4px 0; max-height: 50vh; overflow-y: auto; }
+  .cat-country-link {
+    display: flex; align-items: center; padding: 10px 14px; color: #333; text-decoration: none;
+    font-size: 13px; font-weight: bold; border-bottom: 1px solid #f0f0f0;
+  }
+  .cat-country-link:hover { background: #fdfdfd; color: var(--theme-color, #872732); }
+  .cat-country-icon { font-size: 10px; color: #999; margin-right: 8px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-  .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
-  .scroll-arrow.active { display: flex; }
-
-  .header-word-bar { background: #fff; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
-  .header-word-inner::-webkit-scrollbar { display: none; }
+  /* ヘッダー周りの追加スタイル */
+  .header-word-bar { background: #fff; border-bottom: 1px solid #eee; }
+  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; }
   .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
-  .bottom-line { height: 10px; }
-
-
-  /* ================================================= */
-  /* ▼▼▼ スマホ版専用のスタイル ▼▼▼ */
-  /* ================================================= */
-  
-  .sp-top-gray-bar { 
-    background-color: #e6e6e6; 
-    width: 100%; 
-    height: 38px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    padding: 0 14px; 
-    box-sizing: border-box; 
-    position: relative; 
-  }
-  .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
-  .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
-  
-  .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
-  .reload-icon { width: 14px; height: 14px; color: #333; }
-  
-  .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
-  .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
-
-  .sp-search-form { position: relative; display: flex; align-items: center; }
-  .sp-search-input { 
-    position: absolute; 
-    right: 34px; 
-    top: 50%; 
-    transform: translateY(-50%); 
-    width: 0; 
-    height: 30px !important; 
-    padding: 0 !important; 
-    background: #fff; 
-    border: 1px solid transparent; 
-    border-radius: 8px; 
-    opacity: 0; 
-    transition: all 0.3s ease; 
-    box-sizing: border-box; 
-    z-index: 10;
-  }
-  .sp-search-input.active { 
-    /* ▼修正：左側に余白を作るため、180px -> 195px に変更しました */
-    width: calc(100vw - 195px) !important; 
-    padding: 0 10px !important; 
-    border: 1px solid #ccc; 
-    opacity: 1; 
-  }
-  .sp-search-btn { 
-    width: 28px !important; 
-    height: 28px !important; 
-    border-radius: 50%; 
-    box-sizing: border-box; 
-    flex-shrink: 0; 
-    background: #fff; 
-    border: 1px solid #ccc; 
-    padding: 0; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    z-index: 11;
-  }
-  .sp-search-btn .search-icon { width: 14px; height: 14px; }
-
-
-  .sp-header-top { 
-    padding: 6px 14px; 
-    align-items: center; 
-    overflow: hidden; 
-  }
-  
-  .sp-logo-image { width: 150px; }
-  
-  .sp-right-area { 
-    gap: 8px; 
-    position: relative; 
-    flex: 1; 
-    min-width: 0; 
-    align-items: flex-end !important; 
-  }
-  
-  .sp-weather-widget { 
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-end; 
-    gap: 4px; 
-    text-decoration: none; 
-    margin-top: 0; 
-    overflow: hidden; 
-    max-width: 140px; 
-  }
-  .sp-weather-icon { display: flex; align-items: center; justify-content: center; width: 28px; flex-shrink: 0; }
-  .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; min-width: 0; }
-  
-  .no-wrap-text { 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    width: 100%; 
-    text-align: right;
-  }
-  .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
-  .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; white-space: nowrap; }
-
-  .sp-category-bar { width: 100%; overflow: hidden; position: relative; }
-  .sp-category-bar::after {
-    content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%;
-    background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%);
-    pointer-events: none;
-  }
-  .sp-scroll { padding-left: 6px; scrollbar-width: none; }
-  .sp-scroll::-webkit-scrollbar { display: none; }
-  .sp-scroll-padding { width: 45px; flex-shrink: 0; }
-
-  @media (max-width: 768px) { 
-    .category-link { font-size: 14px; padding: 0 10px; height: 46px; }
-  }
+  .bottom-line { height: 10px; width: 100%; }
 </style>
 
 <script is:inline>
   window.addEventListener('load', function() {
+    // 既存機能（検索）
     function setupSearch(btnId, inputId, formId) {
-      var btn = document.getElementById(btnId);
-      var input = document.getElementById(inputId);
-      var form = document.getElementById(formId);
-      if (btn && input && form) {
-        btn.addEventListener('click', function(e) {
-          if (!input.classList.contains('active')) {
-            e.preventDefault();
-            input.classList.add('active');
-            input.focus();
-          } else {
-            if (input.value.trim() === '') {
-              e.preventDefault();
-              input.classList.remove('active');
-            } else {
-              form.submit();
-            }
-          }
-        });
-      }
+      const btn = document.getElementById(btnId), input = document.getElementById(inputId), form = document.getElementById(formId);
+      btn?.addEventListener('click', (e) => {
+        if (!input.classList.contains('active')) { e.preventDefault(); input.classList.add('active'); input.focus(); }
+        else if (input.value.trim() === '') { e.preventDefault(); input.classList.remove('active'); }
+        else form.submit();
+      });
     }
     setupSearch('pc-search-icon-btn', 'pc-search-input', 'pc-search-form');
     setupSearch('sp-search-icon-btn', 'sp-search-input', 'sp-search-form');
 
-    function setupRegionPanel(btnId) {
-      var btn = document.getElementById(btnId);
-      var rlPanel = document.getElementById('rl-panel');
-      var rlOverlay = document.getElementById('rl-overlay');
-      if (btn && rlPanel && rlOverlay) {
-        btn.addEventListener('click', function() {
-          rlPanel.classList.add('open');
-          rlOverlay.classList.add('open');
-          var currentLang = btn.getAttribute('data-current-lang');
-          var activeLangBtn = document.querySelector('.rl-lang-btn[data-lang="' + currentLang + '"]');
-          if (activeLangBtn) { activeLangBtn.click(); }
-        });
+    // 地域・言語パネル
+    const rlOverlay = document.getElementById('rl-overlay');
+    const rlPanel = document.getElementById('rl-panel');
+    function openRL(lang) {
+      if(rlOverlay && rlPanel) {
+        rlOverlay.classList.add('open');
+        rlPanel.classList.add('open');
+        const activeLangBtn = document.querySelector('.rl-lang-btn[data-lang="' + lang + '"]');
+        activeLangBtn?.click();
       }
     }
-    setupRegionPanel('pc-region-lang-btn');
-    setupRegionPanel('sp-region-lang-btn');
+    document.getElementById('pc-region-lang-btn')?.addEventListener('click', (e) => openRL(e.currentTarget.dataset.currentLang));
+    document.getElementById('sp-region-lang-btn')?.addEventListener('click', (e) => openRL(e.currentTarget.dataset.currentLang));
 
-    var pcScroll = document.getElementById('pc-scroll');
-    var pcBtnLeft = document.getElementById('pc-arrow-left');
-    var pcBtnRight = document.getElementById('pc-arrow-right');
-    function updateArrows() {
-      var width = window.innerWidth;
-      if (pcScroll && pcBtnLeft && pcBtnRight) {
-        if (width > 1000 || width <= 768) {
-          pcBtnLeft.classList.remove('active');
-          pcBtnRight.classList.remove('active');
-        } else {
-          var atLeftPC = pcScroll.scrollLeft <= 5;
-          var atRightPC = pcScroll.scrollLeft >= (pcScroll.scrollWidth - pcScroll.clientWidth - 5);
-          if (!atLeftPC) { pcBtnLeft.classList.add('active'); } else { pcBtnLeft.classList.remove('active'); }
-          if (!atRightPC) { pcBtnRight.classList.add('active'); } else { pcBtnRight.classList.remove('active'); }
+    // お手本移植：ドロップダウン制御
+    var catCountryPanel = document.getElementById('cat-country-panel'), 
+        catCountryInner = document.getElementById('cat-country-panel-inner'), 
+        catCountryTitle = document.getElementById('cat-country-title'), 
+        catCountryClose = document.getElementById('cat-country-close'), 
+        countriesDataEl = document.getElementById('lang-top-countries-data'), 
+        currentPanelSlug = null;
+
+    if (catCountryPanel && countriesDataEl) {
+      var availableCountries = JSON.parse(countriesDataEl.textContent);
+      var currentLang = document.documentElement.lang || 'ja';
+
+      document.querySelectorAll('.cat-dropdown-trigger').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault(); e.stopPropagation();
+          var slug = btn.getAttribute('data-slug'), catName = btn.textContent.trim();
+          
+          if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) {
+            catCountryPanel.classList.remove('show'); currentPanelSlug = null; return;
+          }
+
+          currentPanelSlug = slug;
+          if (catCountryTitle) { catCountryTitle.textContent = catName; }
+          var rect = btn.getBoundingClientRect();
+          catCountryInner.innerHTML = ''; 
+
+          availableCountries.forEach(function(c) {
+            var a = document.createElement('a'); a.className = 'cat-country-link';
+            a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
+            a.innerHTML = '<span class="cat-country-icon">▶</span>' + c.name;
+            catCountryInner.appendChild(a);
+          });
+
+          // 位置計算（絶対に広げないよう計算）
+          var top = rect.bottom + window.scrollY + 8;
+          var left = rect.left + window.scrollX;
+          if (window.innerWidth <= 600) { left = (window.innerWidth - 200) / 2; }
+          else if (left + 200 > window.innerWidth) { left = window.innerWidth - 220; }
+          
+          catCountryPanel.style.top = top + 'px'; catCountryPanel.style.left = left + 'px';
+          catCountryPanel.classList.add('show');
+        });
+      });
+
+      catCountryClose?.addEventListener('click', function(e) { 
+        e.stopPropagation(); catCountryPanel.classList.remove('show'); currentPanelSlug = null; 
+      });
+      document.addEventListener('click', function(e) { 
+        if (!e.target.closest('.cat-country-panel') && !e.target.closest('.cat-dropdown-trigger')) {
+          catCountryPanel.classList.remove('show'); currentPanelSlug = null;
         }
-      }
+      });
     }
-    if(pcBtnLeft) pcBtnLeft.addEventListener('click', function() { pcScroll.scrollBy({ left: -200, behavior: 'smooth' }); });
-    if(pcBtnRight) pcBtnRight.addEventListener('click', function() { pcScroll.scrollBy({ left: 200, behavior: 'smooth' }); });
-    if (pcScroll) pcScroll.addEventListener('scroll', updateArrows);
-    window.addEventListener('resize', updateArrows);
-    updateArrows();
   });
 </script>
