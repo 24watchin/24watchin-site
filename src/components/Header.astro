@@ -21,7 +21,7 @@ const lang = supportedLangs.includes(pathParts[0]) ? pathParts[0] : 'ja';
 // 2. URL内の国コードの判定 ('info'の場合は国指定なしとみなす)
 const urlCountry = (pathParts.length > 1 && pathParts[1] !== 'info') ? pathParts[1] : '';
 
-// 3. カテゴリや天気用の「国」を設定（言語トップページと同じ挙動にするため、指定がない場合は 'jp'）
+// 3. 天気データ取得用の「国」設定（国指定がない場合は引き続き 'jp' などをフォールバック）
 const country = urlCountry || 'jp';
 
 const SITE_ID = 'jp-ja';
@@ -48,18 +48,24 @@ const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
-const basePath = '/' + lang + '/' + country;
+// ▼ 修正ポイント：リンクのベースパスを切り替える
+// urlCountryがない（言語のトップやinfoページ）場合は、国を含めず `/${lang}` をベースにする
+const linkBasePath = urlCountry ? `/${lang}/${urlCountry}` : `/${lang}`;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
+// カテゴリのリンク生成（/ja/info/ にいる時は /ja/category/政治/ となります）
 const categoryItems = (labels.headerCategories || []).map((item) => {
-  const href = basePath + '/category/' + item.slug + '/';
-  return { href, label: item.label, isActive: cleanCurrentPath === (basePath + '/category/' + item.slug), slug: item.slug };
+  const href = linkBasePath + '/category/' + item.slug + '/';
+  return { href, label: item.label, isActive: cleanCurrentPath === (linkBasePath + '/category/' + item.slug), slug: item.slug };
 });
 
-// ▼ ロゴのリンク：国指定がない(infoなど)場合は言語トップページへ
+// ロゴのリンク
 const homeHref = urlCountry ? `/${lang}/${urlCountry}/` : `/${lang}/`;
 
-const searchAction = basePath + '/search/';
+// 検索窓と天気のリンク
+const searchAction = linkBasePath + '/search/';
+const weatherHref = linkBasePath + '/weather/';
+
 const countryLabel = getCountryLabel(country, lang);
 
 const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
@@ -82,8 +88,6 @@ const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 
 const moreHasActive = moreItems.some(item => item.isActive);
-
-const weatherHref = basePath + '/weather/';
 
 const cities = countryCityMap[country] || countryCityMap['jp'];
 
@@ -405,7 +409,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
     z-index: 10;
   }
   .sp-search-input.active { 
-    /* ▼修正：左側に余白を作るため、180px -> 195px に変更しました */
     width: calc(100vw - 195px) !important; padding: 0 10px !important; 
     border: 1px solid #ccc; 
     opacity: 1;
