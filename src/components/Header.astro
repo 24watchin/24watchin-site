@@ -58,7 +58,7 @@ const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 const basePath = '/' + lang + '/' + country;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
-// カテゴリ設定：infoページならドロップダウン用フラグを立てる
+// カテゴリ設定：infoページならドロップダウン用のクラスを付与
 const categoryItems = (labels.headerCategories || []).map((item) => {
   const href = isInfoPage ? 'javascript:void(0)' : basePath + '/category/' + item.slug + '/';
   return { 
@@ -212,7 +212,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
       <form action={searchAction} method="get" class="search-form-animated sp-search-form" id="sp-search-form">
         <input type="text" name="q" class="search-input-animated sp-search-input" placeholder={labels.searchPlaceholder} id="sp-search-input" />
         <button type="button" class="search-icon-btn sp-search-btn" id="sp-search-icon-btn" aria-label="検索">
-          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" x1="16" x2="21" y2="21"></line></svg>
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
         </button>
       </form>
       <button type="button" class="sp-reload-btn" onclick="window.location.reload();" aria-label="ページを更新">
@@ -271,7 +271,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   </header>
 </div>
 
-{/* 国名選択用ドロップダウンパネル */}
+{/* ▼ 言語トップとお揃いの「国名ドロップダウン」パネルを挿入 */}
 <div id="cat-country-panel" class="cat-country-panel">
   <div class="cat-country-header">
     <span id="cat-country-title" class="cat-country-title">カテゴリ名</span>
@@ -285,10 +285,11 @@ const defaultWeatherData = cityDataForJs[0] || null;
 <RegionLangPanel currentLang={lang} currentCountry={country} themeColor={labels.themeColor || '#872732'} />
 
 <style>
-  .header-pc-wrapper { display: block; margin: 0; padding: 0; }
-  .header-sp-wrapper { display: none; margin: 0; padding: 0; }
+  /* 以前のHeader.astroのスタイルを維持 */
+  .header-pc-wrapper { display: block; margin: 0; padding: 0; border-radius: 0; }
+  .header-sp-wrapper { display: none; margin: 0; padding: 0; border-radius: 0; }
   @media (max-width: 768px) { .header-pc-wrapper { display: none; } .header-sp-wrapper { display: block; } }
-  .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; }
+  .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
   .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
   .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
   .pc-header-top { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 14px 15px; }
@@ -296,18 +297,21 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .search-form-animated { display: flex; align-items: center; justify-content: flex-end; }
   .search-input-animated { width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent; transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0; height: 34px; box-sizing: border-box; }
   .search-input-animated.active { width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; }
-  .search-icon-btn { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0; }
+  .search-icon-btn { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0; box-sizing: border-box; }
   .region-lang-open-btn { background: none; border: none; color: #000; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0; }
   .hamburger-icon { font-size: 22px; font-weight: bold; }
-  .site-header { width: 100%; background: #ffffff; }
+  .site-header { width: 100%; background: #ffffff; border-radius: 0 !important; }
   .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; }
+  .brand-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
   .logo-image { width: 200px; height: auto; }
+  .right-area { display: flex; flex-direction: column; align-items: flex-end; }
+  .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
   .category-bar { background: #393737; width: 100%; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
   .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
   .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; -webkit-overflow-scrolling: touch; }
   .category-scroll::-webkit-scrollbar { display: none; }
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; background: transparent; border: none; cursor: pointer; }
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; border: none; background: transparent; cursor: pointer; }
   .category-link.active { background: var(--theme-color); }
   .category-link-text, .more-link-text { position: relative; display: inline-block; }
   .category-link-text::after, .more-link-text::after { content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease; }
@@ -319,27 +323,30 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .more-wrapper:hover .more-dropdown { display: block; }
   .more-wrapper:hover .more-chevron { transform: rotate(180deg); }
-  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; background: transparent; border: none; width: 100%; cursor: pointer; }
-  .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; }
+  .more-link { display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; }
+  .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
   .scroll-arrow.active { display: flex; }
   .header-word-bar { background: #fff; }
   .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
   .header-word-inner::-webkit-scrollbar { display: none; }
   .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
   .bottom-line { height: 10px; }
-  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; }
+  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative; }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
   .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
   .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+  .reload-icon { width: 14px; height: 14px; color: #333; }
   .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
+  .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
   .sp-search-form { position: relative; display: flex; align-items: center; }
-  .sp-search-input { position: absolute; right: 34px; top: 50%; transform: translateY(-50%); width: 0; height: 30px !important; padding: 0 !important; background: #fff; border: 1px solid transparent; border-radius: 8px; opacity: 0; transition: all 0.3s ease; }
+  .sp-search-input { position: absolute; right: 34px; top: 50%; transform: translateY(-50%); width: 0; height: 30px !important; padding: 0 !important; background: #fff; border: 1px solid transparent; border-radius: 8px; opacity: 0; transition: all 0.3s ease; box-sizing: border-box; z-index: 10; }
   .sp-search-input.active { width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1; }
-  .sp-search-btn { width: 28px !important; height: 28px !important; border-radius: 50%; background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; }
+  .sp-search-btn { width: 28px !important; height: 28px !important; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; background: #fff; border: 1px solid #ccc; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 11; }
+  .sp-search-btn .search-icon { width: 14px; height: 14px; }
   .sp-header-top { padding: 6px 14px; align-items: center; overflow: hidden; }
   .sp-logo-image { width: 150px; }
-  .sp-right-area { gap: 8px; position: relative; flex: 1; min-width: 0; }
-  .sp-weather-widget { display: flex; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; overflow: hidden; max-width: 140px; }
+  .sp-right-area { gap: 8px; position: relative; flex: 1; min-width: 0; align-items: flex-end !important; }
+  .sp-weather-widget { display: flex; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; margin-top: 0; overflow: hidden; max-width: 140px; }
   .sp-weather-icon { display: flex; align-items: center; justify-content: center; width: 28px; flex-shrink: 0; }
   .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; min-width: 0; }
   .no-wrap-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right; }
@@ -352,83 +359,82 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .sp-scroll-padding { width: 45px; flex-shrink: 0; }
   @media (max-width: 768px) { .category-link { font-size: 14px; padding: 0 10px; height: 46px; } }
 
-  /* ドロップダウン用スタイル */
-  .cat-country-panel { display: none; position: absolute; background: #ffffff; border: 1px solid #dddddd; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-radius: 6px; z-index: 99999; width: 220px; overflow: hidden; }
-  .cat-country-panel.show { display: block; animation: fadeIn 0.2s ease; }
-  .cat-country-header { background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid var(--theme-color, #872732); display: flex; justify-content: space-between; align-items: center; }
-  .cat-country-title { font-size: 15px; font-weight: 800; color: #333333; }
-  .cat-country-close { background: none; border: none; font-size: 22px; color: #aaaaaa; cursor: pointer; }
-  .cat-country-panel-inner { display: flex; flex-direction: column; padding: 6px 0; max-height: 60vh; overflow-y: auto; }
-  .cat-country-link { display: flex; align-items: center; padding: 12px 16px; color: #444444; text-decoration: none; font-size: 14px; font-weight: bold; border-bottom: 1px dashed #eeeeee; }
-  .cat-country-link:hover { background: #fdfdfd; color: var(--theme-color, #872732); padding-left: 20px; }
-  .cat-country-icon { font-size: 10px; color: #cccccc; margin-right: 10px; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+  /* ================================================= */
+  /* ▼▼▼ お手本(LanguageTopHeader)から完全移植したスタイル ▼▼▼ */
+  /* ================================================= */
+  .cat-country-panel {
+    display: none;
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    z-index: 99999;
+    width: 200px;
+    overflow: hidden;
+  }
+  .cat-country-panel.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+  }
+  .cat-country-header {
+    background-color: #f7f7f7;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--theme-color, #872732);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cat-country-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #111;
+    margin: 0;
+  }
+  .cat-country-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+  }
+  .cat-country-panel-inner {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .cat-country-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    color: #333;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cat-country-link:hover {
+    background: #fdfdfd;
+    color: var(--theme-color, #872732);
+  }
+  .cat-country-icon {
+    font-size: 10px;
+    color: #999;
+    margin-right: 8px;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 
 <script is:inline>
   window.addEventListener('load', function() {
-    const catCountryPanel = document.getElementById('cat-country-panel');
-    const catCountryInner = document.getElementById('cat-country-panel-inner');
-    const catCountryTitle = document.getElementById('cat-country-title');
-    const catCountryClose = document.getElementById('cat-country-close');
-    const countriesDataEl = document.getElementById('lang-top-countries-data');
-    let currentPanelSlug = null;
-
-    if (catCountryPanel && countriesDataEl) {
-      const availableCountries = JSON.parse(countriesDataEl.textContent);
-      const currentLang = document.documentElement.lang || 'ja';
-
-      document.querySelectorAll('.cat-dropdown-trigger').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          const slug = btn.getAttribute('data-slug');
-          const catName = btn.textContent.trim();
-
-          if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) {
-            catCountryPanel.classList.remove('show');
-            currentPanelSlug = null;
-            return;
-          }
-
-          currentPanelSlug = slug;
-          catCountryTitle.textContent = catName;
-          catCountryInner.innerHTML = ''; 
-
-          availableCountries.forEach(function(c) {
-            const a = document.createElement('a');
-            a.className = 'cat-country-link';
-            a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
-            a.innerHTML = '<span class="cat-country-icon">▶</span>' + c.name;
-            catCountryInner.appendChild(a);
-          });
-
-          const rect = btn.getBoundingClientRect();
-          let top = rect.bottom + window.scrollY + 8;
-          let left = rect.left + window.scrollX;
-          if (window.innerWidth <= 600) { left = (window.innerWidth - 220) / 2; }
-          else if (left + 220 > window.innerWidth) { left = window.innerWidth - 240; }
-
-          catCountryPanel.style.top = top + 'px';
-          catCountryPanel.style.left = left + 'px';
-          catCountryPanel.classList.add('show');
-        });
-      });
-
-      catCountryClose?.addEventListener('click', () => {
-        catCountryPanel.classList.remove('show');
-        currentPanelSlug = null;
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.cat-country-panel') && !e.target.closest('.cat-dropdown-trigger')) {
-          catCountryPanel.classList.remove('show');
-          currentPanelSlug = null;
-        }
-      });
-    }
-
-    // 検索・地域パネル・スクロール等の既存機能
+    // 検索・地域パネル・スクロール等のHeader.astro既存機能
     function setupSearch(btnId, inputId, formId) {
       const btn = document.getElementById(btnId), input = document.getElementById(inputId), form = document.getElementById(formId);
       btn?.addEventListener('click', (e) => {
@@ -463,5 +469,91 @@ const defaultWeatherData = cityDataForJs[0] || null;
     pcScroll?.addEventListener('scroll', updateArrows);
     window.addEventListener('resize', updateArrows);
     updateArrows();
+
+    // ================================================= */
+    // ▼▼▼ お手本(LanguageTopHeader)から完全移植したスクリプト ▼▼▼ */
+    // ================================================= */
+    const catCountryPanel = document.getElementById('cat-country-panel');
+    const catCountryInner = document.getElementById('cat-country-panel-inner');
+    const catCountryTitle = document.getElementById('cat-country-title');
+    const catCountryClose = document.getElementById('cat-country-close');
+    const countriesDataEl = document.getElementById('lang-top-countries-data');
+    let currentPanelSlug = null;
+
+    if (catCountryPanel && countriesDataEl) {
+      const availableCountries = JSON.parse(countriesDataEl.textContent);
+      const currentLang = document.documentElement.lang || 'ja';
+
+      // トリガー(aタグ)のクリックイベント設定
+      document.querySelectorAll('.cat-dropdown-trigger').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          // infoページのみ動作
+          e.preventDefault();
+          e.stopPropagation(); // ドキュメントクリックへの伝播を防ぐ
+          
+          const slug = btn.getAttribute('data-slug');
+          const catName = btn.textContent.trim();
+
+          // 同じカテゴリがクリックされた場合は閉じる
+          if (catCountryPanel.classList.contains('show') && currentPanelSlug === slug) {
+            catCountryPanel.classList.remove('show');
+            currentPanelSlug = null;
+            return;
+          }
+
+          currentPanelSlug = slug;
+          catCountryTitle.textContent = catName;
+          catCountryInner.innerHTML = ''; // 一旦クリア
+
+          // 国リストを生成して挿入
+          availableCountries.forEach(function(c) {
+            const a = document.createElement('a');
+            a.className = 'cat-country-link';
+            // hrefを設定 (例: /ja/jp/category/politics/)
+            a.href = '/' + currentLang + '/' + c.code + '/category/' + slug + '/';
+            a.innerHTML = '<span class="cat-country-icon">▶</span>' + c.name;
+            catCountryInner.appendChild(a);
+          });
+
+          // パネルの位置計算
+          const rect = btn.getBoundingClientRect();
+          let top, left;
+
+          if (window.innerWidth <= 600) {
+            // スマホ：画面中央付近
+            top = rect.top + window.scrollY - 10;
+            left = (window.innerWidth - 200) / 2;
+          } else {
+            // PC：ボタンの真下
+            top = rect.bottom + window.scrollY + 8;
+            left = rect.left + window.scrollX;
+            // 画面右端からはみ出す場合の調整
+            if (left + 200 > window.innerWidth) {
+              left = window.innerWidth - 220;
+            }
+          }
+
+          catCountryPanel.style.top = top + 'px';
+          catCountryPanel.style.left = left + 'px';
+          catCountryPanel.classList.add('show');
+        });
+      });
+
+      // 閉じるボタン
+      catCountryClose?.addEventListener('click', function() {
+        catCountryPanel.classList.remove('show');
+        currentPanelSlug = null;
+      });
+
+      // パネル外クリックで閉じる
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.cat-country-panel') && !e.target.closest('.cat-dropdown-trigger')) {
+          if (catCountryPanel.classList.contains('show')) {
+            catCountryPanel.classList.remove('show');
+            currentPanelSlug = null;
+          }
+        }
+      });
+    }
   });
 </script>
