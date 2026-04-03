@@ -4,8 +4,10 @@ import { ja } from '../../lib/info/ja/termsData.ts';
 import { en } from '../../lib/info/en/termsData.ts';
 import { zhTW } from '../../lib/info/zh-tw/termsData.ts';
 import { zhCN } from '../../lib/info/zh-cn/termsData.ts';
+// ロシア語データを新しく読み込みます
+import { ru } from '../../lib/info/ru/termsData.ts';
 
-// 現在のURLから言語を自動判別します
+// 現在のURLから「ja」か「en」か「zh-tw」か「zh-cn」か「ru」を自動判別します
 const { pathname } = Astro.url;
 
 // 言語判定とテーマカラーの設定
@@ -21,6 +23,9 @@ if (pathname.startsWith('/en/')) {
 } else if (pathname.startsWith('/zh-cn/')) {
   data = zhCN;
   themeColor = '#0e7c7b'; // 中国語簡体字
+} else if (pathname.startsWith('/ru/')) {
+  data = ru;
+  themeColor = '#500d80'; // ロシア語
 }
 ---
 
