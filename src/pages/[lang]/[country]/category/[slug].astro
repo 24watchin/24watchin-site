@@ -3,6 +3,8 @@ import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import Layout from '../../../../layouts/Layout.astro';
 import CategoryHero from '../../../../components/CategoryHero.astro';
 import NewsList from '../../../../components/NewsList.astro';
+// ▼ 広告を表示するための部品を読み込みます
+import GoogleAdBanner from '../../../../components/GoogleAdBanner.astro';
 import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels.ts';
 // ▼ siteRoutes（大元のカンペ）を読み込む
 import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
@@ -118,6 +120,7 @@ const emptyMessageMap: Record<string, string> = {
   de:      'Noch keine Artikel verfügbar.',
   ru:      'Статьи пока недоступны.',
 };
+
 const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
 ---
 
@@ -133,6 +136,10 @@ const emptyMessage = emptyMessageMap[lang] || emptyMessageMap['en'];
     (
       <>
         <CategoryHero posts={categoryPosts} categoryName={categoryName} getImageUrl={getImageUrl} lang={lang} country={country} />
+        
+        {/* ▼ カテゴリのメイン記事の下に広告スペースを置きます */}
+        <GoogleAdBanner position="カテゴリ中間" />
+        
         <hr class="divider" />
         <h2 class="section-title">{moreNewsTitle}</h2>
         <NewsList posts={categoryPosts.slice(5)} getImageUrl={getImageUrl} lang={lang} country={country} />
