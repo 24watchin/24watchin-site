@@ -6,6 +6,8 @@ import ShareButtons from '../../../../components/ShareButtons.astro';
 import RelatedNews from '../../../../components/RelatedNews.astro';
 import EditorPicks from '../../../../components/EditorPicks.astro';
 import RecommendedLinks from '../../../../components/RecommendedLinks.astro';
+// ▼ 広告を表示するための部品を読み込みます
+import GoogleAdBanner from '../../../../components/GoogleAdBanner.astro';
 import { categoryLabelMap, type SiteLanguageKey } from '../../../../lib/categoryLabels';
 import { langCountryPairs, getBlogId } from '../../../../lib/siteRoutes.ts';
 import { getCountryLabel } from '../../../../lib/countryData.ts';
@@ -131,6 +133,9 @@ const newsArticleJsonLd = {
     <div class="post-content" id="post-content-area" set:html={post.content} />
     <ReactionBar articleId={post.id} />
   </article>
+
+  {/* ▼ 記事を読み終わった直後の場所に広告スペースを置きます */}
+  <GoogleAdBanner position="記事下" />
 
   <div slot="bottom-wide">
     <RelatedNews relatedPosts={allPosts.filter(p => p.id !== post.id && p.labels?.includes(lang + '-' + country)).slice(0, 6)} lang={lang} country={country} />
