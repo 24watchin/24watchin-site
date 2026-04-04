@@ -1,18 +1,13 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
-// ▼【修正1】データの受け取り口を「posts」に変更しました。
-// 司令塔（親ファイル）は「posts」という名前で記事を渡してきているため、これで正しくデータを受け取れます。
-const { posts = [], latestStories = [] } = Astro.props;
-// 念のため、postsが空の場合はlatestStoriesも確認する安全設計にしています。
-const sourceStories = posts.length > 0 ? posts : latestStories;
+// 司令塔から記事データを受け取ります
+// ※万が一のために latestStories だけでなく posts という名前でも受け取れるように広げています
+const { latestStories = [], posts = [] } = Astro.props;
+const sourceStories = latestStories.length > 0 ? latestStories : posts;
 
 // 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
-
-// LanguageTopMainNews.astro を参考に、本物の国コードリストを追加しました
-const validCountries = ['jp', 'us', 'de', 'fr', 'gb', 'es', 'cn', 'tw', 'ae', 'au', 'sg', 'ca', 'nz', 'hk', 'in', 'my', 'ph', 'th', 'vn', 'id', 'kr', 'mx', 'br', 'za', 'eg', 'qa', 'om', 'sa', 'tr', 'ar', 'co'];
-const searchPrefix = 'en-';
 
 // 英語の国名辞書
 const countryNameMap = {
@@ -22,17 +17,13 @@ const countryNameMap = {
   br: 'Brazil', kr: 'South Korea'
 };
 
-// ▼【修正2】「posts」の中から「en-○○」タグがついている記事だけに絞り込みます
+// デモ(backupStories)は完全に削除し、実際の記事データから「en-」タグを持つものだけを抽出します
 const displayStories = sourceStories.filter((post) => {
-  if (!post.labels) return false;
-  const labelsArray = Array.isArray(post.labels) ? post.labels : [post.labels];
-  return labelsArray.some((label) => {
-    if (typeof label === 'string' && label.startsWith(searchPrefix)) {
-      const code = label.replace(searchPrefix, '');
-      return validCountries.includes(code); // 正しい国コードかどうかもチェックします
-    }
-    return false;
-  });
+  if (post.labels && Array.isArray(post.labels)) {
+    // 大文字小文字のズレを防ぐため、小文字(toLowerCase)にしてから 'en-' を探します
+    return post.labels.some(label => typeof label === 'string' && label.toLowerCase().startsWith('en-'));
+  }
+  return false;
 });
 
 const languages = [
@@ -52,25 +43,11 @@ function stripHtml(html) {
   return text.length > 100 ? text.substring(0, 100) + '...' : text;
 }
 
-// 記事に画像がない場合でもエラーにならないようにする安全対策です
-const getThumbnail = (content) => {
-  const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
+function getThumbnail(content) {
+  if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
+  const match = content.match(/<img[^>]+src="([^">]+)"/);
   return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
-};
-
-// タグから国コードを抜き出すための機能です
-const getCountryFromLabels = (labels) => {
-  if (!labels) return 'world';
-  const labelsArray = Array.isArray(labels) ? labels : [labels];
-  const targetLabel = labelsArray.find((label) => {
-    if (typeof label === 'string' && label.startsWith(searchPrefix)) {
-      const code = label.replace(searchPrefix, '');
-      return validCountries.includes(code);
-    }
-    return false;
-  });
-  return targetLabel ? targetLabel.replace(searchPrefix, '') : 'world';
-};
+}
 ---
 
 <header class="global-header">
@@ -170,20 +147,26 @@ const getCountryFromLabels = (labels) => {
             <div class="carousel-spacer"></div>
              
             {displayStories.map((post) => {
-              const bgImage = getThumbnail(post.content);
-              const countryCode = getCountryFromLabels(post.labels);
-              const countryName = countryNameMap[countryCode] || '';
-              
+              let bgImage = getThumbnail(post.content);
               let categoryName = 'News';
-              if (post.labels) {
-                const labelsArray = Array.isArray(post.labels) ? post.labels : [post.labels];
+              let countryCode = 'world';
+              let countryName = '';
+              let dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+              if (post.labels && Array.isArray(post.labels)) {
+                const countryTag = post.labels.find(l => typeof l === 'string' && l.toLowerCase().startsWith('en-'));
+                if (countryTag) {
+                  countryCode = countryTag.toLowerCase().replace('en-', '');
+                  if (countryNameMap[countryCode]) {
+                    countryName = countryNameMap[countryCode];
+                  }
+                }
+                
                 const foundCat = enCategories.find(cat => 
-                  labelsArray.some(label => typeof label === 'string' && cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
+                  post.labels.some(label => typeof label === 'string' && cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
                 );
                 if (foundCat) categoryName = foundCat.label;
               }
-
-              const dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
               return (
                 <a href={`/en/${countryCode}/news/${post.id}`} class="story-card observer-card no-link-color">
