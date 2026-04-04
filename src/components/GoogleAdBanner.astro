@@ -21,11 +21,19 @@ const adText = adLabels[lang] || adLabels['en'];
 ---
 
 <div class="ad-container">
-  {/* 広告の上に小さく「広告」というラベルを表示します（Googleの推奨ルールです） */}
+  {/* 広告の上に小さく「広告」というラベルを表示します */}
   <span class="ad-label">{adText}</span>
   
   <div class="ad-wrapper">
-    {/* ▼ ここが、なるさん専用のIDが入った本物のGoogle AdSenseコードです */}
+    {/* ▼ 公開するまでは、このダミーの文字が表示されます */}
+    <span class="dummy-text">Advertisement Space</span>
+
+    {/* ▼▼▼ ここが、なるさん専用のIDが入った本物のGoogle AdSenseコードです ▼▼▼ 
+      ※現在は、画面から見えなくなってしまうのを防ぐため、一時的に「コメントアウト」して動作を止めています。
+      いざ審査が通って本番公開する時は、上のダミー文字を消し、
+      以下のコードを囲んでいる {/* と */} を消すだけで、一瞬で本物の広告が出ます！
+    */}
+    {/*
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2614349930540151" crossorigin="anonymous"></script>
     <ins class="adsbygoogle"
          style="display:block"
@@ -35,6 +43,7 @@ const adText = adLabels[lang] || adLabels['en'];
     <script is:inline>
          (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
+    */}
   </div>
 </div>
 
@@ -52,12 +61,21 @@ const adText = adLabels[lang] || adLabels['en'];
     margin-bottom: 4px;
     letter-spacing: 0.5px;
   }
+  
+  /* ▼ サイドバーと同じ、グレーの点線の枠を表示する設定に書き換えました */
   .ad-wrapper {
     width: 100%;
-    min-height: 100px; /* 広告が読み込まれる前に、サイトがガタガタ動かないように最低限の枠の大きさを確保します */
-    background-color: #f4f4f4; /* 広告が表示されない間（審査中など）は、薄いグレーの背景になります */
+    min-height: 120px; 
+    background-color: #f0f0f0;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  .dummy-text {
+    color: #999;
+    font-size: 14px;
   }
 </style>
