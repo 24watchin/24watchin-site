@@ -1,0 +1,141 @@
+---
+const { lang = 'ja' } = Astro.props;
+
+// アカウントの末尾文字（ロシア語と簡体字はアカウントがないため設定から除外しています）
+const snsSuffixMap: Record<string, string> = {
+  ja: 'ja',
+  en: 'en',
+  'zh-tw': 'tw',
+  es: 'es',
+  fr: 'fr',
+  de: 'de',
+};
+const snsSuffix = snsSuffixMap[lang];
+
+// 言語ごとのキャッチコピーを定義します
+const catchphraseMap: Record<string, string> = {
+  ja: '公式SNSをフォロー！',
+  en: 'Follow us on SNS!',
+  'zh-cn': '关注我们的官方SNS！',
+  'zh-tw': '關注我們的官方SNS！',
+  es: '¡Síguenos en redes sociales!',
+  fr: 'Suivez-nous sur les réseaux !',
+  de: 'Folgen Sie uns!',
+  ru: 'Подписывайтесь на нас!',
+};
+const catchphrase = catchphraseMap[lang] || catchphraseMap['en'];
+
+// リンク先のURLを組み立てます
+const xUrl = snsSuffix ? `https://x.com/24watchin_${snsSuffix}` : null;
+const fbUrl = snsSuffix ? `https://www.facebook.com/24watchin.${snsSuffix}/` : null;
+---
+
+{/* アカウントが存在する言語（ロシア語・簡体字以外）の時だけウィジェットを表示します */}
+{snsSuffix && (
+  <div class="sns-widget">
+    <div class="sns-widget-inner">
+      <h3 class="sns-catchphrase">{catchphrase}</h3>
+      <div class="sns-buttons">
+        
+        {/* X (Twitter) のボタン */}
+        {xUrl && (
+          <a href={xUrl} target="_blank" rel="noopener noreferrer" class="sns-btn x-btn" aria-label="X (Twitter)">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="sns-svg">
+              <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+            </svg>
+          </a>
+        )}
+        
+        {/* Facebook のボタン */}
+        {fbUrl && (
+          <a href={fbUrl} target="_blank" rel="noopener noreferrer" class="sns-btn fb-btn" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="sns-svg fb-svg">
+              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
+            </svg>
+          </a>
+        )}
+        
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  /* ウィジェット全体（外枠）のデザイン */
+  .sns-widget {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* うっすらとした影をつけます */
+    margin-bottom: 24px;
+  }
+  
+  .sns-widget-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  /* キャッチコピーの文字設定 */
+  .sns-catchphrase {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    letter-spacing: 0.05em;
+  }
+  
+  .sns-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+  
+  /* ボタンの共通設定（丸くする設定など） */
+  .sns-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-decoration: none;
+    /* マウスを乗せた時のなめらかなアニメーション設定 */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  }
+  
+  /* X (Twitter) 専用の色と影 */
+  .x-btn {
+    background-color: #000000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  .x-btn:hover {
+    transform: translateY(-4px) scale(1.05); /* 少し上に浮き上がって大きくなる */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Facebook 専用の色と影 */
+  .fb-btn {
+    background-color: #1877F2;
+    box-shadow: 0 4px 10px rgba(24, 119, 242, 0.3);
+  }
+  .fb-btn:hover {
+    transform: translateY(-4px) scale(1.05); /* 少し上に浮き上がって大きくなる */
+    box-shadow: 0 6px 15px rgba(24, 119, 242, 0.4);
+  }
+
+  /* アイコンの大きさ設定 */
+  .sns-svg {
+    width: 22px;
+    height: 22px;
+  }
+  
+  /* Facebookの「f」マークだけ少し大きめにバランス調整 */
+  .fb-svg {
+    transform: scale(1.3);
+  }
+</style>
