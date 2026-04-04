@@ -14,7 +14,7 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
 import WeatherSidebar from '../components/WeatherSidebar.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 
-// ▼ 【追加1】先ほど作成したSNSウィジェットを読み込みます
+// ▼ 先ほど作成したSNSウィジェットを読み込みます
 import SnsWidget from '../components/SnsWidget.astro';
 
 const {
@@ -35,7 +35,7 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || '';
 
-// 現在開いているページが「言語＋info」ページかどうかを判定します（/ja/jp/info の場合は false になります）
+// 現在開いているページが「言語＋info」ページかどうかを判定します
 const isInfoPage = pathParts[1] === 'info';
 
 const canonicalUrl = `${SITE_URL}${currentPath}`;
@@ -215,7 +215,7 @@ const organizationJsonLd = {
       @media (max-width: 900px) { .main-layout { grid-template-columns: minmax(0, 1fr); } .sidebar-area { display: none; } }
       @media (max-width: 640px) { .container { padding: 0 14px; } }
       
-      /* ▼ 【追加3】広告を入れるための空き箱（スペース）のデザインです */
+      /* ▼ 【修正】広告を入れるための空き箱（グレーの枠と文字が見える状態に戻しました） */
       .sidebar-ad-space {
         width: 100%;
         min-height: 250px;
@@ -243,7 +243,7 @@ const organizationJsonLd = {
           <slot />
         </main>
         <aside class="sidebar-area">
-          {/* ▼ 【修正2】言語のinfoページの時だけ、SNSと広告を表示します */}
+          {/* 言語のinfoページの時だけ、SNSと広告を表示します */}
           {isInfoPage ? (
             <div class="info-sidebar-content">
               {/* 作成したSNSウィジェットをここに置きます */}
