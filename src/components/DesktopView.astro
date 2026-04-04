@@ -1,13 +1,16 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
-// 司令塔から記事データを受け取ります
-const { latestStories = [] } = Astro.props;
+// ▼【修正1】データの受け取り口を「posts」に変更しました。
+// 司令塔（親ファイル）は「posts」という名前で記事を渡してきているため、これで正しくデータを受け取れます。
+const { posts = [], latestStories = [] } = Astro.props;
+// 念のため、postsが空の場合はlatestStoriesも確認する安全設計にしています。
+const sourceStories = posts.length > 0 ? posts : latestStories;
 
 // 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
-// ▼ LanguageTopMainNews.astro を参考に、本物の国コードリストを追加しました
+// LanguageTopMainNews.astro を参考に、本物の国コードリストを追加しました
 const validCountries = ['jp', 'us', 'de', 'fr', 'gb', 'es', 'cn', 'tw', 'ae', 'au', 'sg', 'ca', 'nz', 'hk', 'in', 'my', 'ph', 'th', 'vn', 'id', 'kr', 'mx', 'br', 'za', 'eg', 'qa', 'om', 'sa', 'tr', 'ar', 'co'];
 const searchPrefix = 'en-';
 
@@ -19,8 +22,8 @@ const countryNameMap = {
   br: 'Brazil', kr: 'South Korea'
 };
 
-// ▼ LanguageTopMainNews.astro の仕組みを使って「en-」タグの記事だけを絞り込みます
-const displayStories = latestStories.filter((post) => {
+// ▼【修正2】「posts」の中から「en-○○」タグがついている記事だけに絞り込みます
+const displayStories = sourceStories.filter((post) => {
   if (!post.labels) return false;
   const labelsArray = Array.isArray(post.labels) ? post.labels : [post.labels];
   return labelsArray.some((label) => {
@@ -49,13 +52,13 @@ function stripHtml(html) {
   return text.length > 100 ? text.substring(0, 100) + '...' : text;
 }
 
-// ▼ LanguageTopMainNews.astro の安全対策を取り入れつつ、トップのデザインに合わせています
+// 記事に画像がない場合でもエラーにならないようにする安全対策です
 const getThumbnail = (content) => {
   const match = (content || '').match(/<img[^>]+src="([^">]+)"/);
   return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
 };
 
-// ▼ ラベルから確実に国コードを抜き出す関数を新しく追加しました
+// タグから国コードを抜き出すための機能です
 const getCountryFromLabels = (labels) => {
   if (!labels) return 'world';
   const labelsArray = Array.isArray(labels) ? labels : [labels];
