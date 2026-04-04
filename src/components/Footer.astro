@@ -29,6 +29,30 @@ if (!Array.isArray(allPosts)) { allPosts = []; }
 const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const themeColor = categoryLabelMap[localeKeyMap[lang] || 'jp']?.themeColor || '#872732';
 
+// SNSアイコン用のホバー色
+const snsColorMap: Record<string, string> = {
+  ja: '#872732',
+  en: '#001580',
+  'zh-cn': '#0e7c7b',
+  'zh-tw': '#b33224',
+  es: '#b38000',
+  fr: '#3d3d99',
+  de: '#006600',
+  ru: '#500d80',
+};
+const snsHoverColor = snsColorMap[lang] || '#872732';
+
+// ▼ 修正1：各言語用のアカウントの末尾の文字を定義します（ロシア語と簡体字は除外しています）
+const snsSuffixMap: Record<string, string> = {
+  ja: 'ja',
+  en: 'en',
+  'zh-tw': 'tw', // 繁体字のみ「tw」
+  es: 'es',
+  fr: 'fr',
+  de: 'de',
+};
+const snsSuffix = snsSuffixMap[lang];
+
 const globalRegionsRaw = [
   { key: 'asia',     countries: ['jp','tw','kr','cn','th','sg','in','hk','vn','my'] },
   { key: 'europe',   countries: ['de','fr','gb','it','es','nl'] },
@@ -51,7 +75,7 @@ const globalRegions = globalRegionsRaw.map(region => {
     .map(code => {
       // 通常通りマスターリストから取得
       let label = getCountryLabel(code, lang);
-      // ▼ フッターだけの特別ルール：日本語版で日本を指す時だけ「日本」にする
+      // フッターだけの特別ルール：日本語版で日本を指す時だけ「日本」にする
       if (lang === 'ja' && code === 'jp') {
         label = '日本';
       }
@@ -103,10 +127,27 @@ const footerTextMap = {
 const footerText = footerTextMap[lang] || footerTextMap['en'];
 ---
 
-<footer class="site-footer" style={`--theme-color:${themeColor};`}>
+<footer class="site-footer" style={`--theme-color:${themeColor}; --sns-hover-color:${snsHoverColor};`}>
   <div class="footer-inner">
     <div class="top-row">
       <a href={homePath} class="footer-logo"><img src="/images/logo-24watchin-white.png" alt="24Watchin" /></a>
+      
+      {/* ▼ 修正2＆3：アカウント設定がある言語（snsSuffixがある時）だけアイコンを表示し、URLを自動で組み立てます */}
+      {snsSuffix && (
+        <div class="sns-links">
+          <a href={`https://x.com/24watchin_${snsSuffix}`} target="_blank" rel="noopener noreferrer" class="sns-icon" aria-label="X (Twitter)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+            </svg>
+          </a>
+          <a href={`https://www.facebook.com/24watchin.${snsSuffix}/`} target="_blank" rel="noopener noreferrer" class="sns-icon" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z"/>
+            </svg>
+          </a>
+        </div>
+      )}
+
     </div>
     <hr class="divider" />
     <div class="accordion-list">
@@ -135,18 +176,29 @@ const footerText = footerTextMap[lang] || footerTextMap['en'];
   .footer-inner { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
   .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .footer-logo img { height: 48px; width: auto; filter: brightness(0) invert(1); }
+  
+  .sns-links { display: flex; gap: 18px; align-items: center; }
+  .sns-icon { color: #d1d5db; transition: color 0.3s ease; display: flex; align-items: center; justify-content: center; }
+  .sns-icon:hover { color: var(--sns-hover-color); }
+  
   .divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin-bottom: 24px; }
   .accordion-list { display: flex; flex-direction: column; gap: 6px; }
   .region-group { border-radius: 8px; overflow: hidden; }
-  .region-header { width: 100%; display: flex; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.07); border: none; color: #fff; cursor: pointer; }
+  
+  .region-header { font-size: 16px; width: 100%; display: flex; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.07); border: none; color: #fff; cursor: pointer; }
   .region-body { display: none; flex-wrap: wrap; gap: 8px; padding: 14px; background: rgba(255,255,255,0.05); }
   .region-body.open { display: flex; }
-  .country-link { font-size: 11px; color: #d1d5db; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); text-decoration: none; }
+  
+  .country-link { font-size: 13px; color: #d1d5db; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); text-decoration: none; }
+  
   .info-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12); }
   .info-links { display: flex; flex-wrap: wrap; gap: 12px 28px; }
-  .info-link { font-size: 12px; color: #d1d5db; text-decoration: none; }
+  
+  .info-link { font-size: 14px; color: #d1d5db; text-decoration: none; }
+  
   .footer-bottom { background-color: #2b2a2a; padding: 32px 20px; text-align: center; }
-  .footer-bottom p { margin: 0 0 8px; font-size: 12px; color: #9ca3af; }
+  
+  .footer-bottom p { margin: 0 0 8px; font-size: 13px; color: #9ca3af; }
 </style>
 
 <script is:inline>
