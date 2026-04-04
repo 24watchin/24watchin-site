@@ -1,6 +1,11 @@
 ---
-// 1. 各言語ごとの「広告」という文字の翻訳辞書です
-const adLabels = {
+// 何語のサイトか自動で読み取ります
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(Boolean);
+const lang = pathParts[0] || 'ja';
+
+// 各言語ごとの「広告」という文字の翻訳辞書です
+const labels = {
   ja: '広告',
   en: 'Advertisement',
   fr: 'Publicité',
@@ -10,56 +15,20 @@ const adLabels = {
   'zh-cn': '广告',
   'zh-tw': '廣告',
 };
-
-// 2. 今見ているページのURLから「何語のサイトか」を自動で読み取ります
-const currentPath = Astro.url.pathname;
-const pathParts = currentPath.split('/').filter(Boolean);
-const lang = pathParts[0] || 'ja';
-
-// 3. 読み取った言語に合わせて、表示する文字を決定します
-const adText = adLabels[lang] || adLabels['en'];
+const text = labels[lang] || labels['en'];
 ---
 
-<div class="ad-container">
-  {/* 広告の上に小さく「広告」というラベルを表示します */}
-  <span class="ad-label">{adText}</span>
+{/* ▼ 絶対にブロックされないように、クラス名（裏側の名前）を使わず、直接デザインを指定しました */}
+<div style="width: 100%; margin: 30px 0; text-align: center;">
   
-  <div class="ad-wrapper">
-    {/* ▼ 公開するまでは、このダミーの文字が表示されます */}
-    <span class="dummy-text">Advertisement Space</span>
+  <span style="display: block; font-size: 11px; color: #999999; margin-bottom: 4px; letter-spacing: 0.5px;">
+    {text}
+  </span>
+  
+  <div style="width: 100%; min-height: 120px; background-color: #f0f0f0; border: 1px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+    
+    {/* ▼ ダミーの文字も Advertisement（広告） という単語を避けて Placeholder（場所取り） に変更しました */}
+    <span style="color: #999; font-size: 14px;">Placeholder Space</span>
 
     </div>
 </div>
-
-<style>
-  /* 広告枠のデザインとレイアウトのルールです */
-  .ad-container {
-    width: 100%;
-    margin: 30px 0; /* 上下に30pxの余白を空けて、記事とくっつかないようにします */
-    text-align: center; /* 広告を真ん中に配置します */
-  }
-  .ad-label {
-    display: block;
-    font-size: 11px;
-    color: #999999;
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
-  }
-  
-  /* グレーの点線の枠を表示する設定です */
-  .ad-wrapper {
-    width: 100%;
-    min-height: 120px; 
-    background-color: #f0f0f0;
-    border: 1px dashed #ccc;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .dummy-text {
-    color: #999;
-    font-size: 14px;
-  }
-</style>
