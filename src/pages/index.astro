@@ -10,15 +10,22 @@ const BLOG_ID = getBlogId('en');
 const cacheKey = 'bloggerPostsCache_top_en';
 let englishPosts = [];
 
-// ✅ API_KEYとBLOG_IDの確認を先に行い、その中でfetchします
-// ✅ { cache: 'no-store' } と nocache を削除しました（Node.js 22で誤動作する原因）
 if (API_KEY && BLOG_ID) {
   if (!globalThis[cacheKey]) {
     const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=20`;
     globalThis[cacheKey] = fetch(url)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => data && data.items ? data.items : [])
-      .catch(() => []);
+      .then(res => {
+        console.log('★ APIステータス:', res.status);
+        return res.ok ? res.json() : null;
+      })
+      .then(data => {
+        console.log('★ APIデータ:', data ? JSON.stringify(data).slice(0, 200) : 'null');
+        return data && data.items ? data.items : [];
+      })
+      .catch((e) => {
+        console.log('★ APIエラー:', e.message);
+        return [];
+      });
   }
   englishPosts = await globalThis[cacheKey];
 }
