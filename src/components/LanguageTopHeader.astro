@@ -19,14 +19,18 @@ const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
 
-const searchAction = '/' + lang + '/search/';
-
 const availableCountries = langCountryPairs
   .filter(pair => pair.lang === lang)
   .map(pair => ({
     code: pair.country,
     name: getCountryLabel(pair.country, lang)
   }));
+
+// ▼ 修正1：検索URLを作るために、メインの国（デフォルト国）を先に特定します
+const defaultCountryForWeather = availableCountries.length > 0 ? availableCountries[0].code : 'jp';
+
+// ▼ 修正2：検索の移動先URLに、特定した「国コード」を追加して Header.astro と同じ動きにします
+const searchAction = '/' + lang + '/' + defaultCountryForWeather + '/search/';
 
 const categoryItems = (labels.headerCategories || []).map((item) => {
   return { label: item.label, slug: item.slug };
@@ -37,10 +41,7 @@ const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 
-// ▼ 修正：言語ごとのメインとなる国（デフォルト国）を特定します
-const defaultCountryForWeather = availableCountries.length > 0 ? availableCountries[0].code : 'jp';
-
-// ▼ 修正：特定したメインの国の「国名（JAPANなど）」をHeader.astroと同じ仕組みで取得します
+// 国名（JAPANなど）を取得します
 const countryLabel = getCountryLabel(defaultCountryForWeather, lang);
 
 const cities = countryCityMap[defaultCountryForWeather] || countryCityMap['jp'];
@@ -90,7 +91,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
 <div class="header-pc-wrapper">
   <div class="pc-top-gray-bar">
     <div class="pc-top-gray-inner">
-      {/* ▼ 修正：取得した国名（countryLabel）を表示するように変更しました */}
       <span class="pc-top-country">{countryLabel}</span>
     </div>
   </div>
@@ -146,7 +146,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
     </nav>
 
     <div class="header-spacer"></div>
-    
+
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
@@ -154,7 +154,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
 <div class="header-sp-wrapper">
   <div class="sp-top-gray-bar">
-    {/* ▼ 修正：スマホ版も同様に取得した国名（countryLabel）を表示します */}
     <div class="sp-top-country">{countryLabel}</div>
     
     <div class="sp-top-actions">
