@@ -123,8 +123,8 @@ const footerText = footerTextMap[lang] || footerTextMap['en'];
             </svg>
           </a>
           <a href={`https://www.facebook.com/24watchin.${snsSuffix}/`} target="_blank" rel="noopener noreferrer" class="sns-icon" aria-label="Facebook">
-            {/* ▼ 修正：Facebookのアイコンを「f」のみのデザインに変更しました */}
-            <svg viewBox="0 0 24 24" fill="currentColor">
+            {/* ▼ 修正1：Facebook専用のクラス（fb-svg）を追加しました */}
+            <svg viewBox="0 0 24 24" fill="currentColor" class="fb-svg">
               <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
             </svg>
           </a>
@@ -173,6 +173,11 @@ const footerText = footerTextMap[lang] || footerTextMap['en'];
   }
   
   .sns-icon svg { width: 18px; height: 18px; }
+
+  /* ▼ 修正2：Facebookの「f」アイコンのみ、1.4倍に拡大してバランスを取ります */
+  .sns-icon .fb-svg {
+    transform: scale(1.4);
+  }
 
   .sns-icon:hover {
     background-color: var(--sns-hover-color);
