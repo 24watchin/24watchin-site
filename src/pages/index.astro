@@ -6,8 +6,10 @@ import MobileView from '../components/MobileView.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 import { getBlogId } from '../lib/siteRoutes.ts';
 
-const API_KEY = import.meta.env.API_KEY;
-const BLOG_ID = getBlogId('en');
+// ✅ SSRモードではruntime.envで取得する
+const runtime = Astro.locals.runtime as any;
+const API_KEY = runtime?.env?.API_KEY ?? import.meta.env.API_KEY;
+const BLOG_ID = runtime?.env?.BLOG_ID_EN ?? getBlogId('en');
 
 const cacheKey = 'bloggerPostsCache_top_en';
 let englishPosts = [];
