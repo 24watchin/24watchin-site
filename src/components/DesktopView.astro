@@ -1,3 +1,4 @@
+---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
 // 司令塔から記事データを受け取ります
@@ -180,11 +181,11 @@ function getThumbnail(content) {
     <section class="seq-panel" id="screen-5">
       <div class="seq-inner">
         <div class="section-header"><h2>Latest Stories</h2></div>
-        
+
         <div class="carousel-wrapper">
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-            
+
             {displayStories.map((post) => {
               let bgImage = getThumbnail(post.content);
               let categoryName = 'News';
@@ -241,7 +242,7 @@ function getThumbnail(content) {
 
             <div class="carousel-spacer"></div>
           </div>
-          
+
           <div class="carousel-bottom-nav">
             <button class="carousel-nav-arrow" id="story-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="story-carousel-dots">
@@ -273,7 +274,7 @@ function getThumbnail(content) {
             ))}
             <div class="carousel-spacer"></div>
           </div>
-          
+
           <div class="carousel-bottom-nav">
             <button class="carousel-nav-arrow" id="lang-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="lang-carousel-dots">
@@ -332,14 +333,14 @@ function getThumbnail(content) {
   html.is-locked, body.is-locked {
     overflow: hidden !important;
   }
-  
+
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
-  
-  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; filter: brightness(0) invert(1); } 
+
+  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; filter: brightness(0) invert(1); }
   .header-logo-img:hover { opacity: 0.8; }
-  
+
   .menu-trigger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
   .burger-line { width: 30px; height: 2px; background: #fff; border-radius: 2px; }
   .side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: rgba(10, 10, 10, 0.98); z-index: 400; transition: right 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); padding: 80px 40px; display: flex; justify-content: center; }
@@ -348,10 +349,10 @@ function getThumbnail(content) {
   .menu-inner { max-width: 1000px; width: 100%; text-align: center; }
   .menu-inner h3 { font-size: 14px; letter-spacing: 4px; margin-bottom: 50px; color: #888; }
   .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-  
+
   .menu-lang-card { padding: 40px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; transition: all 0.3s ease; background-color: var(--accent); text-decoration: none; color: white; }
   .menu-lang-card:hover { border-color: #ffffff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); transform: translateY(-5px); }
-  
+
   .scroll-indicator { position: fixed; top: 75%; right: 25px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 500; }
   .scroll-indicator .dot { width: 6px; height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .scroll-indicator .dot.active { height: 32px; background: rgba(255, 255, 255, 0.9); }
@@ -386,9 +387,9 @@ function getThumbnail(content) {
   .brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
   .brand-panel.is-visible { visibility: visible; }
   .seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-  
+
   #screen-6 { z-index: 41; padding-bottom: 180px; }
-  
+
   .seq-panel.is-visible { visibility: visible; pointer-events: auto; }
   .seq-inner { width: 100%; opacity: 0; transform: translateY(40px); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s; }
   .seq-panel.is-visible .seq-inner { opacity: 1; transform: translateY(0); }
@@ -399,9 +400,9 @@ function getThumbnail(content) {
   .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%); opacity: 0; transition: opacity 1.3s ease; }
   .brand-panel.is-bg .brand-bg-overlay { opacity: 1; }
   .brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  
+
   .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; filter: brightness(0) invert(1); }
-  
+
   .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); }
   .brand-desc p { font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 300; color: #eee; margin-bottom: 15px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); }
   .fade-base { opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
@@ -415,7 +416,7 @@ function getThumbnail(content) {
   .text-anim-target.is-visible .anim-desc3 { transition-delay: 3.4s; }
   .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
   .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
-  
+
   .carousel-wrapper { position: relative; width: 100%; }
   .no-link-color { color: inherit !important; text-decoration: none !important; }
   .no-link-color:visited, .no-link-color:hover, .no-link-color:active { color: inherit !important; text-decoration: none !important; }
@@ -428,7 +429,7 @@ function getThumbnail(content) {
   .story-card.is-center:hover .card-bg { transform: scale(1.05); }
 
   .card-text-box { width: 100%; height: 33.33%; padding: 20px 30px; background: linear-gradient(to bottom, #050b1e, #02040a); display: flex; flex-direction: column; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); }
-  
+
   .card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
   .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 4px; }
   .card-meta .country-name { color: #aaa; font-size: 10px; }
@@ -445,9 +446,9 @@ function getThumbnail(content) {
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
-  
+
   .lang-card { flex: 0 0 28vw; height: 42vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
-  
+
   .lang-card::before { content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 5; pointer-events: none; transition: top 0.6s ease, left 0.6s ease, right 0.6s ease, bottom 0.6s ease, border-color 0.6s ease; }
   .lang-card.is-center::before { top: 25px; left: 25px; right: 25px; bottom: 25px; border-color: rgba(255, 255, 255, 0.6); }
 
@@ -486,8 +487,8 @@ function getThumbnail(content) {
       const BRAND_BG_DELAY_MS = 700;
       const BRAND_TEXT_DELAY_MS = 1350;
       const BRAND_UNLOCK_MS = 2300;
-      const BRAND_HIDE_MS = 600; 
-      const MASK_IN_MS  = 800;   
+      const BRAND_HIDE_MS = 600;
+      const MASK_IN_MS  = 800;
       const MASK_UNLOCK_MS = 100;
       let currentStep = 0;
       let isAnimating = false;
@@ -507,50 +508,317 @@ function getThumbnail(content) {
       const menuOpenBtn = document.getElementById('menu-open');
       const menuCloseBtn = document.getElementById('menu-close');
       const sideMenu = document.getElementById('side-menu');
+
       menuOpenBtn?.addEventListener('click', () => { sideMenu?.classList.add('is-open'); });
       menuCloseBtn?.addEventListener('click', () => { sideMenu?.classList.remove('is-open'); });
-      function setBodyLocked(locked) { 
-        document.body.classList.toggle('is-locked', locked); 
+
+      function setBodyLocked(locked) {
+        document.body.classList.toggle('is-locked', locked);
         document.documentElement.classList.toggle('is-locked', locked);
       }
-      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
-      function showMask() { transitionMask?.classList.add('is-visible'); }
-      function hideMask() { transitionMask?.classList.remove('is-visible'); }
-      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
-      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible'); }
-      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible'); }
-      function revealBrandImmediate() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night', 'is-bg'); requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); }); }
-      function showBrandAnimated() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night'); window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS); window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS); window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS); }
-      function hideBrandAnimated() { brandTextTarget?.classList.remove('is-visible'); brandPanel?.classList.remove('is-bg', 'is-night'); window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS); }
-      function activateHeroSlide(index) { leftPanels.forEach((panel) => panel.classList.remove('is-active')); rightPanels.forEach((panel) => panel.classList.remove('is-active')); if (index === 0) { l2?.classList.remove('is-open'); r2?.classList.remove('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 1) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 2) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.add('is-open'); r3?.classList.add('is-open'); } window.setTimeout(() => { if(leftPanels.length > index) leftPanels[index].classList.add('is-active'); if(rightPanels.length > index) rightPanels[index].classList.add('is-active'); isAnimating = false; }, HERO_ANIM_MS); }
-      function transitionBrandToStories() { showMask(); window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
-      function transitionStoriesToBrand() { showMask(); window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
-      function transitionBetweenSections(targetStep) { showMask(); window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
-      function transitionBrandToHero() { showMask(); window.setTimeout(() => { resetBrandPanel(); clearSectionVisibility(); activateHeroSlide(2); hideMask(); }, MASK_IN_MS); }
-      function goToStep(step) { if (step < 0 || step > 5) return; if (isAnimating) return; const previousStep = currentStep; currentStep = step; isAnimating = true; updateIndicator(step); if (step <= 2) { setBodyLocked(true); desktopSequence?.classList.remove('is-hidden'); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 3 && step === 2) { transitionBrandToHero(); return; } hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return; } if (step === 3) { setBodyLocked(true); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 4) { transitionStoriesToBrand(); return; } hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden'); if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } else { showBrandAnimated(); } return; } if (step === 4 && previousStep === 3) { transitionBrandToStories(); return; } if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return; } if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; } showSection(step); window.setTimeout(() => { isAnimating = false; }, 300); }
-      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
-      function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
-      window.addEventListener('wheel', (e) => { if (document.getElementById('side-menu')?.classList.contains('is-open')) return; e.preventDefault(); if (isAnimating) return; if (e.deltaY > WHEEL_THRESHOLD) moveNext(); else if (e.deltaY < -WHEEL_THRESHOLD) movePrev(); }, { passive: false });
-      function scrollCarouselByOneCard(container, direction) { if (!container) return; const cards = container.querySelectorAll('.observer-card'); if (cards.length === 0) return; const cardWidth = cards[0].offsetWidth; const style = window.getComputedStyle(cards[0]); const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight); const distance = (cardWidth + margin) * direction; container.scrollBy({ left: distance, behavior: 'smooth' }); }
+
+      function updateIndicator(index) {
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === index);
+        });
+      }
+
+      function showMask() {
+        transitionMask?.classList.add('is-visible');
+      }
+
+      function hideMask() {
+        transitionMask?.classList.remove('is-visible');
+      }
+
+      function clearSectionVisibility() {
+        screen5?.classList.remove('is-visible');
+        screen6?.classList.remove('is-visible');
+      }
+
+      function showSection(step) {
+        clearSectionVisibility();
+        if (step === 4) screen5?.classList.add('is-visible');
+        if (step === 5) screen6?.classList.add('is-visible');
+      }
+
+      function resetBrandPanel() {
+        brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg');
+        brandTextTarget?.classList.remove('is-visible');
+      }
+
+      function revealBrandImmediate() {
+        desktopSequence?.classList.remove('is-hidden');
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night', 'is-bg');
+        requestAnimationFrame(() => {
+          brandTextTarget?.classList.add('is-visible');
+        });
+      }
+
+      function showBrandAnimated() {
+        desktopSequence?.classList.remove('is-hidden');
+        resetBrandPanel();
+        brandPanel?.classList.add('is-visible', 'is-night');
+        window.setTimeout(() => {
+          brandPanel?.classList.add('is-bg');
+        }, BRAND_BG_DELAY_MS);
+        window.setTimeout(() => {
+          brandTextTarget?.classList.add('is-visible');
+        }, BRAND_TEXT_DELAY_MS);
+        window.setTimeout(() => {
+          isAnimating = false;
+        }, BRAND_UNLOCK_MS);
+      }
+
+      function hideBrandAnimated() {
+        brandTextTarget?.classList.remove('is-visible');
+        brandPanel?.classList.remove('is-bg', 'is-night');
+        window.setTimeout(() => {
+          brandPanel?.classList.remove('is-visible');
+          isAnimating = false;
+        }, BRAND_HIDE_MS);
+      }
+
+      function activateHeroSlide(index) {
+        leftPanels.forEach((panel) => panel.classList.remove('is-active'));
+        rightPanels.forEach((panel) => panel.classList.remove('is-active'));
+
+        if (index === 0) {
+          l2?.classList.remove('is-open');
+          r2?.classList.remove('is-open');
+          l3?.classList.remove('is-open');
+          r3?.classList.remove('is-open');
+        } else if (index === 1) {
+          l2?.classList.add('is-open');
+          r2?.classList.add('is-open');
+          l3?.classList.remove('is-open');
+          r3?.classList.remove('is-open');
+        } else if (index === 2) {
+          l2?.classList.add('is-open');
+          r2?.classList.add('is-open');
+          l3?.classList.add('is-open');
+          r3?.classList.add('is-open');
+        }
+
+        window.setTimeout(() => {
+          if (leftPanels.length > index) leftPanels[index].classList.add('is-active');
+          if (rightPanels.length > index) rightPanels[index].classList.add('is-active');
+          isAnimating = false;
+        }, HERO_ANIM_MS);
+      }
+
+      function transitionBrandToStories() {
+        showMask();
+        window.setTimeout(() => {
+          showSection(4);
+          hideMask();
+          window.setTimeout(() => {
+            isAnimating = false;
+          }, MASK_UNLOCK_MS);
+        }, MASK_IN_MS);
+      }
+
+      function transitionStoriesToBrand() {
+        showMask();
+        window.setTimeout(() => {
+          clearSectionVisibility();
+          revealBrandImmediate();
+          hideMask();
+          window.setTimeout(() => {
+            isAnimating = false;
+          }, MASK_UNLOCK_MS);
+        }, MASK_IN_MS);
+      }
+
+      function transitionBetweenSections(targetStep) {
+        showMask();
+        window.setTimeout(() => {
+          showSection(targetStep);
+          hideMask();
+          window.setTimeout(() => {
+            isAnimating = false;
+          }, MASK_UNLOCK_MS);
+        }, MASK_IN_MS);
+      }
+
+      function transitionBrandToHero() {
+        showMask();
+        window.setTimeout(() => {
+          resetBrandPanel();
+          clearSectionVisibility();
+          activateHeroSlide(2);
+          hideMask();
+        }, MASK_IN_MS);
+      }
+
+      function goToStep(step) {
+        if (step < 0 || step > 5) return;
+        if (isAnimating) return;
+
+        const previousStep = currentStep;
+        currentStep = step;
+        isAnimating = true;
+        updateIndicator(step);
+
+        if (step <= 2) {
+          setBodyLocked(true);
+          desktopSequence?.classList.remove('is-hidden');
+          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+          if (previousStep === 3 && step === 2) {
+            transitionBrandToHero();
+            return;
+          }
+
+          hideMask();
+          clearSectionVisibility();
+          resetBrandPanel();
+          activateHeroSlide(step);
+          return;
+        }
+
+        if (step === 3) {
+          setBodyLocked(true);
+          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+          if (previousStep === 4) {
+            transitionStoriesToBrand();
+            return;
+          }
+
+          hideMask();
+          clearSectionVisibility();
+          desktopSequence?.classList.remove('is-hidden');
+
+          if (previousStep >= 5) {
+            revealBrandImmediate();
+            window.setTimeout(() => {
+              isAnimating = false;
+            }, 200);
+          } else {
+            showBrandAnimated();
+          }
+          return;
+        }
+
+        if (step === 4 && previousStep === 3) {
+          transitionBrandToStories();
+          return;
+        }
+
+        if (step === 5 && previousStep === 4) {
+          transitionBetweenSections(5);
+          return;
+        }
+
+        if (step === 4 && previousStep === 5) {
+          transitionBetweenSections(4);
+          return;
+        }
+
+        showSection(step);
+        window.setTimeout(() => {
+          isAnimating = false;
+        }, 300);
+      }
+
+      function moveNext() {
+        if (currentStep < 5) {
+          goToStep(currentStep + 1);
+        }
+      }
+
+      function movePrev() {
+        if (currentStep > 0) {
+          goToStep(currentStep - 1);
+        }
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (document.getElementById('side-menu')?.classList.contains('is-open')) return;
+        e.preventDefault();
+        if (isAnimating) return;
+        if (e.deltaY > WHEEL_THRESHOLD) moveNext();
+        else if (e.deltaY < -WHEEL_THRESHOLD) movePrev();
+      }, { passive: false });
+
+      function scrollCarouselByOneCard(container, direction) {
+        if (!container) return;
+        const cards = container.querySelectorAll('.observer-card');
+        if (cards.length === 0) return;
+        const cardWidth = cards[0].offsetWidth;
+        const style = window.getComputedStyle(cards[0]);
+        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        const distance = (cardWidth + margin) * direction;
+        container.scrollBy({ left: distance, behavior: 'smooth' });
+      }
+
       const storyCards = document.querySelectorAll('#story-carousel .observer-card');
       const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
       const storyPrevBtn = document.getElementById('story-carousel-prev');
       const storyNextBtn = document.getElementById('story-carousel-next');
       const storyContainer = document.getElementById('story-carousel');
+
       storyPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, -1));
       storyNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, 1));
-      const storyObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-center'); const index = Array.from(storyCards).indexOf(entry.target); if(index !== -1 && storyDots[index]) { storyDots.forEach(d => d.classList.remove('active')); storyDots[index].classList.add('active'); } } else { entry.target.classList.remove('is-center'); } }); }, { root: storyContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
+
+      const storyObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-center');
+            const index = Array.from(storyCards).indexOf(entry.target);
+            if (index !== -1 && storyDots[index]) {
+              storyDots.forEach(d => d.classList.remove('active'));
+              storyDots[index].classList.add('active');
+            }
+          } else {
+            entry.target.classList.remove('is-center');
+          }
+        });
+      }, { root: storyContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
+
       storyCards.forEach(card => storyObserver.observe(card));
+
       const langCards = document.querySelectorAll('#lang-carousel .observer-card');
       const langDots = document.querySelectorAll('#lang-carousel-dots .c-dot');
       const langPrevBtn = document.getElementById('lang-carousel-prev');
       const langNextBtn = document.getElementById('lang-carousel-next');
       const langContainer = document.getElementById('lang-carousel');
+
       langPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, -1));
       langNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, 1));
-      const langObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-center'); const index = Array.from(langCards).indexOf(entry.target); if(index !== -1 && langDots[index]) { langDots.forEach(d => d.classList.remove('active')); langDots[index].classList.add('active'); } } else { entry.target.classList.remove('is-center'); } }); }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
+
+      const langObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-center');
+            const index = Array.from(langCards).indexOf(entry.target);
+            if (index !== -1 && langDots[index]) {
+              langDots.forEach(d => d.classList.remove('active'));
+              langDots[index].classList.add('active');
+            }
+          } else {
+            entry.target.classList.remove('is-center');
+          }
+        });
+      }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
+
       langCards.forEach(card => langObserver.observe(card));
-      setBodyLocked(true); if(desktopSequence) desktopSequence.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0); window.setTimeout(() => { if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); }, 400);
-    } catch (error) { console.error("プログラムでエラーが発生しました:", error); }
+
+      setBodyLocked(true);
+      if (desktopSequence) desktopSequence.classList.remove('is-hidden');
+      hideMask();
+      resetBrandPanel();
+      clearSectionVisibility();
+      updateIndicator(0);
+
+      window.setTimeout(() => {
+        if (leftPanels.length > 0) leftPanels[0].classList.add('is-active');
+        if (rightPanels.length > 0) rightPanels[0].classList.add('is-active');
+      }, 400);
+    } catch (error) {
+      console.error("プログラムでエラーが発生しました:", error);
+    }
   });
 </script>
