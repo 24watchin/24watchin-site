@@ -83,6 +83,7 @@ const globalRegions = globalRegionsRaw.map(region => {
   };
 }).filter(region => region.countries.length > 0);
 
+// ▼ 修正：フランス語などの記号(')がエラーにならないように整理・修正しました
 const infoMenus: Record<string, { label: string; href: string }[]> = {
   ja: [ { label: 'About 24Watchin', href: `${infoBasePath}/about/` }, { label: 'プライバシーポリシー', href: `${infoBasePath}/privacy/` }, { label: '利用規約', href: `${infoBasePath}/terms/` }, { label: 'お問い合わせ', href: `${infoBasePath}/contact/` }, { label: '訂正・修正ポリシー', href: `${infoBasePath}/corrections/` }, { label: '著作権・転載・引用について', href: `${infoBasePath}/copyright/` }, ],
   en: [ { label: 'About 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Privacy Policy', href: `${infoBasePath}/privacy/` }, { label: 'Terms of Use', href: `${infoBasePath}/terms/` }, { label: 'Contact', href: `${infoBasePath}/contact/` }, { label: 'Corrections Policy', href: `${infoBasePath}/corrections/` }, { label: 'Copyright / Reuse', href: `${infoBasePath}/copyright/` }, ],
@@ -91,7 +92,7 @@ const infoMenus: Record<string, { label: string; href: string }[]> = {
   es: [ { label: 'Acerca de 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Política de privacidad', href: `${infoBasePath}/privacy/` }, { label: 'Términos de uso', href: `${infoBasePath}/terms/` }, { label: 'Contacto', href: `${infoBasePath}/contact/` }, { label: 'Política de correcciones', href: `${infoBasePath}/corrections/` }, { label: 'Derechos de autor', href: `${infoBasePath}/copyright/` } ],
   fr: [ { label: 'À propos de 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Politique de confidentialité', href: `${infoBasePath}/privacy/` }, { label: "Conditions d'utilisation", href: `${infoBasePath}/terms/` }, { label: 'Contact', href: `${infoBasePath}/contact/` }, { label: 'Politique de corrections', href: `${infoBasePath}/corrections/` }, { label: "Droits d'auteur", href: `${infoBasePath}/copyright/` } ],
   de: [ { label: 'Über 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Datenschutzrichtlinie', href: `${infoBasePath}/privacy/` }, { label: 'Nutzungsbedingungen', href: `${infoBasePath}/terms/` }, { label: 'Kontakt', href: `${infoBasePath}/contact/` }, { label: 'Korrekturrichtlinie', href: `${infoBasePath}/corrections/` }, { label: 'Urheberrecht', href: `${infoBasePath}/copyright/` } ],
-  ru: [ { label: 'О 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Политика конфиденциальности', href: `${infoBasePath}/privacy/` }, { label: 'Conditions d'utilisation', href: `${infoBasePath}/terms/` }, { label: 'Contact', href: `${infoBasePath}/contact/` }, { label: 'Политика исправлений', href: `${infoBasePath}/corrections/` }, { label: '著作権について', href: `${infoBasePath}/copyright/` } ],
+  ru: [ { label: 'О 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Политика конфиденциальности', href: `${infoBasePath}/privacy/` }, { label: 'Условия использования', href: `${infoBasePath}/terms/` }, { label: 'Контакты', href: `${infoBasePath}/contact/` }, { label: 'Политика исправлений', href: `${infoBasePath}/corrections/` }, { label: 'Авторские права', href: `${infoBasePath}/copyright/` } ],
 };
 
 const currentMenu = infoMenus[lang] || infoMenus['en'];
@@ -160,26 +161,18 @@ const footerText = footerTextMap[lang] || footerTextMap['en'];
   
   .sns-links { display: flex; gap: 14px; align-items: center; }
   
-  /* ▼ 修正1＆2：SNSアイコンを丸いボタンにする設定です */
   .sns-icon {
-    /* 丸い外枠の設定 */
-    width: 38px; height: 38px; /* 枠のサイズ */
-    border-radius: 50%; /* 完全に丸くする */
-    background-color: rgba(255,255,255,0.1); /* 通常時の薄いグレー背景 */
-    
-    /* 中のアイコンを真ん中に寄せる設定 */
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.1);
     display: flex; align-items: center; justify-content: center;
-    
-    /* 色とアニメーションの設定 */
-    color: #fff; /* 通常時のアイコンの色（白） */
-    transition: background-color 0.3s ease; /* ホバー時のアニメーション */
+    color: #fff;
+    transition: background-color 0.3s ease;
     text-decoration: none;
   }
   
-  /* SVGアイコン自体のサイズ調整 */
   .sns-icon svg { width: 18px; height: 18px; }
 
-  /* ホバー時の設定：背景をご指定のテーマカラーにします */
   .sns-icon:hover {
     background-color: var(--sns-hover-color);
   }
