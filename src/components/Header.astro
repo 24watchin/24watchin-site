@@ -16,29 +16,10 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || 'jp';
 
-const SITE_ID = 'jp-ja'; 
-const SLOT = 'header_words';
-
-type HeaderWord = { label: string; url: string; displayOrder: number; };
-let headerWords: HeaderWord[] = [];
-
-if (SPACE_ID && DELIVERY_TOKEN) {
-  try {
-    const params = new URLSearchParams({ content_type: 'headerWord', 'fields.siteId': SITE_ID, 'fields.slot': SLOT, 'fields.enabled': 'true', order: 'fields.displayOrder', limit: '20' });
-    const res = await fetch(`https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`, { headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` } });
-    if (res.ok) {
-      const data = await res.json();
-      headerWords = (data.items ?? []).map((item: any) => ({ label: item?.fields?.label ?? '', url: item?.fields?.url ?? '#', displayOrder: Number(item?.fields?.displayOrder ?? 9999), enabled: item?.fields?.enabled ?? false, siteId: item?.fields?.siteId ?? '', slot: item?.fields?.slot ?? '' }))
-        .filter((item: any) => item.enabled === true && item.siteId === SITE_ID && item.slot === SLOT && item.label)
-        .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
-        .map((item: any) => ({ label: item.label, url: item.url, displayOrder: item.displayOrder }));
-    }
-  } catch (e) { headerWords = []; }
-}
-
 const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
+
 const basePath = '/' + lang + '/' + country;
 const cleanCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
@@ -52,6 +33,7 @@ const searchAction = basePath + '/search/';
 const countryLabel = getCountryLabel(country, lang);
 
 const allowedLangs = langCountryPairs.filter(pair => pair.country === country).map(pair => pair.lang);
+
 const languageOptions = [
   { code: 'ja', key: 'jp', label: '日本語', barStyle: 'background:#872732' },
   { code: 'en', key: 'en', label: 'English', barStyle: 'background:#001580' },
@@ -64,9 +46,11 @@ const languageOptions = [
 ].filter(opt => allowedLangs.includes(opt.code)).map(opt => ({ ...opt, href: '/' + opt.code + '/' + country + '/', linkClass: opt.key === localeKey ? 'lang-option current' : 'lang-option' }));
 
 const moreSlugsMap: Record<string, string[]> = { jp: ['health-life', 'weather', 'traffic'], en: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], es: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], fr: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], de: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], ru: ['environment-energy', 'sports', 'health-life', 'weather', 'traffic'], 'zh-cn': [], 'zh-tw': [] };
+
 const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
+
 const moreHasActive = moreItems.some(item => item.isActive);
 
 const weatherHref = basePath + '/weather/';
@@ -80,6 +64,7 @@ const allCityWeather: Record<string, any> = {};
 for (const city of cities) {
   const cityKey = city.key;
   const now = Date.now();
+
   const CACHE = 30 * 60 * 1000;
   if (globalThis.weatherCache[cityKey] && (now - globalThis.weatherCache[cityKey].time < CACHE)) {
     allCityWeather[cityKey] = globalThis.weatherCache[cityKey].data;
@@ -110,6 +95,7 @@ const cityDataForJs = cities.map((city: any) => {
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
+
 const defaultWeatherData = cityDataForJs[0] || null;
 ---
 
@@ -166,13 +152,9 @@ const defaultWeatherData = cityDataForJs[0] || null;
       </div>
     </nav>
 
-    <div class="header-word-bar">
-      <div class="header-word-inner">
-        {headerWords.map((item, index) => (
-          <a href={item.url} class="header-word-link">{item.label}</a>
-        ))}
-      </div>
-    </div>
+    {/* ▼ 修正：キーワード部分を削除し、半分の高さの白い空白を配置しました */}
+    <div class="header-spacer"></div>
+
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
@@ -277,26 +259,29 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .search-form-animated { 
     display: flex; 
     align-items: center; 
-    justify-content: flex-end; 
+    justify-content: flex-end;
   }
   .search-input-animated {
     width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
     transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0;
     height: 34px; 
-    box-sizing: border-box; 
+    box-sizing: border-box;
   }
   .search-input-animated.active {
-    width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; 
+    width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1;
+    margin-right: 6px; 
   }
   .search-icon-btn {
-    width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff;
+    width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px;
+    background: #ffffff;
     cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0;
-    box-sizing: border-box; 
+    box-sizing: border-box;
   }
 
   .region-lang-open-btn {
     background: none; border: none; color: #000; font-size: 15px; font-weight: bold;
-    cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px; padding: 0;
   }
   .hamburger-icon { font-size: 22px; font-weight: bold; }
 
@@ -306,7 +291,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .logo-image { width: 200px; height: auto; }
   
   .right-area { 
-    display: flex; 
+    display: flex;
     flex-direction: column; 
     align-items: flex-end; 
   }
@@ -340,10 +325,9 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
   .scroll-arrow.active { display: flex; }
 
-  .header-word-bar { background: #fff; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
-  .header-word-inner::-webkit-scrollbar { display: none; }
-  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
+  /* ▼ 修正：追加した白い空白（スペーサー）のデザインです。高さを15pxにしています */
+  .header-spacer { height: 15px; background: #ffffff; width: 100%; }
+
   .bottom-line { height: 10px; }
 
 
@@ -352,15 +336,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
   /* ================================================= */
   
   .sp-top-gray-bar { 
-    background-color: #e6e6e6; 
-    width: 100%; 
-    height: 38px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    padding: 0 14px; 
-    box-sizing: border-box; 
-    position: relative; 
+    background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative;
   }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
   .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
@@ -373,89 +349,42 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
   .sp-search-form { position: relative; display: flex; align-items: center; }
   .sp-search-input { 
-    position: absolute; 
-    right: 34px; 
-    top: 50%; 
-    transform: translateY(-50%); 
-    width: 0; 
-    height: 30px !important; 
-    padding: 0 !important; 
-    background: #fff; 
-    border: 1px solid transparent; 
-    border-radius: 8px; 
-    opacity: 0; 
-    transition: all 0.3s ease; 
-    box-sizing: border-box; 
-    z-index: 10;
+    position: absolute; right: 34px; top: 50%; transform: translateY(-50%); width: 0; height: 30px !important; padding: 0 !important; background: #fff; border: 1px solid transparent; border-radius: 8px; opacity: 0; transition: all 0.3s ease; box-sizing: border-box; z-index: 10;
   }
   .sp-search-input.active { 
-    /* ▼修正：左側に余白を作るため、180px -> 195px に変更しました */
-    width: calc(100vw - 195px) !important; 
-    padding: 0 10px !important; 
-    border: 1px solid #ccc; 
-    opacity: 1; 
+    width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1;
   }
   .sp-search-btn { 
-    width: 28px !important; 
-    height: 28px !important; 
-    border-radius: 50%; 
-    box-sizing: border-box; 
-    flex-shrink: 0; 
-    background: #fff; 
-    border: 1px solid #ccc; 
-    padding: 0; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    z-index: 11;
+    width: 28px !important; height: 28px !important; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; background: #fff; border: 1px solid #ccc; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 11;
   }
   .sp-search-btn .search-icon { width: 14px; height: 14px; }
 
 
   .sp-header-top { 
-    padding: 6px 14px; 
-    align-items: center; 
-    overflow: hidden; 
+    padding: 6px 14px; align-items: center; overflow: hidden; 
   }
   
   .sp-logo-image { width: 150px; }
   
   .sp-right-area { 
-    gap: 8px; 
-    position: relative; 
-    flex: 1; 
-    min-width: 0; 
-    align-items: flex-end !important; 
+    gap: 8px; position: relative; flex: 1; min-width: 0; align-items: flex-end !important; 
   }
   
   .sp-weather-widget { 
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-end; 
-    gap: 4px; 
-    text-decoration: none; 
-    margin-top: 0; 
-    overflow: hidden; 
-    max-width: 140px; 
+    display: flex; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; margin-top: 0; overflow: hidden; max-width: 140px; 
   }
   .sp-weather-icon { display: flex; align-items: center; justify-content: center; width: 28px; flex-shrink: 0; }
   .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; min-width: 0; }
   
   .no-wrap-text { 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    width: 100%; 
-    text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right;
   }
   .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
   .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; white-space: nowrap; }
 
   .sp-category-bar { width: 100%; overflow: hidden; position: relative; }
   .sp-category-bar::after {
-    content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%;
-    background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%);
-    pointer-events: none;
+    content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%; background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%); pointer-events: none;
   }
   .sp-scroll { padding-left: 6px; scrollbar-width: none; }
   .sp-scroll::-webkit-scrollbar { display: none; }
