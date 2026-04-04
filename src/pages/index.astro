@@ -7,14 +7,21 @@ import { getBlogId } from '../lib/siteRoutes.ts';
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId('en');
 
-let topStories = [];
-try {
-  const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=20`);
-  if (res.ok) {
-    const data = await res.json();
-    topStories = data?.items ?? [];
-  }
-} catch (e) {}
+const cacheKey = 'bloggerPostsCache_top_en';
+if (!globalThis[cacheKey]) {
+  const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=10&nocache=${Date.now()}`;
+  globalThis[cacheKey] = fetch(url, { cache: 'no-store' })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => data && data.items ? data.items : [])
+    .catch(() => []);
+}
+
+let englishPosts = [];
+if (API_KEY && BLOG_ID) {
+  englishPosts = await globalThis[cacheKey];
+}
+
+const topStories = englishPosts.slice(0, 5);
 ---
 
 <html lang="en">
