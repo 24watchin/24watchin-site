@@ -6,7 +6,6 @@ import MobileView from '../components/MobileView.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 import { getBlogId } from '../lib/siteRoutes.ts';
 
-// ✅ SSRモードではruntime.envで取得する
 const runtime = Astro.locals.runtime as any;
 const API_KEY = runtime?.env?.API_KEY ?? import.meta.env.API_KEY;
 const BLOG_ID = runtime?.env?.BLOG_ID_EN ?? getBlogId('en');
@@ -44,13 +43,6 @@ const topStories = englishPosts;
   </head>
 
   <body class="is-locked">
-    <!-- ★デバッグ用（確認後に削除してください）★ -->
-    <div style="position:fixed;top:0;right:0;background:red;color:white;padding:8px;font-size:12px;z-index:99999;">
-      API_KEY: {API_KEY ? '✅SET' : '❌MISSING'} |
-      BLOG_ID: {BLOG_ID ? '✅SET' : '❌MISSING'} |
-      posts: {topStories.length}件
-    </div>
-
     <DesktopView latestStories={topStories} />
     <MobileView latestStories={topStories} />
     <CookieBanner />
