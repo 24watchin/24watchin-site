@@ -1,30 +1,69 @@
----
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
 // 司令塔から記事データを受け取ります
-// ※万が一のために latestStories だけでなく posts という名前でも受け取れるように広げています
-const { latestStories = [], posts = [] } = Astro.props;
-const sourceStories = latestStories.length > 0 ? latestStories : posts;
+const { posts = [], latestStories = [] } = Astro.props;
 
 // 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
+// 有効な国コード
+const validCountries = [
+  'jp', 'us', 'de', 'fr', 'gb', 'es', 'cn', 'tw', 'ae', 'au',
+  'sg', 'ca', 'nz', 'hk', 'in', 'my', 'ph', 'th', 'vn', 'id',
+  'kr', 'mx', 'br', 'za', 'eg', 'qa', 'om', 'sa', 'tr', 'ar', 'co'
+];
+
 // 英語の国名辞書
 const countryNameMap = {
-  jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
-  gb: 'UK', sg: 'Singapore', ca: 'Canada', cn: 'China',
-  tw: 'Taiwan', es: 'Spain', fr: 'France', de: 'Germany',
-  br: 'Brazil', kr: 'South Korea'
+  jp: 'Japan',
+  us: 'USA',
+  ae: 'UAE',
+  au: 'Australia',
+  gb: 'UK',
+  sg: 'Singapore',
+  ca: 'Canada',
+  cn: 'China',
+  tw: 'Taiwan',
+  es: 'Spain',
+  fr: 'France',
+  de: 'Germany',
+  br: 'Brazil',
+  kr: 'South Korea',
+  nz: 'New Zealand',
+  hk: 'Hong Kong',
+  in: 'India',
+  my: 'Malaysia',
+  ph: 'Philippines',
+  th: 'Thailand',
+  vn: 'Vietnam',
+  id: 'Indonesia',
+  mx: 'Mexico',
+  za: 'South Africa',
+  eg: 'Egypt',
+  qa: 'Qatar',
+  om: 'Oman',
+  sa: 'Saudi Arabia',
+  tr: 'Turkey',
+  ar: 'Argentina',
+  co: 'Colombia'
 };
 
-// デモ(backupStories)は完全に削除し、実際の記事データから「en-」タグを持つものだけを抽出します
-const displayStories = sourceStories.filter((post) => {
-  if (post.labels && Array.isArray(post.labels)) {
-    // 大文字小文字のズレを防ぐため、小文字(toLowerCase)にしてから 'en-' を探します
-    return post.labels.some(label => typeof label === 'string' && label.toLowerCase().startsWith('en-'));
-  }
-  return false;
-});
+// latestStories が入っていればそれを優先し、空なら posts を使います
+const sourcePosts =
+  Array.isArray(latestStories) && latestStories.length > 0
+    ? latestStories
+    : posts;
+
+// en-○○ タグが付いた記事だけを表示対象にします
+const displayStories = sourcePosts.filter((post) => {
+  if (!post?.labels || !Array.isArray(post.labels)) return false;
+
+  return post.labels.some((label) => {
+    if (!label.startsWith('en-')) return false;
+    const code = label.replace('en-', '');
+    return validCountries.includes(code);
+  });
+}).slice(0, 10);
 
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
@@ -145,27 +184,42 @@ function getThumbnail(content) {
         <div class="carousel-wrapper">
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-             
+            
             {displayStories.map((post) => {
               let bgImage = getThumbnail(post.content);
               let categoryName = 'News';
               let countryCode = 'world';
               let countryName = '';
-              let dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+              let dateText = '';
 
               if (post.labels && Array.isArray(post.labels)) {
-                const countryTag = post.labels.find(l => typeof l === 'string' && l.toLowerCase().startsWith('en-'));
+                const countryTag = post.labels.find((l) => l.startsWith('en-'));
                 if (countryTag) {
-                  countryCode = countryTag.toLowerCase().replace('en-', '');
-                  if (countryNameMap[countryCode]) {
-                    countryName = countryNameMap[countryCode];
+                  const foundCode = countryTag.replace('en-', '');
+                  if (validCountries.includes(foundCode)) {
+                    countryCode = foundCode;
+                    if (countryNameMap[countryCode]) {
+                      countryName = countryNameMap[countryCode];
+                    }
                   }
                 }
-                
-                const foundCat = enCategories.find(cat => 
-                  post.labels.some(label => typeof label === 'string' && cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
+
+                const foundCat = enCategories.find((cat) =>
+                  post.labels.some((label) =>
+                    cat.keywords?.some((key) =>
+                      label.toLowerCase().includes(key.toLowerCase())
+                    )
+                  )
                 );
                 if (foundCat) categoryName = foundCat.label;
+
+                dateText = post.published
+                  ? new Date(post.published).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })
+                  : '';
               }
 
               return (
@@ -249,7 +303,7 @@ function getThumbnail(content) {
               <a href="/en/info/copyright/">COPYRIGHT / REUSE</a>
             </div>
             <div class="top-footer-copy">
-               <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
+              <p>Unauthorized reproduction or use of any articles, photos, images, charts, or other content on 24Watchin.com is prohibited.</p>
               <p>Copyright belongs to The Dexent Media Enterprises or respective rights holders.</p>
               <p>&copy; 2026 The Dexent Media Enterprises. All Rights Reserved.</p>
             </div>
@@ -435,7 +489,6 @@ function getThumbnail(content) {
       const BRAND_HIDE_MS = 600; 
       const MASK_IN_MS  = 800;   
       const MASK_UNLOCK_MS = 100;
-    
       let currentStep = 0;
       let isAnimating = false;
       const desktopSequence = document.getElementById('desktop-sequence');
@@ -460,58 +513,25 @@ function getThumbnail(content) {
         document.body.classList.toggle('is-locked', locked); 
         document.documentElement.classList.toggle('is-locked', locked);
       }
-      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); });
-      }
+      function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
       function showMask() { transitionMask?.classList.add('is-visible'); }
-      function hideMask() { transitionMask?.classList.remove('is-visible');
-      }
-      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible');
-      }
-      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible');
-      }
-      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible');
-      }
-      function revealBrandImmediate() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night', 'is-bg'); requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); });
-      }
-      function showBrandAnimated() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night'); window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS);
-      window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS); window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS);
-      }
-      function hideBrandAnimated() { brandTextTarget?.classList.remove('is-visible'); brandPanel?.classList.remove('is-bg', 'is-night');
-      window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS); }
-      function activateHeroSlide(index) { leftPanels.forEach((panel) => panel.classList.remove('is-active'));
-      rightPanels.forEach((panel) => panel.classList.remove('is-active')); if (index === 0) { l2?.classList.remove('is-open'); r2?.classList.remove('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 1) { l2?.classList.add('is-open');
-      r2?.classList.add('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 2) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.add('is-open'); r3?.classList.add('is-open');
-      } window.setTimeout(() => { if(leftPanels.length > index) leftPanels[index].classList.add('is-active'); if(rightPanels.length > index) rightPanels[index].classList.add('is-active'); isAnimating = false; }, HERO_ANIM_MS);
-      }
-      function transitionBrandToStories() { showMask();
-      window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
-      }
-      function transitionStoriesToBrand() { showMask();
-      window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
-      }
-      function transitionBetweenSections(targetStep) { showMask();
-      window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS);
-      }
-      function transitionBrandToHero() { showMask(); window.setTimeout(() => { resetBrandPanel(); clearSectionVisibility(); activateHeroSlide(2); hideMask(); }, MASK_IN_MS);
-      }
-      function goToStep(step) { if (step < 0 || step > 5) return;
-      if (isAnimating) return; const previousStep = currentStep; currentStep = step; isAnimating = true; updateIndicator(step); if (step <= 2) { setBodyLocked(true);
-      desktopSequence?.classList.remove('is-hidden'); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 3 && step === 2) { transitionBrandToHero(); return;
-      } hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return; } if (step === 3) { setBodyLocked(true);
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 4) { transitionStoriesToBrand(); return; } hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden');
-      if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } else { showBrandAnimated(); } return;
-      } if (step === 4 && previousStep === 3) { transitionBrandToStories(); return;
-      } if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return;
-      } if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; } showSection(step);
-      window.setTimeout(() => { isAnimating = false; }, 300); }
-      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1);
-      } }
-      function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1);
-      } }
+      function hideMask() { transitionMask?.classList.remove('is-visible'); }
+      function clearSectionVisibility() { screen5?.classList.remove('is-visible'); screen6?.classList.remove('is-visible'); }
+      function showSection(step) { clearSectionVisibility(); if (step === 4) screen5?.classList.add('is-visible'); if (step === 5) screen6?.classList.add('is-visible'); }
+      function resetBrandPanel() { brandPanel?.classList.remove('is-visible', 'is-night', 'is-bg'); brandTextTarget?.classList.remove('is-visible'); }
+      function revealBrandImmediate() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night', 'is-bg'); requestAnimationFrame(() => { brandTextTarget?.classList.add('is-visible'); }); }
+      function showBrandAnimated() { desktopSequence?.classList.remove('is-hidden'); resetBrandPanel(); brandPanel?.classList.add('is-visible', 'is-night'); window.setTimeout(() => { brandPanel?.classList.add('is-bg'); }, BRAND_BG_DELAY_MS); window.setTimeout(() => { brandTextTarget?.classList.add('is-visible'); }, BRAND_TEXT_DELAY_MS); window.setTimeout(() => { isAnimating = false; }, BRAND_UNLOCK_MS); }
+      function hideBrandAnimated() { brandTextTarget?.classList.remove('is-visible'); brandPanel?.classList.remove('is-bg', 'is-night'); window.setTimeout(() => { brandPanel?.classList.remove('is-visible'); isAnimating = false; }, BRAND_HIDE_MS); }
+      function activateHeroSlide(index) { leftPanels.forEach((panel) => panel.classList.remove('is-active')); rightPanels.forEach((panel) => panel.classList.remove('is-active')); if (index === 0) { l2?.classList.remove('is-open'); r2?.classList.remove('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 1) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.remove('is-open'); r3?.classList.remove('is-open'); } else if (index === 2) { l2?.classList.add('is-open'); r2?.classList.add('is-open'); l3?.classList.add('is-open'); r3?.classList.add('is-open'); } window.setTimeout(() => { if(leftPanels.length > index) leftPanels[index].classList.add('is-active'); if(rightPanels.length > index) rightPanels[index].classList.add('is-active'); isAnimating = false; }, HERO_ANIM_MS); }
+      function transitionBrandToStories() { showMask(); window.setTimeout(() => { showSection(4); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
+      function transitionStoriesToBrand() { showMask(); window.setTimeout(() => { clearSectionVisibility(); revealBrandImmediate(); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
+      function transitionBetweenSections(targetStep) { showMask(); window.setTimeout(() => { showSection(targetStep); hideMask(); window.setTimeout(() => { isAnimating = false; }, MASK_UNLOCK_MS); }, MASK_IN_MS); }
+      function transitionBrandToHero() { showMask(); window.setTimeout(() => { resetBrandPanel(); clearSectionVisibility(); activateHeroSlide(2); hideMask(); }, MASK_IN_MS); }
+      function goToStep(step) { if (step < 0 || step > 5) return; if (isAnimating) return; const previousStep = currentStep; currentStep = step; isAnimating = true; updateIndicator(step); if (step <= 2) { setBodyLocked(true); desktopSequence?.classList.remove('is-hidden'); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 3 && step === 2) { transitionBrandToHero(); return; } hideMask(); clearSectionVisibility(); resetBrandPanel(); activateHeroSlide(step); return; } if (step === 3) { setBodyLocked(true); window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); if (previousStep === 4) { transitionStoriesToBrand(); return; } hideMask(); clearSectionVisibility(); desktopSequence?.classList.remove('is-hidden'); if (previousStep >= 5) { revealBrandImmediate(); window.setTimeout(() => { isAnimating = false; }, 200); } else { showBrandAnimated(); } return; } if (step === 4 && previousStep === 3) { transitionBrandToStories(); return; } if (step === 5 && previousStep === 4) { transitionBetweenSections(5); return; } if (step === 4 && previousStep === 5) { transitionBetweenSections(4); return; } showSection(step); window.setTimeout(() => { isAnimating = false; }, 300); }
+      function moveNext() { if (currentStep < 5) { goToStep(currentStep + 1); } }
+      function movePrev() { if (currentStep > 0) { goToStep(currentStep - 1); } }
       window.addEventListener('wheel', (e) => { if (document.getElementById('side-menu')?.classList.contains('is-open')) return; e.preventDefault(); if (isAnimating) return; if (e.deltaY > WHEEL_THRESHOLD) moveNext(); else if (e.deltaY < -WHEEL_THRESHOLD) movePrev(); }, { passive: false });
-      function scrollCarouselByOneCard(container, direction) { if (!container) return; const cards = container.querySelectorAll('.observer-card'); if (cards.length === 0) return; const cardWidth = cards[0].offsetWidth;
-      const style = window.getComputedStyle(cards[0]); const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight); const distance = (cardWidth + margin) * direction;
-      container.scrollBy({ left: distance, behavior: 'smooth' }); }
+      function scrollCarouselByOneCard(container, direction) { if (!container) return; const cards = container.querySelectorAll('.observer-card'); if (cards.length === 0) return; const cardWidth = cards[0].offsetWidth; const style = window.getComputedStyle(cards[0]); const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight); const distance = (cardWidth + margin) * direction; container.scrollBy({ left: distance, behavior: 'smooth' }); }
       const storyCards = document.querySelectorAll('#story-carousel .observer-card');
       const storyDots = document.querySelectorAll('#story-carousel-dots .c-dot');
       const storyPrevBtn = document.getElementById('story-carousel-prev');
@@ -530,9 +550,7 @@ function getThumbnail(content) {
       langNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, 1));
       const langObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-center'); const index = Array.from(langCards).indexOf(entry.target); if(index !== -1 && langDots[index]) { langDots.forEach(d => d.classList.remove('active')); langDots[index].classList.add('active'); } } else { entry.target.classList.remove('is-center'); } }); }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
       langCards.forEach(card => langObserver.observe(card));
-      setBodyLocked(true); if(desktopSequence) desktopSequence.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0);
-      window.setTimeout(() => { if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); }, 400);
-    } catch (error) { console.error("プログラムでエラーが発生しました:", error);
-    }
+      setBodyLocked(true); if(desktopSequence) desktopSequence.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0); window.setTimeout(() => { if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); }, 400);
+    } catch (error) { console.error("プログラムでエラーが発生しました:", error); }
   });
 </script>
