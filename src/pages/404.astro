@@ -6,21 +6,22 @@ import Layout from '../layouts/Layout.astro';
   <div class="not-found-container">
     <div class="not-found-inner">
       <div class="error-code">404</div>
-      <div class="globe-icon">🌐</div>
-      <h1 class="error-title" id="error-title">ページが見つかりません</h1>
-      <p class="error-sub" id="error-sub">お探しのページは存在しないか、移動した可能性があります。</p>
-      <a href="/ja/" class="back-btn" id="back-btn">トップページに戻る</a>
+      <div class="domain-text">24watchin.com</div>
+      
+      <h1 class="error-title" id="error-title">Page Not Found</h1>
+      <p class="error-sub" id="error-sub">The page you are looking for does not exist or has been moved.</p>
+      <a href="/en/" class="back-btn" id="back-btn">Back to Top</a>
     </div>
   </div>
 </Layout>
 
 <script is:inline>
-  // 1. 各言語ごとのメッセージとURLプレフィックスの設定
+  // 各言語ごとのメッセージとURLプレフィックスの設定
   const messages = {
     ja: { title: 'ページが見つかりません', sub: 'お探しのページは存在しないか、移動した可能性があります。', btn: 'トップページに戻る', prefix: '/ja/' },
     en: { title: 'Page Not Found', sub: 'The page you are looking for does not exist or has been moved.', btn: 'Back to Top', prefix: '/en/' },
     'zh-cn': { title: '页面未找到', sub: '您查找的页面不存在或已被移动。', btn: '返回首页', prefix: '/zh-cn/' },
-    'zh-tw': { title: '找不到頁面', sub: '您尋找的页面不存在或已被移动。', btn: '返回首頁', prefix: '/zh-tw/' },
+    'zh-tw': { title: '找不到頁面', sub: '您尋找的頁面不存在或已被移動。', btn: '返回首頁', prefix: '/zh-tw/' },
     es: { title: 'Página no encontrada', sub: 'La página que busca no existe o ha sido movida.', btn: 'Volver al inicio', prefix: '/es/' },
     fr: { title: 'Page introuvable', sub: "La page que vous recherchez n'existe pas ou a été déplacée.", btn: "Retour à l'accueil", prefix: '/fr/' },
     de: { title: 'Seite nicht gefunden', sub: 'Die gesuchte Seite existiert nicht oder wurde verschoben.', btn: 'Zurück zur Startseite', prefix: '/de/' },
@@ -28,32 +29,17 @@ import Layout from '../layouts/Layout.astro';
   };
 
   const supportedLangs = Object.keys(messages);
-
-  // 2. 言語の判定（URLの最初のアドレスから判定します）
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-  let detectedLang = '';
+  
+  // ▼ 修正2：URLで言語が指定されていない場合は、強制的に「英語（en）」を基準にします
+  let detectedLang = 'en';
 
   if (pathParts.length > 0 && supportedLangs.includes(pathParts[0])) {
     detectedLang = pathParts[0];
-  } else {
-    // URLで判定できない場合は、ブラウザの設定言語を確認します
-    const browserLangs = navigator.languages || [navigator.language || 'ja'];
-    for (const bl of browserLangs) {
-      const lower = bl.toLowerCase();
-      if (lower.startsWith('zh-tw') || lower.startsWith('zh-hant')) { detectedLang = 'zh-tw'; break; }
-      if (lower.startsWith('zh')) { detectedLang = 'zh-cn'; break; }
-      if (lower.startsWith('ja')) { detectedLang = 'ja'; break; }
-      if (lower.startsWith('en')) { detectedLang = 'en'; break; }
-      if (lower.startsWith('es')) { detectedLang = 'es'; break; }
-      if (lower.startsWith('fr')) { detectedLang = 'fr'; break; }
-      if (lower.startsWith('de')) { detectedLang = 'de'; break; }
-      if (lower.startsWith('ru')) { detectedLang = 'ru'; break; }
-    }
   }
 
-  // 3. 画面上のテキストとボタンの書き換え
-  const lang = detectedLang || 'ja';
-  const msg = messages[lang];
+  // 画面上のテキストとボタンの書き換え
+  const msg = messages[detectedLang];
 
   document.getElementById('error-title').textContent = msg.title;
   document.getElementById('error-sub').textContent = msg.sub;
@@ -61,10 +47,9 @@ import Layout from '../layouts/Layout.astro';
   backBtn.textContent = msg.btn;
   backBtn.href = msg.prefix;
 
-  // 4. ヘッダーのロゴリンクを現在の言語のトップページに書き換える
+  // ヘッダーのロゴリンクを現在の言語のトップページに書き換える
   const headerLinks = document.querySelectorAll('header a');
   headerLinks.forEach(link => {
-    // ヘッダー内のリンク（ロゴなど）は、すべて安全のために現在の言語のトップへ向けておきます
     link.href = msg.prefix;
   });
 </script>
@@ -97,9 +82,13 @@ import Layout from '../layouts/Layout.astro';
     letter-spacing: -4px;
   }
 
-  .globe-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+  /* ▼ 修正1：新しく追加したドメインテキストのデザインです */
+  .domain-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #888;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
   }
 
   .error-title {
@@ -136,6 +125,7 @@ import Layout from '../layouts/Layout.astro';
     .not-found-inner { padding: 40px 20px; }
     .error-code { font-size: 72px; }
     .error-title { font-size: 20px; }
+    .domain-text { font-size: 16px; } /* スマホ用の文字サイズ調整 */
   }
 </style>
 
@@ -147,23 +137,11 @@ import Layout from '../layouts/Layout.astro';
   .sidebar-area, footer, .site-footer { display: none !important; }
 
   /* 3. ヘッダーの不要なパーツを正確な名前で狙い撃ちして非表示にします */
-  
-  /* 一番上のグレーのバー（JAPANなど） */
   .pc-top-gray-bar, .sp-top-gray-bar { display: none !important; }
-  
-  /* 検索ボックス、地域/言語ボタン、天気などの右側エリア */
   .pc-right-area, .sp-right-area, .sp-top-actions { display: none !important; }
-  
-  /* カテゴリメニュー（黒い帯の部分） */
   .category-bar, .sp-category-bar { display: none !important; }
-  
-  /* トレンドキーワード（イラン情勢、関税など） */
   .header-word-bar { display: none !important; }
-  
-  /* ヘッダー下部の装飾ラインや余白 */
   .bottom-line { display: none !important; }
   .site-header > div[style*="height: 10px"] { display: none !important; }
-
-  /* 地域/言語切り替え用のパネルが裏に隠れていたらそれも消す */
   #rl-panel, #rl-overlay { display: none !important; }
 </style>
