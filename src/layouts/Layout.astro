@@ -14,7 +14,7 @@ import ArticleSidebar from '../components/ArticleSidebar.astro';
 import WeatherSidebar from '../components/WeatherSidebar.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 
-// ▼ 先ほど作成したSNSウィジェットを読み込みます
+// 先ほど作成したSNSウィジェットを読み込みます
 import SnsWidget from '../components/SnsWidget.astro';
 
 const {
@@ -69,8 +69,8 @@ const defaultDescriptions: Record<string, string> = {
   fr: "L'actualité du monde entier dans votre langue. 24Watchin vous propose les dernières informations locales, expliquées clairement.",
   es: 'Noticias de todo el mundo en tu idioma. 24Watchin ofrece las últimas noticias locales explicadas de forma clara y sencilla.',
   ru: 'Новости со всего мира на вашем языке. 24Watchin доставляет актуальные местные новости, понятно объяснённые для иностранцев.',
-  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂的本地新闻与深度解说。',
-  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂的本地新聞與深度解說。',
+  'zh-cn': '用您的母语了解世界各地的最新资讯。24Watchin为海外居民提供清晰易懂の本地新闻与深度解说。',
+  'zh-tw': '用您的母語了解世界各地的最新資訊。24Watchin為海外居民提供清晰易懂の本地新聞與深度解說。',
 };
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
@@ -94,7 +94,7 @@ const xDefaultUrl = country
   ? `${SITE_URL}/ja/${country}${restPathStr}`
   : `${SITE_URL}/ja/`;
 
-// WebSite 構造化データ（全ページ共通）
+// WebSite 構造化データ
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -112,7 +112,7 @@ const websiteJsonLd = {
   }
 };
 
-// Organization 構造化データ（全ページ共通）
+// Organization 構造化データ
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsMediaOrganization",
@@ -191,13 +191,11 @@ const organizationJsonLd = {
     </script>
 
     <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
-
     <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
 
     <slot name="head" />
 
     <style>
-      /* 画面全体をぴったりくっつけて角を四角にする強力なリセット */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
@@ -215,7 +213,7 @@ const organizationJsonLd = {
       @media (max-width: 900px) { .main-layout { grid-template-columns: minmax(0, 1fr); } .sidebar-area { display: none; } }
       @media (max-width: 640px) { .container { padding: 0 14px; } }
       
-      /* ▼ 【修正】広告を入れるための空き箱（グレーの枠と文字が見える状態に戻しました） */
+      /* 広告を入れるための空き箱（ダミーの枠）の設定です */
       .sidebar-ad-space {
         width: 100%;
         min-height: 250px;
@@ -243,20 +241,28 @@ const organizationJsonLd = {
           <slot />
         </main>
         <aside class="sidebar-area">
-          {/* 言語のinfoページの時だけ、SNSと広告を表示します */}
+          {/* 条件分岐: infoページの場合 */}
           {isInfoPage ? (
             <div class="info-sidebar-content">
-              {/* 作成したSNSウィジェットをここに置きます */}
               <SnsWidget lang={lang} />
-              {/* 広告用の空きスペースです */}
               <div class="sidebar-ad-space">
                 <span class="ad-label">Advertisement</span>
               </div>
             </div>
-          ) : sidebarType === 'category' ? <CategorySidebar />
-            : sidebarType === 'article' ? <ArticleSidebar />
-            : sidebarType === 'weather' ? <WeatherSidebar />
-            : <Sidebar />}
+          ) : (
+            /* 条件分岐: 通常の言語＋国ページなどの場合 */
+            <>
+              {sidebarType === 'category' ? <CategorySidebar />
+                : sidebarType === 'article' ? <ArticleSidebar />
+                : sidebarType === 'weather' ? <WeatherSidebar />
+                : <Sidebar />}
+              
+              {/* ▼ 【追加】通常のサイドバーの下にも広告の目印を表示させます */}
+              <div class="sidebar-ad-space">
+                <span class="ad-label">Advertisement</span>
+              </div>
+            </>
+          )}
         </aside>
       </div>
       <div class="bottom-wide">
