@@ -146,6 +146,8 @@ const formatPostTime = (dateString) => {
   @media (max-width: 600px) {
     .hero-post a { grid-template-columns: 1fr; }
     .sub-grid { grid-template-columns: 1fr; }
-    .grid-image { width: 96px; height: 64px; }
+    
+    /* ▼ 修正：スマホ表示時に左側の画像が小さくなる設定を解除し、左右の画像を同じ108x72pxに統一します */
+    .grid-image, .list-image { width: 108px; height: 72px; }
   }
 </style>
