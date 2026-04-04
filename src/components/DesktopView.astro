@@ -1,26 +1,31 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
-// 司令塔から記事データを受け取ります
 const { latestStories = [] } = Astro.props;
-// 英語のカテゴリ翻訳ルールを読み込みます
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
-// 英語の国名辞書
-const countryNameMap = {
+// ★デバッグ用★
+console.log('★ latestStories件数:', latestStories.length);
+if (latestStories.length > 0) {
+  console.log('★ 1件目タイトル:', latestStories[0].title);
+  console.log('★ 1件目ラベル:', JSON.stringify(latestStories[0].labels));
+}
+
+const countryNameMap: Record<string, string> = {
   jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
   gb: 'UK', sg: 'Singapore', ca: 'Canada', cn: 'China',
   tw: 'Taiwan', es: 'Spain', fr: 'France', de: 'Germany',
   br: 'Brazil', kr: 'South Korea'
 };
-const backupStories = [
-  { id: 1, category: 'Politics', countryCode: 'jp', country: 'Japan', title: 'New Semiconductor Hub Opens in Hokkaido, Boosting Local Tech Industry', excerpt: 'The government aims to revitalize the regional economy with a multi-billion yen investment in chip manufacturing.', image: 'url("https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 2, category: 'Economy', countryCode: 'us', country: 'USA', title: 'Federal Reserve Signals Potential Rate Cuts by Year-End', excerpt: 'Market rallies as inflation data shows signs of cooling off for the third consecutive month.', image: 'url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 3, category: 'Society', countryCode: 'fr', country: 'France', title: 'Paris Sets New Standard for Eco-Friendly Urban Planning', excerpt: 'Historic districts are being transformed with green roofs and pedestrian-only zones.', image: 'url("https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 4, category: 'Environment', countryCode: 'br', country: 'Brazil', title: 'Amazon Conservation Efforts Show Promising Results This Quarter', excerpt: 'Deforestation rates drop significantly as new AI monitoring technologies are deployed across the rainforest.', image: 'url("https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
-  { id: 5, category: 'Technology', countryCode: 'kr', country: 'South Korea', title: 'Breakthrough in Solid-State Battery Tech Announced in Seoul', excerpt: 'Researchers unveil a new prototype that could double the range of current electric vehicles.', image: 'url("https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")' },
+
+const validCountries = [
+  'jp', 'us', 'de', 'fr', 'gb', 'es', 'cn', 'tw', 'ae', 'au',
+  'sg', 'ca', 'nz', 'hk', 'in', 'my', 'ph', 'th', 'vn', 'id',
+  'kr', 'mx', 'br', 'za', 'eg', 'qa', 'om', 'sa', 'tr', 'ar', 'co'
 ];
-const displayStories = latestStories.length > 0 ? latestStories : backupStories;
+
+const displayStories = latestStories as any[];
+
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
   { code: 'ja', name: '日本語', color: '#872732', url: '/ja/' },
@@ -31,13 +36,14 @@ const languages = [
   { code: 'de', name: 'Deutsch', color: '#276749', url: '/de/' },
   { code: 'ru', name: 'Русский', color: '#744210', url: '/ru/' },
 ];
-function stripHtml(html) {
+
+function stripHtml(html: string) {
   if (!html) return '';
   const text = html.replace(/<[^>]*>?/gm, '');
   return text.length > 100 ? text.substring(0, 100) + '...' : text;
 }
 
-function getThumbnail(content) {
+function getThumbnail(content: string) {
   if (!content) return 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
   const match = content.match(/<img[^>]+src="([^">]+)"/);
   return match ? `url("${match[1]}")` : 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)';
@@ -135,44 +141,48 @@ function getThumbnail(content) {
     <section class="seq-panel" id="screen-5">
       <div class="seq-inner">
         <div class="section-header"><h2>Latest Stories</h2></div>
-        
+
         <div class="carousel-wrapper">
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-            
-            {displayStories.map((post) => {
-              let bgImage = '';
+
+            {displayStories.map((post: any) => {
+              const bgImage = post.labels
+                ? getThumbnail(post.content)
+                : (post.image || 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)');
+
               let categoryName = 'News';
               let countryCode = 'world';
               let countryName = '';
               let dateText = '';
+
               if (post.labels && Array.isArray(post.labels)) {
-                bgImage = getThumbnail(post.content);
-                const countryTag = post.labels.find(l => l.startsWith('en-'));
+                const countryTag = post.labels.find((l: string) => {
+                  if (l.startsWith('en-')) {
+                    const code = l.replace('en-', '');
+                    return validCountries.includes(code);
+                  }
+                  return false;
+                });
                 if (countryTag) {
                   countryCode = countryTag.replace('en-', '');
-                  if (countryNameMap[countryCode]) {
-                    countryName = countryNameMap[countryCode];
-                  }
+                  countryName = countryNameMap[countryCode] || '';
                 }
-                
-                const foundCat = enCategories.find(cat => 
-                  post.labels.some(label => cat.keywords?.some(key => label.toLowerCase().includes(key.toLowerCase())))
-                );
-                if (foundCat) categoryName = foundCat.label;
 
-                dateText = post.published ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-              } 
-              else {
-                bgImage = post.image;
-                categoryName = post.category;
-                countryCode = post.countryCode;
-                countryName = post.country;
-                dateText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const foundCat = enCategories.find((cat: any) =>
+                  post.labels.some((label: string) =>
+                    cat.keywords?.some((key: string) => label.toLowerCase().includes(key.toLowerCase()))
+                  )
+                );
+                if (foundCat) categoryName = (foundCat as any).label;
+
+                dateText = post.published
+                  ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                  : '';
               }
 
               return (
-                <a href={`/en/${countryCode}/news/${post.id}`} class="story-card observer-card no-link-color">
+                <a href={`/en/${countryCode}/news/${post.id}/`} class="story-card observer-card no-link-color">
                   <div class="card-img-box">
                     <div class="card-bg" style={`background-image: ${bgImage};`}></div>
                   </div>
@@ -190,11 +200,11 @@ function getThumbnail(content) {
 
             <div class="carousel-spacer"></div>
           </div>
-          
+
           <div class="carousel-bottom-nav">
             <button class="carousel-nav-arrow" id="story-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="story-carousel-dots">
-              {displayStories.map((_, i) => (
+              {displayStories.map((_: any, i: number) => (
                 <div class={`c-dot ${i === 0 ? 'active' : ''}`}></div>
               ))}
             </div>
@@ -222,7 +232,7 @@ function getThumbnail(content) {
             ))}
             <div class="carousel-spacer"></div>
           </div>
-          
+
           <div class="carousel-bottom-nav">
             <button class="carousel-nav-arrow" id="lang-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="lang-carousel-dots">
@@ -281,14 +291,14 @@ function getThumbnail(content) {
   html.is-locked, body.is-locked {
     overflow: hidden !important;
   }
-  
+
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
-  
-  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; filter: brightness(0) invert(1); } 
+
+  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; filter: brightness(0) invert(1); }
   .header-logo-img:hover { opacity: 0.8; }
-  
+
   .menu-trigger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
   .burger-line { width: 30px; height: 2px; background: #fff; border-radius: 2px; }
   .side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: rgba(10, 10, 10, 0.98); z-index: 400; transition: right 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); padding: 80px 40px; display: flex; justify-content: center; }
@@ -297,10 +307,10 @@ function getThumbnail(content) {
   .menu-inner { max-width: 1000px; width: 100%; text-align: center; }
   .menu-inner h3 { font-size: 14px; letter-spacing: 4px; margin-bottom: 50px; color: #888; }
   .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-  
+
   .menu-lang-card { padding: 40px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; transition: all 0.3s ease; background-color: var(--accent); text-decoration: none; color: white; }
   .menu-lang-card:hover { border-color: #ffffff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); transform: translateY(-5px); }
-  
+
   .scroll-indicator { position: fixed; top: 75%; right: 25px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 500; }
   .scroll-indicator .dot { width: 6px; height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .scroll-indicator .dot.active { height: 32px; background: rgba(255, 255, 255, 0.9); }
@@ -335,10 +345,10 @@ function getThumbnail(content) {
   .brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
   .brand-panel.is-visible { visibility: visible; }
   .seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-  
+
   #screen-6 { z-index: 41; padding-bottom: 180px; }
-  
   .seq-panel.is-visible { visibility: visible; pointer-events: auto; }
+
   .seq-inner { width: 100%; opacity: 0; transform: translateY(40px); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s; }
   .seq-panel.is-visible .seq-inner { opacity: 1; transform: translateY(0); }
   .brand-night { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 35%, rgba(33, 76, 160, 0.18) 0%, rgba(17, 36, 82, 0.28) 22%, rgba(7, 15, 40, 0.62) 56%, rgba(4, 8, 24, 0.92) 100%), linear-gradient(to bottom, rgba(8, 18, 48, 0.55) 0%, rgba(5, 12, 32, 0.88) 75%, rgba(3, 7, 20, 0.96) 100%); transition: opacity 0.6s ease; }
@@ -348,9 +358,9 @@ function getThumbnail(content) {
   .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%); opacity: 0; transition: opacity 1.3s ease; }
   .brand-panel.is-bg .brand-bg-overlay { opacity: 1; }
   .brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  
+
   .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; filter: brightness(0) invert(1); }
-  
+
   .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); }
   .brand-desc p { font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 300; color: #eee; margin-bottom: 15px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); }
   .fade-base { opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
@@ -364,7 +374,7 @@ function getThumbnail(content) {
   .text-anim-target.is-visible .anim-desc3 { transition-delay: 3.4s; }
   .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
   .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
-  
+
   .carousel-wrapper { position: relative; width: 100%; }
   .no-link-color { color: inherit !important; text-decoration: none !important; }
   .no-link-color:visited, .no-link-color:hover, .no-link-color:active { color: inherit !important; text-decoration: none !important; }
@@ -377,7 +387,7 @@ function getThumbnail(content) {
   .story-card.is-center:hover .card-bg { transform: scale(1.05); }
 
   .card-text-box { width: 100%; height: 33.33%; padding: 20px 30px; background: linear-gradient(to bottom, #050b1e, #02040a); display: flex; flex-direction: column; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); }
-  
+
   .card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
   .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 4px; }
   .card-meta .country-name { color: #aaa; font-size: 10px; }
@@ -394,9 +404,9 @@ function getThumbnail(content) {
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
-  
+
   .lang-card { flex: 0 0 28vw; height: 42vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
-  
+
   .lang-card::before { content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 5; pointer-events: none; transition: top 0.6s ease, left 0.6s ease, right 0.6s ease, bottom 0.6s ease, border-color 0.6s ease; }
   .lang-card.is-center::before { top: 25px; left: 25px; right: 25px; bottom: 25px; border-color: rgba(255, 255, 255, 0.6); }
 
@@ -435,8 +445,8 @@ function getThumbnail(content) {
       const BRAND_BG_DELAY_MS = 700;
       const BRAND_TEXT_DELAY_MS = 1350;
       const BRAND_UNLOCK_MS = 2300;
-      const BRAND_HIDE_MS = 600; 
-      const MASK_IN_MS  = 800;   
+      const BRAND_HIDE_MS = 600;
+      const MASK_IN_MS  = 800;
       const MASK_UNLOCK_MS = 100;
       let currentStep = 0;
       let isAnimating = false;
@@ -458,8 +468,8 @@ function getThumbnail(content) {
       const sideMenu = document.getElementById('side-menu');
       menuOpenBtn?.addEventListener('click', () => { sideMenu?.classList.add('is-open'); });
       menuCloseBtn?.addEventListener('click', () => { sideMenu?.classList.remove('is-open'); });
-      function setBodyLocked(locked) { 
-        document.body.classList.toggle('is-locked', locked); 
+      function setBodyLocked(locked) {
+        document.body.classList.toggle('is-locked', locked);
         document.documentElement.classList.toggle('is-locked', locked);
       }
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
