@@ -1,11 +1,9 @@
 ---
 import { categoryLabelMap } from '../lib/categoryLabels.ts';
 
-// prop名は latestStories のままキープ（root index.astro と合わせる）
 const { latestStories = [] } = Astro.props;
 const enCategories = categoryLabelMap?.['en']?.allCategories || [];
 
-// 英語の国名辞書
 const countryNameMap: Record<string, string> = {
   jp: 'Japan', us: 'USA', ae: 'UAE', au: 'Australia',
   gb: 'UK', sg: 'Singapore', ca: 'Canada', cn: 'China',
@@ -13,24 +11,14 @@ const countryNameMap: Record<string, string> = {
   br: 'Brazil', kr: 'South Korea'
 };
 
-// LanguageTopMainNews と同じ有効な国コード一覧
 const validCountries = [
   'jp', 'us', 'de', 'fr', 'gb', 'es', 'cn', 'tw', 'ae', 'au',
   'sg', 'ca', 'nz', 'hk', 'in', 'my', 'ph', 'th', 'vn', 'id',
   'kr', 'mx', 'br', 'za', 'eg', 'qa', 'om', 'sa', 'tr', 'ar', 'co'
 ];
 
-// 「en-○○」タグが付いている記事だけを抽出（LanguageTopMainNews と同じ仕組み）
-const displayStories = (latestStories as any[]).filter((post) => {
-  if (!post.labels) return false;
-  return post.labels.some((label: string) => {
-    if (label.startsWith('en-')) {
-      const code = label.replace('en-', '');
-      return validCountries.includes(code);
-    }
-    return false;
-  });
-});
+// フィルタなし：取得できた記事をそのまま全部表示する
+const displayStories = latestStories as any[];
 
 const languages = [
   { code: 'en', name: 'English', color: '#1A365D', url: '/en/' },
@@ -147,39 +135,45 @@ function getThumbnail(content: string) {
     <section class="seq-panel" id="screen-5">
       <div class="seq-inner">
         <div class="section-header"><h2>Latest Stories</h2></div>
-        
+
         <div class="carousel-wrapper">
           <div class="carousel-container" id="story-carousel">
             <div class="carousel-spacer"></div>
-            
+
             {displayStories.map((post: any) => {
-              const bgImage = getThumbnail(post.content);
+              const bgImage = post.labels
+                ? getThumbnail(post.content)
+                : (post.image || 'linear-gradient(135deg, #1a1c29 0%, #2a3b4c 100%)');
+
               let categoryName = 'News';
               let countryCode = 'world';
               let countryName = '';
+              let dateText = '';
 
-              const countryTag = post.labels.find((l: string) => {
-                if (l.startsWith('en-')) {
-                  const code = l.replace('en-', '');
-                  return validCountries.includes(code);
+              if (post.labels && Array.isArray(post.labels)) {
+                const countryTag = post.labels.find((l: string) => {
+                  if (l.startsWith('en-')) {
+                    const code = l.replace('en-', '');
+                    return validCountries.includes(code);
+                  }
+                  return false;
+                });
+                if (countryTag) {
+                  countryCode = countryTag.replace('en-', '');
+                  countryName = countryNameMap[countryCode] || '';
                 }
-                return false;
-              });
-              if (countryTag) {
-                countryCode = countryTag.replace('en-', '');
-                countryName = countryNameMap[countryCode] || '';
+
+                const foundCat = enCategories.find((cat: any) =>
+                  post.labels.some((label: string) =>
+                    cat.keywords?.some((key: string) => label.toLowerCase().includes(key.toLowerCase()))
+                  )
+                );
+                if (foundCat) categoryName = (foundCat as any).label;
+
+                dateText = post.published
+                  ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                  : '';
               }
-
-              const foundCat = enCategories.find((cat: any) =>
-                post.labels.some((label: string) =>
-                  cat.keywords?.some((key: string) => label.toLowerCase().includes(key.toLowerCase()))
-                )
-              );
-              if (foundCat) categoryName = (foundCat as any).label;
-
-              const dateText = post.published
-                ? new Date(post.published).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                : '';
 
               return (
                 <a href={`/en/${countryCode}/news/${post.id}/`} class="story-card observer-card no-link-color">
@@ -200,7 +194,7 @@ function getThumbnail(content: string) {
 
             <div class="carousel-spacer"></div>
           </div>
-          
+
           <div class="carousel-bottom-nav">
             <button class="carousel-nav-arrow" id="story-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="story-carousel-dots">
@@ -232,7 +226,7 @@ function getThumbnail(content: string) {
             ))}
             <div class="carousel-spacer"></div>
           </div>
-          
+
           <div class="carousel-bottom-nav">
             <button class="carousel-nav-arrow" id="lang-carousel-prev" aria-label="Previous">&lt;</button>
             <div class="carousel-dots-wrapper" id="lang-carousel-dots">
@@ -291,14 +285,14 @@ function getThumbnail(content: string) {
   html.is-locked, body.is-locked {
     overflow: hidden !important;
   }
-  
+
   .global-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 300; pointer-events: none; }
   .header-band { display: flex; justify-content: space-between; align-items: center; padding: 30px 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); pointer-events: auto; }
   .logo-area a { text-decoration: none; outline: none; }
-  
-  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; filter: brightness(0) invert(1); } 
+
+  .header-logo-img { height: 48px; width: auto; transition: opacity 0.3s ease; filter: brightness(0) invert(1); }
   .header-logo-img:hover { opacity: 0.8; }
-  
+
   .menu-trigger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
   .burger-line { width: 30px; height: 2px; background: #fff; border-radius: 2px; }
   .side-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: rgba(10, 10, 10, 0.98); z-index: 400; transition: right 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); padding: 80px 40px; display: flex; justify-content: center; }
@@ -307,10 +301,10 @@ function getThumbnail(content: string) {
   .menu-inner { max-width: 1000px; width: 100%; text-align: center; }
   .menu-inner h3 { font-size: 14px; letter-spacing: 4px; margin-bottom: 50px; color: #888; }
   .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-  
+
   .menu-lang-card { padding: 40px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; transition: all 0.3s ease; background-color: var(--accent); text-decoration: none; color: white; }
   .menu-lang-card:hover { border-color: #ffffff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); transform: translateY(-5px); }
-  
+
   .scroll-indicator { position: fixed; top: 75%; right: 25px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 500; }
   .scroll-indicator .dot { width: 6px; height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .scroll-indicator .dot.active { height: 32px; background: rgba(255, 255, 255, 0.9); }
@@ -345,10 +339,10 @@ function getThumbnail(content: string) {
   .brand-panel { position: absolute; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; }
   .brand-panel.is-visible { visibility: visible; }
   .seq-panel { position: absolute; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: linear-gradient(to bottom, #0d0d0d 0%, #1a1a24 50%, #0d0d0d 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-  
+
   #screen-6 { z-index: 41; padding-bottom: 180px; }
   .seq-panel.is-visible { visibility: visible; pointer-events: auto; }
-  
+
   .seq-inner { width: 100%; opacity: 0; transform: translateY(40px); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s; }
   .seq-panel.is-visible .seq-inner { opacity: 1; transform: translateY(0); }
   .brand-night { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 35%, rgba(33, 76, 160, 0.18) 0%, rgba(17, 36, 82, 0.28) 22%, rgba(7, 15, 40, 0.62) 56%, rgba(4, 8, 24, 0.92) 100%), linear-gradient(to bottom, rgba(8, 18, 48, 0.55) 0%, rgba(5, 12, 32, 0.88) 75%, rgba(3, 7, 20, 0.96) 100%); transition: opacity 0.6s ease; }
@@ -358,9 +352,9 @@ function getThumbnail(content: string) {
   .brand-bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.62) 100%); opacity: 0; transition: opacity 1.3s ease; }
   .brand-panel.is-bg .brand-bg-overlay { opacity: 1; }
   .brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  
+
   .brand-logo-img { width: 250px; height: auto; margin-bottom: 30px; filter: brightness(0) invert(1); }
-  
+
   .brand-catch { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 30px; font-weight: 300; letter-spacing: 0.05em; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); }
   .brand-desc p { font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 300; color: #eee; margin-bottom: 15px; letter-spacing: 0.05em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); }
   .fade-base { opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
@@ -374,7 +368,7 @@ function getThumbnail(content: string) {
   .text-anim-target.is-visible .anim-desc3 { transition-delay: 3.4s; }
   .section-header { text-align: center; margin-bottom: 60px; padding: 0 20px; }
   .section-header h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; font-weight: 600; }
-  
+
   .carousel-wrapper { position: relative; width: 100%; }
   .no-link-color { color: inherit !important; text-decoration: none !important; }
   .no-link-color:visited, .no-link-color:hover, .no-link-color:active { color: inherit !important; text-decoration: none !important; }
@@ -387,7 +381,7 @@ function getThumbnail(content: string) {
   .story-card.is-center:hover .card-bg { transform: scale(1.05); }
 
   .card-text-box { width: 100%; height: 33.33%; padding: 20px 30px; background: linear-gradient(to bottom, #050b1e, #02040a); display: flex; flex-direction: column; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); }
-  
+
   .card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
   .card-meta .category { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.4); padding-bottom: 4px; }
   .card-meta .country-name { color: #aaa; font-size: 10px; }
@@ -404,9 +398,9 @@ function getThumbnail(content: string) {
   .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 20px; align-items: center; -ms-overflow-style: none; scrollbar-width: none; }
   .carousel-container::-webkit-scrollbar { display: none; }
   .carousel-spacer { flex: 0 0 calc(50vw - 20vw); }
-  
+
   .lang-card { flex: 0 0 28vw; height: 42vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.05); }
-  
+
   .lang-card::before { content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 5; pointer-events: none; transition: top 0.6s ease, left 0.6s ease, right 0.6s ease, bottom 0.6s ease, border-color 0.6s ease; }
   .lang-card.is-center::before { top: 25px; left: 25px; right: 25px; bottom: 25px; border-color: rgba(255, 255, 255, 0.6); }
 
@@ -445,8 +439,8 @@ function getThumbnail(content: string) {
       const BRAND_BG_DELAY_MS = 700;
       const BRAND_TEXT_DELAY_MS = 1350;
       const BRAND_UNLOCK_MS = 2300;
-      const BRAND_HIDE_MS = 600; 
-      const MASK_IN_MS  = 800;   
+      const BRAND_HIDE_MS = 600;
+      const MASK_IN_MS  = 800;
       const MASK_UNLOCK_MS = 100;
       let currentStep = 0;
       let isAnimating = false;
@@ -468,8 +462,8 @@ function getThumbnail(content: string) {
       const sideMenu = document.getElementById('side-menu');
       menuOpenBtn?.addEventListener('click', () => { sideMenu?.classList.add('is-open'); });
       menuCloseBtn?.addEventListener('click', () => { sideMenu?.classList.remove('is-open'); });
-      function setBodyLocked(locked) { 
-        document.body.classList.toggle('is-locked', locked); 
+      function setBodyLocked(locked) {
+        document.body.classList.toggle('is-locked', locked);
         document.documentElement.classList.toggle('is-locked', locked);
       }
       function updateIndicator(index) { dots.forEach((dot, i) => { dot.classList.toggle('active', i === index); }); }
@@ -498,18 +492,4 @@ function getThumbnail(content: string) {
       const storyContainer = document.getElementById('story-carousel');
       storyPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, -1));
       storyNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(storyContainer, 1));
-      const storyObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-center'); const index = Array.from(storyCards).indexOf(entry.target); if(index !== -1 && storyDots[index]) { storyDots.forEach(d => d.classList.remove('active')); storyDots[index].classList.add('active'); } } else { entry.target.classList.remove('is-center'); } }); }, { root: storyContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
-      storyCards.forEach(card => storyObserver.observe(card));
-      const langCards = document.querySelectorAll('#lang-carousel .observer-card');
-      const langDots = document.querySelectorAll('#lang-carousel-dots .c-dot');
-      const langPrevBtn = document.getElementById('lang-carousel-prev');
-      const langNextBtn = document.getElementById('lang-carousel-next');
-      const langContainer = document.getElementById('lang-carousel');
-      langPrevBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, -1));
-      langNextBtn?.addEventListener('click', () => scrollCarouselByOneCard(langContainer, 1));
-      const langObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-center'); const index = Array.from(langCards).indexOf(entry.target); if(index !== -1 && langDots[index]) { langDots.forEach(d => d.classList.remove('active')); langDots[index].classList.add('active'); } } else { entry.target.classList.remove('is-center'); } }); }, { root: langContainer, rootMargin: '0px -45% 0px -45%', threshold: 0 });
-      langCards.forEach(card => langObserver.observe(card));
-      setBodyLocked(true); if(desktopSequence) desktopSequence.classList.remove('is-hidden'); hideMask(); resetBrandPanel(); clearSectionVisibility(); updateIndicator(0); window.setTimeout(() => { if(leftPanels.length > 0) leftPanels[0].classList.add('is-active'); if(rightPanels.length > 0) rightPanels[0].classList.add('is-active'); }, 400);
-    } catch (error) { console.error("プログラムでエラーが発生しました:", error); }
-  });
-</script>
+      const storyObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-center'); const index = Array.from(storyCards).indexOf(entry.target); if(inde
