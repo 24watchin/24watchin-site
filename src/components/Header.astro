@@ -152,7 +152,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
       </div>
     </nav>
 
-    {/* ▼ 修正：キーワード部分を削除し、半分の高さの白い空白を配置しました */}
     <div class="header-spacer"></div>
 
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
@@ -304,7 +303,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; -webkit-overflow-scrolling: touch; }
   .category-scroll::-webkit-scrollbar { display: none; }
 
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+  /* ▼ 修正1＆2：高さズレ防止のため、box-sizingとline-heightを追加しました */
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; background: transparent; border: none; cursor: pointer; font-family: inherit; box-sizing: border-box; line-height: 1; white-space: nowrap; }
   .category-link.active { background: var(--theme-color); }
   
   .category-link-text, .more-link-text { position: relative; display: inline-block; }
@@ -314,7 +314,9 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .category-link:hover .category-link-text::after, .more-link:hover .more-link-text::after { width: 100%; }
   
   .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+  
+  /* ▼ 修正3：「さらに見る」ボタンも同様にズレ防止設定を追加しました */
+  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; background: transparent; border: none; font-family: inherit; box-sizing: border-box; line-height: 1; white-space: nowrap; }
   .more-btn.active { background: var(--theme-color); }
   .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
   .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
@@ -325,7 +327,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
   .scroll-arrow.active { display: flex; }
 
-  /* ▼ 修正：追加した白い空白（スペーサー）のデザインです。高さを15pxにしています */
   .header-spacer { height: 15px; background: #ffffff; width: 100%; }
 
   .bottom-line { height: 10px; }
@@ -393,6 +394,72 @@ const defaultWeatherData = cityDataForJs[0] || null;
   @media (max-width: 768px) { 
     .category-link { font-size: 14px; padding: 0 10px; height: 46px; }
   }
+</style>
+
+<style is:global>
+  .cat-country-panel {
+    display: none;
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    z-index: 99999;
+    width: 220px;
+    overflow: hidden;
+  }
+  .cat-country-panel.show { display: block; animation: fadeIn 0.2s ease; }
+  
+  .cat-country-header {
+    background-color: #f8f9fa;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--theme-color, #872732);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cat-country-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #333333;
+    margin: 0;
+  }
+  .cat-country-close {
+    background: none; border: none; font-size: 22px; line-height: 1; color: #aaaaaa; cursor: pointer; padding: 0;
+  }
+  .cat-country-close:hover { color: #333333; }
+
+  .cat-country-panel-inner {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 0;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .cat-country-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #444444;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px dashed #eeeeee;
+    transition: background 0.2s, padding-left 0.2s, color 0.2s;
+  }
+  .cat-country-link:last-child { border-bottom: none; }
+  .cat-country-link:hover {
+    background: #fdfdfd;
+    color: var(--theme-color, #872732);
+    padding-left: 20px;
+  }
+  .cat-country-icon {
+    font-size: 10px; color: #cccccc; margin-right: 10px; transition: color 0.2s;
+  }
+  .cat-country-link:hover .cat-country-icon {
+    color: var(--theme-color, #872732);
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script is:inline>
