@@ -21,26 +21,6 @@ const langNameMap: Record<string, string> = {
 };
 const topLangLabel = langNameMap[lang] || 'English';
 
-const SITE_ID = 'jp-ja'; 
-const SLOT = 'header_words';
-
-type HeaderWord = { label: string; url: string; displayOrder: number; };
-let headerWords: HeaderWord[] = [];
-
-if (SPACE_ID && DELIVERY_TOKEN) {
-  try {
-    const params = new URLSearchParams({ content_type: 'headerWord', 'fields.siteId': SITE_ID, 'fields.slot': SLOT, 'fields.enabled': 'true', order: 'fields.displayOrder', limit: '20' });
-    const res = await fetch(`https://cdn.contentful.com/spaces/${SPACE_ID}/environments/master/entries?${params.toString()}`, { headers: { Authorization: `Bearer ${DELIVERY_TOKEN}` } });
-    if (res.ok) {
-      const data = await res.json();
-      headerWords = (data.items ?? []).map((item: any) => ({ label: item?.fields?.label ?? '', url: item?.fields?.url ?? '#', displayOrder: Number(item?.fields?.displayOrder ?? 9999), enabled: item?.fields?.enabled ?? false, siteId: item?.fields?.siteId ?? '', slot: item?.fields?.slot ?? '' }))
-        .filter((item: any) => item.enabled === true && item.siteId === SITE_ID && item.slot === SLOT && item.label)
-        .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
-        .map((item: any) => ({ label: item.label, url: item.url, displayOrder: item.displayOrder }));
-    }
-  } catch (e) { headerWords = []; }
-}
-
 const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
@@ -69,9 +49,11 @@ const { isImperial, tempUnit } = getUnitSystem(lang);
 
 if (!globalThis.weatherCache) globalThis.weatherCache = {};
 const allCityWeather: Record<string, any> = {};
+
 for (const city of cities) {
   const cityKey = city.key;
   const now = Date.now();
+
   const CACHE = 30 * 60 * 1000;
   if (globalThis.weatherCache[cityKey] && (now - globalThis.weatherCache[cityKey].time < CACHE)) {
     allCityWeather[cityKey] = globalThis.weatherCache[cityKey].data;
@@ -102,6 +84,7 @@ const cityDataForJs = cities.map((city: any) => {
     conditionText: conditionCode ? getWeatherCondition(conditionCode, lang) : '',
   };
 });
+
 const defaultWeatherData = cityDataForJs[0] || null;
 ---
 
@@ -162,13 +145,9 @@ const defaultWeatherData = cityDataForJs[0] || null;
       </div>
     </nav>
 
-    <div class="header-word-bar">
-      <div class="header-word-inner">
-        {headerWords.map((item) => (
-          <a href={item.url} class="header-word-link">{item.label}</a>
-        ))}
-      </div>
-    </div>
+    {/* ▼ 修正：キーワード部分を削除し、半分の高さの白い空白を配置しました */}
+    <div class="header-spacer"></div>
+    
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
 </div>
@@ -309,10 +288,9 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
   .scroll-arrow.active { display: flex; }
 
-  .header-word-bar { background: #fff; }
-  .header-word-inner { max-width: 1280px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
-  .header-word-inner::-webkit-scrollbar { display: none; }
-  .header-word-link { font-size: 14px; color: #111; text-decoration: underline; white-space: nowrap; }
+  /* ▼ 修正：追加した白い空白（スペーサー）のデザインです。高さを15pxにしています */
+  .header-spacer { height: 15px; background: #ffffff; width: 100%; }
+
   .bottom-line { height: 10px; }
 
   .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative; }
@@ -348,7 +326,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
   @media (max-width: 768px) { .category-link { font-size: 14px; padding: 0 10px; height: 46px; } }
 </style>
 
-{/* ▼▼▼ 追加：ドロップダウンのデザインをJSで作った要素にも効かせるための「is:global」設定 ▼▼▼ */}
 <style is:global>
   .cat-country-panel {
     display: none;
@@ -383,8 +360,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .cat-country-close:hover { color: #333333; }
 
   .cat-country-panel-inner {
-    display: flex;                 /* ←追加：横並びを防ぐ */
-    flex-direction: column;        /* ←追加：確実に縦並びにする */
+    display: flex;
+    flex-direction: column;
     padding: 6px 0;
     max-height: 60vh;
     overflow-y: auto;
@@ -414,7 +391,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
   }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
-{/* ▲▲▲ 追加ここまで ▲▲▲ */}
 
 <script is:inline>
   window.addEventListener('load', function() {
@@ -482,14 +458,13 @@ const defaultWeatherData = cityDataForJs[0] || null;
     window.addEventListener('resize', updateArrows);
     updateArrows();
 
-    // ドロップダウンの動き
     var catCountryPanel = document.getElementById('cat-country-panel');
     var catCountryInner = document.getElementById('cat-country-panel-inner');
     var catCountryTitle = document.getElementById('cat-country-title');
     var catCountryClose = document.getElementById('cat-country-close');
     var countriesDataEl = document.getElementById('lang-top-countries-data');
     var currentPanelSlug = null;
-    
+
     if (catCountryPanel && countriesDataEl) {
       var availableCountries = JSON.parse(countriesDataEl.textContent);
       var currentLang = document.documentElement.lang || 'ja';
