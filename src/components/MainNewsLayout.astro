@@ -1,5 +1,5 @@
 ---
-// ▼ 【修正1】親ファイル（index.astro）から、厳格に絞り込まれた記事（posts）と、言語・国情報を受け取ります
+// ▼ 親ファイル（index.astro）から、厳格に絞り込まれた記事（posts）と、言語・国情報を受け取ります
 const { posts = [], lang = 'ja', country = 'jp' } = Astro.props;
 
 // --- 記事の自動配置ロジック（鳴川さんの設定をそのまま維持） ---
@@ -42,7 +42,7 @@ const getImageUrl = (content) => {
   return match ? match[1] : 'https://placehold.co/600x400/eeeeee/999999?text=No+Image';
 };
 
-// ▼ 【修正2】日付の表示も言語に合わせて自動で切り替わるようにしました
+// ▼ 日付の表示も言語に合わせて自動で切り替わるようにしました
 const formatPostTime = (dateString) => {
   if (!dateString) return '';
   try {
@@ -53,12 +53,11 @@ const formatPostTime = (dateString) => {
 };
 ---
 
-{/* 以下、元のHTML構造を完全に維持しています */}
 <div class="top-news-container">
   <div class="main-column">
     {displayPosts.length > 0 && (
       <article class="hero-post">
-        {/* ▼ 【修正3】 /ja/jp/ ではなく、どの国でも使えるように自動化しました */}
+        {/* ▼ /ja/jp/ ではなく、どの国でも使えるように自動化しました */}
         <a href={`/${lang}/${country}/news/${displayPosts[0].id}/`}>
           <div class="hero-image">
             <img src={getImageUrl(displayPosts[0].content)} alt={displayPosts[0].title} />
@@ -76,7 +75,6 @@ const formatPostTime = (dateString) => {
     <div class="sub-grid">
       {displayPosts.slice(1, 5).map((post) => (
         <article class="grid-item">
-          {/* ▼ 【修正3】 自動リンク化 */}
           <a href={`/${lang}/${country}/news/${post.id}/`}>
             <div class="grid-image">
               <img src={getImageUrl(post.content)} alt={post.title} />
@@ -113,7 +111,6 @@ const formatPostTime = (dateString) => {
 </div>
 
 <style>
-  /* 鳴川さんの元のCSSをそのまま100%継承しています */
   .top-news-container { display: grid; grid-template-columns: minmax(0, 1fr) 410px; gap: 24px; margin-bottom: 28px; align-items: start; }
   .main-column { min-width: 0; }
   .hero-post a { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.03fr); gap: 18px; text-decoration: none; color: #111111; margin-bottom: 24px; align-items: start; }
@@ -147,7 +144,7 @@ const formatPostTime = (dateString) => {
     .hero-post a { grid-template-columns: 1fr; }
     .sub-grid { grid-template-columns: 1fr; }
     
-    /* ▼ 修正：スマホ表示時に左側の画像が小さくなる設定を解除し、左右の画像を同じ108x72pxに統一します */
-    .grid-image, .list-image { width: 108px; height: 72px; }
+    /* ▼ 修正：スマホ表示時の画像を、さらに大きい「横120px・縦80px」に拡大して統一しました */
+    .grid-image, .list-image { width: 120px; height: 80px; }
   }
 </style>
