@@ -20,7 +20,7 @@ import Layout from '../layouts/Layout.astro';
     ja: { title: 'ページが見つかりません', sub: 'お探しのページは存在しないか、移動した可能性があります。', btn: 'トップページに戻る', prefix: '/ja/' },
     en: { title: 'Page Not Found', sub: 'The page you are looking for does not exist or has been moved.', btn: 'Back to Top', prefix: '/en/' },
     'zh-cn': { title: '页面未找到', sub: '您查找的页面不存在或已被移动。', btn: '返回首页', prefix: '/zh-cn/' },
-    'zh-tw': { title: '找不到頁面', sub: '您尋找的頁面不存在或已被移動。', btn: '返回首頁', prefix: '/zh-tw/' },
+    'zh-tw': { title: '找不到頁面', sub: '您尋找的頁面不存在或已被移动。', btn: '返回首頁', prefix: '/zh-tw/' },
     es: { title: 'Página no encontrada', sub: 'La página que busca no existe o ha sido movida.', btn: 'Volver al inicio', prefix: '/es/' },
     fr: { title: 'Page introuvable', sub: "La page que vous recherchez n'existe pas ou a été déplacée.", btn: "Retour à l'accueil", prefix: '/fr/' },
     de: { title: 'Seite nicht gefunden', sub: 'Die gesuchte Seite existiert nicht oder wurde verschoben.', btn: 'Zurück zur Startseite', prefix: '/de/' },
@@ -29,8 +29,7 @@ import Layout from '../layouts/Layout.astro';
 
   const supportedLangs = Object.keys(messages);
 
-  // 2. 言語の判定
-  // まず、現在のURL（アドレスバー）を見て判断します（例: /en/ で始まっていれば英語）
+  // 2. 言語の判定（URLの最初のアドレスから判定します）
   const pathParts = window.location.pathname.split('/').filter(Boolean);
   let detectedLang = '';
 
@@ -62,17 +61,12 @@ import Layout from '../layouts/Layout.astro';
   backBtn.textContent = msg.btn;
   backBtn.href = msg.prefix;
 
-  // 4. 【重要】ヘッダーやフッター、ナビゲーションにあるリンクも現在の言語に修正
-  // 日本語(/ja/)で始まっているリンクを、判定された言語のプレフィックスに置き換えます
-  if (lang !== 'ja') {
-    const allLinks = document.querySelectorAll('header a, footer a, nav a');
-    allLinks.forEach(link => {
-      const currentHref = link.getAttribute('href');
-      if (currentHref && currentHref.startsWith('/ja/')) {
-        link.href = currentHref.replace('/ja/', msg.prefix);
-      }
-    });
-  }
+  // 4. ヘッダーのロゴリンクを現在の言語のトップページに書き換える
+  const headerLinks = document.querySelectorAll('header a');
+  headerLinks.forEach(link => {
+    // ヘッダー内のリンク（ロゴなど）は、すべて安全のために現在の言語のトップへ向けておきます
+    link.href = msg.prefix;
+  });
 </script>
 
 <style>
@@ -146,11 +140,23 @@ import Layout from '../layouts/Layout.astro';
 </style>
 
 <style is:global>
-  /* 404ページのみ、サイドバーを消してメインエリアを全画面に広げる設定 */
+  /* サイドバー用の隙間をなくし、メインエリアを100%（1fr）に広げます */
   .main-layout {
     grid-template-columns: 1fr !important;
   }
+  
+  /* サイドバー自体を完全に非表示にします */
   .sidebar-area {
+    display: none !important;
+  }
+
+  /* フッターを完全に非表示にします */
+  footer, .site-footer {
+    display: none !important;
+  }
+
+  /* ヘッダーのカテゴリメニューやナビゲーションを非表示にします（ロゴだけ残します） */
+  header nav, .header-nav, .category-menu, .menu-trigger {
     display: none !important;
   }
 </style>
