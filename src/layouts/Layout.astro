@@ -4,7 +4,7 @@ import { langCountryPairs } from '../lib/siteRoutes.ts';
 import '../styles/global.css';
 
 import Header from '../components/Header.astro';
-// ▼ 【追加】infoページ用に、言語トップと同じヘッダーを読み込んでおきます
+// infoページ用に、言語トップと同じヘッダーを読み込んでおきます
 import LanguageTopHeader from '../components/LanguageTopHeader.astro';
 
 import Footer from '../components/Footer.astro';
@@ -13,6 +13,9 @@ import CategorySidebar from '../components/CategorySidebar.astro';
 import ArticleSidebar from '../components/ArticleSidebar.astro';
 import WeatherSidebar from '../components/WeatherSidebar.astro';
 import CookieBanner from '../components/CookieBanner.astro';
+
+// ▼ 【追加1】先ほど作成したSNSウィジェットを読み込みます
+import SnsWidget from '../components/SnsWidget.astro';
 
 const {
   title,
@@ -32,7 +35,7 @@ const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 const country = pathParts[1] || '';
 
-// ▼ 【追加】現在開いているページが「info」ページかどうかを判定します
+// 現在開いているページが「言語＋info」ページかどうかを判定します（/ja/jp/info の場合は false になります）
 const isInfoPage = pathParts[1] === 'info';
 
 const canonicalUrl = `${SITE_URL}${currentPath}`;
@@ -43,7 +46,6 @@ const localeKeyMap = {
   ja: 'jp', en: 'en', 'zh-cn': 'zh-cn',
   'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru'
 };
-
 const localeKey = (localeKeyMap[lang as keyof typeof localeKeyMap] || 'jp') as keyof typeof categoryLabelMap;
 const themeColor = categoryLabelMap[localeKey]?.themeColor || '#872732';
 
@@ -58,7 +60,6 @@ const ogLocaleMap: Record<string, string> = {
   de: 'de_DE',
   ru: 'ru_RU',
 };
-
 const ogLocale = ogLocaleMap[lang] || 'ja_JP';
 
 const defaultDescriptions: Record<string, string> = {
@@ -74,7 +75,6 @@ const defaultDescriptions: Record<string, string> = {
 
 const metaDescription = description || defaultDescriptions[lang] || defaultDescriptions['en'];
 const metaTitle = title ? `${title} | 24Watchin` : '24Watchin';
-
 const bodyStyle = '--theme-color: ' + themeColor + ';';
 
 // hreflang タグ生成
@@ -197,7 +197,7 @@ const organizationJsonLd = {
     <slot name="head" />
 
     <style>
-      /* ▼▼▼ 追加：画面全体をぴったりくっつけて角を四角にする強力なリセット ▼▼▼ */
+      /* 画面全体をぴったりくっつけて角を四角にする強力なリセット */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
@@ -205,7 +205,6 @@ const organizationJsonLd = {
         width: 100%;
         overflow-x: hidden;
       }
-      /* ▲▲▲ 追加ここまで ▲▲▲ */
 
       body { font-family: sans-serif; background-color: #f8f9fa; color: #333; }
       .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
@@ -215,11 +214,26 @@ const organizationJsonLd = {
       .bottom-wide { margin-top: 20px; width: 100%; }
       @media (max-width: 900px) { .main-layout { grid-template-columns: minmax(0, 1fr); } .sidebar-area { display: none; } }
       @media (max-width: 640px) { .container { padding: 0 14px; } }
+      
+      /* ▼ 【追加3】広告を入れるための空き箱（スペース）のデザインです */
+      .sidebar-ad-space {
+        width: 100%;
+        min-height: 250px;
+        background-color: #f0f0f0;
+        border: 1px dashed #ccc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 12px;
+        margin-bottom: 24px;
+      }
     </style>
   </head>
   <body style={bodyStyle}>
     
-    {/* ▼ 【変更】infoページならLanguageTopHeader、それ以外は通常のHeaderを表示します */}
+    {/* infoページならLanguageTopHeader、それ以外は通常のHeaderを表示します */}
     {isInfoPage ? <LanguageTopHeader /> : <Header />}
 
     <div class="container page-shell">
@@ -229,7 +243,17 @@ const organizationJsonLd = {
           <slot />
         </main>
         <aside class="sidebar-area">
-          {sidebarType === 'category' ? <CategorySidebar />
+          {/* ▼ 【修正2】言語のinfoページの時だけ、SNSと広告を表示します */}
+          {isInfoPage ? (
+            <div class="info-sidebar-content">
+              {/* 作成したSNSウィジェットをここに置きます */}
+              <SnsWidget lang={lang} />
+              {/* 広告用の空きスペースです */}
+              <div class="sidebar-ad-space">
+                <span class="ad-label">Advertisement</span>
+              </div>
+            </div>
+          ) : sidebarType === 'category' ? <CategorySidebar />
             : sidebarType === 'article' ? <ArticleSidebar />
             : sidebarType === 'weather' ? <WeatherSidebar />
             : <Sidebar />}
