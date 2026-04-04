@@ -15,12 +15,6 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pathParts = currentPath.split('/').filter(Boolean);
 const lang = pathParts[0] || 'ja';
 
-const langNameMap: Record<string, string> = {
-  ja: '日本語', en: 'English', 'zh-cn': '简体中文', 'zh-tw': '繁體中文',
-  es: 'Español', fr: 'Français', de: 'Deutsch', ru: 'Русский'
-};
-const topLangLabel = langNameMap[lang] || 'English';
-
 const localeKeyMap: Record<string, string> = { ja: 'jp', en: 'en', 'zh-cn': 'zh-cn', 'zh-tw': 'zh-tw', es: 'es', de: 'de', fr: 'fr', ru: 'ru' };
 const localeKey = (localeKeyMap[lang] || 'jp') as SiteLanguageKey;
 const labels = categoryLabelMap[localeKey] || categoryLabelMap.jp;
@@ -43,7 +37,12 @@ const moreSlugs = moreSlugsMap[localeKey] || [];
 const mainItems = categoryItems.filter(item => !moreSlugs.includes(item.slug));
 const moreItems = categoryItems.filter(item => moreSlugs.includes(item.slug));
 
+// ▼ 修正：言語ごとのメインとなる国（デフォルト国）を特定します
 const defaultCountryForWeather = availableCountries.length > 0 ? availableCountries[0].code : 'jp';
+
+// ▼ 修正：特定したメインの国の「国名（JAPANなど）」をHeader.astroと同じ仕組みで取得します
+const countryLabel = getCountryLabel(defaultCountryForWeather, lang);
+
 const cities = countryCityMap[defaultCountryForWeather] || countryCityMap['jp'];
 const { isImperial, tempUnit } = getUnitSystem(lang);
 
@@ -91,7 +90,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
 <div class="header-pc-wrapper">
   <div class="pc-top-gray-bar">
     <div class="pc-top-gray-inner">
-      <span class="pc-top-country">{topLangLabel}</span>
+      {/* ▼ 修正：取得した国名（countryLabel）を表示するように変更しました */}
+      <span class="pc-top-country">{countryLabel}</span>
     </div>
   </div>
 
@@ -145,7 +145,6 @@ const defaultWeatherData = cityDataForJs[0] || null;
       </div>
     </nav>
 
-    {/* ▼ 修正：キーワード部分を削除し、半分の高さの白い空白を配置しました */}
     <div class="header-spacer"></div>
     
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
@@ -155,7 +154,8 @@ const defaultWeatherData = cityDataForJs[0] || null;
 
 <div class="header-sp-wrapper">
   <div class="sp-top-gray-bar">
-    <div class="sp-top-country">{topLangLabel}</div>
+    {/* ▼ 修正：スマホ版も同様に取得した国名（countryLabel）を表示します */}
+    <div class="sp-top-country">{countryLabel}</div>
     
     <div class="sp-top-actions">
       <form action={searchAction} method="get" class="search-form-animated sp-search-form" id="sp-search-form">
@@ -219,7 +219,7 @@ const defaultWeatherData = cityDataForJs[0] || null;
       </div>
     </nav>
 
-    <div style="height: 10px; background-color: #ffffff; width: 100%;"></div>
+    <div class="header-spacer"></div>
 
     <div class="bottom-line" style={`background: ${labels.themeColor || '#872732'}`}></div>
   </header>
@@ -240,45 +240,86 @@ const defaultWeatherData = cityDataForJs[0] || null;
 <script type="application/json" id="lang-top-countries-data" set:html={JSON.stringify(availableCountries)}></script>
 
 <style>
-  /* === 元のヘッダースタイル === */
+  /* === PC版とスマホ版の表示切り替えスイッチ === */
   .header-pc-wrapper { display: block; margin: 0; padding: 0; border-radius: 0; }
   .header-sp-wrapper { display: none; margin: 0; padding: 0; border-radius: 0; }
-  @media (max-width: 768px) { .header-pc-wrapper { display: none; } .header-sp-wrapper { display: block; } }
+
+  @media (max-width: 768px) { 
+    .header-pc-wrapper { display: none; } 
+    .header-sp-wrapper { display: block; }
+  }
+
+  /* ================================================= */
+  /* ▼▼▼ PC版・共通のスタイル ▼▼▼ */
+  /* ================================================= */
 
   .pc-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 34px; display: flex; align-items: center; border-radius: 0 !important; }
   .pc-top-gray-inner { max-width: 1280px; margin: 0 auto; width: 100%; padding: 0 14px; }
   .pc-top-country { font-size: 16px; font-weight: bold; color: #000; }
+  
   .pc-header-top { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 14px 15px; }
   .pc-right-area { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
 
-  .search-form-animated { display: flex; align-items: center; justify-content: flex-end; }
-  .search-input-animated { width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent; transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0; height: 34px; box-sizing: border-box; }
-  .search-input-animated.active { width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1; margin-right: 6px; }
-  .search-icon-btn { width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0; box-sizing: border-box; }
+  .search-form-animated { 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end;
+  }
+  .search-input-animated {
+    width: 0; padding: 0; border: 1px solid transparent; outline: none; background: transparent;
+    transition: all 0.4s ease; font-size: 15px; border-radius: 8px; opacity: 0;
+    height: 34px; 
+    box-sizing: border-box;
+  }
+  .search-input-animated.active {
+    width: 200px; padding: 0 10px; border: 1px solid #c7c1ba; background: #d8d3cc; opacity: 1;
+    margin-right: 6px; 
+  }
+  .search-icon-btn {
+    width: 34px; height: 34px; border: 1px solid #d8d8d8; border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0;
+    box-sizing: border-box;
+  }
 
-  .region-lang-open-btn { background: none; border: none; color: #000; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0; }
+  .region-lang-open-btn {
+    background: none; border: none; color: #000; font-size: 15px; font-weight: bold;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px; padding: 0;
+  }
   .hamburger-icon { font-size: 22px; font-weight: bold; }
 
   .site-header { width: 100%; background: #ffffff; border-radius: 0 !important; }
   .header-top { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; }
   .brand-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
   .logo-image { width: 200px; height: auto; }
-  .right-area { display: flex; flex-direction: column; align-items: flex-end; }
+  
+  .right-area { 
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-end; 
+  }
   .search-icon { width: 16px; height: 16px; stroke: #393737; stroke-width: 2.2; fill: none; }
   
   .category-bar { background: #393737; width: 100%; }
   .category-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 4px; }
+  
   .pc-category-group { display: flex; align-items: center; flex: 1; min-width: 0; }
   .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; min-width: 0; flex: 1; -webkit-overflow-scrolling: touch; }
   .category-scroll::-webkit-scrollbar { display: none; }
 
-  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; background: transparent; border: none; cursor: pointer; font-family: inherit; box-sizing: border-box; }
+  .category-link { height: 54px; display: inline-flex; align-items: center; padding: 0 16px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; flex-shrink: 0; background: transparent; border: none; cursor: pointer; font-family: inherit; box-sizing: border-box; line-height: 1; white-space: nowrap; }
+  .category-link.active { background: var(--theme-color); }
+  
   .category-link-text, .more-link-text { position: relative; display: inline-block; }
-  .category-link-text::after, .more-link-text::after { content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease; }
+  .category-link-text::after, .more-link-text::after {
+    content: ''; position: absolute; left: 0; bottom: -6px; width: 0; height: 3px; background-color: #ffffff; transition: width 0.3s ease;
+  }
   .category-link:hover .category-link-text::after, .more-link:hover .more-link-text::after { width: 100%; }
   
   .more-wrapper { position: relative; flex-shrink: 0; }
-  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .more-btn { height: 54px; display: flex; align-items: center; gap: 5px; padding: 0 16px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; background: transparent; border: none; font-family: inherit; box-sizing: border-box; line-height: 1; white-space: nowrap; }
+  .more-btn.active { background: var(--theme-color); }
   .more-chevron { width: 13px; height: 13px; stroke: #fff; stroke-width: 2.5; fill: none; transition: transform 0.2s; }
   .more-dropdown { display: none; position: absolute; top: 54px; right: 0; background: #393737; min-width: 220px; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .more-wrapper:hover .more-dropdown { display: block; }
@@ -288,42 +329,73 @@ const defaultWeatherData = cityDataForJs[0] || null;
   .scroll-arrow { display: none; background: rgba(255,255,255,0.18); border: none; color: #ffffff; font-size: 22px; width: 28px; height: 54px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center; z-index: 10; }
   .scroll-arrow.active { display: flex; }
 
-  /* ▼ 修正：追加した白い空白（スペーサー）のデザインです。高さを15pxにしています */
   .header-spacer { height: 15px; background: #ffffff; width: 100%; }
 
   .bottom-line { height: 10px; }
 
-  .sp-top-gray-bar { background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative; }
+
+  /* ================================================= */
+  /* ▼▼▼ スマホ版専用のスタイル ▼▼▼ */
+  /* ================================================= */
+  
+  .sp-top-gray-bar { 
+    background-color: #e6e6e6; width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; position: relative;
+  }
   .sp-top-country { font-size: 15px; font-weight: bold; color: #000; }
   .sp-top-actions { display: flex; align-items: center; gap: 10px; } 
+  
   .sp-reload-btn { background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
   .reload-icon { width: 14px; height: 14px; color: #333; }
+  
   .sp-region-lang-btn { font-size: 13px; font-weight: bold; padding: 0; }
   .sp-region-lang-btn .hamburger-icon { font-size: 18px; }
 
   .sp-search-form { position: relative; display: flex; align-items: center; }
-  .sp-search-input { position: absolute; right: 34px; top: 50%; transform: translateY(-50%); width: 0; height: 30px !important; padding: 0 !important; background: #fff; border: 1px solid transparent; border-radius: 8px; opacity: 0; transition: all 0.3s ease; box-sizing: border-box; z-index: 10; }
-  .sp-search-input.active { width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1; }
-  .sp-search-btn { width: 28px !important; height: 28px !important; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; background: #fff; border: 1px solid #ccc; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 11; }
+  .sp-search-input { 
+    position: absolute; right: 34px; top: 50%; transform: translateY(-50%); width: 0; height: 30px !important; padding: 0 !important; background: #fff; border: 1px solid transparent; border-radius: 8px; opacity: 0; transition: all 0.3s ease; box-sizing: border-box; z-index: 10;
+  }
+  .sp-search-input.active { 
+    width: calc(100vw - 195px) !important; padding: 0 10px !important; border: 1px solid #ccc; opacity: 1;
+  }
+  .sp-search-btn { 
+    width: 28px !important; height: 28px !important; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; background: #fff; border: 1px solid #ccc; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 11;
+  }
   .sp-search-btn .search-icon { width: 14px; height: 14px; }
 
-  .sp-header-top { padding: 6px 14px; align-items: center; overflow: hidden; }
+
+  .sp-header-top { 
+    padding: 6px 14px; align-items: center; overflow: hidden; 
+  }
+  
   .sp-logo-image { width: 150px; }
-  .sp-right-area { gap: 8px; position: relative; flex: 1; min-width: 0; align-items: flex-end !important; }
-  .sp-weather-widget { display: flex; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; margin-top: 0; overflow: hidden; max-width: 140px; }
+  
+  .sp-right-area { 
+    gap: 8px; position: relative; flex: 1; min-width: 0; align-items: flex-end !important; 
+  }
+  
+  .sp-weather-widget { 
+    display: flex; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; margin-top: 0; overflow: hidden; max-width: 140px; 
+  }
   .sp-weather-icon { display: flex; align-items: center; justify-content: center; width: 28px; flex-shrink: 0; }
   .sp-weather-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; min-width: 0; }
-  .no-wrap-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right; }
+  
+  .no-wrap-text { 
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right;
+  }
   .sp-weather-loc { font-size: 10px; color: #0044cc; font-weight: bold; }
   .sp-weather-temp { font-size: 11px; color: #d9534f; font-weight: bold; white-space: nowrap; }
 
   .sp-category-bar { width: 100%; overflow: hidden; position: relative; }
-  .sp-category-bar::after { content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%; background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%); pointer-events: none; }
+  .sp-category-bar::after {
+    content: ''; position: absolute; top: 0; right: 0; width: 35px; height: 100%; background: linear-gradient(to right, rgba(57,55,55,0) 0%, rgba(57,55,55,1) 100%); pointer-events: none;
+  }
   .sp-scroll { padding-left: 6px; scrollbar-width: none; }
   .sp-scroll::-webkit-scrollbar { display: none; }
   .sp-scroll-padding { width: 45px; flex-shrink: 0; }
 
-  @media (max-width: 768px) { .category-link { font-size: 14px; padding: 0 10px; height: 46px; } }
+  @media (max-width: 768px) { 
+    .category-link { font-size: 14px; padding: 0 10px; height: 46px; }
+  }
 </style>
 
 <style is:global>
