@@ -83,7 +83,7 @@ const globalRegions = globalRegionsRaw.map(region => {
   };
 }).filter(region => region.countries.length > 0);
 
-// ▼ 修正：フランス語などの記号(')がエラーにならないように整理・修正しました
+// フランス語などの記号(')がエラーにならないように整理・修正済み
 const infoMenus: Record<string, { label: string; href: string }[]> = {
   ja: [ { label: 'About 24Watchin', href: `${infoBasePath}/about/` }, { label: 'プライバシーポリシー', href: `${infoBasePath}/privacy/` }, { label: '利用規約', href: `${infoBasePath}/terms/` }, { label: 'お問い合わせ', href: `${infoBasePath}/contact/` }, { label: '訂正・修正ポリシー', href: `${infoBasePath}/corrections/` }, { label: '著作権・転載・引用について', href: `${infoBasePath}/copyright/` }, ],
   en: [ { label: 'About 24Watchin', href: `${infoBasePath}/about/` }, { label: 'Privacy Policy', href: `${infoBasePath}/privacy/` }, { label: 'Terms of Use', href: `${infoBasePath}/terms/` }, { label: 'Contact', href: `${infoBasePath}/contact/` }, { label: 'Corrections Policy', href: `${infoBasePath}/corrections/` }, { label: 'Copyright / Reuse', href: `${infoBasePath}/copyright/` }, ],
@@ -123,8 +123,9 @@ const footerText = footerTextMap[lang] || footerTextMap['en'];
             </svg>
           </a>
           <a href={`https://www.facebook.com/24watchin.${snsSuffix}/`} target="_blank" rel="noopener noreferrer" class="sns-icon" aria-label="Facebook">
+            {/* ▼ 修正：Facebookのアイコンを「f」のみのデザインに変更しました */}
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z"/>
+              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
             </svg>
           </a>
         </div>
