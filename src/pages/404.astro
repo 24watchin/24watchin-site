@@ -20,7 +20,7 @@ import Layout from '../layouts/Layout.astro';
     ja: { title: 'ページが見つかりません', sub: 'お探しのページは存在しないか、移動した可能性があります。', btn: 'トップページに戻る', prefix: '/ja/' },
     en: { title: 'Page Not Found', sub: 'The page you are looking for does not exist or has been moved.', btn: 'Back to Top', prefix: '/en/' },
     'zh-cn': { title: '页面未找到', sub: '您查找的页面不存在或已被移动。', btn: '返回首页', prefix: '/zh-cn/' },
-    'zh-tw': { title: '找不到頁面', sub: '您尋找的頁面不存在或已被移动。', btn: '返回首頁', prefix: '/zh-tw/' },
+    'zh-tw': { title: '找不到頁面', sub: '您尋找的页面不存在或已被移动。', btn: '返回首頁', prefix: '/zh-tw/' },
     es: { title: 'Página no encontrada', sub: 'La página que busca no existe o ha sido movida.', btn: 'Volver al inicio', prefix: '/es/' },
     fr: { title: 'Page introuvable', sub: "La page que vous recherchez n'existe pas ou a été déplacée.", btn: "Retour à l'accueil", prefix: '/fr/' },
     de: { title: 'Seite nicht gefunden', sub: 'Die gesuchte Seite existiert nicht oder wurde verschoben.', btn: 'Zurück zur Startseite', prefix: '/de/' },
@@ -146,19 +146,24 @@ import Layout from '../layouts/Layout.astro';
   /* 2. サイドバーとフッターを完全に非表示にします */
   .sidebar-area, footer, .site-footer { display: none !important; }
 
-  /* 3. ヘッダーの中の「ロゴ以外」の不要なものを一掃します */
-  /* ボタン類（検索ボタンやハンバーガーメニューなど） */
-  header button, header form, .search-btn, .menu-trigger { display: none !important; }
+  /* 3. ヘッダーの不要なパーツを正確な名前で狙い撃ちして非表示にします */
   
-  /* ナビゲーションメニュー */
-  header nav, .header-nav, .category-menu { display: none !important; }
+  /* 一番上のグレーのバー（JAPANなど） */
+  .pc-top-gray-bar, .sp-top-gray-bar { display: none !important; }
   
-  /* 上部のグレーのバー（JAPANなど）と思われるクラス名 */
-  .header-top, .top-bar, .country-bar, .site-top-bar { display: none !important; }
+  /* 検索ボックス、地域/言語ボタン、天気などの右側エリア */
+  .pc-right-area, .sp-right-area, .sp-top-actions { display: none !important; }
   
-  /* 右側のエリア（地域/言語など）と思われるクラス名 */
-  .header-right, .header-controls, .right-section { display: none !important; }
+  /* カテゴリメニュー（黒い帯の部分） */
+  .category-bar, .sp-category-bar { display: none !important; }
   
-  /* 下部のキーワードリンク（イラン情勢、関税など）と思われるクラス名 */
-  .trending-keywords, .hot-topics, .keyword-list, .header-bottom, .topic-links { display: none !important; }
+  /* トレンドキーワード（イラン情勢、関税など） */
+  .header-word-bar { display: none !important; }
+  
+  /* ヘッダー下部の装飾ラインや余白 */
+  .bottom-line { display: none !important; }
+  .site-header > div[style*="height: 10px"] { display: none !important; }
+
+  /* 地域/言語切り替え用のパネルが裏に隠れていたらそれも消す */
+  #rl-panel, #rl-overlay { display: none !important; }
 </style>
