@@ -140,23 +140,25 @@ import Layout from '../layouts/Layout.astro';
 </style>
 
 <style is:global>
-  /* サイドバー用の隙間をなくし、メインエリアを100%（1fr）に広げます */
-  .main-layout {
-    grid-template-columns: 1fr !important;
-  }
+  /* 1. サイドバー用の隙間をなくし、メインエリアを全画面に広げます */
+  .main-layout { grid-template-columns: 1fr !important; }
   
-  /* サイドバー自体を完全に非表示にします */
-  .sidebar-area {
-    display: none !important;
-  }
+  /* 2. サイドバーとフッターを完全に非表示にします */
+  .sidebar-area, footer, .site-footer { display: none !important; }
 
-  /* フッターを完全に非表示にします */
-  footer, .site-footer {
-    display: none !important;
-  }
-
-  /* ヘッダーのカテゴリメニューやナビゲーションを非表示にします（ロゴだけ残します） */
-  header nav, .header-nav, .category-menu, .menu-trigger {
-    display: none !important;
-  }
+  /* 3. ヘッダーの中の「ロゴ以外」の不要なものを一掃します */
+  /* ボタン類（検索ボタンやハンバーガーメニューなど） */
+  header button, header form, .search-btn, .menu-trigger { display: none !important; }
+  
+  /* ナビゲーションメニュー */
+  header nav, .header-nav, .category-menu { display: none !important; }
+  
+  /* 上部のグレーのバー（JAPANなど）と思われるクラス名 */
+  .header-top, .top-bar, .country-bar, .site-top-bar { display: none !important; }
+  
+  /* 右側のエリア（地域/言語など）と思われるクラス名 */
+  .header-right, .header-controls, .right-section { display: none !important; }
+  
+  /* 下部のキーワードリンク（イラン情勢、関税など）と思われるクラス名 */
+  .trending-keywords, .hot-topics, .keyword-list, .header-bottom, .topic-links { display: none !important; }
 </style>
