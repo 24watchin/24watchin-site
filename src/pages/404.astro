@@ -121,3 +121,15 @@ import Layout from '../layouts/Layout.astro';
     .error-title { font-size: 20px; }
   }
 </style>
+
+<style is:global>
+  /* サイドバー用の隙間をなくし、メインエリアを100%（1fr）に広げます */
+  .main-layout {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* サイドバー自体を完全に非表示にします */
+  .sidebar-area {
+    display: none !important;
+  }
+</style>
