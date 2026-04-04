@@ -23,15 +23,19 @@ const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId(lang);
 const WEATHER_API_KEY = import.meta.env.WEATHER_API_KEY;
 
-let allPosts = globalThis.bloggerPostsCache || [];
-if (allPosts.length === 0 && API_KEY && BLOG_ID) {
-  const url = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts?key=' + API_KEY + '&maxResults=100';
-  const response = await fetch(url).catch(() => null);
-  if (response && response.ok) {
-    const data = await response.json();
-    allPosts = data.items || [];
-    globalThis.bloggerPostsCache = allPosts;
+// ▼ 【修正】関連記事が消える原因だった「他言語とのデータ混ざり」を防ぐ設定です！
+const cacheKey = 'bloggerPostsCache_' + lang;
+let allPosts = [];
+
+if (API_KEY && BLOG_ID) {
+  if (!globalThis[cacheKey]) {
+    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=100`;
+    globalThis[cacheKey] = fetch(url)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => data && data.items ? data.items : [])
+      .catch(() => []);
   }
+  allPosts = await globalThis[cacheKey];
 }
 
 const targetTag = lang + '-' + country;
@@ -40,6 +44,7 @@ const relatedNews = allPosts.filter((post: any) =>
   post.labels.includes(targetTag) &&
   post.labels.some((label: string) => ['天気', '気象', '災害', 'weather', 'Weather'].includes(label))
 ).slice(0, 3);
+
 const cities = countryCityMap[country] || countryCityMap['jp'];
 
 const tzMap: Record<string, string> = {
@@ -58,6 +63,7 @@ const tzMap: Record<string, string> = {
   pt: 'Europe/Lisbon',       gr: 'Europe/Athens',       it: 'Europe/Rome',
   bd: 'Asia/Dhaka',          np: 'Asia/Kathmandu',
 };
+
 const allForecastData: Record<string, any> = {};
 for (const city of cities) {
   if (!WEATHER_API_KEY) break;
@@ -148,7 +154,7 @@ const countryLabelMap: Record<string, Record<string, string>> = {
   qa: { ja: 'カタール',   en: 'Qatar',       'zh-cn': 'カタール',   'zh-tw': '卡達',     es: 'Catar',      fr: 'Qatar',      de: 'Katar',      ru: 'カタール'     },
   om: { ja: 'オマーン',   en: 'Oman',        'zh-cn': 'オマーン',   'zh-tw': '阿曼',     es: 'Omán',       fr: 'Oman',       de: 'Oman',       ru: 'オマーン'     },
   sa: { ja: 'サウジアラビア', en: 'Saudi Arabia', 'zh-cn': 'サウジアラビア', 'zh-tw': '沙烏地阿拉伯', es: 'Arabia Saudita', fr: 'Arabie Saoudite', de: 'Saudi-Arabien', ru: 'サウジアラビア' },
-  tr: { ja: 'トルコ',     en: 'Turkey',      'zh-cn': 'トルコ',     'zh-tw': '土耳其',   es: 'Turquía',    fr: 'Turquie',    de: 'Türkei',     ru: 'トルコ'       },
+  tr: { ja: 'トルコ',     en: 'Turkey',      'zh-cn': 'トルコ',     'zh-tw': '土耳其',   es: 'Turquía',   fr: 'Turquie',    de: 'Türkei',     ru: 'トルコ'       },
   ar: { ja: 'アルゼンチン', en: 'Argentina',   'zh-cn': 'アルゼンチン', 'zh-tw': '阿根廷',   es: 'Argentina',  fr: 'Argentine',  de: 'Argentinien', ru: 'アルゼンチン'   },
   co: { ja: 'コロンビア', en: 'Colombia',    'zh-cn': 'コロンビア', 'zh-tw': '哥倫比亞', es: 'Colombia',   fr: 'Colombie',   de: 'Kolumbien',  ru: 'コロンビア'   },
 };
@@ -231,7 +237,6 @@ window.addEventListener('DOMContentLoaded', function() {
   var alertContentPC  = document.getElementById('alert-ticker-content-pc');
   var alertCityNameSP = document.getElementById('alert-city-name-sp');
   var alertContentSP  = document.getElementById('alert-ticker-content-sp');
-  
   var forecastTitle     = document.getElementById('forecast-title');
   var forecastContainer = document.getElementById('forecast-container');
 
@@ -315,7 +320,7 @@ window.addEventListener('DOMContentLoaded', function() {
       html += '</div>';
       html += '<div class="temp-info">';
       html += '<span class="value-text temp-max">' + day.maxtemp + tempUnit + '</span>';
-      html += '<span class="temp-sep">/</span>'; 
+      html += '<span class="temp-sep">/</span>';
       html += '<span class="value-text temp-min">' + day.mintemp + tempUnit + '</span>';
       html += '</div>';
       html += '<div class="rain-info"><span class="rain-label">' + (labels.rain||'Rain') + ': </span><span class="value-text rain-val">' + day.rainChance + '%</span></div>';
@@ -475,10 +480,11 @@ window.addEventListener('DOMContentLoaded', function() {
   .weather-page .day-group { border-bottom: 1px solid #e5e7eb; }
   
   .weather-page .day-summary-btn.pc-view { 
-    width: 100%; 
+    width: 100%;
     /* 右端のボタン領域を広げて改行を防止 */
     display: grid; grid-template-columns: 0.8fr 1.8fr 1.5fr 0.6fr 1.2fr; align-items: center; 
-    padding: 12px 16px; background: none; border: none; cursor: pointer; transition: background 0.2s;
+    padding: 12px 16px;
+    background: none; border: none; cursor: pointer; transition: background 0.2s;
   }
   .weather-page .day-summary-btn.pc-view:hover { background: #f8f9fa; }
   
@@ -498,10 +504,10 @@ window.addEventListener('DOMContentLoaded', function() {
   
   /* ボタン内文字が絶対に改行されない設定 */
   .weather-page .hourly-badge { 
-    background-color: var(--theme-color, #872732); color: white; 
+    background-color: var(--theme-color, #872732); color: white;
     padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; 
     display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-    white-space: nowrap; 
+    white-space: nowrap;
   }
   
   .weather-page .hourly-scroll-wrapper { width: 100%; overflow-x: auto; scrollbar-width: thin; box-sizing: border-box; }
@@ -528,22 +534,26 @@ window.addEventListener('DOMContentLoaded', function() {
     .sp-view { display: block !important; }
 
     .weather-page { 
-      padding: 12px 10px; box-sizing: border-box; width: 100%; overflow-x: hidden; 
+      padding: 12px 10px;
+      box-sizing: border-box; width: 100%; overflow-x: hidden; 
     }
     .weather-page * { box-sizing: border-box; }
     
     .alert-ticker-container.sp-view { 
-      display: flex !important; flex-direction: column; align-items: stretch; background: #f0f7ff; 
-      border: 1.5px solid #1fa7db; border-radius: 8px; padding: 10px 12px; margin-bottom: 24px; gap: 8px; 
+      display: flex !important;
+      flex-direction: column; align-items: stretch; background: #f0f7ff; 
+      border: 1.5px solid #1fa7db; border-radius: 8px; padding: 10px 12px; margin-bottom: 24px; gap: 8px;
     }
     .sp-view .alert-ticker-label { font-size: 1rem; color: #0068b7; }
     .sp-view .alert-ticker-window { background-color: #ffffff; border: 1px solid #1fa7db; border-radius: 4px; height: 38px; width: 100%; }
     .sp-view .alert-ticker-text { color: #c53030; } 
 
     .weather-page .day-summary-btn.sp-view { 
-      width: 100%; display: grid !important; grid-template-columns: auto 1fr auto; 
+      width: 100%; display: grid !important;
+      grid-template-columns: auto 1fr auto; 
       grid-template-areas: "date icon temp" "date icon rain" "badge badge badge";
-      padding: 16px 10px; gap: 8px 10px; background: none; border: none; cursor: pointer;
+      padding: 16px 10px; gap: 8px 10px;
+      background: none; border: none; cursor: pointer;
     }
     
     .sp-view .date-info { grid-area: date; text-align: left; width: 100%; }
@@ -563,7 +573,7 @@ window.addEventListener('DOMContentLoaded', function() {
     .sp-view .badge-wrapper { grid-area: badge; width: 100%; margin-top: 10px; }
     .sp-view .hourly-badge.sp-btn { 
       width: 100%; display: flex; justify-content: center; padding: 10px; font-size: 1rem; border-radius: 8px; 
-      background-color: #ffffff; color: var(--theme-color, #872732); border: 1.5px solid var(--theme-color, #872732); 
+      background-color: #ffffff; color: var(--theme-color, #872732); border: 1.5px solid var(--theme-color, #872732);
     }
     
     .weather-page .hourly-details.sp-view .hourly-scroll-wrapper { padding: 16px 10px; }
