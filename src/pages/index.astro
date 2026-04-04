@@ -7,22 +7,14 @@ import { getBlogId } from '../lib/siteRoutes.ts';
 const API_KEY = import.meta.env.API_KEY;
 const BLOG_ID = getBlogId('en');
 
-// [lang]/index.astro と完全に同じ仕組みで取得します
-if (!globalThis.bloggerApiCache) {
-  globalThis.bloggerApiCache = {};
-}
-
 let topStories = [];
-if (API_KEY && BLOG_ID) {
-  if (!globalThis.bloggerApiCache[BLOG_ID]) {
-    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=50`;
-    globalThis.bloggerApiCache[BLOG_ID] = fetch(url)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => data && data.items ? data.items : [])
-      .catch(() => []);
+try {
+  const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=20`);
+  if (res.ok) {
+    const data = await res.json();
+    topStories = data?.items ?? [];
   }
-  topStories = await globalThis.bloggerApiCache[BLOG_ID];
-}
+} catch (e) {}
 ---
 
 <html lang="en">
